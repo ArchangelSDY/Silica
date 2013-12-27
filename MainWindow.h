@@ -25,6 +25,8 @@ protected:
     virtual void keyPressEvent(QKeyEvent *);
 
 private:
+    void fitInWindowIfNecessary();
+
     Ui::MainWindow *ui;
 
     Navigator m_navigator;

@@ -24,15 +24,23 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::fitInWindowIfNecessary()
+{
+    if (m_fitInWindow) {
+        ui->graphicsView->fitInView(
+            ui->graphicsView->sceneRect(), Qt::KeepAspectRatio);
+    } else {
+        ui->graphicsView->resetMatrix();
+    }
+}
+
 void MainWindow::paint(QImage image)
 {
     QPixmap pixmap = QPixmap::fromImage(image);
-    QPixmap scaledPixmap = pixmap.scaled(ui->centralWidget->width(),
-                                         ui->centralWidget->height(),
-                                         Qt::KeepAspectRatio);
     m_imageScene.clear();
-    m_imageScene.setSceneRect(scaledPixmap.rect());
-    m_imageScene.addPixmap(scaledPixmap);
+    m_imageScene.setSceneRect(pixmap.rect());
+    m_imageScene.addPixmap(pixmap);
+    fitInWindowIfNecessary();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
@@ -45,6 +53,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             m_navigator.goPrev();
             break;
         case Qt::Key_F:
+            m_fitInWindow = !m_fitInWindow;
+            fitInWindowIfNecessary();
             break;
     }
 }
