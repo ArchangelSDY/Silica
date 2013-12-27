@@ -35,7 +35,6 @@ private:
 
     QFuture<QImage> m_readerFuture;
     QFutureWatcher<QImage> m_readerWatcher;
-    QImageReader m_reader;
 };
 
 #endif // IMAGE_H

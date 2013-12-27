@@ -3,6 +3,7 @@
 Navigator::Navigator(QObject *parent) :
     QObject(parent)
 {
+    m_cachedImages.setMaxCost(10);
 }
 
 void Navigator::setPlaylist(QList<QUrl> playlist)

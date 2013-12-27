@@ -2,9 +2,10 @@
 
 #include "Image.h"
 
-static QImage loadImageAtBackground(QImageReader *reader)
+static QImage loadImageAtBackground(QString path)
 {
-    return reader->read();
+    QImageReader reader(path);
+    return reader.read();
 }
 
 Image::Image(QUrl url, QObject *parent) :
@@ -24,10 +25,7 @@ void Image::load()
     m_status = Image::Loading;
 
     QString path = m_url.toLocalFile();
-    m_reader.setFileName(path);
-
-    m_readerFuture = QtConcurrent::run(
-        loadImageAtBackground, &m_reader);
+    m_readerFuture = QtConcurrent::run(loadImageAtBackground, path);
     m_readerWatcher.setFuture(m_readerFuture);
 }
 
