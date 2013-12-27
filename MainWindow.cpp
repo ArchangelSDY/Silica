@@ -3,7 +3,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow) ,
+    m_fitInWindow(true)
 {
     ui->setupUi(this);
 
@@ -25,5 +26,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::paint(QImage image)
 {
-    m_imageScene.addPixmap(QPixmap::fromImage(image));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    QPixmap scaledPixmap = pixmap.scaled(ui->centralWidget->width(),
+                                         ui->centralWidget->height(),
+                                         Qt::KeepAspectRatio);
+    m_imageScene.clear();
+    m_imageScene.setSceneRect(scaledPixmap.rect());
+    m_imageScene.addPixmap(scaledPixmap);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *ev)
+{
+    switch (ev->key()) {
+        case Qt::Key_J:
+            m_navigator.goNext();
+            break;
+        case Qt::Key_K:
+            m_navigator.goPrev();
+            break;
+        case Qt::Key_F:
+            break;
+    }
 }

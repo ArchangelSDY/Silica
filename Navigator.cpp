@@ -34,15 +34,15 @@ void Navigator::goIndex(int index)
 
 void Navigator::goPrev()
 {
-    if (m_currentIndex < m_playlist.count() - 1) {
-        goIndex(m_currentIndex + 1);
+    if (m_currentIndex > 0) {
+        goIndex(m_currentIndex - 1);
     }
 }
 
 void Navigator::goNext()
 {
-    if (m_currentIndex > 0) {
-        goIndex(m_currentIndex - 1);
+    if (m_currentIndex < m_playlist.count() - 1) {
+        goIndex(m_currentIndex + 1);
     }
 }
 
