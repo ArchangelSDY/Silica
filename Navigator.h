@@ -11,7 +11,7 @@ class Navigator : public QObject
 public:
     explicit Navigator(QObject *parent = 0);
 
-    void setPlaylist(QList<QUrl> playlist);
+    void openDir(const QString& path);
 
     void goIndex(int index);
     void goPrev();

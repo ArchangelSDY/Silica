@@ -9,16 +9,15 @@ MainWindow::MainWindow(QWidget *parent) :
     m_fitInWindow(true)
 {
     ui->setupUi(this);
-
     ui->graphicsView->setScene(&m_imageScene);
 
-    QList<QUrl> imageUrls;
-    imageUrls.append(QUrl("file:///home/sdy/Downloads/big.png"));
-    imageUrls.append(QUrl("file:///home/sdy/Downloads/big.3.png"));
-
     connect(&m_navigator, SIGNAL(paint(QImage)), this, SLOT(paint(QImage)));
-    m_navigator.setPlaylist(imageUrls);
-    m_navigator.goIndex(0);
+
+    QStringList args = QApplication::arguments();
+    if (args.length() > 1) {
+        QString dirPath = args.last();
+        m_navigator.openDir(dirPath);
+    }
 }
 
 MainWindow::~MainWindow()
