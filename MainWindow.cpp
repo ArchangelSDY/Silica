@@ -73,6 +73,9 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 setWindowState(Qt::WindowNoState);
             }
             break;
+        case Qt::Key_Escape:
+            QApplication::exit();
+            break;
     }
 }
 
