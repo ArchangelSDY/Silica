@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_fitInWindow(true)
 {
     ui->setupUi(this);
+    ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
     ui->graphicsView->setScene(&m_imageScene);
     m_imageScene.setBackgroundBrush(Qt::gray);
 
