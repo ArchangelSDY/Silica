@@ -12,13 +12,16 @@ void Navigator::openDir(const QString &path)
 
     QStringList filters;
     filters << "*.png" << "*.jpg";
+    dir.setNameFilters(filters);
 
-    m_playlist.clear();
-    foreach (const QFileInfo& fileInfo, dir.entryInfoList(filters)) {
-        m_playlist << QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+    if (dir.entryInfoList().length() > 0) {
+        m_playlist.clear();
+        foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
+            m_playlist << QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+        }
+
+        goIndex(0);
     }
-
-    goIndex(0);
 }
 
 void Navigator::goIndex(int index)

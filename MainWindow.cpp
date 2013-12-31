@@ -1,3 +1,4 @@
+#include <QFileDialog>
 #include <QGraphicsPixmapItem>
 
 #include "MainWindow.h"
@@ -59,6 +60,10 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         case Qt::Key_F:
             m_fitInWindow = !m_fitInWindow;
             fitInWindowIfNecessary();
+            break;
+        case Qt::Key_O:
+            QString path = QFileDialog::getExistingDirectory(this);
+            m_navigator.openDir(path);
             break;
     }
 }
