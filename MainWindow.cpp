@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->graphicsView->setScene(&m_imageScene);
+    m_imageScene.setBackgroundBrush(Qt::gray);
 
     connect(&m_navigator, SIGNAL(paint(QImage)), this, SLOT(paint(QImage)));
 
