@@ -23,6 +23,7 @@ public slots:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
+    virtual void resizeEvent(QResizeEvent *);
 
 private:
     void fitInWindowIfNecessary();

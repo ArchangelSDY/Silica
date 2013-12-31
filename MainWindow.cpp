@@ -62,3 +62,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             break;
     }
 }
+
+void MainWindow::resizeEvent(QResizeEvent *)
+{
+    fitInWindowIfNecessary();
+}
