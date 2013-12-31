@@ -61,9 +61,17 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             m_fitInWindow = !m_fitInWindow;
             fitInWindowIfNecessary();
             break;
-        case Qt::Key_O:
+        case Qt::Key_O: {
             QString path = QFileDialog::getExistingDirectory(this);
             m_navigator.openDir(path);
+            break;
+        }
+        case Qt::Key_F11:
+            if (!isFullScreen()) {
+                setWindowState(Qt::WindowFullScreen);
+            } else {
+                setWindowState(Qt::WindowNoState);
+            }
             break;
     }
 }
