@@ -1,3 +1,5 @@
+#include <QGraphicsPixmapItem>
+
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -39,7 +41,8 @@ void MainWindow::paint(QImage image)
     QPixmap pixmap = QPixmap::fromImage(image);
     m_imageScene.clear();
     m_imageScene.setSceneRect(pixmap.rect());
-    m_imageScene.addPixmap(pixmap);
+    QGraphicsPixmapItem *item = m_imageScene.addPixmap(pixmap);
+    item->setTransformationMode(Qt::SmoothTransformation);
     fitInWindowIfNecessary();
 }
 
