@@ -47,6 +47,10 @@ win32 {
     INSTALLS += headers target
     # workaround for qdatetime.h macro bug
     DEFINES += NOMINMAX
+
+    INCLUDEPATH += $$PWD/../../zlib/include
+    DEPENDPATH += $$PWD/../../zlib/include
+    LIBS += -L$$PWD/../../zlib/lib -lzlib
 }
 
 
