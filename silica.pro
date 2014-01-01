@@ -24,3 +24,9 @@ HEADERS  += MainWindow.h \
     PlayList.h
 
 FORMS    += MainWindow.ui
+
+INCLUDEPATH += $$PWD/deps/quazip/quazip
+DEPENDPATH += $$PWD/deps/quazip/quazip
+
+unix:LIBS += -L$$PWD/deps/quazip/quazip/ -lquazip
+unix:PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a

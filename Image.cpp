@@ -1,11 +1,33 @@
 #include <QtConcurrent/QtConcurrent>
+#include <quazipfile.h>
 
 #include "Image.h"
 
-static QImage loadImageAtBackground(QString path)
+static QImage loadImageAtBackground(QUrl url)
 {
-    QImageReader reader(path);
-    return reader.read();
+    if (url.scheme() == "file") {
+        QString imagePath = url.toLocalFile();
+
+        QImageReader reader(imagePath);
+        return reader.read();
+    } else if (url.scheme() == "zip") {
+        QString imageName = url.fragment();
+
+        QUrl zipUrl = url;
+        zipUrl.setScheme("file");
+        zipUrl.setFragment("");
+        QString zipPath = zipUrl.toLocalFile();
+
+        QuaZipFile imageFile(zipPath, imageName);
+        bool success = imageFile.open(QuaZipFile::ReadOnly);
+
+        if (success) {
+            QImageReader reader(&imageFile);
+            return reader.read();
+        }
+    }
+
+    return QImage();
 }
 
 Image::Image(QUrl url, QObject *parent) :
@@ -24,8 +46,7 @@ void Image::load()
 
     m_status = Image::Loading;
 
-    QString path = m_url.toLocalFile();
-    m_readerFuture = QtConcurrent::run(loadImageAtBackground, path);
+    m_readerFuture = QtConcurrent::run(loadImageAtBackground, m_url);
     m_readerWatcher.setFuture(m_readerFuture);
 }
 

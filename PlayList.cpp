@@ -37,18 +37,6 @@ void PlayList::addPath(const QUrl &url)
         QString path = url.toLocalFile();
         addPath(path);
     } else if (url.scheme() == "zip") {
-        QString imageName = url.fragment();
-
-        QUrl zipUrl = url;
-        zipUrl.setScheme("file");
-        zipUrl.setFragment("");
-        QString zipPath = zipUrl.toLocalFile();
-
-        addFileInZip(zipPath, imageName);
+        *this << url;
     }
-}
-
-void PlayList::addFileInZip(const QString &zipPath, const QString &imageName)
-{
-    // TODO
 }
