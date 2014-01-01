@@ -28,6 +28,9 @@ void Navigator::goIndex(int index)
         m_cachedImages.insert(url, image);
         connect(image, SIGNAL(loaded()), this, SLOT(imageLoaded()));
         image->load();
+
+        // TODO: A better indicator image
+        emit paint(QImage());
     }
 
     m_currentIndex = index;
