@@ -1,3 +1,4 @@
+#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 
@@ -12,6 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
+
+    // Move to screen center
+    const QRect screen = QApplication::desktop()->screenGeometry();
+    move(screen.center() - rect().center());
+
     ui->graphicsView->setScene(&m_imageScene);
     m_imageScene.setBackgroundBrush(Qt::gray);
 
