@@ -27,8 +27,12 @@ public slots:
     void imageLoaded();
 
 private:
+    Image* loadIndex(int index, bool shouldPaint);
+    void preload();
+
     int m_currentIndex;
     Image* m_currentImage;
+    bool m_reverseNavigation;
     QCache<QUrl, Image> m_cachedImages;
     PlayList m_playlist;
 };
