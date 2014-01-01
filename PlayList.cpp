@@ -3,6 +3,13 @@
 
 #include "PlayList.h"
 
+PlayList::PlayList(const QList<QUrl> &imageUrls)
+{
+    foreach(const QUrl &imageUrl, imageUrls) {
+        addPath(imageUrl);
+    }
+}
+
 void PlayList::addPath(const QString &path)
 {
     QFileInfo file(path);

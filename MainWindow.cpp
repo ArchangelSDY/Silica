@@ -45,6 +45,24 @@ void MainWindow::processCommandLineOptions()
     m_navigator.setPlayList(playList);
 }
 
+void MainWindow::promptToChooseFiles()
+{
+    QList<QUrl> images = QFileDialog::getOpenFileUrls(
+        this, QString(), QUrl(),
+        "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip)");
+
+    // Hack for zip
+    // FIXME: Better way to handle this?
+    for (QList<QUrl>::iterator i = images.begin(); i != images.end(); ++i) {
+        if ((*i).path().endsWith(".zip")) {
+            (*i).setScheme("zip");
+        }
+    }
+
+    PlayList playList(images);
+    m_navigator.setPlayList(playList);
+}
+
 void MainWindow::fitInWindowIfNecessary()
 {
     if (m_fitInWindow) {
@@ -79,10 +97,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             fitInWindowIfNecessary();
             break;
         case Qt::Key_O: {
-            QString path = QFileDialog::getExistingDirectory(this);
-            PlayList playList;
-            playList.addPath(path);
-            m_navigator.setPlayList(playList);
+            promptToChooseFiles();
             break;
         }
         case Qt::Key_F11:

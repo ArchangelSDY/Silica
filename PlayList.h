@@ -6,6 +6,9 @@
 class PlayList : public QList<QUrl>
 {
 public:
+    PlayList() {}
+    PlayList(const QList<QUrl> &imageUrls);
+
     void addPath(const QString &);
     void addPath(const QUrl &);
 };
