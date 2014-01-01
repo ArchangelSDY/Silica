@@ -29,6 +29,7 @@ public slots:
 private:
     Image* loadIndex(int index, bool shouldPaint);
     void preload();
+    void reset();
 
     int m_currentIndex;
     Image* m_currentImage;

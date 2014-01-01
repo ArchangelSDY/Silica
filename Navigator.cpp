@@ -2,11 +2,22 @@
 
 static const int MAX_PRELOAD = 5;
 
+// Cache both backward/forward preloaded images and the current one
+static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
+
 Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
     m_reverseNavigation(false)
 {
-    m_cachedImages.setMaxCost(10);
+    m_cachedImages.setMaxCost(MAX_CACHE);
+}
+
+void Navigator::reset()
+{
+    m_cachedImages.clear();
+    m_currentImage = 0;
+    m_currentIndex = 0;
+    m_reverseNavigation = false;
 }
 
 void Navigator::preload()
@@ -20,6 +31,8 @@ void Navigator::preload()
 
 void Navigator::setPlayList(const PlayList &playList)
 {
+    reset();
+
     m_playlist = playList;
     goIndex(0);
 }
