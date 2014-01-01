@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "Image.h"
+#include "PlayList.h"
 
 class Navigator : public QObject
 {
@@ -11,7 +12,7 @@ class Navigator : public QObject
 public:
     explicit Navigator(QObject *parent = 0);
 
-    void openDir(const QString& path);
+    void setPlayList(const PlayList&);
 
     void goIndex(int index);
     void goPrev();
@@ -29,7 +30,7 @@ private:
     int m_currentIndex;
     Image* m_currentImage;
     QCache<QUrl, Image> m_cachedImages;
-    QList<QUrl> m_playlist;
+    PlayList m_playlist;
 };
 
 #endif // NAVIGATOR_H

@@ -26,6 +26,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 private:
+    void processCommandLineOptions();
+
     void fitInWindowIfNecessary();
 
     Ui::MainWindow *ui;

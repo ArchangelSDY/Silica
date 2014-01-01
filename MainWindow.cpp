@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 
+#include "PlayList.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
@@ -16,16 +17,32 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&m_navigator, SIGNAL(paint(QImage)), this, SLOT(paint(QImage)));
 
-    QStringList args = QApplication::arguments();
-    if (args.length() > 1) {
-        QString dirPath = args.last();
-        m_navigator.openDir(dirPath);
-    }
+    processCommandLineOptions();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::processCommandLineOptions()
+{
+    QCommandLineParser parser;
+    parser.addPositionalArgument("paths", "Directories or files", "[paths...]");
+
+    parser.process(*QCoreApplication::instance());
+    const QStringList imagePaths = parser.positionalArguments();
+
+    PlayList playList;
+    foreach (const QString& imagePath, imagePaths) {
+        if (imagePath.startsWith("file://") || imagePath.startsWith("zip://")) {
+            playList.addPath(QUrl(imagePath));
+        } else {
+            playList.addPath(imagePath);
+        }
+    }
+
+    m_navigator.setPlayList(playList);
 }
 
 void MainWindow::fitInWindowIfNecessary()
@@ -63,7 +80,9 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             break;
         case Qt::Key_O: {
             QString path = QFileDialog::getExistingDirectory(this);
-            m_navigator.openDir(path);
+            PlayList playList;
+            playList.addPath(path);
+            m_navigator.setPlayList(playList);
             break;
         }
         case Qt::Key_F11:

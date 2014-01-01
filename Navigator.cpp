@@ -6,22 +6,10 @@ Navigator::Navigator(QObject *parent) :
     m_cachedImages.setMaxCost(10);
 }
 
-void Navigator::openDir(const QString &path)
+void Navigator::setPlayList(const PlayList &playList)
 {
-    QDir dir(path);
-
-    QStringList filters;
-    filters << "*.png" << "*.jpg";
-    dir.setNameFilters(filters);
-
-    if (dir.entryInfoList().length() > 0) {
-        m_playlist.clear();
-        foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
-            m_playlist << QUrl::fromLocalFile(fileInfo.absoluteFilePath());
-        }
-
-        goIndex(0);
-    }
+    m_playlist = playList;
+    goIndex(0);
 }
 
 void Navigator::goIndex(int index)
