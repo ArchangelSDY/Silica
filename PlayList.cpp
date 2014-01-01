@@ -1,4 +1,5 @@
 #include <QDir>
+#include <quazip.h>
 
 #include "PlayList.h"
 
@@ -37,6 +38,30 @@ void PlayList::addPath(const QUrl &url)
         QString path = url.toLocalFile();
         addPath(path);
     } else if (url.scheme() == "zip") {
-        *this << url;
+        if (url.hasFragment()) {
+            // Single file
+            *this << url;
+        } else {
+            // Add all files in the zip
+            // FIXME: Should skip non image files
+            QUrl fileUrl = url;
+            fileUrl.setScheme("file");
+            QString zipPath = fileUrl.toLocalFile();
+
+            QuaZip zip(zipPath);
+            bool success = zip.open(QuaZip::mdUnzip);
+
+            if (success) {
+                foreach(const QString &name, zip.getFileNameList()) {
+                    QUrl imageUrl = url;
+                    imageUrl.setFragment(name);
+
+                    *this << imageUrl;
+                }
+
+                zip.close();
+            }
+
+        }
     }
 }

@@ -23,7 +23,10 @@ static QImage loadImageAtBackground(QUrl url)
 
         if (success) {
             QImageReader reader(&imageFile);
-            return reader.read();
+            QImage image = reader.read();
+
+            imageFile.close();
+            return image;
         }
     }
 
