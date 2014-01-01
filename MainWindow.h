@@ -19,7 +19,7 @@ public:
     ~MainWindow();
 
 public slots:
-    void paint(QImage image);
+    void paint(Image *image);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);

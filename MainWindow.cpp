@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setScene(&m_imageScene);
     m_imageScene.setBackgroundBrush(Qt::gray);
 
-    connect(&m_navigator, SIGNAL(paint(QImage)), this, SLOT(paint(QImage)));
+    connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
 
     processCommandLineOptions();
 }
@@ -79,14 +79,23 @@ void MainWindow::fitInWindowIfNecessary()
     }
 }
 
-void MainWindow::paint(QImage image)
+void MainWindow::paint(Image *image)
 {
-    QPixmap pixmap = QPixmap::fromImage(image);
-    m_imageScene.clear();
-    m_imageScene.setSceneRect(pixmap.rect());
-    QGraphicsPixmapItem *item = m_imageScene.addPixmap(pixmap);
-    item->setTransformationMode(Qt::SmoothTransformation);
-    fitInWindowIfNecessary();
+    if (image) {
+        QPixmap pixmap = QPixmap::fromImage(image->data());
+        m_imageScene.clear();
+        m_imageScene.setSceneRect(pixmap.rect());
+        QGraphicsPixmapItem *item = m_imageScene.addPixmap(pixmap);
+        item->setTransformationMode(Qt::SmoothTransformation);
+        fitInWindowIfNecessary();
+
+        QString status = (image->status() ==
+                          Image::LoadComplete) ? "" : "[Loading]";
+        QString title = image->name();
+        title += status;
+
+        setWindowTitle(title);
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)

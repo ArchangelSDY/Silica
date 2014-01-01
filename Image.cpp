@@ -59,3 +59,14 @@ void Image::readerFinished()
     m_image = m_readerFuture.result();
     emit loaded();
 }
+
+QString Image::name() const
+{
+    if (m_url.scheme() == "zip") {
+        return m_url.fragment();
+    } else {
+        QString path = m_url.toLocalFile();
+        QFileInfo file(path);
+        return file.fileName();
+    }
+}

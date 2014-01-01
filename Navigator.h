@@ -21,7 +21,7 @@ public:
     Image* currentImage() const { return m_currentImage; }
 
 signals:
-    void paint(QImage image);
+    void paint(Image *image);
 
 public slots:
     void imageLoaded();

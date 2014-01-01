@@ -19,6 +19,7 @@ public:
     Status status() const { return m_status; }
     QImage data() { return m_image; }
     QUrl url() const { return m_url; }
+    QString name() const;
 
     void load();
 

@@ -62,11 +62,7 @@ void Navigator::goIndex(int index)
         return;
     }
 
-    if (image->status() == Image::LoadComplete) {
-        emit paint(image->data());
-    } else {
-        emit paint(QImage());
-    }
+    emit paint(image);
 
     m_currentIndex = index;
     m_currentImage = image;
@@ -95,7 +91,7 @@ void Navigator::imageLoaded()
     Image *loadedImage = static_cast<Image*>(QObject::sender());
     if (loadedImage && !loadedImage->data().isNull()) {
         if (loadedImage->url() == m_currentImage->url()) {
-            emit paint(loadedImage->data());
+            emit paint(loadedImage);
         }
     }
 }
