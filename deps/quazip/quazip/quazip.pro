@@ -6,7 +6,8 @@ INCLUDEPATH += .
 !win32:VERSION = 1.0.0
 
 DEFINES += QUAZIP_BUILD
-CONFIG(staticlib): DEFINES += QUAZIP_STATIC
+# CONFIG(staticlib): DEFINES += QUAZIP_STATIC
+DEFINES += QUAZIP_STATIC
 
 # Input
 HEADERS += \
@@ -37,7 +38,7 @@ unix:!symbian {
 
 	OBJECTS_DIR=.obj
 	MOC_DIR=.moc
-	
+
 }
 
 win32 {

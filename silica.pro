@@ -31,6 +31,9 @@ DEPENDPATH += $$PWD/deps/quazip/quazip
 DEFINES += QUAZIP_STATIC
 
 unix {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += zlib
+
     LIBS += -L$$PWD/deps/quazip/quazip/ -lquazip
     PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a
 }
