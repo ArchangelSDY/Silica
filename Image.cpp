@@ -4,7 +4,8 @@
 #include "Image.h"
 
 static const QString THUMBNAIL_FOLDER = "thumbnails";
-static const int THUMBNAIL_HEIGHT = 480;
+static const int THUMBNAIL_MIN_HEIGHT = 480;
+static const int THUMBNAIL_SCALE_RATIO = 8;
 
 static QImage loadImageAtBackground(QUrl url)
 {
@@ -84,7 +85,10 @@ void Image::loadThumbnail()
 
 void Image::makeThumbnail()
 {
-    m_thumbnail = m_image.scaledToHeight(THUMBNAIL_HEIGHT);
+    int height = qMax<int>(
+        THUMBNAIL_MIN_HEIGHT, m_image.height() / THUMBNAIL_SCALE_RATIO);
+
+    m_thumbnail = m_image.scaledToHeight(height);
     m_thumbnail.save(m_thumbnailPath, "JPG");
     emit thumbnailLoaded();
 }
