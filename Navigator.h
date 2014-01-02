@@ -23,9 +23,11 @@ public:
 
 signals:
     void paint(Image *image);
+    void paintThumbnail(Image *image);
 
 public slots:
     void imageLoaded();
+    void thumbnailLoaded();
 
 private:
     Image* loadIndex(int index, bool shouldPaint);

@@ -52,6 +52,8 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     }
 
     if (shouldPaint) {
+        connect(image, SIGNAL(thumbnailLoaded()),
+                this, SLOT(thumbnailLoaded()));
         connect(image, SIGNAL(loaded()), this, SLOT(imageLoaded()),
                 Qt::UniqueConnection);
     }
@@ -80,6 +82,10 @@ void Navigator::goIndex(int index)
     m_currentIndex = index;
     m_currentImage = image;
 
+    if (image->status() != Image::LoadComplete) {
+        image->loadThumbnail();
+    }
+
     preload();
 }
 
@@ -105,6 +111,19 @@ void Navigator::imageLoaded()
     if (loadedImage && !loadedImage->data().isNull()) {
         if (loadedImage->url() == m_currentImage->url()) {
             emit paint(loadedImage);
+        }
+    }
+}
+
+void Navigator::thumbnailLoaded()
+{
+    Image *image = static_cast<Image*>(QObject::sender());
+    if (image &&
+        image->status() != Image::LoadComplete &&
+        !image->thumbnail().isNull()) {
+
+        if (image->url() == m_currentImage->url()) {
+            emit paintThumbnail(image);
         }
     }
 }

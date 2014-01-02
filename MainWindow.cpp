@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_imageScene.setBackgroundBrush(Qt::gray);
 
     connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
+    connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
+            this, SLOT(paintThumbnail(Image*)));
 
     processCommandLineOptions();
 }
@@ -95,6 +97,24 @@ void MainWindow::paint(Image *image)
         title += status;
 
         setWindowTitle(title);
+    }
+}
+
+void MainWindow::paintThumbnail(Image *image)
+{
+    if (image) {
+        const QSize &viewSize = ui->graphicsView->size();
+        QPixmap rawThumbnail = QPixmap::fromImage(image->thumbnail());
+        QPixmap fitThumbnail = rawThumbnail.scaled(
+            viewSize, Qt::KeepAspectRatioByExpanding);
+
+        m_imageScene.clear();
+        m_imageScene.setSceneRect(fitThumbnail.rect());
+
+        QGraphicsPixmapItem *item = m_imageScene.addPixmap(fitThumbnail);
+        item->setTransformationMode(Qt::SmoothTransformation);
+
+        ui->graphicsView->fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
     }
 }
 

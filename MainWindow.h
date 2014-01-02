@@ -20,6 +20,7 @@ public:
 
 public slots:
     void paint(Image *image);
+    void paintThumbnail(Image *image);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
