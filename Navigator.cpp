@@ -7,9 +7,9 @@ static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
 
 Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
-    m_reverseNavigation(false)
+    m_reverseNavigation(false) ,
+    m_cachedImages(MAX_CACHE)
 {
-    m_cachedImages.setMaxCost(MAX_CACHE);
 }
 
 void Navigator::reset()
@@ -44,11 +44,11 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     }
 
     QUrl url = m_playlist[index];
-    Image *image = m_cachedImages.object(url);
+    Image *image = m_cachedImages.at(index);
 
     if (!image) {
         image = new Image(url);
-        m_cachedImages.insert(url, image);
+        m_cachedImages.insert(index, image);
     }
 
     if (shouldPaint) {

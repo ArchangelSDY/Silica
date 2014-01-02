@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "Image.h"
+#include "ImagesCache.h"
 #include "PlayList.h"
 
 class Navigator : public QObject
@@ -34,7 +35,7 @@ private:
     int m_currentIndex;
     Image* m_currentImage;
     bool m_reverseNavigation;
-    QCache<QUrl, Image> m_cachedImages;
+    ImagesCache m_cachedImages;
     PlayList m_playlist;
 };
 
