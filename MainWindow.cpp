@@ -1,6 +1,8 @@
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
+#include <QMessageBox>
+#include <QStatusBar>
 
 #include "PlayList.h"
 #include "MainWindow.h"
@@ -9,7 +11,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
-    m_fitInWindow(true)
+    m_fitInWindow(true) ,
+    m_inputMode(ControlMode)
 {
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
@@ -120,6 +123,15 @@ void MainWindow::paintThumbnail(Image *image)
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
+    if (m_inputMode == ControlMode) {
+        handleControlKeyPress(ev);
+    } else if (m_inputMode == CommandMode) {
+        handleCommandKeyPress(ev);
+    }
+}
+
+void MainWindow::handleControlKeyPress(QKeyEvent *ev)
+{
     switch (ev->key()) {
         case Qt::Key_J:
             m_navigator.goNext();
@@ -143,9 +155,29 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             }
             break;
         case Qt::Key_Escape:
-            QApplication::exit();
+            if (QMessageBox::question(this, "Exit", "Exit?") ==
+                    QMessageBox::Yes) {
+                QApplication::exit();
+            }
+            break;
+        case Qt::Key_Slash:
+            m_inputMode = CommandMode;
+            statusBar()->showMessage("Command Mode");
+            statusBar()->show();
             break;
     }
+}
+
+void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
+{
+    switch (ev->key()) {
+        case Qt::Key_Escape:
+            m_inputMode = ControlMode;
+            statusBar()->clearMessage();
+            statusBar()->hide();
+            break;
+    }
+
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)
