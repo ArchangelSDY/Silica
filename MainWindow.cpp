@@ -107,8 +107,8 @@ void MainWindow::paint(Image *image)
 
         QString status = (image->status() ==
                           Image::LoadComplete) ? "" : "[Loading]";
-        QString title = image->name();
-        title += status;
+        QString title;
+        QTextStream(&title) << status << image->name();
 
         setWindowTitle(title);
     }
