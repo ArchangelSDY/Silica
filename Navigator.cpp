@@ -7,6 +7,7 @@ static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
 
 Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
+    m_currentIndex(-1) ,
     m_reverseNavigation(false) ,
     m_cachedImages(MAX_CACHE)
 {
@@ -16,7 +17,7 @@ void Navigator::reset()
 {
     m_cachedImages.clear();
     m_currentImage = 0;
-    m_currentIndex = 0;
+    m_currentIndex = -1;
     m_reverseNavigation = false;
 }
 
@@ -34,6 +35,8 @@ void Navigator::setPlayList(const PlayList &playList)
     reset();
 
     m_playlist = playList;
+    emit playListChange(&m_playlist);
+
     goIndex(0);
 }
 
@@ -67,7 +70,7 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
 
 void Navigator::goIndex(int index)
 {
-    if (index < 0 || index >= m_playlist.count()) {
+    if (index < 0 || index >= m_playlist.count() || index == m_currentIndex) {
         return;
     }
 
@@ -77,10 +80,11 @@ void Navigator::goIndex(int index)
         return;
     }
 
-    emit paint(image);
-
     m_currentIndex = index;
     m_currentImage = image;
+
+    emit paint(image);
+    emit navigationChange(index);
 
     if (image->status() != Image::LoadComplete) {
         image->loadThumbnail();

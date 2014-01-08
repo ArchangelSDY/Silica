@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 
 #include "Navigator.h"
+#include "PlayList.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,8 @@ public:
 public slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
+    void playListChange(PlayList *playList);
+    void navigationChange(int index);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);

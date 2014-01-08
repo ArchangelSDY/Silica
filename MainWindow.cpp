@@ -9,6 +9,8 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
@@ -30,6 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
     connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
             this, SLOT(paintThumbnail(Image*)));
+    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+            this, SLOT(playListChange(PlayList *)));
+    connect(&m_navigator, SIGNAL(navigationChange(int)),
+            this, SLOT(navigationChange(int)));
+    connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
+            &m_navigator, SLOT(goIndex(int)));
 
     processCommandLineOptions();
 }
@@ -122,6 +130,28 @@ void MainWindow::paintThumbnail(Image *image)
 
         ui->graphicsView->fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
     }
+}
+
+void MainWindow::playListChange(PlayList *playList)
+{
+    QListWidget *list = ui->playListWidget;
+    list->clear();
+    foreach (const QUrl &url, *playList) {
+        if (url.scheme() != "zip") {
+            list->addItem(QFileInfo(url.toLocalFile()).completeBaseName());
+        } else {
+            list->addItem(url.fragment());
+        }
+    }
+}
+
+void MainWindow::navigationChange(int index)
+{
+    ui->playListWidget->setCurrentRow(index);
+    QString title;
+    QTextStream(&title) << PLAYLIST_TITLE_PREFIX << " - "
+        << (index + 1) << "/" << m_navigator.playList().count();
+    ui->sidebar->setWindowTitle(title);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)

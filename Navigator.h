@@ -13,19 +13,25 @@ class Navigator : public QObject
 public:
     explicit Navigator(QObject *parent = 0);
 
+    const PlayList &playList() const { return m_playlist; }
     void setPlayList(const PlayList&);
 
-    void goIndex(int index);
     void goPrev();
     void goNext();
 
     Image* currentImage() const { return m_currentImage; }
+    int currentIndex() { return m_currentIndex; }
+
 
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
+    void playListChange(PlayList *playList);
+    void navigationChange(int index);
 
 public slots:
+    void goIndex(int index);
+
     void imageLoaded();
     void thumbnailLoaded();
 
