@@ -1,4 +1,5 @@
 #include <QDesktopWidget>
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QMessageBox>
@@ -16,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->sidebar->hide();
+    statusBar()->setVisible(false);
 
     // Move to screen center
     const QRect screen = QApplication::desktop()->screenGeometry();
@@ -164,6 +167,10 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             m_inputMode = CommandMode;
             statusBar()->showMessage("Command Mode");
             statusBar()->show();
+            break;
+        case Qt::Key_T:
+            QDockWidget *sidebar = ui->sidebar;
+            sidebar->setVisible(!sidebar->isVisible());
             break;
     }
 }
