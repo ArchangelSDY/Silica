@@ -41,6 +41,8 @@ unix {
 }
 
 win32 {
+    DESTDIR = $$OUT_PWD
+
     INCLUDEPATH += $$PWD/deps/zlib/include
     DEPENDPATH += $$PWD/deps/zlib/include
 
@@ -56,4 +58,17 @@ win32 {
         LIBS += -L$$PWD/deps/build-quazip-win32-debug/quazip/debug/ -lquazip
         PRE_TARGETDEPS += $$PWD/deps/build-quazip-win32-debug/quazip/debug/quazip.lib
     }
+
+    runtime.path = $$OUT_PWD
+    runtime.files = \
+        $$[QT_INSTALL_BINS]\Qt5Core.dll \
+        $$[QT_INSTALL_BINS]\Qt5Gui.dll \
+        $$[QT_INSTALL_BINS]\Qt5Widgets.dll \
+        $$[QT_INSTALL_BINS]\libEGL.dll \
+        $$[QT_INSTALL_BINS]\libGLESv2.dll \
+        $$[QT_INSTALL_BINS]\icuin51.dll \
+        $$[QT_INSTALL_BINS]\icuuc51.dll \
+        $$[QT_INSTALL_BINS]\icudt51.dll
+
+    INSTALLS += runtime
 }
