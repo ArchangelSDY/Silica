@@ -17,13 +17,15 @@ SOURCES += main.cpp\
     Navigator.cpp \
     Image.cpp \
     PlayList.cpp \
-    ImagesCache.cpp
+    ImagesCache.cpp \
+    ui/MainGraphicsView.cpp
 
 HEADERS  += MainWindow.h \
     Navigator.h \
     Image.h \
     PlayList.h \
-    ImagesCache.h
+    ImagesCache.h \
+    ui/MainGraphicsView.h
 
 FORMS    += MainWindow.ui
 
