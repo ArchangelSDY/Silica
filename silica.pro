@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,14 +18,18 @@ SOURCES += main.cpp\
     Image.cpp \
     PlayList.cpp \
     ImagesCache.cpp \
-    ui/MainGraphicsView.cpp
+    ui/MainGraphicsView.cpp \
+    db/Database.cpp \
+    db/AsunaDatabase.cpp
 
 HEADERS  += MainWindow.h \
     Navigator.h \
     Image.h \
     PlayList.h \
     ImagesCache.h \
-    ui/MainGraphicsView.h
+    ui/MainGraphicsView.h \
+    db/Database.h \
+    db/AsunaDatabase.h
 
 FORMS    += MainWindow.ui
 

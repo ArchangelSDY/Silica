@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 
+#include "db/Database.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -46,6 +47,7 @@ private:
     Ui::MainWindow *ui;
 
     Navigator m_navigator;
+    Database *m_database;
     QGraphicsScene m_imageScene;
     bool m_fitInWindow;
     Mode m_inputMode;

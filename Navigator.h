@@ -14,7 +14,6 @@ public:
     explicit Navigator(QObject *parent = 0);
 
     const PlayList &playList() const { return m_playlist; }
-    void setPlayList(const PlayList&);
 
     void goPrev();
     void goNext();
@@ -30,6 +29,8 @@ signals:
     void navigationChange(int index);
 
 public slots:
+    void setPlayList(const PlayList&);
+
     void goIndex(int index);
 
     void imageLoaded();

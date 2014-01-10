@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QStatusBar>
 
+#include "db/AsunaDatabase.h"
 #include "PlayList.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -14,6 +15,7 @@ static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
+    m_database(new AsunaDatabase()) ,
     m_fitInWindow(true) ,
     m_inputMode(ControlMode)
 {
@@ -38,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(navigationChange(int)));
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             &m_navigator, SLOT(goIndex(int)));
+    connect(m_database, SIGNAL(gotPlayList(PlayList)),
+            &m_navigator, SLOT(setPlayList(PlayList)));
 
     processCommandLineOptions();
 }
@@ -45,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_database;
 }
 
 void MainWindow::processCommandLineOptions()
@@ -198,9 +203,13 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             statusBar()->showMessage("Command Mode");
             statusBar()->show();
             break;
-        case Qt::Key_T:
+        case Qt::Key_T: {
             QDockWidget *sidebar = ui->sidebar;
             sidebar->setVisible(!sidebar->isVisible());
+            break;
+        }
+        case Qt::Key_A:
+            m_database->queryByTag("pantsu");
             break;
     }
 }
