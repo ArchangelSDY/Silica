@@ -69,14 +69,20 @@ win32 {
 
     runtime.path = $$OUT_PWD
     runtime.files = \
-        $$[QT_INSTALL_BINS]\Qt5Core.dll \
-        $$[QT_INSTALL_BINS]\Qt5Gui.dll \
-        $$[QT_INSTALL_BINS]\Qt5Widgets.dll \
-        $$[QT_INSTALL_BINS]\libEGL.dll \
-        $$[QT_INSTALL_BINS]\libGLESv2.dll \
-        $$[QT_INSTALL_BINS]\icuin51.dll \
-        $$[QT_INSTALL_BINS]\icuuc51.dll \
-        $$[QT_INSTALL_BINS]\icudt51.dll
+        $$[QT_INSTALL_BINS]/Qt5Core.dll \
+        $$[QT_INSTALL_BINS]/Qt5Gui.dll \
+        $$[QT_INSTALL_BINS]/Qt5Network.dll \
+        $$[QT_INSTALL_BINS]/Qt5Widgets.dll \
+        $$[QT_INSTALL_BINS]/libEGL.dll \
+        $$[QT_INSTALL_BINS]/libGLESv2.dll \
+        $$[QT_INSTALL_BINS]/icuin51.dll \
+        $$[QT_INSTALL_BINS]/icuuc51.dll \
+        $$[QT_INSTALL_BINS]/icudt51.dll
 
     INSTALLS += runtime
+
+    config.path = $$OUT_PWD/config/Asuna
+    config.files = $$PWD/assets/Silica.ini
+
+    INSTALLS += config
 }
