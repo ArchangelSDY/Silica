@@ -7,12 +7,6 @@
 
 #include "AsunaDatabase.h"
 
-static const char *ASUNA_BASE = "http://asuna.archangelsdy.com";
-static const int PAGE_LIMIT = 50;
-
-// TODO: Read this from config
-static const char *LOCAL_ZIPS_DIR = "G:/ACG/Pic/Moe-Zip/";
-
 AsunaDatabase::AsunaDatabase()
 {
 }
@@ -21,7 +15,8 @@ void AsunaDatabase::queryByTag(const QString &tag, int page)
 {
     QString urlString;
     QTextStream urlBuilder(&urlString);
-    urlBuilder << ASUNA_BASE << "/api/images/by-tag/" << tag
+    urlBuilder << m_settings.value("ASUNA_BASE").toString()
+               << "/api/images/by-tag/" << tag
                << "/?page=" << page;
 
     QUrl url(urlString);
@@ -55,8 +50,9 @@ void AsunaDatabase::parseJsonResponse(QNetworkReply *reply)
 
         QString imageUrl;
         QTextStream imageUrlBuilder(&imageUrl);
-        imageUrlBuilder << "zip:///" << LOCAL_ZIPS_DIR << zipPackage
-            << "#" << fileName;
+        imageUrlBuilder << "zip:///"
+                        << m_settings.value("ZIP_DIR").toString()
+                        << zipPackage << "#" << fileName;
 
         playList << QUrl(imageUrl);
     }
@@ -64,7 +60,7 @@ void AsunaDatabase::parseJsonResponse(QNetworkReply *reply)
     emit gotPlayList(playList);
 
     // Check for next page
-    if (images.count() == PAGE_LIMIT) {
+    if (images.count() == m_settings.value("PAGE_LIMIT").toInt()) {
         queryNextPage(reply->url());
     }
 }

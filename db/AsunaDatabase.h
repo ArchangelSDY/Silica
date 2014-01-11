@@ -1,6 +1,8 @@
 #ifndef ASUNADATABASE_H
 #define ASUNADATABASE_H
 
+#include <QSettings>
+
 #include "Database.h"
 
 class AsunaDatabase : public Database
@@ -16,6 +18,8 @@ public slots:
 private:
     void parseJsonResponse(QNetworkReply *);
     void queryNextPage(QUrl url);
+
+    QSettings m_settings;
 };
 
 #endif // ASUNADATABASE_H
