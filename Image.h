@@ -14,6 +14,7 @@ public:
         NotLoad,
         Loading,
         LoadComplete,
+        LoadError,
     };
 
     Status status() const { return m_status; }

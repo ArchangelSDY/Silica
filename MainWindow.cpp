@@ -115,8 +115,16 @@ void MainWindow::paint(Image *image)
         item->setTransformationMode(Qt::SmoothTransformation);
         fitInWindowIfNecessary();
 
-        QString status = (image->status() ==
-                          Image::LoadComplete) ? "" : "[Loading]";
+
+        QString status;
+        if (image->status() == Image::Loading) {
+            status = "[Loading]";
+        } else if (image->status() == Image::LoadError) {
+            status = "[Error]";
+        } else {
+            status = "";
+        }
+
         QString title;
         QTextStream(&title) << status << image->name();
 

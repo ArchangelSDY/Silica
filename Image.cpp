@@ -61,11 +61,17 @@ void Image::load()
 
 void Image::readerFinished()
 {
-    m_status = Image::LoadComplete;
     m_image = m_readerFuture.result();
+
+    if (!m_image.isNull()) {
+        m_status = Image::LoadComplete;
+    } else {
+        m_status = Image::LoadError;
+    }
+
     emit loaded();
 
-    if (m_thumbnail.isNull()) {
+    if (m_thumbnail.isNull() && !m_image.isNull()) {
         makeThumbnail();
     }
 }

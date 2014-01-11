@@ -1,6 +1,6 @@
 #include "Navigator.h"
 
-static const int MAX_PRELOAD = 5;
+static const int MAX_PRELOAD = 0;
 
 // Cache both backward/forward preloaded images and the current one
 static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
@@ -133,7 +133,7 @@ void Navigator::goNext()
 void Navigator::imageLoaded()
 {
     Image *loadedImage = static_cast<Image*>(QObject::sender());
-    if (loadedImage && !loadedImage->data().isNull()) {
+    if (loadedImage) {
         if (loadedImage->url() == m_currentImage->url()) {
             emit paint(loadedImage);
         }
