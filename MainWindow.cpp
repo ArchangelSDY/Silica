@@ -156,11 +156,20 @@ void MainWindow::playListAppend(PlayList *appended)
             list->addItem(url.fragment());
         }
     }
+
+    updateSidebarTitle();
 }
 
 void MainWindow::navigationChange(int index)
 {
     ui->playListWidget->setCurrentRow(index);
+
+    updateSidebarTitle();
+}
+
+void MainWindow::updateSidebarTitle()
+{
+    int index = m_navigator.currentIndex();
     QString title;
     QTextStream(&title) << PLAYLIST_TITLE_PREFIX << " - "
         << (index + 1) << "/" << m_navigator.playList().count();

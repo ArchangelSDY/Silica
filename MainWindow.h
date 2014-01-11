@@ -40,6 +40,8 @@ private:
     void handleControlKeyPress(QKeyEvent *);
     void handleCommandKeyPress(QKeyEvent *);
 
+    void updateSidebarTitle();
+
     enum Mode {
         ControlMode,
         CommandMode,
