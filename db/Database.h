@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <QNetworkAccessManager>
+#include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QObject>
 
@@ -17,6 +18,7 @@ public:
 
 protected:
     QNetworkAccessManager m_net;
+    QNetworkDiskCache m_cache;
 
 signals:
     void gotPlayList(PlayList playList);

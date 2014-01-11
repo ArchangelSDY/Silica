@@ -25,7 +25,10 @@ void AsunaDatabase::queryByTag(const QString &tag, int page)
                << "/?page=" << page;
 
     QUrl url(urlString);
-    m_net.get(QNetworkRequest(url));
+    QNetworkRequest request(url);
+    request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                         QNetworkRequest::PreferCache);
+    m_net.get(request);
 }
 
 void AsunaDatabase::reqFinish(QNetworkReply * reply)
@@ -81,7 +84,10 @@ void AsunaDatabase::queryNextPage(QUrl url)
             QString nextQuery = url.query().replace(re, nextPageQuery);
             url.setQuery(nextQuery);
 
-            m_net.get(QNetworkRequest(url));
+            QNetworkRequest request(url);
+            request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+                                 QNetworkRequest::PreferCache);
+            m_net.get(request);
         }
     }
 
