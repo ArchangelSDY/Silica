@@ -35,8 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
     connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
             this, SLOT(paintThumbnail(Image*)));
-    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
-            this, SLOT(playListChange(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
+            this, SLOT(playListChange(PlayList)));
     connect(&m_navigator, SIGNAL(playListAppend(PlayList*)),
             this, SLOT(playListAppend(PlayList*)));
     connect(&m_navigator, SIGNAL(navigationChange(int)),
@@ -161,17 +161,17 @@ void MainWindow::paintThumbnail(Image *image)
     }
 }
 
-void MainWindow::playListChange(PlayList *playList)
+void MainWindow::playListChange(PlayList playList)
 {
     ui->playListWidget->clear();
 
     playListAppend(playList);
 }
 
-void MainWindow::playListAppend(PlayList *appended)
+void MainWindow::playListAppend(PlayList appended)
 {
     QListWidget *list = ui->playListWidget;
-    foreach (const QUrl &url, *appended) {
+    foreach (const QUrl &url, appended) {
         if (url.scheme() != "zip") {
             list->addItem(QFileInfo(url.toLocalFile()).completeBaseName());
         } else {

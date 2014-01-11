@@ -25,8 +25,8 @@ public:
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-    void playListChange(PlayList *playList);
-    void playListAppend(PlayList *appended);
+    void playListChange(PlayList playList);
+    void playListAppend(PlayList appended);
     void navigationChange(int index);
 
 public slots:
