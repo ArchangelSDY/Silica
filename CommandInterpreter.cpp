@@ -2,9 +2,9 @@
 
 CommandInterpreter::CommandInterpreter(Navigator *navigator, Database *database,
                                        QObject *parent) :
+    QObject(parent) ,
     m_navigator(navigator) ,
-    m_database(database) ,
-    QObject(parent)
+    m_database(database)
 {
 }
 

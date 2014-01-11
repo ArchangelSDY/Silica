@@ -36,7 +36,7 @@ void Navigator::setPlayList(const PlayList &playList)
     reset();
 
     m_playlist = playList;
-    emit playListChange(&m_playlist);
+    emit playListChange(m_playlist);
 
     goIndex(0);
 }
@@ -47,7 +47,7 @@ void Navigator::appendPlayList(const PlayList &playList)
     bool shouldGoFirst = (m_playlist.count() == 0);
 
     m_playlist.append(playList);
-    emit playListAppend(&PlayList(playList));
+    emit playListAppend(playList);
 
     if (shouldGoFirst) {
         goIndex(0);
@@ -58,7 +58,7 @@ void Navigator::clearPlayList()
 {
     reset();
 
-    emit playListChange(&m_playlist);
+    emit playListChange(m_playlist);
 }
 
 Image* Navigator::loadIndex(int index, bool shouldPaint)
