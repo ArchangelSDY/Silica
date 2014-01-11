@@ -13,7 +13,7 @@ class Database : public QObject
 public:
     explicit Database(QObject *parent = 0);
 
-    virtual void queryByTag(const QString &tag) = 0;
+    virtual void queryByTag(const QString &tag, int page = 1) = 0;
 
 protected:
     QNetworkAccessManager m_net;

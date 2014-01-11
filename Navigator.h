@@ -26,10 +26,13 @@ signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
     void playListChange(PlayList *playList);
+    void playListAppend(PlayList *appended);
     void navigationChange(int index);
 
 public slots:
-    void setPlayList(const PlayList&);
+    void setPlayList(const PlayList &);
+    void appendPlayList(const PlayList &);
+    void clearPlayList();
 
     void goIndex(int index);
 

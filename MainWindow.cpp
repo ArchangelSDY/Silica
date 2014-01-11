@@ -36,12 +36,14 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(paintThumbnail(Image*)));
     connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
             this, SLOT(playListChange(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListAppend(PlayList*)),
+            this, SLOT(playListAppend(PlayList*)));
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             &m_navigator, SLOT(goIndex(int)));
     connect(m_database, SIGNAL(gotPlayList(PlayList)),
-            &m_navigator, SLOT(setPlayList(PlayList)));
+            &m_navigator, SLOT(appendPlayList(PlayList)));
 
     processCommandLineOptions();
 }
@@ -139,9 +141,15 @@ void MainWindow::paintThumbnail(Image *image)
 
 void MainWindow::playListChange(PlayList *playList)
 {
+    ui->playListWidget->clear();
+
+    playListAppend(playList);
+}
+
+void MainWindow::playListAppend(PlayList *appended)
+{
     QListWidget *list = ui->playListWidget;
-    list->clear();
-    foreach (const QUrl &url, *playList) {
+    foreach (const QUrl &url, *appended) {
         if (url.scheme() != "zip") {
             list->addItem(QFileInfo(url.toLocalFile()).completeBaseName());
         } else {
@@ -209,6 +217,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             break;
         }
         case Qt::Key_A:
+            m_navigator.clearPlayList();
             m_database->queryByTag("pantsu");
             break;
     }

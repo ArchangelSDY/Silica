@@ -19,6 +19,7 @@ void Navigator::reset()
     m_currentImage = 0;
     m_currentIndex = -1;
     m_reverseNavigation = false;
+    m_playlist.clear();
 }
 
 void Navigator::preload()
@@ -38,6 +39,26 @@ void Navigator::setPlayList(const PlayList &playList)
     emit playListChange(&m_playlist);
 
     goIndex(0);
+}
+
+void Navigator::appendPlayList(const PlayList &playList)
+{
+    // If empty, load the first one
+    bool shouldGoFirst = (m_playlist.count() == 0);
+
+    m_playlist.append(playList);
+    emit playListAppend(&PlayList(playList));
+
+    if (shouldGoFirst) {
+        goIndex(0);
+    }
+}
+
+void Navigator::clearPlayList()
+{
+    reset();
+
+    emit playListChange(&m_playlist);
 }
 
 Image* Navigator::loadIndex(int index, bool shouldPaint)
