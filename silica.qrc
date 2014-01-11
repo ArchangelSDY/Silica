@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/warning.png</file>
+    </qresource>
+</RCC>

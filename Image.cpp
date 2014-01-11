@@ -67,11 +67,14 @@ void Image::readerFinished()
         m_status = Image::LoadComplete;
     } else {
         m_status = Image::LoadError;
+
+        // Show a warning image
+        m_image = QImage(":/res/warning.png");
     }
 
     emit loaded();
 
-    if (m_thumbnail.isNull() && !m_image.isNull()) {
+    if (m_thumbnail.isNull() && m_status == Image::LoadComplete) {
         makeThumbnail();
     }
 }

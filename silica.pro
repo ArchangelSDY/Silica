@@ -40,6 +40,9 @@ DEPENDPATH += $$PWD/deps/quazip/quazip
 
 DEFINES += QUAZIP_STATIC
 
+RESOURCES += \
+    silica.qrc
+
 unix {
     CONFIG += link_pkgconfig
     PKGCONFIG += zlib

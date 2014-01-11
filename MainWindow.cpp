@@ -97,11 +97,22 @@ void MainWindow::promptToChooseFiles()
 
 void MainWindow::fitInWindowIfNecessary()
 {
+    QGraphicsView *view = ui->graphicsView;
     if (m_fitInWindow) {
-        ui->graphicsView->fitInView(
-            ui->graphicsView->sceneRect(), Qt::KeepAspectRatio);
+        if (m_navigator.currentImage()) {
+            QSize imageSize = m_navigator.currentImage()->data().size();
+
+            if (imageSize.width() > view->width() ||
+                imageSize.height() > view->height()) {
+                view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
+            } else {
+                // No need to fit in view(expanding in this case)
+                // if image is smaller than view.
+                view->resetMatrix();
+            }
+        }
     } else {
-        ui->graphicsView->resetMatrix();
+        view->resetMatrix();
     }
 }
 
