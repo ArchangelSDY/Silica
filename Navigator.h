@@ -17,6 +17,8 @@ public:
 
     void goPrev();
     void goNext();
+    void goFirst();
+    void goLast();
 
     Image* currentImage() const { return m_currentImage; }
     int currentIndex() { return m_currentIndex; }

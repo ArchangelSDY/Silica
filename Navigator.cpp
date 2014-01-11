@@ -130,6 +130,18 @@ void Navigator::goNext()
     }
 }
 
+void Navigator::goFirst()
+{
+    m_reverseNavigation = false;
+    goIndex(0);
+}
+
+void Navigator::goLast()
+{
+    m_reverseNavigation = true;
+    goIndex(m_playlist.count() - 1);
+}
+
 void Navigator::imageLoaded()
 {
     Image *loadedImage = static_cast<Image*>(QObject::sender());

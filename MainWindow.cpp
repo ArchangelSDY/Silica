@@ -262,9 +262,11 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             sidebar->setVisible(!sidebar->isVisible());
             break;
         }
-        case Qt::Key_A:
-            m_navigator.clearPlayList();
-            m_database->queryByTag("pantsu");
+        case Qt::Key_Home:
+            m_navigator.goFirst();
+            break;
+        case Qt::Key_End:
+            m_navigator.goLast();
             break;
     }
 
