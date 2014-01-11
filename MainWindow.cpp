@@ -207,6 +207,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
 {
     switch (ev->key()) {
         case Qt::Key_J:
+        case Qt::Key_Space:
             m_navigator.goNext();
             break;
         case Qt::Key_K:
