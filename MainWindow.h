@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 
+#include "CommandInterpreter.h"
 #include "db/Database.h"
 #include "Navigator.h"
 #include "PlayList.h"
@@ -26,6 +27,7 @@ public slots:
     void playListChange(PlayList *playList);
     void playListAppend(PlayList *appended);
     void navigationChange(int index);
+    void updateStatus(QString message);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
@@ -51,6 +53,7 @@ private:
 
     Navigator m_navigator;
     Database *m_database;
+    CommandInterpreter m_commandInterpreter;
     QGraphicsScene m_imageScene;
     bool m_fitInWindow;
     Mode m_inputMode;

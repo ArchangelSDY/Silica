@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     ImagesCache.cpp \
     ui/MainGraphicsView.cpp \
     db/Database.cpp \
-    db/AsunaDatabase.cpp
+    db/AsunaDatabase.cpp \
+    CommandInterpreter.cpp
 
 HEADERS  += MainWindow.h \
     Navigator.h \
@@ -29,7 +30,8 @@ HEADERS  += MainWindow.h \
     ImagesCache.h \
     ui/MainGraphicsView.h \
     db/Database.h \
-    db/AsunaDatabase.h
+    db/AsunaDatabase.h \
+    CommandInterpreter.h
 
 FORMS    += MainWindow.ui
 

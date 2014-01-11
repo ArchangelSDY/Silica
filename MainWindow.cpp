@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
     m_database(new AsunaDatabase()) ,
+    m_commandInterpreter(&m_navigator, m_database) ,
     m_fitInWindow(true) ,
     m_inputMode(ControlMode)
 {
@@ -44,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent) :
             &m_navigator, SLOT(goIndex(int)));
     connect(m_database, SIGNAL(gotPlayList(PlayList)),
             &m_navigator, SLOT(appendPlayList(PlayList)));
+    connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
+            this, SLOT(updateStatus(QString)));
 
     processCommandLineOptions();
 }
@@ -176,12 +179,27 @@ void MainWindow::updateSidebarTitle()
     ui->sidebar->setWindowTitle(title);
 }
 
+void MainWindow::updateStatus(QString message)
+{
+    if (!message.isEmpty()) {
+        statusBar()->showMessage(message);
+        statusBar()->show();
+    } else {
+        statusBar()->clearMessage();
+        statusBar()->hide();
+    }
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
     if (m_inputMode == ControlMode) {
         handleControlKeyPress(ev);
     } else if (m_inputMode == CommandMode) {
         handleCommandKeyPress(ev);
+
+        if (m_commandInterpreter.isEmpty()) {
+            m_inputMode = ControlMode;
+        }
     }
 }
 
@@ -217,8 +235,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             break;
         case Qt::Key_Slash:
             m_inputMode = CommandMode;
-            statusBar()->showMessage("Command Mode");
-            statusBar()->show();
+            handleCommandKeyPress(ev);
             break;
         case Qt::Key_T: {
             QDockWidget *sidebar = ui->sidebar;
@@ -230,18 +247,18 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             m_database->queryByTag("pantsu");
             break;
     }
+
+    ev->accept();
 }
 
 void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 {
-    switch (ev->key()) {
-        case Qt::Key_Escape:
-            m_inputMode = ControlMode;
-            statusBar()->clearMessage();
-            statusBar()->hide();
-            break;
+    if (ev->key() == Qt::Key_Escape) {
+        m_inputMode = ControlMode;
+        m_commandInterpreter.reset();
+    } else {
+        m_commandInterpreter.keyPress(ev);
     }
-
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)
