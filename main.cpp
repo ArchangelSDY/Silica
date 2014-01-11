@@ -12,6 +12,9 @@ int main(int argc, char *argv[])
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
                        "config");
 
+    QTextCodec *codec = QTextCodec::codecForName("utf8");
+    QTextCodec::setCodecForLocale(codec);
+
     MainWindow w;
     w.show();
 
