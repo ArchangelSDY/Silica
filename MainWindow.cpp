@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(paintThumbnail(Image*)));
     connect(&m_navigator, SIGNAL(playListChange(PlayList)),
             this, SLOT(playListChange(PlayList)));
-    connect(&m_navigator, SIGNAL(playListAppend(PlayList*)),
-            this, SLOT(playListAppend(PlayList*)));
+    connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
+            this, SLOT(playListAppend(PlayList)));
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
