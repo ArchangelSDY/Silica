@@ -1,6 +1,6 @@
 #include "Navigator.h"
 
-static const int MAX_PRELOAD = 0;
+static const int MAX_PRELOAD = 5;
 
 // Cache both backward/forward preloaded images and the current one
 static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
