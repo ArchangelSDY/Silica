@@ -55,7 +55,6 @@ private:
     Database *m_database;
     CommandInterpreter m_commandInterpreter;
     QGraphicsScene m_imageScene;
-    bool m_fitInWindow;
     Mode m_inputMode;
 };
 

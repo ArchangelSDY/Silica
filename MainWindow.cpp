@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow) ,
     m_database(new AsunaDatabase()) ,
     m_commandInterpreter(&m_navigator, m_database) ,
-    m_fitInWindow(true) ,
     m_inputMode(ControlMode)
 {
     ui->setupUi(this);
@@ -95,27 +94,6 @@ void MainWindow::promptToChooseFiles()
     m_navigator.setPlayList(playList);
 }
 
-void MainWindow::fitInWindowIfNecessary()
-{
-    QGraphicsView *view = ui->graphicsView;
-    if (m_fitInWindow) {
-        if (m_navigator.currentImage()) {
-            QSize imageSize = m_navigator.currentImage()->data().size();
-
-            if (imageSize.width() > view->width() ||
-                imageSize.height() > view->height()) {
-                view->fitInView(view->sceneRect(), Qt::KeepAspectRatio);
-            } else {
-                // No need to fit in view(expanding in this case)
-                // if image is smaller than view.
-                view->resetMatrix();
-            }
-        }
-    } else {
-        view->resetMatrix();
-    }
-}
-
 void MainWindow::paint(Image *image)
 {
     if (image) {
@@ -124,7 +102,7 @@ void MainWindow::paint(Image *image)
         m_imageScene.setSceneRect(pixmap.rect());
         QGraphicsPixmapItem *item = m_imageScene.addPixmap(pixmap);
         item->setTransformationMode(Qt::SmoothTransformation);
-        fitInWindowIfNecessary();
+        ui->graphicsView->fitInViewIfNecessary();
 
 
         QString status;
@@ -233,8 +211,8 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             m_navigator.goPrev();
             break;
         case Qt::Key_F:
-            m_fitInWindow = !m_fitInWindow;
-            fitInWindowIfNecessary();
+            ui->graphicsView->toggleFitInView();
+            ui->graphicsView->fitInViewIfNecessary();
             break;
         case Qt::Key_O: {
             promptToChooseFiles();
@@ -278,7 +256,6 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         case Qt::Key_8:
         case Qt::Key_9:
             ui->graphicsView->fitGridInView(ev->text().toInt());
-            m_fitInWindow = false;
             break;
     }
 
@@ -297,5 +274,5 @@ void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
-    fitInWindowIfNecessary();
+    ui->graphicsView->fitInViewIfNecessary();
 }

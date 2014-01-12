@@ -11,8 +11,14 @@ public:
     explicit MainGraphicsView(QWidget *parent = 0);
 
     void fitGridInView(int grid);
+    void fitInViewIfNecessary();
+    void toggleFitInView();
+
 protected:
     virtual void wheelEvent(QWheelEvent *);
+
+private:
+    bool m_fitInView;
 };
 
 #endif // MAINGRAPHICSVIEW_H
