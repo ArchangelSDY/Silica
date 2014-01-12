@@ -10,6 +10,7 @@ class MainGraphicsView : public QGraphicsView
 public:
     explicit MainGraphicsView(QWidget *parent = 0);
 
+    void fitGridInView(int grid);
 protected:
     virtual void wheelEvent(QWheelEvent *);
 };

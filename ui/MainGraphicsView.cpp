@@ -32,3 +32,14 @@ void MainGraphicsView::wheelEvent(QWheelEvent *ev)
         QGraphicsView::wheelEvent(ev);
     }
 }
+
+void MainGraphicsView::fitGridInView(int grid)
+{
+    qreal width = sceneRect().width() / 3;
+    qreal height = sceneRect().height() / 3;
+
+    qreal gridX = ((grid - 1) % 3) * width;
+    qreal gridY = ((grid - 1) / 3) * height;
+
+    fitInView(gridX, gridY, width, height, Qt::KeepAspectRatio);
+}

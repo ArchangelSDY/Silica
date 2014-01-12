@@ -268,6 +268,18 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         case Qt::Key_End:
             m_navigator.goLast();
             break;
+        case Qt::Key_1:
+        case Qt::Key_2:
+        case Qt::Key_3:
+        case Qt::Key_4:
+        case Qt::Key_5:
+        case Qt::Key_6:
+        case Qt::Key_7:
+        case Qt::Key_8:
+        case Qt::Key_9:
+            ui->graphicsView->fitGridInView(ev->text().toInt());
+            m_fitInWindow = false;
+            break;
     }
 
     ev->accept();
