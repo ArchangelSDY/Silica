@@ -43,7 +43,14 @@ DEFINES += QUAZIP_STATIC
 RESOURCES += \
     silica.qrc
 
-unix {
+macx {
+    LIBS += -L/usr/local/opt/zlib/lib/ -lz
+
+    LIBS += -L$$PWD/deps/quazip/quazip -lquazip
+    PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a
+}
+
+linux {
     CONFIG += link_pkgconfig
     PKGCONFIG += zlib
 
