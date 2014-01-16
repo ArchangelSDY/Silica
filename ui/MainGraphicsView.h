@@ -8,6 +8,12 @@ class MainGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
+    enum FitMode {
+        Fit = 0,
+        FitExpand = 1,
+        Actual = 2,
+    };
+
     explicit MainGraphicsView(QWidget *parent = 0);
 
     void fitGridInView(int grid);
@@ -18,7 +24,7 @@ protected:
     virtual void wheelEvent(QWheelEvent *);
 
 private:
-    bool m_fitInView;
+    FitMode m_fitInView;
 };
 
 #endif // MAINGRAPHICSVIEW_H

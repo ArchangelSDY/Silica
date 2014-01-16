@@ -4,7 +4,7 @@ static const double SCALE_FACTOR = 0.05;
 
 MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
-    m_fitInView(true)
+    m_fitInView(Fit)
 {
 }
 
@@ -43,25 +43,27 @@ void MainGraphicsView::fitGridInView(int grid)
     qreal gridY = ((grid - 1) / 3) * height;
 
     fitInView(gridX, gridY, width, height, Qt::KeepAspectRatio);
-    m_fitInView = false;
+    m_fitInView = Actual;
 }
 
 void MainGraphicsView::fitInViewIfNecessary()
 {
-    if (m_fitInView) {
-        if (sceneRect().width() > width() || sceneRect().height() > height()) {
+    if (sceneRect().width() > width() || sceneRect().height() > height()) {
+        if (m_fitInView == Fit) {
             fitInView(sceneRect(), Qt::KeepAspectRatio);
+        } else if (m_fitInView == FitExpand) {
+            fitInView(sceneRect(), Qt::KeepAspectRatioByExpanding);
         } else {
-            // No need to fit in view(expanding in this case)
-            // if image is smaller than view.
             resetMatrix();
         }
     } else {
+        // No need to fit in view(expanding in this case)
+        // if image is smaller than view.
         resetMatrix();
     }
 }
 
 void MainGraphicsView::toggleFitInView()
 {
-    m_fitInView = !m_fitInView;
+    m_fitInView = static_cast<MainGraphicsView::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
 }
