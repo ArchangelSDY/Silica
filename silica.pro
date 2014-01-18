@@ -48,6 +48,11 @@ macx {
 
     LIBS += -L$$PWD/deps/quazip/quazip -lquazip
     PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a
+
+    config.path = $$OUT_PWD/silica.app/Contents/MacOS/config/Asuna
+    config.files = $$PWD/assets/Silica.ini
+
+    INSTALLS += config
 }
 
 linux {
