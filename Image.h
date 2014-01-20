@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QtGui>
 
+#include "ImageSource.h"
+
 class Image : public QObject
 {
     Q_OBJECT
@@ -20,11 +22,15 @@ public:
     Status status() const { return m_status; }
     QImage data() { return m_image; }
     QImage thumbnail() { return m_thumbnail; }
-    QUrl url() const { return m_url; }
     QString name() const;
 
     void load();
     void loadThumbnail();
+
+    inline bool operator ==(const Image &other)
+    {
+        return m_imageSource == other.m_imageSource;
+    }
 
 signals:
     void loaded();
@@ -38,7 +44,7 @@ private:
     void computeThumbnailPath();
 
     Status m_status;
-    QUrl m_url;
+    ImageSource m_imageSource;
     QImage m_image;
     QImage m_thumbnail;
     QString m_thumbnailPath;

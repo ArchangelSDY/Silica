@@ -146,7 +146,7 @@ void Navigator::imageLoaded()
 {
     Image *loadedImage = static_cast<Image*>(QObject::sender());
     if (loadedImage) {
-        if (loadedImage->url() == m_currentImage->url()) {
+        if (loadedImage == m_currentImage) {
             emit paint(loadedImage);
         }
     }
@@ -159,7 +159,7 @@ void Navigator::thumbnailLoaded()
         image->status() != Image::LoadComplete &&
         !image->thumbnail().isNull()) {
 
-        if (image->url() == m_currentImage->url()) {
+        if (image == m_currentImage) {
             emit paintThumbnail(image);
         }
     }

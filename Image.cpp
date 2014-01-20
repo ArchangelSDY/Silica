@@ -7,40 +7,23 @@ static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
-static QImage loadImageAtBackground(QUrl url)
+static QImage loadImageAtBackground(ImageSource imageSource)
 {
-    if (url.scheme() == "file") {
-        QString imagePath = url.toLocalFile();
+    if (imageSource.open()) {
+        QImageReader reader(imageSource.device());
+        QImage image = reader.read();
 
-        QImageReader reader(imagePath);
-        return reader.read();
-    } else if (url.scheme() == "zip") {
-        QString imageName = url.fragment();
-
-        QUrl zipUrl = url;
-        zipUrl.setScheme("file");
-        zipUrl.setFragment("");
-        QString zipPath = zipUrl.toLocalFile();
-
-        QuaZipFile imageFile(zipPath, imageName);
-        bool success = imageFile.open(QuaZipFile::ReadOnly);
-
-        if (success) {
-            QImageReader reader(&imageFile);
-            QImage image = reader.read();
-
-            imageFile.close();
-            return image;
-        }
+        imageSource.close();
+        return image;
+    } else {
+        return QImage();
     }
-
-    return QImage();
 }
 
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
-    m_url(url)
+    m_imageSource(url)
 {
     computeThumbnailPath();
 
@@ -49,13 +32,13 @@ Image::Image(QUrl url, QObject *parent) :
 
 void Image::load()
 {
-    if (m_status != Image::NotLoad || m_url.isEmpty()) {
+    if (m_status != Image::NotLoad) {
         return;
     }
 
     m_status = Image::Loading;
 
-    m_readerFuture = QtConcurrent::run(loadImageAtBackground, m_url);
+    m_readerFuture = QtConcurrent::run(loadImageAtBackground, m_imageSource);
     m_readerWatcher.setFuture(m_readerFuture);
 }
 
@@ -104,8 +87,8 @@ void Image::makeThumbnail()
 
 void Image::computeThumbnailPath()
 {
-    QByteArray hash = QCryptographicHash::hash(
-        QByteArray(m_url.url().toUtf8()), QCryptographicHash::Sha1).toHex();
+    QByteArray hash = m_imageSource.hash();
+
     QString sub = hash.left(2);
     QString name =hash.mid(2);
 
@@ -120,11 +103,5 @@ void Image::computeThumbnailPath()
 
 QString Image::name() const
 {
-    if (m_url.scheme() == "zip") {
-        return m_url.fragment();
-    } else {
-        QString path = m_url.toLocalFile();
-        QFileInfo file(path);
-        return file.fileName();
-    }
+    return m_imageSource.name();
 }

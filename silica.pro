@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     ui/MainGraphicsView.cpp \
     db/Database.cpp \
     db/AsunaDatabase.cpp \
-    CommandInterpreter.cpp
+    CommandInterpreter.cpp \
+    ImageSource.cpp
 
 HEADERS  += MainWindow.h \
     Navigator.h \
@@ -31,7 +32,8 @@ HEADERS  += MainWindow.h \
     ui/MainGraphicsView.h \
     db/Database.h \
     db/AsunaDatabase.h \
-    CommandInterpreter.h
+    CommandInterpreter.h \
+    ImageSource.h
 
 FORMS    += MainWindow.ui
 
