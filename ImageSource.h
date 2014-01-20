@@ -30,6 +30,7 @@ public:
 
 private:
     void initLocalImage(QString path);
+    QString searchRealPath(QString path);
     void computeHash();
 
     SourceFormat m_sourceFormat;

@@ -1,9 +1,12 @@
 #include <QCryptographicHash>
+#include <QDir>
 #include <QFileInfo>
+#include <QSettings>
 #include <QTextStream>
 #include <QUrl>
 #include <quazipfile.h>
 
+#include "GlobalConfig.h"
 #include "ImageSource.h"
 
 ImageSource::ImageSource(QUrl url) :
@@ -18,9 +21,13 @@ ImageSource::ImageSource(QUrl url) :
         QUrl zipUrl = url;
         zipUrl.setScheme("file");
         zipUrl.setFragment("");
-        m_zipPath = zipUrl.toLocalFile();
+        m_zipPath = searchRealPath(zipUrl.toLocalFile());
 
-        m_sourceFormat = LocalZip;
+        if (!m_zipPath.isEmpty()) {
+            m_sourceFormat = LocalZip;
+        } else {
+            m_sourceFormat = NoneImage;
+        }
     }
 }
 
@@ -33,12 +40,32 @@ ImageSource::ImageSource(QString path) :
 
 void ImageSource::initLocalImage(QString path)
 {
-    QFileInfo file(path);
-    if (file.exists()) {
+    QString realPath = searchRealPath(path);
+    if (!realPath.isEmpty()) {
+        QFileInfo info(realPath);
         m_imagePath = path;
-        m_name = file.fileName();
+        m_name = info.fileName();
         m_sourceFormat = LocalImage;
     }
+
+}
+
+QString ImageSource::searchRealPath(QString path)
+{
+    QFileInfo file(path);
+    if (file.exists()) {
+        return path;
+    }
+
+    foreach (const QString &dir, GlobalConfig::instance()->zipDirs()) {
+        QString realPath = dir + path;
+        file = QFileInfo(realPath);
+        if (file.exists()) {
+            return realPath;
+        }
+    }
+
+    return QString();
 }
 
 const QByteArray ImageSource::hash()

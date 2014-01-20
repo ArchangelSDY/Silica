@@ -51,7 +51,6 @@ void AsunaDatabase::parseJsonResponse(QNetworkReply *reply)
         QString imageUrl;
         QTextStream imageUrlBuilder(&imageUrl);
         imageUrlBuilder << "zip:///"
-                        << m_settings.value("ZIP_DIR").toString()
                         << zipPackage << "#" << fileName;
 
         playList << QUrl(imageUrl);
