@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                       "config");
+                       QCoreApplication::applicationDirPath() + "/config");
 
     QTextCodec *codec = QTextCodec::codecForName("utf8");
     QTextCodec::setCodecForLocale(codec);

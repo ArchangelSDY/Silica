@@ -23,11 +23,14 @@ GlobalConfig *GlobalConfig::instance()
 void GlobalConfig::load()
 {
     QSettings settings;
+    qDebug() << "Config: " << settings.fileName() << "\n";
+
     int size = settings.beginReadArray("ZipDirs");
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
         m_zipDirs << settings.value("DIR").toString();
-        qDebug() << settings.value("DIR").toString() << "\n";
+
+        qDebug() << "ZipDir: " << settings.value("DIR").toString() << "\n";
     }
     settings.endArray();
 }
