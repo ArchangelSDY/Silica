@@ -21,8 +21,6 @@ void AsunaDatabase::queryByTag(const QString &tag, int page)
 
     QUrl url(urlString);
     QNetworkRequest request(url);
-    request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
-                         QNetworkRequest::PreferCache);
     m_net.get(request);
 }
 
