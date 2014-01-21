@@ -21,11 +21,11 @@ public:
 
     QIODevice *device() { return m_device.data(); }
     const QString name() const { return m_name; }
-    const QByteArray hash();
+    const QByteArray hash() const { return m_hash; }
 
     inline bool operator ==(const ImageSource &other)
     {
-        return m_hash == other.m_hash;
+        return hash() == other.hash();
     }
 
 private:

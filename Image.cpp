@@ -90,15 +90,16 @@ void Image::computeThumbnailPath()
     QByteArray hash = m_imageSource.hash();
 
     QString sub = hash.left(2);
-    QString name =hash.mid(2);
+    QString name = hash.mid(2);
 
     QStringList pathParts;
-    pathParts << QCoreApplication::applicationDirPath() << QDir::separator()
+    pathParts << QCoreApplication::applicationDirPath()
               << THUMBNAIL_FOLDER << sub << name;
     m_thumbnailPath = pathParts.join(QDir::separator());
 
     QDir dir;
-    dir.mkpath(THUMBNAIL_FOLDER + QDir::separator() + sub);
+    dir.mkpath(QCoreApplication::applicationDirPath() + QDir::separator() +
+               THUMBNAIL_FOLDER + QDir::separator() + sub);
 }
 
 

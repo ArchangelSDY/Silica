@@ -29,6 +29,8 @@ ImageSource::ImageSource(QUrl url) :
             m_sourceFormat = NoneImage;
         }
     }
+
+    computeHash();
 }
 
 ImageSource::ImageSource(QString path) :
@@ -36,6 +38,7 @@ ImageSource::ImageSource(QString path) :
     m_device(0)
 {
     initLocalImage(path);
+    computeHash();
 }
 
 void ImageSource::initLocalImage(QString path)
@@ -68,15 +71,6 @@ QString ImageSource::searchRealPath(QString path)
     return QString();
 }
 
-const QByteArray ImageSource::hash()
-{
-    if (m_hash.isEmpty()) {
-        computeHash();
-    }
-
-    return m_hash;
-}
-
 bool ImageSource::open()
 {
     if (m_sourceFormat == NoneImage) {
@@ -102,7 +96,7 @@ void ImageSource::close()
 void ImageSource::computeHash()
 {
     QString totalPath;
-    QTextStream(&totalPath) << m_imagePath << "#" << m_zipPath;
+    QTextStream(&totalPath) << m_imagePath << "#" << m_zipPath << "#" << m_name;
     m_hash = QCryptographicHash::hash(
         QByteArray(totalPath.toUtf8()), QCryptographicHash::Sha1).toHex();
 }
