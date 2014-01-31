@@ -9,6 +9,8 @@ public:
     LocalImageSource(QString path);
 
     virtual bool open();
+
+    virtual bool copy(const QString &destPath);
 private:
     QString m_path;
 };

@@ -15,6 +15,8 @@ public:
     virtual bool open() = 0;
     virtual void close();
 
+    virtual bool copy(const QString &destPath) = 0;
+
     QIODevice *device() { return m_device.data(); }
     const QString name() const { return m_name; }
     const QByteArray hash() const { return m_hash; }

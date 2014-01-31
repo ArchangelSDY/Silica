@@ -28,6 +28,8 @@ public:
     void load();
     void loadThumbnail();
 
+    bool copy(const QString &destPath);
+
     inline bool operator ==(const Image &other)
     {
         return m_imageSource == other.m_imageSource;

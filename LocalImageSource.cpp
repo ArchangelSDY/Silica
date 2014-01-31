@@ -25,3 +25,8 @@ bool LocalImageSource::open()
     m_device.reset(new QFile(m_path));
     return m_device->open(QIODevice::ReadOnly);
 }
+
+bool LocalImageSource::copy(const QString &destPath)
+{
+    return QFile::copy(m_path, destPath);
+}

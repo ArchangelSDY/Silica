@@ -35,7 +35,8 @@ protected:
 
 private:
     void processCommandLineOptions();
-    void promptToChooseFiles();
+    void promptToOpen();
+    void promptToSave();
 
     void fitInWindowIfNecessary();
 

@@ -76,7 +76,7 @@ void MainWindow::processCommandLineOptions()
     m_navigator.setPlayList(playList);
 }
 
-void MainWindow::promptToChooseFiles()
+void MainWindow::promptToOpen()
 {
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
         this, QString(), QUrl(),
@@ -92,6 +92,17 @@ void MainWindow::promptToChooseFiles()
 
     PlayList playList(images);
     m_navigator.setPlayList(playList);
+}
+
+void MainWindow::promptToSave()
+{
+    if (m_navigator.currentImage()) {
+        QString destDir = QFileDialog::getExistingDirectory(this);
+        QString fileName = m_navigator.currentImage()->name();
+        QString destPath = destDir + QDir::separator() + fileName;
+
+        m_navigator.currentImage()->copy(destPath);
+    }
 }
 
 void MainWindow::paint(Image *image)
@@ -215,7 +226,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             ui->graphicsView->fitInViewIfNecessary();
             break;
         case Qt::Key_O: {
-            promptToChooseFiles();
+            promptToOpen();
             break;
         }
         case Qt::Key_F11:
@@ -234,6 +245,9 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         case Qt::Key_Slash:
             m_inputMode = CommandMode;
             handleCommandKeyPress(ev);
+            break;
+        case Qt::Key_S:
+            promptToSave();
             break;
         case Qt::Key_T: {
             QDockWidget *sidebar = ui->sidebar;
