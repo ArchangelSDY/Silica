@@ -118,7 +118,7 @@ QString Image::name() const
 bool Image::copy(const QString &destPath)
 {
     if (!m_imageSource.isNull()) {
-        m_imageSource->copy(destPath);
+        return m_imageSource->copy(destPath);
     } else {
         return false;
     }
