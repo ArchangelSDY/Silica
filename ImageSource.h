@@ -7,17 +7,13 @@
 class ImageSource
 {
 public:
-    enum SourceFormat {
-        NoneImage,
-        LocalImage,
-        LocalZip,
-    };
+    static ImageSource *create(QUrl url);
+    static ImageSource *create(QString path);
 
-    explicit ImageSource(QUrl url);
-    explicit ImageSource(QString path);
+    virtual ~ImageSource();
 
-    bool open();
-    void close();
+    virtual bool open() = 0;
+    virtual void close();
 
     QIODevice *device() { return m_device.data(); }
     const QString name() const { return m_name; }
@@ -28,14 +24,11 @@ public:
         return hash() == other.hash();
     }
 
-private:
-    void initLocalImage(QString path);
-    QString searchRealPath(QString path);
-    void computeHash();
+protected:
+    ImageSource() {}
 
-    SourceFormat m_sourceFormat;
-    QString m_imagePath;
-    QString m_zipPath;
+    QString searchRealPath(QString path);
+
     QString m_name;
     QByteArray m_hash;
     QSharedPointer<QIODevice> m_device;

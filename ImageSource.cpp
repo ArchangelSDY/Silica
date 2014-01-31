@@ -8,49 +8,35 @@
 
 #include "GlobalConfig.h"
 #include "ImageSource.h"
+#include "LocalImageSource.h"
+#include "ZipImageSource.h"
 
-ImageSource::ImageSource(QUrl url) :
-    m_sourceFormat(NoneImage) ,
-    m_device(0)
+ImageSource *ImageSource::create(QUrl url)
 {
     if (url.scheme() == "file") {
-        initLocalImage(url.toLocalFile());
+        return new LocalImageSource(url.toLocalFile());
     } else if (url.scheme() == "zip") {
-        m_name = url.fragment();
+        QString imageName = url.fragment();
 
         QUrl zipUrl = url;
         zipUrl.setScheme("file");
         zipUrl.setFragment("");
-        m_zipPath = searchRealPath(zipUrl.toLocalFile());
+        QString zipPath = zipUrl.toLocalFile();
 
-        if (!m_zipPath.isEmpty()) {
-            m_sourceFormat = LocalZip;
-        } else {
-            m_sourceFormat = NoneImage;
-        }
+        return new ZipImageSource(zipPath, imageName);
+    } else {
+        return 0;
     }
-
-    computeHash();
 }
 
-ImageSource::ImageSource(QString path) :
-    m_sourceFormat(NoneImage) ,
-    m_device(0)
+ImageSource *ImageSource::create(QString path)
 {
-    initLocalImage(path);
-    computeHash();
+    return new LocalImageSource(path);
 }
 
-void ImageSource::initLocalImage(QString path)
+ImageSource::~ImageSource()
 {
-    QString realPath = searchRealPath(path);
-    if (!realPath.isEmpty()) {
-        QFileInfo info(realPath);
-        m_imagePath = path;
-        m_name = info.fileName();
-        m_sourceFormat = LocalImage;
-    }
-
+    m_device.clear();
 }
 
 QString ImageSource::searchRealPath(QString path)
@@ -71,32 +57,10 @@ QString ImageSource::searchRealPath(QString path)
     return QString();
 }
 
-bool ImageSource::open()
-{
-    if (m_sourceFormat == NoneImage) {
-        return false;
-    }
-
-    if (m_sourceFormat == LocalImage) {
-        m_device.reset(new QFile(m_imagePath));
-    } else if (m_sourceFormat == LocalZip) {
-        m_device.reset(new QuaZipFile(m_zipPath, m_name));
-    }
-
-    return m_device->open(QIODevice::ReadOnly);
-}
-
 void ImageSource::close()
 {
-    if (m_device) {
+    if (!m_device.isNull()) {
         m_device->close();
+        m_device.clear();
     }
-}
-
-void ImageSource::computeHash()
-{
-    QString totalPath;
-    QTextStream(&totalPath) << m_imagePath << "#" << m_zipPath << "#" << m_name;
-    m_hash = QCryptographicHash::hash(
-        QByteArray(totalPath.toUtf8()), QCryptographicHash::Sha1).toHex();
 }

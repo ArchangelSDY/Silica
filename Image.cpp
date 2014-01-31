@@ -7,13 +7,13 @@ static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
-static QImage loadImageAtBackground(ImageSource imageSource)
+static QImage loadImageAtBackground(QSharedPointer<ImageSource> imageSource)
 {
-    if (imageSource.open()) {
-        QImageReader reader(imageSource.device());
+    if (!imageSource.isNull() && imageSource->open()) {
+        QImageReader reader(imageSource->device());
         QImage image = reader.read();
 
-        imageSource.close();
+        imageSource->close();
         return image;
     } else {
         return QImage();
@@ -23,11 +23,16 @@ static QImage loadImageAtBackground(ImageSource imageSource)
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
-    m_imageSource(url)
+    m_imageSource(ImageSource::create(url))
 {
     computeThumbnailPath();
 
     connect(&m_readerWatcher, SIGNAL(finished()), this, SLOT(readerFinished()));
+}
+
+Image::~Image()
+{
+    m_imageSource.clear();
 }
 
 void Image::load()
@@ -87,23 +92,25 @@ void Image::makeThumbnail()
 
 void Image::computeThumbnailPath()
 {
-    QByteArray hash = m_imageSource.hash();
+    if (!m_imageSource.isNull()) {
+        QByteArray hash = m_imageSource->hash();
 
-    QString sub = hash.left(2);
-    QString name = hash.mid(2);
+        QString sub = hash.left(2);
+        QString name = hash.mid(2);
 
-    QStringList pathParts;
-    pathParts << QCoreApplication::applicationDirPath()
-              << THUMBNAIL_FOLDER << sub << name;
-    m_thumbnailPath = pathParts.join(QDir::separator());
+        QStringList pathParts;
+        pathParts << QCoreApplication::applicationDirPath()
+                  << THUMBNAIL_FOLDER << sub << name;
+        m_thumbnailPath = pathParts.join(QDir::separator());
 
-    QDir dir;
-    dir.mkpath(QCoreApplication::applicationDirPath() + QDir::separator() +
-               THUMBNAIL_FOLDER + QDir::separator() + sub);
+        QDir dir;
+        dir.mkpath(QCoreApplication::applicationDirPath() + QDir::separator() +
+                   THUMBNAIL_FOLDER + QDir::separator() + sub);
+    }
 }
 
 
 QString Image::name() const
 {
-    return m_imageSource.name();
+    return m_imageSource.isNull() ? QString() : m_imageSource->name();
 }
