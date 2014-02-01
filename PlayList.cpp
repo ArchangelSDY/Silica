@@ -27,11 +27,13 @@ void PlayList::addPath(const QString &path)
 
         if (dir.entryInfoList().length() > 0) {
             foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
-                *this << QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+                QUrl imageUrl = QUrl::fromLocalFile(
+                    fileInfo.absoluteFilePath());
+                *this << QSharedPointer<Image>(new Image(imageUrl));
             }
         }
     } else {
-        *this << QUrl::fromLocalFile(path);
+        *this << QSharedPointer<Image>(new Image(QUrl::fromLocalFile(path)));
     }
 }
 
@@ -47,7 +49,7 @@ void PlayList::addPath(const QUrl &url)
     } else if (url.scheme() == "zip") {
         if (url.hasFragment()) {
             // Single file
-            *this << url;
+            *this << QSharedPointer<Image>(new Image(url));
         } else {
             // Add all files in the zip
             // FIXME: Should skip non image files
@@ -63,7 +65,7 @@ void PlayList::addPath(const QUrl &url)
                     QUrl imageUrl = url;
                     imageUrl.setFragment(name);
 
-                    *this << imageUrl;
+                    *this << QSharedPointer<Image>(new Image(imageUrl));
                 }
 
                 zip.close();

@@ -162,12 +162,8 @@ void MainWindow::playListChange(PlayList playList)
 void MainWindow::playListAppend(PlayList appended)
 {
     QListWidget *list = ui->playListWidget;
-    foreach (const QUrl &url, appended) {
-        if (url.scheme() != "zip") {
-            list->addItem(QFileInfo(url.toLocalFile()).completeBaseName());
-        } else {
-            list->addItem(url.fragment());
-        }
+    foreach (const QSharedPointer<Image> &image, appended) {
+        list->addItem(image->name());
     }
 
     updateSidebarTitle();

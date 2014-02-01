@@ -67,11 +67,10 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
         return 0;
     }
 
-    QUrl url = m_playlist[index];
     Image *image = m_cachedImages.at(index);
 
     if (!image) {
-        image = new Image(url);
+        image = m_playlist[index].data();
         m_cachedImages.insert(index, image);
     }
 

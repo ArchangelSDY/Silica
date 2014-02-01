@@ -3,7 +3,9 @@
 
 #include <QUrl>
 
-class PlayList : public QList<QUrl>
+#include "Image.h"
+
+class PlayList : public QList<QSharedPointer<Image> >
 {
 public:
     PlayList() {}

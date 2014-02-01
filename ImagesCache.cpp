@@ -29,7 +29,7 @@ void ImagesCache::clear()
          i != m_images.end(); ++i) {
         Image *image = i.value();
         if (image) {
-            delete image;
+            image->scheduleUnload();
         }
     }
 
@@ -55,6 +55,6 @@ void ImagesCache::trim(int index)
     }
 
     if (toRemove) {
-        delete toRemove;
+        toRemove->scheduleUnload();
     }
 }

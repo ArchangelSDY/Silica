@@ -7,23 +7,24 @@ static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
-static QImage loadImageAtBackground(QSharedPointer<ImageSource> imageSource)
+static QImage *loadImageAtBackground(QSharedPointer<ImageSource> imageSource)
 {
     if (!imageSource.isNull() && imageSource->open()) {
         QImageReader reader(imageSource->device());
         QImage image = reader.read();
 
         imageSource->close();
-        return image;
+        return new QImage(image);
     } else {
-        return QImage();
+        return new QImage();
     }
 }
 
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
-    m_imageSource(ImageSource::create(url))
+    m_imageSource(ImageSource::create(url)) ,
+    m_image(new QImage())
 {
     computeThumbnailPath();
 
@@ -47,30 +48,56 @@ void Image::load()
     m_readerWatcher.setFuture(m_readerFuture);
 }
 
+void Image::scheduleUnload()
+{
+    if (m_status == Image::Loading) {
+        m_status = Image::ScheduleUnload;
+    } else {
+        unload();
+    }
+}
+
+void Image::unload()
+{
+    m_status = Image::NotLoad;
+    delete m_image;
+    m_image = new QImage();
+}
+
 void Image::readerFinished()
 {
-    m_image = m_readerFuture.result();
+    if (m_status == Image::Loading) {
+        delete m_image;
+        m_image = m_readerFuture.result();
 
-    if (!m_image.isNull()) {
-        m_status = Image::LoadComplete;
+        if (!m_image->isNull()) {
+            m_status = Image::LoadComplete;
+        } else {
+            m_status = Image::LoadError;
+
+            // Show a warning image
+            delete m_image;
+            m_image = new QImage(":/res/warning.png");
+        }
+
+        emit loaded();
+
+        if (m_thumbnail.isNull() && m_status == Image::LoadComplete) {
+            makeThumbnail();
+        }
     } else {
-        m_status = Image::LoadError;
-
-        // Show a warning image
-        m_image = QImage(":/res/warning.png");
-    }
-
-    emit loaded();
-
-    if (m_thumbnail.isNull() && m_status == Image::LoadComplete) {
-        makeThumbnail();
+        // For Status::ScheduleUnload
+        unload();
     }
 }
 
 void Image::loadThumbnail()
 {
-    QFile file(m_thumbnailPath);
+    if (!m_thumbnail.isNull()) {
+        return;
+    }
 
+    QFile file(m_thumbnailPath);
     if (file.exists()) {
         m_thumbnail = QImage(m_thumbnailPath);
 
@@ -82,10 +109,12 @@ void Image::loadThumbnail()
 
 void Image::makeThumbnail()
 {
-    int height = qMax<int>(
-        THUMBNAIL_MIN_HEIGHT, m_image.height() / THUMBNAIL_SCALE_RATIO);
+    Q_ASSERT(m_image);
 
-    m_thumbnail = m_image.scaledToHeight(height);
+    int height = qMax<int>(
+        THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
+
+    m_thumbnail = m_image->scaledToHeight(height);
     m_thumbnail.save(m_thumbnailPath, "JPG");
     emit thumbnailLoaded();
 }

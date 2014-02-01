@@ -51,7 +51,7 @@ void AsunaDatabase::parseJsonResponse(QNetworkReply *reply)
         imageUrlBuilder << "zip:///"
                         << zipPackage << "#" << fileName;
 
-        playList << QUrl(imageUrl);
+        playList << QSharedPointer<Image>(new Image(imageUrl));
     }
 
     emit gotPlayList(playList);
