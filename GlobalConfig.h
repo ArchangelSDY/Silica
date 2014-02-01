@@ -10,6 +10,7 @@ public:
     static GlobalConfig *instance();
 
     QList<QString> zipDirs() const { return m_zipDirs; }
+    const QString &wallpaperDir() const { return m_wallpaperDir; }
 private:
     GlobalConfig();
 
@@ -17,6 +18,7 @@ private:
 
     static GlobalConfig *m_instance;
     QList<QString> m_zipDirs;
+    QString m_wallpaperDir;
 };
 
 #endif // GLOBALCONFIG_H

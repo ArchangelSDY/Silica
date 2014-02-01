@@ -6,6 +6,7 @@
 #include <QStatusBar>
 
 #include "db/AsunaDatabase.h"
+#include "GlobalConfig.h"
 #include "PlayList.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -97,7 +98,8 @@ void MainWindow::promptToOpen()
 void MainWindow::promptToSave()
 {
     if (m_navigator.currentImage()) {
-        QString destDir = QFileDialog::getExistingDirectory(this);
+        QString destDir = QFileDialog::getExistingDirectory(
+            this, "Save to", GlobalConfig::instance()->wallpaperDir());
         QString fileName = m_navigator.currentImage()->name();
         QString destPath = destDir + QDir::separator() + fileName;
 

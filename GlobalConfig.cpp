@@ -25,6 +25,7 @@ void GlobalConfig::load()
     QSettings settings;
     qDebug() << "Config: " << settings.fileName() << "\n";
 
+    // Zip dirs
     int size = settings.beginReadArray("ZipDirs");
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
@@ -33,4 +34,8 @@ void GlobalConfig::load()
         qDebug() << "ZipDir: " << settings.value("DIR").toString() << "\n";
     }
     settings.endArray();
+
+    // Wallpaper dir
+    m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
+    qDebug() << "WallpaperDir: " << m_wallpaperDir << "\n";
 }
