@@ -48,10 +48,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
             ui->gallery, SLOT(playListAppend(PlayList)));
 
+    // Navigation binding for playListWidget
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             &m_navigator, SLOT(goIndex(int)));
+
+    // Navigation binding for galery
+    connect(ui->gallery, SIGNAL(currentSelectionChanged(int)),
+            &m_navigator, SLOT(goIndex(int)));
+
     connect(m_database, SIGNAL(gotPlayList(PlayList)),
             &m_navigator, SLOT(appendPlayList(PlayList)));
     connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),

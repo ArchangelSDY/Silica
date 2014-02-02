@@ -48,8 +48,13 @@ void GalleryView::playListAppend(PlayList appended)
         qreal y = i / maxColumns * galleryItemSize.height();
         item->setPos(x, y);
 
-        // qDebug() << "thumbnail at :" << x << "," << y << "\n";
-
         m_scene->addItem(item);
     }
+}
+
+void GalleryView::mousePressEvent(QMouseEvent *event)
+{
+    QGraphicsItem *item = itemAt(event->pos());
+    int index = items().length() - items().indexOf(item) - 1;
+    emit currentSelectionChanged(index);
 }

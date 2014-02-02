@@ -1,3 +1,5 @@
+#include <QGraphicsScene>
+
 #include "GalleryItem.h"
 #include "../GlobalConfig.h"
 
