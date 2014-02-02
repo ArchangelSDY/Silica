@@ -23,7 +23,7 @@ GlobalConfig *GlobalConfig::instance()
 void GlobalConfig::load()
 {
     QSettings settings;
-    qDebug() << "Config: " << settings.fileName() << "\n";
+    qDebug() << "Config: " << settings.fileName();
 
     // Zip dirs
     int size = settings.beginReadArray("ZipDirs");
@@ -31,13 +31,13 @@ void GlobalConfig::load()
         settings.setArrayIndex(i);
         m_zipDirs << settings.value("DIR").toString();
 
-        qDebug() << "ZipDir: " << settings.value("DIR").toString() << "\n";
+        qDebug() << "ZipDir: " << settings.value("DIR").toString();
     }
     settings.endArray();
 
     // Wallpaper dir
     m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
-    qDebug() << "WallpaperDir: " << m_wallpaperDir << "\n";
+    qDebug() << "WallpaperDir: " << m_wallpaperDir;
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(150, 150);
