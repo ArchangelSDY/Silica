@@ -38,4 +38,7 @@ void GlobalConfig::load()
     // Wallpaper dir
     m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
     qDebug() << "WallpaperDir: " << m_wallpaperDir << "\n";
+
+    // FIXME: Load gallery item size
+    m_galleryItemSize = QSize(100, 100);
 }

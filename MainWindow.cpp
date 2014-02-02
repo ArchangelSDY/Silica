@@ -35,10 +35,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
     connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
             this, SLOT(paintThumbnail(Image*)));
+
+    // Update sidebar
     connect(&m_navigator, SIGNAL(playListChange(PlayList)),
             this, SLOT(playListChange(PlayList)));
     connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
             this, SLOT(playListAppend(PlayList)));
+
+    // Update gallery
+    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
+            ui->gallery, SLOT(playListChange(PlayList)));
+    connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
+            ui->gallery, SLOT(playListAppend(PlayList)));
+
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),

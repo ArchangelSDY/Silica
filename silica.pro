@@ -13,33 +13,38 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
-    Navigator.cpp \
+    CommandInterpreter.cpp \
+    GlobalConfig.cpp \
     Image.cpp \
-    PlayList.cpp \
     ImagesCache.cpp \
-    ui/MainGraphicsView.cpp \
+    ImageSource.cpp \
+    LocalImageSource.cpp \
+    MainWindow.cpp \
+    Navigator.cpp \
+    PlayList.cpp \
+    ZipImageSource.cpp \
     db/Database.cpp \
     db/AsunaDatabase.cpp \
-    CommandInterpreter.cpp \
-    ImageSource.cpp \
-    GlobalConfig.cpp \
-    LocalImageSource.cpp \
-    ZipImageSource.cpp
+    ui/GalleryItem.cpp \
+    ui/GalleryView.cpp \
+    ui/MainGraphicsView.cpp
 
-HEADERS  += MainWindow.h \
-    Navigator.h \
+HEADERS  += \
+    CommandInterpreter.h \
+    GlobalConfig.h \
     Image.h \
-    PlayList.h \
     ImagesCache.h \
-    ui/MainGraphicsView.h \
+    ImageSource.h \
+    LocalImageSource.h \
+    MainWindow.h \
+    Navigator.h \
+    PlayList.h \
+    ZipImageSource.h \
     db/Database.h \
     db/AsunaDatabase.h \
-    CommandInterpreter.h \
-    ImageSource.h \
-    GlobalConfig.h \
-    LocalImageSource.h \
-    ZipImageSource.h
+    ui/GalleryItem.h \
+    ui/GalleryView.h \
+    ui/MainGraphicsView.h
 
 FORMS    += MainWindow.ui
 
