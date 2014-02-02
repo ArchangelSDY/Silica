@@ -15,9 +15,12 @@ public:
 public slots:
     void thumbnailLoaded();
 
+protected:
+    virtual void paint(QPainter *painter,
+                       const QStyleOptionGraphicsItem *, QWidget *);
+
 private:
     Image *m_image;
-
 };
 
 #endif // GALLERYITEM_H

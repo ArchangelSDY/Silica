@@ -8,6 +8,7 @@ GalleryView::GalleryView(QWidget *parent) :
     m_playList(0) ,
     m_scene(new QGraphicsScene)
 {
+    m_scene->setBackgroundBrush(Qt::gray);
     setScene(m_scene);
 }
 
