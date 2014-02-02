@@ -7,16 +7,25 @@ GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
 {
     // FIXME: Make thumbnail immediately when not available
     if (m_image) {
-        m_image->loadThumbnail();
+        connect(m_image, SIGNAL(thumbnailLoaded()),
+                this, SLOT(thumbnailLoaded()));
+        m_image->loadThumbnail(true);
+    }
+}
 
-        const QImage &thumbnailImage = m_image->thumbnail();
-        if (!thumbnailImage.isNull()) {
-            QPixmap thumbnail = QPixmap::fromImage(m_image->thumbnail());
-            QPixmap scaledThumbnail = thumbnail.scaled(
-                GlobalConfig::instance()->galleryItemSize(),
-                Qt::KeepAspectRatio, Qt::SmoothTransformation);
+void GalleryItem::thumbnailLoaded()
+{
+    if (!m_image) {
+        return;
+    }
 
-            setPixmap(scaledThumbnail);
-        }
+    const QImage &thumbnailImage = m_image->thumbnail();
+    if (!thumbnailImage.isNull()) {
+        QPixmap thumbnail = QPixmap::fromImage(m_image->thumbnail());
+        QPixmap scaledThumbnail = thumbnail.scaled(
+            GlobalConfig::instance()->galleryItemSize(),
+            Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        setPixmap(scaledThumbnail);
     }
 }

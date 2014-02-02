@@ -5,10 +5,15 @@
 
 #include "../Image.h"
 
-class GalleryItem : public QGraphicsPixmapItem
+class GalleryItem : public QObject, public QGraphicsPixmapItem
 {
+    Q_OBJECT
+
 public:
     explicit GalleryItem(Image *image, QGraphicsItem *parent = 0);
+
+public slots:
+    void thumbnailLoaded();
 
 private:
     Image *m_image;

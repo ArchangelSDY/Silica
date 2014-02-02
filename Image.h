@@ -18,7 +18,6 @@ public:
         Loading,
         LoadComplete,
         LoadError,
-        ScheduleUnload,
     };
 
     Status status() const { return m_status; }
@@ -31,7 +30,7 @@ public:
     QString name() const;
 
     void load();
-    void loadThumbnail();
+    void loadThumbnail(bool makeImmediately = false);
     void scheduleUnload();
 
     bool copy(const QString &destPath);
@@ -49,7 +48,7 @@ public slots:
     void readerFinished();
 
 private:
-    void unload();
+    void unloadIfNeeded();
     void makeThumbnail();
     void computeThumbnailPath();
 
@@ -58,6 +57,7 @@ private:
     QImage *m_image;
     QImage m_thumbnail;
     QString m_thumbnailPath;
+    int m_loadRequestsCount;
 
     QFuture<QImage *> m_readerFuture;
     QFutureWatcher<QImage *> m_readerWatcher;

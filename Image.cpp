@@ -24,7 +24,8 @@ Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
     m_imageSource(ImageSource::create(url)) ,
-    m_image(new QImage())
+    m_image(new QImage()),
+    m_loadRequestsCount(0)
 {
     computeThumbnailPath();
 
@@ -38,11 +39,12 @@ Image::~Image()
 
 void Image::load()
 {
-    if (m_status != Image::NotLoad) {
+    m_loadRequestsCount ++;
+    m_status = Image::Loading;
+
+    if (m_readerFuture.isRunning()) {
         return;
     }
-
-    m_status = Image::Loading;
 
     m_readerFuture = QtConcurrent::run(loadImageAtBackground, m_imageSource);
     m_readerWatcher.setFuture(m_readerFuture);
@@ -50,50 +52,45 @@ void Image::load()
 
 void Image::scheduleUnload()
 {
-    if (m_status == Image::Loading) {
-        m_status = Image::ScheduleUnload;
-    } else {
-        unload();
-    }
+    unloadIfNeeded();
 }
 
-void Image::unload()
+void Image::unloadIfNeeded()
 {
-    m_status = Image::NotLoad;
-    delete m_image;
-    m_image = new QImage();
+    if (m_loadRequestsCount == 0) {
+        m_status = Image::NotLoad;
+        delete m_image;
+        m_image = new QImage();
+    } else {
+        m_loadRequestsCount --;
+    }
 }
 
 void Image::readerFinished()
 {
-    if (m_status == Image::Loading) {
-        delete m_image;
-        m_image = m_readerFuture.result();
+    delete m_image;
+    m_image = m_readerFuture.result();
+    makeThumbnail();
 
-        if (!m_image->isNull()) {
-            m_status = Image::LoadComplete;
-        } else {
-            m_status = Image::LoadError;
-
-            // Show a warning image
-            delete m_image;
-            m_image = new QImage(":/res/warning.png");
-        }
-
-        emit loaded();
-
-        if (m_thumbnail.isNull() && m_status == Image::LoadComplete) {
-            makeThumbnail();
-        }
+    if (!m_image->isNull()) {
+        m_status = Image::LoadComplete;
     } else {
-        // For Status::ScheduleUnload
-        unload();
+        m_status = Image::LoadError;
+
+        // Show a warning image
+        delete m_image;
+        m_image = new QImage(":/res/warning.png");
     }
+
+    emit loaded();
+
+    unloadIfNeeded();
 }
 
-void Image::loadThumbnail()
+void Image::loadThumbnail(bool makeImmediately)
 {
     if (!m_thumbnail.isNull()) {
+        emit thumbnailLoaded();
         return;
     }
 
@@ -104,12 +101,19 @@ void Image::loadThumbnail()
         if (!m_thumbnail.isNull()) {
             emit thumbnailLoaded();
         }
+    } else if (makeImmediately) {
+        load();
+        scheduleUnload();   // Release memory after thumbnail generated
     }
 }
 
 void Image::makeThumbnail()
 {
     Q_ASSERT(m_image);
+
+    if (m_image->isNull()) {
+        return;
+    }
 
     int height = qMax<int>(
         THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);

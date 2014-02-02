@@ -40,5 +40,5 @@ void GlobalConfig::load()
     qDebug() << "WallpaperDir: " << m_wallpaperDir << "\n";
 
     // FIXME: Load gallery item size
-    m_galleryItemSize = QSize(100, 100);
+    m_galleryItemSize = QSize(150, 150);
 }
