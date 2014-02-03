@@ -22,6 +22,7 @@ public:
 
 protected:
     virtual void wheelEvent(QWheelEvent *);
+    virtual void resizeEvent(QResizeEvent *);
 
 private:
     FitMode m_fitInView;

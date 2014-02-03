@@ -34,6 +34,11 @@ void MainGraphicsView::wheelEvent(QWheelEvent *ev)
     }
 }
 
+void MainGraphicsView::resizeEvent(QResizeEvent *)
+{
+    fitInViewIfNecessary();
+}
+
 void MainGraphicsView::fitGridInView(int grid)
 {
     qreal width = sceneRect().width() / 3;
