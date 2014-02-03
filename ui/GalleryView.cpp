@@ -83,6 +83,13 @@ void GalleryView::mousePressEvent(QMouseEvent *event)
     }
 }
 
+void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
+{
+    if (scene()->selectedItems().length() > 0) {
+        emit transitToView();
+    }
+}
+
 void GalleryView::resizeEvent(QResizeEvent *)
 {
     layout();

@@ -25,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sidebar->hide();
     statusBar()->setVisible(false);
 
+    // Window background
+    QPalette newPalette(palette());
+    newPalette.setColor(QPalette::Background, Qt::gray);
+    setPalette(newPalette);
+
     // Move to screen center
     const QRect screen = QApplication::desktop()->screenGeometry();
     move(screen.center() - rect().center());
@@ -80,22 +85,22 @@ void MainWindow::initUIStateMachines()
     // Define states
     QState *galleryOnly = new QState();
     galleryOnly->assignProperty(ui->gallery, "visible", true);
-    galleryOnly->assignProperty(ui->gallery, "maximumWidth", width());
+    galleryOnly->assignProperty(ui->gallery, "maximumWidth", QWIDGETSIZE_MAX);
     galleryOnly->assignProperty(ui->graphicsView, "visible", false);
     m_exploreStateMachine.addState(galleryOnly);
 
     QState *viewOnly = new QState();
     viewOnly->assignProperty(ui->gallery, "visible", false);
     viewOnly->assignProperty(ui->graphicsView, "visible", true);
-    viewOnly->assignProperty(ui->graphicsView, "maximumWidth", width());
+    viewOnly->assignProperty(ui->graphicsView, "maximumWidth", QWIDGETSIZE_MAX);
     m_exploreStateMachine.addState(viewOnly);
 
     QState *galleryAndView = new QState();
     galleryAndView->assignProperty(ui->gallery, "visible", true);
-    galleryAndView->assignProperty(ui->gallery, "maximumWidth", width() / 2);
     galleryAndView->assignProperty(ui->graphicsView, "visible", true);
-    galleryAndView->assignProperty(ui->graphicsView, "maximumWidth",
-                                   width() / 2);
+    connect(galleryAndView, SIGNAL(entered()),
+            this, SLOT(layoutForGalleryAndView()));
+
     m_exploreStateMachine.addState(galleryAndView);
 
     // Define transitions
@@ -114,11 +119,10 @@ void MainWindow::initUIStateMachines()
     galleryOnly->addTransition(
         this, SIGNAL(transitToGalleryAndView()), galleryAndView);
 
-    QEventTransition *doubleClickGalleryItem = new QEventTransition(
-        ui->gallery->scene(), QEvent::GraphicsSceneMouseDoubleClick);
-    doubleClickGalleryItem->setTargetState(viewOnly);
-    galleryOnly->addTransition(doubleClickGalleryItem);
-    galleryAndView->addTransition(doubleClickGalleryItem);
+    galleryOnly->addTransition(
+        ui->gallery, SIGNAL(transitToView()), viewOnly);
+    galleryAndView->addTransition(
+        ui->gallery, SIGNAL(transitToView()), viewOnly);
 
     m_exploreStateMachine.setInitialState(galleryAndView);
     m_exploreStateMachine.start();
@@ -386,4 +390,15 @@ void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     ui->graphicsView->fitInViewIfNecessary();
+
+    // TODO: Find a better way for this hack
+    if (ui->graphicsView->isVisible() && ui->gallery->isVisible()) {
+        layoutForGalleryAndView();
+    }
+}
+
+void MainWindow::layoutForGalleryAndView()
+{
+    ui->graphicsView->setMaximumWidth(width() / 2);
+    ui->gallery->setMaximumWidth(width() / 2);
 }

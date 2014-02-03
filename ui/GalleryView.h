@@ -12,12 +12,16 @@ public:
     explicit GalleryView(QWidget *parent = 0);
     ~GalleryView();
 
+signals:
+    void transitToView();
+
 public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
 

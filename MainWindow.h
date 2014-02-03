@@ -34,6 +34,7 @@ public slots:
     void navigationChange(int index);
     void updateStatus(QString message);
     void gallerySelectionChanged();
+    void layoutForGalleryAndView();
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
