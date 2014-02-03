@@ -6,7 +6,7 @@
 static int PADDING = 10;
 
 GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
-    QGraphicsPixmapItem(parent) ,
+    QGraphicsItem(parent) ,
     m_image(image)
 {
     if (m_image) {
@@ -14,6 +14,11 @@ GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
                 this, SLOT(thumbnailLoaded()));
         m_image->loadThumbnail(true);
     }
+}
+
+QRectF GalleryItem::boundingRect() const
+{
+    return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());
 }
 
 void GalleryItem::thumbnailLoaded()
@@ -24,20 +29,24 @@ void GalleryItem::thumbnailLoaded()
 
     const QImage &thumbnailImage = m_image->thumbnail();
     if (!thumbnailImage.isNull()) {
-        QPixmap thumbnail = QPixmap::fromImage(m_image->thumbnail());
-
+        // Calculate image size and position
         const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-        QSize imageSize(itemSize.width() - 2 * PADDING,
-                        itemSize.height() - 2 * PADDING);
+        m_imageSize.setWidth(itemSize.width() - 2 * PADDING);
+        m_imageSize.setHeight(itemSize.height() - 2 * PADDING);
 
-        QPixmap scaledThumbnail = thumbnail.scaled(imageSize,
-            Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        m_imageSize = m_image->thumbnail().size().scaled(
+            m_imageSize, Qt::KeepAspectRatio);
 
-        int top = (itemSize.height() - scaledThumbnail.height()) / 2;
-        int left = (itemSize.width() - scaledThumbnail.width()) / 2;
+        m_imagePos.setX((itemSize.width() - m_imageSize.width()) / 2);
+        m_imagePos.setY((itemSize.height() - m_imageSize.height()) / 2);
+    }
+}
 
-        setOffset(left, top);
-        setPixmap(scaledThumbnail);
+void GalleryItem::selectionChange(int index)
+{
+    index = scene()->items().length() - index - 1;
+    if (scene()->items().at(index) == this) {
+
     }
 }
 
@@ -45,6 +54,5 @@ void GalleryItem::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *,
                         QWidget *)
 {
-    // FIXME: Seems no top padding for first line item?
-    painter->drawPixmap(offset(), pixmap());
+    painter->drawImage(QRect(m_imagePos, m_imageSize), m_image->thumbnail());
 }

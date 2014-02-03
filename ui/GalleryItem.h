@@ -1,19 +1,23 @@
 #ifndef GALLERYITEM_H
 #define GALLERYITEM_H
 
-#include <QGraphicsPixmapItem>
+#include <QGraphicsItem>
 
 #include "../Image.h"
 
-class GalleryItem : public QObject, public QGraphicsPixmapItem
+class GalleryItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 
 public:
     explicit GalleryItem(Image *image, QGraphicsItem *parent = 0);
 
+    virtual QRectF boundingRect() const;
+
 public slots:
     void thumbnailLoaded();
+    void selectionChange(int index);
 
 protected:
     virtual void paint(QPainter *painter,
@@ -21,6 +25,8 @@ protected:
 
 private:
     Image *m_image;
+    QSize m_imageSize;
+    QPoint m_imagePos;
 };
 
 #endif // GALLERYITEM_H
