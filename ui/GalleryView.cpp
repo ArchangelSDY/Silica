@@ -1,3 +1,5 @@
+#include <QLayout>
+
 #include "../Image.h"
 #include "GalleryItem.h"
 #include "GalleryView.h"
@@ -28,6 +30,10 @@ void GalleryView::clear()
 
 void GalleryView::layout()
 {
+    if (!isVisible()) {
+        return;
+    }
+
     const QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
     const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
     int maxColumns = width() / galleryItemSize.width();
@@ -79,5 +85,11 @@ void GalleryView::mousePressEvent(QMouseEvent *event)
 
 void GalleryView::resizeEvent(QResizeEvent *)
 {
+    layout();
+}
+
+void GalleryView::showEvent(QShowEvent *)
+{
+    this->parentWidget()->layout()->update();
     layout();
 }

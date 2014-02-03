@@ -19,6 +19,7 @@ public slots:
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *);
+    virtual void showEvent(QShowEvent *);
 
 private:
     void clear();

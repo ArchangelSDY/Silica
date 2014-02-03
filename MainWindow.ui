@@ -29,14 +29,7 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="GalleryView" name="gallery">
-      <property name="minimumSize">
-       <size>
-        <width>500</width>
-        <height>0</height>
-       </size>
-      </property>
-     </widget>
+     <widget class="GalleryView" name="gallery"/>
     </item>
    </layout>
   </widget>

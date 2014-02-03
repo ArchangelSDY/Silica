@@ -21,6 +21,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+signals:
+    void transitToGalleryOnly();
+    void transitToGalleryAndView();
+    void transitToViewOnly();
+
 public slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
@@ -35,20 +40,19 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 private:
+    void initUIStateMachines();
     void processCommandLineOptions();
     void promptToOpen();
     void promptToSave();
-
-    void fitInWindowIfNecessary();
 
     void handleControlKeyPress(QKeyEvent *);
     void handleCommandKeyPress(QKeyEvent *);
 
     void updateSidebarTitle();
 
-    enum Mode {
-        ControlMode,
-        CommandMode,
+    enum InputMode {
+        InputMode_Control,
+        InputMode_Command,
     };
 
     Ui::MainWindow *ui;
@@ -57,7 +61,8 @@ private:
     Database *m_database;
     CommandInterpreter m_commandInterpreter;
     QGraphicsScene m_imageScene;
-    Mode m_inputMode;
+    InputMode m_inputMode;
+    QStateMachine m_exploreStateMachine;
 };
 
 #endif // MAINWINDOW_H

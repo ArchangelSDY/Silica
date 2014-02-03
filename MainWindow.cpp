@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow) ,
     m_database(new AsunaDatabase()) ,
     m_commandInterpreter(&m_navigator, m_database) ,
-    m_inputMode(ControlMode)
+    m_inputMode(InputMode_Control)
 {
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
             this, SLOT(updateStatus(QString)));
 
+    initUIStateMachines();
+
     processCommandLineOptions();
 }
 
@@ -71,6 +73,44 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_database;
+}
+
+void MainWindow::initUIStateMachines()
+{
+    // Define states
+    QState *galleryOnly = new QState();
+    galleryOnly->assignProperty(ui->gallery, "visible", true);
+    galleryOnly->assignProperty(ui->graphicsView, "visible", false);
+    m_exploreStateMachine.addState(galleryOnly);
+
+    QState *viewOnly = new QState();
+    viewOnly->assignProperty(ui->gallery, "visible", false);
+    viewOnly->assignProperty(ui->graphicsView, "visible", true);
+    m_exploreStateMachine.addState(viewOnly);
+
+    QState *galleryAndView = new QState();
+    galleryAndView->assignProperty(ui->gallery, "visible", true);
+    galleryAndView->assignProperty(ui->graphicsView, "visible", true);
+    m_exploreStateMachine.addState(galleryAndView);
+
+    // Define transitions
+    viewOnly->addTransition(
+        this, SIGNAL(transitToGalleryOnly()), galleryOnly);
+    galleryAndView->addTransition(
+        this, SIGNAL(transitToGalleryOnly()), galleryOnly);
+
+    galleryOnly->addTransition(
+        this, SIGNAL(transitToViewOnly()), viewOnly);
+    galleryAndView->addTransition(
+        this, SIGNAL(transitToViewOnly()), viewOnly);
+
+    viewOnly->addTransition(
+        this, SIGNAL(transitToGalleryAndView()), galleryAndView);
+    galleryOnly->addTransition(
+        this, SIGNAL(transitToGalleryAndView()), galleryAndView);
+
+    m_exploreStateMachine.setInitialState(galleryAndView);
+    m_exploreStateMachine.start();
 }
 
 void MainWindow::processCommandLineOptions()
@@ -237,13 +277,13 @@ void MainWindow::gallerySelectionChanged()
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
-    if (m_inputMode == ControlMode) {
+    if (m_inputMode == InputMode_Control) {
         handleControlKeyPress(ev);
-    } else if (m_inputMode == CommandMode) {
+    } else if (m_inputMode == InputMode_Command) {
         handleCommandKeyPress(ev);
 
         if (m_commandInterpreter.isEmpty()) {
-            m_inputMode = ControlMode;
+            m_inputMode = InputMode_Control;
         }
     }
 }
@@ -266,6 +306,15 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             promptToOpen();
             break;
         }
+        case Qt::Key_G:
+            emit transitToGalleryOnly();
+            break;
+        case Qt::Key_V:
+            emit transitToViewOnly();
+            break;
+        case Qt::Key_B:
+            emit transitToGalleryAndView();
+            break;
         case Qt::Key_F11:
             if (!isFullScreen()) {
                 setWindowState(Qt::WindowFullScreen);
@@ -280,7 +329,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             }
             break;
         case Qt::Key_Slash:
-            m_inputMode = CommandMode;
+            m_inputMode = InputMode_Command;
             handleCommandKeyPress(ev);
             break;
         case Qt::Key_S:
@@ -316,7 +365,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
 void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 {
     if (ev->key() == Qt::Key_Escape) {
-        m_inputMode = ControlMode;
+        m_inputMode = InputMode_Control;
         m_commandInterpreter.reset();
     } else {
         m_commandInterpreter.keyPress(ev);
