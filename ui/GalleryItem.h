@@ -27,6 +27,7 @@ private:
     Image *m_image;
     QSize m_imageSize;
     QPoint m_imagePos;
+    bool m_selected;
 };
 
 #endif // GALLERYITEM_H

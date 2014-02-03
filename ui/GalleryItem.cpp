@@ -7,7 +7,8 @@ static int PADDING = 10;
 
 GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
-    m_image(image)
+    m_image(image) ,
+    m_selected(false)
 {
     if (m_image) {
         connect(m_image, SIGNAL(thumbnailLoaded()),
@@ -46,13 +47,21 @@ void GalleryItem::selectionChange(int index)
 {
     index = scene()->items().length() - index - 1;
     if (scene()->items().at(index) == this) {
-
+        m_selected = true;
+    } else {
+        m_selected = false;
     }
+    update(boundingRect());
 }
 
 void GalleryItem::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *,
                         QWidget *)
 {
+    if (m_selected) {
+        painter->fillRect(boundingRect(), Qt::darkCyan);
+    } else {
+        painter->fillRect(boundingRect(), Qt::gray);
+    }
     painter->drawImage(QRect(m_imagePos, m_imageSize), m_image->thumbnail());
 }
