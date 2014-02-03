@@ -55,8 +55,8 @@ MainWindow::MainWindow(QWidget *parent) :
             &m_navigator, SLOT(goIndex(int)));
 
     // Navigation binding for galery
-    connect(ui->gallery, SIGNAL(currentSelectionChanged(int)),
-            &m_navigator, SLOT(goIndex(int)));
+    connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
+            this, SLOT(gallerySelectionChanged()));
 
     connect(m_database, SIGNAL(gotPlayList(PlayList)),
             &m_navigator, SLOT(appendPlayList(PlayList)));
@@ -208,6 +208,18 @@ void MainWindow::updateStatus(QString message)
     } else {
         statusBar()->clearMessage();
         statusBar()->hide();
+    }
+}
+
+void MainWindow::gallerySelectionChanged()
+{
+    QGraphicsScene *scene = ui->gallery->scene();
+    if (scene->selectedItems().length() > 0) {
+        QGraphicsItem * const item = scene->selectedItems()[0];
+        const QList<QGraphicsItem *> &allItems =
+            scene->items(Qt::AscendingOrder);
+        int index = allItems.indexOf(item);
+        m_navigator.goIndex(index);
     }
 }
 

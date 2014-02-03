@@ -73,9 +73,9 @@ void GalleryItem::paint(QPainter *painter,
     }
 
     // Border
-     painter->setBrush(Qt::white);
-     painter->setPen(Qt::white);
-     painter->drawRoundedRect(m_borderRect, BORDER, BORDER);
+    painter->setBrush(Qt::white);
+    painter->setPen(Qt::white);
+    painter->drawRoundedRect(m_borderRect, BORDER, BORDER);
 
     // Image
     painter->drawImage(QRect(m_imagePos, m_imageSize), m_image->thumbnail());

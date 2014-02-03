@@ -12,9 +12,6 @@ public:
     explicit GalleryView(QWidget *parent = 0);
     ~GalleryView();
 
-signals:
-    void currentSelectionChanged(int);
-
 public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);

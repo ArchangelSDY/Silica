@@ -28,6 +28,7 @@ public slots:
     void playListAppend(PlayList appended);
     void navigationChange(int index);
     void updateStatus(QString message);
+    void gallerySelectionChanged();
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
