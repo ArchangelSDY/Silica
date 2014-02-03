@@ -47,6 +47,8 @@ void GalleryItem::thumbnailLoaded()
         m_borderRect.setY(m_imagePos.y() - BORDER);
         m_borderRect.setWidth(m_imageSize.width() + 2 * BORDER);
         m_borderRect.setHeight(m_imageSize.height() + 2 * BORDER);
+
+        update(boundingRect());
     }
 }
 
