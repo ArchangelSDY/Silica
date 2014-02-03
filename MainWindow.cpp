@@ -48,9 +48,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
             ui->gallery, SLOT(playListAppend(PlayList)));
 
-    // Navigation binding for playListWidget
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
+
+    // Navigation binding for playListWidget
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             &m_navigator, SLOT(goIndex(int)));
 
@@ -186,8 +187,19 @@ void MainWindow::playListAppend(PlayList appended)
 
 void MainWindow::navigationChange(int index)
 {
+    // PlayList widget
     ui->playListWidget->setCurrentRow(index);
 
+    // Gallery widget
+    QGraphicsItem *selectedItem =
+        ui->gallery->scene()->items(Qt::AscendingOrder).at(index);
+    if (selectedItem) {
+        ui->gallery->scene()->clearSelection();
+        selectedItem->setSelected(true);
+        selectedItem->ensureVisible();
+    }
+
+    // Sidebar
     updateSidebarTitle();
 }
 
