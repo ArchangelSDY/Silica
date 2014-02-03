@@ -80,17 +80,22 @@ void MainWindow::initUIStateMachines()
     // Define states
     QState *galleryOnly = new QState();
     galleryOnly->assignProperty(ui->gallery, "visible", true);
+    galleryOnly->assignProperty(ui->gallery, "maximumWidth", width());
     galleryOnly->assignProperty(ui->graphicsView, "visible", false);
     m_exploreStateMachine.addState(galleryOnly);
 
     QState *viewOnly = new QState();
     viewOnly->assignProperty(ui->gallery, "visible", false);
     viewOnly->assignProperty(ui->graphicsView, "visible", true);
+    viewOnly->assignProperty(ui->graphicsView, "maximumWidth", width());
     m_exploreStateMachine.addState(viewOnly);
 
     QState *galleryAndView = new QState();
     galleryAndView->assignProperty(ui->gallery, "visible", true);
+    galleryAndView->assignProperty(ui->gallery, "maximumWidth", width() / 2);
     galleryAndView->assignProperty(ui->graphicsView, "visible", true);
+    galleryAndView->assignProperty(ui->graphicsView, "maximumWidth",
+                                   width() / 2);
     m_exploreStateMachine.addState(galleryAndView);
 
     // Define transitions

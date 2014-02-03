@@ -90,6 +90,5 @@ void GalleryView::resizeEvent(QResizeEvent *)
 
 void GalleryView::showEvent(QShowEvent *)
 {
-    this->parentWidget()->layout()->update();
     layout();
 }
