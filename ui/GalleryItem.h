@@ -26,6 +26,7 @@ protected:
 private:
     Image *m_image;
     QSize m_imageSize;
+    QRect m_borderRect;
     QPoint m_imagePos;
     bool m_selected;
 };

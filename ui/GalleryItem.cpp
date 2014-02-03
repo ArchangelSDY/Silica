@@ -3,7 +3,8 @@
 #include "GalleryItem.h"
 #include "../GlobalConfig.h"
 
-static int PADDING = 10;
+static const int PADDING = 10;
+static const int BORDER = 5;
 
 GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
@@ -40,6 +41,11 @@ void GalleryItem::thumbnailLoaded()
 
         m_imagePos.setX((itemSize.width() - m_imageSize.width()) / 2);
         m_imagePos.setY((itemSize.height() - m_imageSize.height()) / 2);
+
+        m_borderRect.setX(m_imagePos.x() - BORDER);
+        m_borderRect.setY(m_imagePos.y() - BORDER);
+        m_borderRect.setWidth(m_imageSize.width() + 2 * BORDER);
+        m_borderRect.setHeight(m_imageSize.height() + 2 * BORDER);
     }
 }
 
@@ -58,10 +64,18 @@ void GalleryItem::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *,
                         QWidget *)
 {
+    // Background
     if (m_selected) {
         painter->fillRect(boundingRect(), Qt::darkCyan);
     } else {
         painter->fillRect(boundingRect(), Qt::gray);
     }
+
+    // Border
+     painter->setBrush(Qt::white);
+     painter->setPen(Qt::white);
+     painter->drawRoundedRect(m_borderRect, BORDER, BORDER);
+
+    // Image
     painter->drawImage(QRect(m_imagePos, m_imageSize), m_image->thumbnail());
 }
