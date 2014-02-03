@@ -26,6 +26,28 @@ void GalleryView::clear()
     m_scene->clear();
 }
 
+void GalleryView::layout()
+{
+    const QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
+    const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
+    int maxColumns = width() / galleryItemSize.width();
+    int maxRows = items.length() / maxColumns + 1;
+
+    for (int i = m_scene->items().length() - 1; i >= 0; --i) {
+        QGraphicsItem *item = items[i];
+
+        // Position
+        qreal x = i % maxColumns * galleryItemSize.width();
+        qreal y = i / maxColumns * galleryItemSize.height();
+        item->setPos(x, y);
+    }
+
+    QRect newSceneRect(0, 0,
+        maxColumns * galleryItemSize.width(),
+        maxRows * galleryItemSize.height());
+    setSceneRect(newSceneRect);
+}
+
 void GalleryView::playListChange(PlayList playList)
 {
     clear();
@@ -34,23 +56,16 @@ void GalleryView::playListChange(PlayList playList)
 
 void GalleryView::playListAppend(PlayList appended)
 {
-    const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
-    int maxColumns = width() / galleryItemSize.width();
-
     // Add new items
     for (int i = m_scene->items().length(); i < appended.length(); ++i) {
         Image *image = appended.at(i).data();
 
         // Paint thumbnail
         GalleryItem *item = new GalleryItem(image);
-
-        // Position
-        qreal x = i % maxColumns * galleryItemSize.width();
-        qreal y = i / maxColumns * galleryItemSize.height();
-        item->setPos(x, y);
-
         m_scene->addItem(item);
     }
+
+    layout();
 }
 
 void GalleryView::mousePressEvent(QMouseEvent *event)
@@ -60,4 +75,9 @@ void GalleryView::mousePressEvent(QMouseEvent *event)
     if (item) {
         item->setSelected(true);
     }
+}
+
+void GalleryView::resizeEvent(QResizeEvent *)
+{
+    layout();
 }

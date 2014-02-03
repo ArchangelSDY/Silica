@@ -18,10 +18,11 @@ public slots:
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void resizeEvent(QResizeEvent *);
 
 private:
     void clear();
-    void refreshGallery();
+    void layout();
 
     PlayList *m_playList;
     QGraphicsScene *m_scene;
