@@ -109,6 +109,12 @@ void MainWindow::initUIStateMachines()
     galleryOnly->addTransition(
         this, SIGNAL(transitToGalleryAndView()), galleryAndView);
 
+    QEventTransition *doubleClickGalleryItem = new QEventTransition(
+        ui->gallery->scene(), QEvent::GraphicsSceneMouseDoubleClick);
+    doubleClickGalleryItem->setTargetState(viewOnly);
+    galleryOnly->addTransition(doubleClickGalleryItem);
+    galleryAndView->addTransition(doubleClickGalleryItem);
+
     m_exploreStateMachine.setInitialState(galleryAndView);
     m_exploreStateMachine.start();
 }
