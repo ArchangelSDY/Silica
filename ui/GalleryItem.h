@@ -28,7 +28,6 @@ private:
     QSize m_imageSize;
     QRect m_borderRect;
     QPoint m_imagePos;
-    bool m_selected;
 };
 
 #endif // GALLERYITEM_H

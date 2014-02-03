@@ -8,9 +8,10 @@ static const int BORDER = 5;
 
 GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
-    m_image(image) ,
-    m_selected(false)
+    m_image(image)
 {
+    setFlag(QGraphicsItem::ItemIsSelectable);
+
     if (m_image) {
         connect(m_image, SIGNAL(thumbnailLoaded()),
                 this, SLOT(thumbnailLoaded()));
@@ -53,9 +54,9 @@ void GalleryItem::selectionChange(int index)
 {
     index = scene()->items().length() - index - 1;
     if (scene()->items().at(index) == this) {
-        m_selected = true;
+        setSelected(true);
     } else {
-        m_selected = false;
+        setSelected(false);
     }
     update(boundingRect());
 }
@@ -65,7 +66,7 @@ void GalleryItem::paint(QPainter *painter,
                         QWidget *)
 {
     // Background
-    if (m_selected) {
+    if (isSelected()) {
         painter->fillRect(boundingRect(), Qt::darkCyan);
     } else {
         painter->fillRect(boundingRect(), Qt::gray);
