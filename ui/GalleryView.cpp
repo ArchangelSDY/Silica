@@ -37,7 +37,12 @@ void GalleryView::layout()
 
     const QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
     const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
+
     int maxColumns = width() / galleryItemSize.width();
+    if (maxColumns == 0) {
+        return;
+    }
+
     int maxRows = items.length() / maxColumns + 1;
 
     for (int i = m_scene->items().length() - 1; i >= 0; --i) {
