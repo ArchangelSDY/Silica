@@ -421,13 +421,22 @@ void MainWindow::resizeEvent(QResizeEvent *)
 
 void MainWindow::layoutForGalleryAndView()
 {
-    int panelsCount = ui->centralWidget->layout()->count();
-    if (panelsCount > 0) {
-        int panelWidth = width() / panelsCount;
-        for (int i = 0; i < panelsCount; ++i) {
+    int visibleWidgetsCount = 0;
+    QLayout *layout = ui->centralWidget->layout();
+    for (int i = layout->count() - 1; i >=0; --i) {
+        QWidget *widget = layout->itemAt(i)->widget();
+        if (widget && widget->isVisible()) {
+            visibleWidgetsCount ++;
+        }
+    }
+
+    if (visibleWidgetsCount > 0) {
+        int widgetWidth = width() / visibleWidgetsCount;
+        for (int i = 0; i < visibleWidgetsCount; ++i) {
             QLayoutItem *panel = ui->centralWidget->layout()->itemAt(i);
             panel->setGeometry(QRect(
-                (panelsCount - i - 1) * panelWidth, 0, panelWidth, height()));
+                (visibleWidgetsCount - i - 1) * widgetWidth, 0,
+                widgetWidth, height()));
         }
     }
 }
