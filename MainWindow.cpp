@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->centralWidget->layout()->setSpacing(0);
     ui->sidebar->hide();
     statusBar()->setVisible(false);
 
@@ -99,7 +100,7 @@ void MainWindow::initUIStateMachines()
     galleryAndView->assignProperty(ui->gallery, "visible", true);
     galleryAndView->assignProperty(ui->graphicsView, "visible", true);
     connect(galleryAndView, SIGNAL(entered()),
-            this, SLOT(layoutForGalleryAndView()));
+        this, SLOT(layoutForGalleryAndView()));
 
     m_exploreStateMachine.addState(galleryAndView);
 
@@ -390,15 +391,18 @@ void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     ui->graphicsView->fitInViewIfNecessary();
-
-    // TODO: Find a better way for this hack
-    if (ui->graphicsView->isVisible() && ui->gallery->isVisible()) {
-        layoutForGalleryAndView();
-    }
+    layoutForGalleryAndView();
 }
 
 void MainWindow::layoutForGalleryAndView()
 {
-    ui->graphicsView->setMaximumWidth(width() / 2);
-    ui->gallery->setMaximumWidth(width() / 2);
+    int panelsCount = ui->centralWidget->layout()->count();
+    if (panelsCount > 0) {
+        int panelWidth = width() / panelsCount;
+        for (int i = 0; i < panelsCount; ++i) {
+            QLayoutItem *panel = ui->centralWidget->layout()->itemAt(i);
+            panel->setGeometry(QRect(
+                (panelsCount - i - 1) * panelWidth, 0, panelWidth, height()));
+        }
+    }
 }
