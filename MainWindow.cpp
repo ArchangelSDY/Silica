@@ -9,6 +9,8 @@
 #include "GlobalConfig.h"
 #include "PlayList.h"
 #include "MainWindow.h"
+#include "ui/GalleryItem.h"
+
 #include "ui_MainWindow.h"
 
 static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
@@ -173,13 +175,18 @@ void MainWindow::promptToOpen()
 
 void MainWindow::promptToSave()
 {
-    if (m_navigator.currentImage()) {
+    if (ui->gallery->scene()->selectedItems().count() > 0) {
         QString destDir = QFileDialog::getExistingDirectory(
             this, "Save to", GlobalConfig::instance()->wallpaperDir());
-        QString fileName = m_navigator.currentImage()->name();
-        QString destPath = destDir + QDir::separator() + fileName;
 
-        m_navigator.currentImage()->copy(destPath);
+        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
+            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+            Image *image = galleryItem->image();
+            if (image) {
+                QString destPath = destDir + QDir::separator() + image->name();
+                image->copy(destPath);
+            }
+        }
     }
 }
 

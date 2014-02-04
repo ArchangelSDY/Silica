@@ -14,6 +14,7 @@ public:
     explicit GalleryItem(Image *image, QGraphicsItem *parent = 0);
 
     virtual QRectF boundingRect() const;
+    Image* image() const { return m_image; }
 
 public slots:
     void thumbnailLoaded();
