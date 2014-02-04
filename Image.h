@@ -6,6 +6,11 @@
 
 #include "ImageSource.h"
 
+struct LoadThumbnailResult {
+    QImage *thumbnail;
+    bool makeImmediately;
+};
+
 class Image : public QObject
 {
     Q_OBJECT
@@ -26,7 +31,10 @@ public:
         Q_ASSERT(m_image);
         return *m_image;
     }
-    QImage thumbnail() { return m_thumbnail; }
+    QImage thumbnail() {
+        Q_ASSERT(m_thumbnail);
+        return *m_thumbnail;
+    }
     QString name() const;
 
     void load();
@@ -46,6 +54,7 @@ signals:
 
 public slots:
     void readerFinished();
+    void thumbnailReaderFinished();
 
 private:
     void unloadIfNeeded();
@@ -55,12 +64,14 @@ private:
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
     QImage *m_image;
-    QImage m_thumbnail;
+    QImage *m_thumbnail;
     QString m_thumbnailPath;
     int m_loadRequestsCount;
 
     QFuture<QImage *> m_readerFuture;
     QFutureWatcher<QImage *> m_readerWatcher;
+    QFuture<LoadThumbnailResult> m_thumbnailFuture;
+    QFutureWatcher<LoadThumbnailResult> m_thumbnailWatcher;
 };
 
 #endif // IMAGE_H

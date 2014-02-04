@@ -20,21 +20,48 @@ static QImage *loadImageAtBackground(QSharedPointer<ImageSource> imageSource)
     }
 }
 
+static struct LoadThumbnailResult loadThumbnailAtBackground(
+    QString thumbnailPath, bool makeImmediately)
+{
+    struct LoadThumbnailResult result;
+    result.makeImmediately = makeImmediately;
+
+    QFile file(thumbnailPath);
+    if (file.exists()) {
+        result.thumbnail = new QImage(thumbnailPath);
+    } else {
+        result.thumbnail = 0;
+    }
+
+    return result;
+}
+
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
     m_imageSource(ImageSource::create(url)) ,
-    m_image(new QImage()),
+    m_image(new QImage()) ,
+    m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0)
 {
     computeThumbnailPath();
 
     connect(&m_readerWatcher, SIGNAL(finished()), this, SLOT(readerFinished()));
+    connect(&m_thumbnailWatcher, SIGNAL(finished()),
+            this, SLOT(thumbnailReaderFinished()));
 }
 
 Image::~Image()
 {
     m_imageSource.clear();
+
+    if (m_image) {
+        delete m_image;
+    }
+
+    if (m_thumbnail) {
+        delete m_thumbnail;
+    }
 }
 
 void Image::load()
@@ -87,24 +114,35 @@ void Image::readerFinished()
     unloadIfNeeded();
 }
 
+void Image::thumbnailReaderFinished()
+{
+    const struct LoadThumbnailResult &result = m_thumbnailFuture.result();
+
+    if (result.thumbnail) {
+        delete m_thumbnail;
+        m_thumbnail = result.thumbnail;
+
+        emit thumbnailLoaded();
+    } else if (m_thumbnailFuture.result().makeImmediately) {
+        load();
+        scheduleUnload();   // Release memory after thumbnail generated
+    }
+}
+
 void Image::loadThumbnail(bool makeImmediately)
 {
-    if (!m_thumbnail.isNull()) {
+    if (!m_thumbnail->isNull()) {
         emit thumbnailLoaded();
         return;
     }
 
-    QFile file(m_thumbnailPath);
-    if (file.exists()) {
-        m_thumbnail = QImage(m_thumbnailPath);
-
-        if (!m_thumbnail.isNull()) {
-            emit thumbnailLoaded();
-        }
-    } else if (makeImmediately) {
-        load();
-        scheduleUnload();   // Release memory after thumbnail generated
+    if (m_thumbnailFuture.isRunning()) {
+        return;
     }
+
+    m_thumbnailFuture = QtConcurrent::run(
+        loadThumbnailAtBackground, m_thumbnailPath, makeImmediately);
+    m_thumbnailWatcher.setFuture(m_thumbnailFuture);
 }
 
 void Image::makeThumbnail()
@@ -118,8 +156,9 @@ void Image::makeThumbnail()
     int height = qMax<int>(
         THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
 
-    m_thumbnail = m_image->scaledToHeight(height);
-    m_thumbnail.save(m_thumbnailPath, "JPG");
+    delete m_thumbnail;
+    m_thumbnail = new QImage(m_image->scaledToHeight(height));
+    m_thumbnail->save(m_thumbnailPath, "JPG");
     emit thumbnailLoaded();
 }
 
