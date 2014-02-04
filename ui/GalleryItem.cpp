@@ -67,6 +67,9 @@ void GalleryItem::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *,
                         QWidget *)
 {
+    painter->setRenderHints(
+        QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+
     // Background
     if (isSelected()) {
         painter->fillRect(boundingRect(), Qt::darkCyan);
