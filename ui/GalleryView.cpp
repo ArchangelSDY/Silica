@@ -10,6 +10,7 @@ GalleryView::GalleryView(QWidget *parent) :
     m_playList(0) ,
     m_scene(new QGraphicsScene)
 {
+    setDragMode(QGraphicsView::RubberBandDrag);
     m_scene->setBackgroundBrush(Qt::gray);
     setScene(m_scene);
 }
@@ -72,15 +73,6 @@ void GalleryView::playListAppend(PlayList appended)
     }
 
     layout();
-}
-
-void GalleryView::mousePressEvent(QMouseEvent *event)
-{
-    scene()->clearSelection();
-    QGraphicsItem *item = itemAt(event->pos());
-    if (item) {
-        item->setSelected(true);
-    }
 }
 
 void GalleryView::mouseDoubleClickEvent(QMouseEvent *)

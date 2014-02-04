@@ -20,7 +20,6 @@ public slots:
     void playListAppend(PlayList appended);
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
