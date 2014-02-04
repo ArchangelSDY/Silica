@@ -35,6 +35,7 @@ public slots:
     void updateStatus(QString message);
     void gallerySelectionChanged();
     void layoutForGalleryAndView();
+    void statusBarMessageChanged(const QString & message);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);

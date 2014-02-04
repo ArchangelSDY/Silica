@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
     ui->centralWidget->layout()->setSpacing(0);
     ui->sidebar->hide();
-    statusBar()->setVisible(false);
+    statusBar()->hide();
 
     // Window background
     QPalette newPalette(palette());
@@ -43,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
     connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
             this, SLOT(paintThumbnail(Image*)));
+
+    // StatusBar
+    connect(statusBar(), SIGNAL(messageChanged(const QString &)),
+            this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
     connect(&m_navigator, SIGNAL(playListChange(PlayList)),
@@ -179,12 +183,24 @@ void MainWindow::promptToSave()
         QString destDir = QFileDialog::getExistingDirectory(
             this, "Save to", GlobalConfig::instance()->wallpaperDir());
 
+        if (destDir.isEmpty()) {
+            return;
+        }
+
         foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
             GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
             Image *image = galleryItem->image();
             if (image) {
                 QString destPath = destDir + QDir::separator() + image->name();
-                image->copy(destPath);
+                bool success = image->copy(destPath);
+                QString msg;
+                if (success) {
+                    QTextStream(&msg) << image->name() << " saved!";
+                } else {
+                    QTextStream(&msg) << "Error occured when saving "
+                                      << image->name();
+                }
+                statusBar()->showMessage(msg, 2000);
             }
         }
     }
@@ -283,10 +299,8 @@ void MainWindow::updateStatus(QString message)
 {
     if (!message.isEmpty()) {
         statusBar()->showMessage(message);
-        statusBar()->show();
     } else {
         statusBar()->clearMessage();
-        statusBar()->hide();
     }
 }
 
@@ -415,5 +429,14 @@ void MainWindow::layoutForGalleryAndView()
             panel->setGeometry(QRect(
                 (panelsCount - i - 1) * panelWidth, 0, panelWidth, height()));
         }
+    }
+}
+
+void MainWindow::statusBarMessageChanged(const QString & message)
+{
+    if (message.isEmpty()) {
+        statusBar()->hide();
+    } else {
+        statusBar()->show();
     }
 }
