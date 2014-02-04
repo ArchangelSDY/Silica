@@ -155,6 +155,10 @@ void MainWindow::promptToOpen()
         this, QString(), QUrl(),
         "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip)");
 
+    if (images.count() == 0) {
+        return;
+    }
+
     // Hack for zip
     // FIXME: Better way to handle this?
     for (QList<QUrl>::iterator i = images.begin(); i != images.end(); ++i) {
