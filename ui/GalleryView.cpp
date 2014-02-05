@@ -68,8 +68,7 @@ void GalleryView::playListChange(PlayList playList)
 
 void GalleryView::playListAppend(PlayList appended)
 {
-    // Add new items
-    for (int i = m_scene->items().length(); i < appended.length(); ++i) {
+    for (int i = 0; i < appended.length(); ++i) {
         Image *image = appended.at(i).data();
 
         // Paint thumbnail
