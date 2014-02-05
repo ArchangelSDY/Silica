@@ -157,8 +157,14 @@ void MainWindow::processCommandLineOptions()
 
 void MainWindow::promptToOpen()
 {
+    QString defaultDir;
+    const QList<QString> &zipDirs = GlobalConfig::instance()->zipDirs();
+    if (zipDirs.count() > 0) {
+        defaultDir = zipDirs[0];
+    }
+
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
-        this, QString(), QUrl(),
+        this, tr("Open"), QUrl::fromLocalFile(defaultDir),
         "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip)");
 
     if (images.count() == 0) {
