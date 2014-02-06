@@ -1,1 +1,4 @@
-silica.pro.user
+.moc/
+.obj/
+*.a
+*.pro.user
