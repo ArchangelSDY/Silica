@@ -2,7 +2,7 @@
 #include <QTest>
 #include <QTextCodec>
 
-#include "TestZipImageSource.h"
+#include "TestImageSource.h"
 
 int main(int argc, char **argv)
 {
@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 
     int err = 0;
     {
-        TestZipImageSource testZipImageSource;
-        err = qMax(err, QTest::qExec(&testZipImageSource, app.arguments()));
+        TestImageSource testImageSource;
+        err = qMax(err, QTest::qExec(&testImageSource, app.arguments()));
     }
 
     if (err != 0) {

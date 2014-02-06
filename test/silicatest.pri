@@ -1,9 +1,9 @@
 SOURCES += \
-    TestZipImageSource.cpp \
-    silicatest.cpp
+    silicatest.cpp \
+    TestImageSource.cpp
 
 HEADERS += \
-    TestZipImageSource.h
+    TestImageSource.h
 
 assets.files = $$PWD/assets/*
 
