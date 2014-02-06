@@ -7,12 +7,12 @@ class TestImageSource : public QObject
 {
     Q_OBJECT
 private slots:
-    void open();
-    void open_data();
-//    void close();
-//    void name();
-//    void hash();
-//    void copy();
+    void openAndClose();
+    void openAndClose_data();
+    void properties();
+    void properties_data();
+    void copy();
+    void copy_data();
 };
 
 #endif // TESTZIPIMAGESOURCE_H
