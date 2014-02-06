@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 
-#include "../Image.h"
+#include "Image.h"
 
 class GalleryItem : public QObject, public QGraphicsItem
 {

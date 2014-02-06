@@ -9,7 +9,7 @@
 #include "GlobalConfig.h"
 #include "PlayList.h"
 #include "MainWindow.h"
-#include "ui/GalleryItem.h"
+#include "GalleryItem.h"
 
 #include "ui_MainWindow.h"
 

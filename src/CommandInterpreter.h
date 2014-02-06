@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "db/Database.h"
+#include "Database.h"
 #include "Navigator.h"
 
 class CommandInterpreter : public QObject

@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 
 #include "CommandInterpreter.h"
-#include "db/Database.h"
+#include "Database.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
