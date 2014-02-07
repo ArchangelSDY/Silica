@@ -73,6 +73,7 @@ public:
         return *m_thumbnail;
     }
     QString name() const;
+    qreal aspectRatio() const;
 
     void load(int priority = NormalPriority);
     void loadThumbnail(bool makeImmediately = false);

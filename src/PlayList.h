@@ -15,6 +15,7 @@ public:
     void addPath(const QUrl &);
 
     void sortByName();
+    void sortByAspectRatio();
 };
 
 #endif // PLAYLIST_H

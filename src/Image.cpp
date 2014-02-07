@@ -188,6 +188,26 @@ QString Image::name() const
     return m_imageSource.isNull() ? QString() : m_imageSource->name();
 }
 
+qreal Image::aspectRatio() const
+{
+    Q_ASSERT(m_image);
+    Q_ASSERT(m_thumbnail);
+
+    if (!m_image->isNull()) {
+        int width = m_image->width();
+        int height = m_image->height();
+
+        return height != 0 ? qreal(width) / qreal(height) : 0;
+    } else if (!m_thumbnail->isNull()) {
+        int width = m_thumbnail->width();
+        int height = m_thumbnail->height();
+
+        return height != 0 ? qreal(width) / qreal(height) : 0;
+    }
+
+    return 0;
+}
+
 bool Image::copy(const QString &destPath)
 {
     if (!m_imageSource.isNull()) {

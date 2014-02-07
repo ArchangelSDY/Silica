@@ -107,9 +107,12 @@ void GalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     QMenu *sorts = menu.addMenu("Sort By");
-    QAction *sortByNameAct = sorts->addAction("Name");
-    connect(sortByNameAct, SIGNAL(triggered()),
+    QAction *byNameAct = sorts->addAction("Name");
+    connect(byNameAct, SIGNAL(triggered()),
             this, SLOT(sortByName()));
+    QAction *byAspectRatioAct = sorts->addAction("Aspect Ratio");
+    connect(byAspectRatioAct, SIGNAL(triggered()),
+            this, SLOT(sortByAspectRatio()));
 
     menu.exec(event->globalPos());
 }
@@ -122,5 +125,16 @@ void GalleryView::sortByName()
 
     PlayList pl = m_navigator->playList();
     pl.sortByName();
+    m_navigator->setPlayList(pl);
+}
+
+void GalleryView::sortByAspectRatio()
+{
+    if (!m_navigator) {
+        return;
+    }
+
+    PlayList pl = m_navigator->playList();
+    pl.sortByAspectRatio();
     m_navigator->setPlayList(pl);
 }

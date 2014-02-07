@@ -21,7 +21,9 @@ signals:
 public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);
+
     void sortByName();
+    void sortByAspectRatio();
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event);

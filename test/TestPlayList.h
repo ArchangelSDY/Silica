@@ -13,6 +13,9 @@ private slots:
     void sortByName();
     void sortByName_data();
 
+    void sortByAspectRatio();
+    void sortByAspectRatio_data();
+
 private:
     QTemporaryDir m_tmpDir;
 };

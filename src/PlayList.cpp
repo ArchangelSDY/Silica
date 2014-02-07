@@ -85,3 +85,14 @@ void PlayList::sortByName()
 {
     qSort(this->begin(), this->end(), imageNameLessThan);
 }
+
+static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
+                                     const QSharedPointer<Image> &right)
+{
+    return left->aspectRatio() < right->aspectRatio();
+}
+
+void PlayList::sortByAspectRatio()
+{
+    qSort(this->begin(), this->end(), imageAspectRatioLessThan);
+}
