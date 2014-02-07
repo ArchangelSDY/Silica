@@ -29,9 +29,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->sidebar->hide();
     statusBar()->hide();
 
-    // Window background
-    QPalette windowPalette(palette());
-    windowPalette.setColor(QPalette::Background, Qt::gray);
+    // Window palette
+    QPalette windowPalette = palette();
+    windowPalette.setColor(QPalette::Window, Qt::gray);
     setPalette(windowPalette);
 
     // Move to screen center
