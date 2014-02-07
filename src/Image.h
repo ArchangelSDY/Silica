@@ -56,6 +56,12 @@ public:
         LoadError,
     };
 
+    enum LoadPriority {
+        NormalPriority = 0,
+        LowPriority = -1,
+        LowestPriority = -2,
+    };
+
     Status status() const { return m_status; }
     QImage data()
     {
@@ -68,7 +74,7 @@ public:
     }
     QString name() const;
 
-    void load();
+    void load(int priority = NormalPriority);
     void loadThumbnail(bool makeImmediately = false);
     void scheduleUnload();
 

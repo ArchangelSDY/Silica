@@ -55,7 +55,7 @@ Image::~Image()
     }
 }
 
-void Image::load()
+void Image::load(int priority)
 {
     m_loadRequestsCount ++;
     m_status = Image::Loading;
@@ -69,7 +69,7 @@ void Image::load()
     LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
     connect(loadImageTask, SIGNAL(loaded(QImage *)),
             this, SLOT(imageReaderFinished(QImage *)));
-    QThreadPool::globalInstance()->start(loadImageTask);
+    QThreadPool::globalInstance()->start(loadImageTask, priority);
 }
 
 void Image::scheduleUnload()
@@ -121,7 +121,7 @@ void Image::thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately)
 
         emit thumbnailLoaded();
     } else if (makeImmediately) {
-        load();
+        load(LowestPriority);   // Thumbnail making should be low priority
         scheduleUnload();   // Release memory after thumbnail generated
     }
 }
