@@ -1,3 +1,11 @@
+#include <qglobal.h>
+
+#ifdef Q_OS_UNIX
+#include <sys/types.h>
+#include <time.h>
+#include <utime.h>
+#endif
+
 #include <quazipfile.h>
 
 #include "Image.h"
@@ -23,6 +31,14 @@ void LoadThumbnailTask::run()
 {
     QFile file(m_thumbnailPath);
     if (file.exists()) {
+        // Set last access/modified time
+#ifdef Q_OS_UNIX
+        time_t now = time(0);
+        struct utimbuf buf;
+        buf.actime = now;
+        buf.modtime = now;
+        utime(m_thumbnailPath.toUtf8().data(), &buf);
+#endif
         emit loaded(new QImage(m_thumbnailPath), m_makeImmediately);
     } else {
         emit loaded(0, m_makeImmediately);
