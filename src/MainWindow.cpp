@@ -340,6 +340,17 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         case Qt::Key_B:
             emit transitToGalleryAndView();
             break;
+        case Qt::Key_S:
+            promptToSave();
+            break;
+        case Qt::Key_T: {
+            QDockWidget *sidebar = ui->sidebar;
+            sidebar->setVisible(!sidebar->isVisible());
+            break;
+        }
+        case Qt::Key_R:
+            ui->graphicsView->rotate(90);
+            break;
         case Qt::Key_F11:
             if (!isFullScreen()) {
                 setWindowState(Qt::WindowFullScreen);
@@ -357,14 +368,6 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             m_inputMode = InputMode_Command;
             handleCommandKeyPress(ev);
             break;
-        case Qt::Key_S:
-            promptToSave();
-            break;
-        case Qt::Key_T: {
-            QDockWidget *sidebar = ui->sidebar;
-            sidebar->setVisible(!sidebar->isVisible());
-            break;
-        }
         case Qt::Key_Home:
             m_navigator.goFirst();
             break;
