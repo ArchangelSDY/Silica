@@ -31,7 +31,8 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 private:
-    QGraphicsScene *m_imageScene;
+    QGraphicsScene *m_scene;
+    QGraphicsPixmapItem *m_imageItem;
 
     FitMode m_fitInView;
 };

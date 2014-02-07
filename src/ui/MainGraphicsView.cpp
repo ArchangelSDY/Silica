@@ -6,22 +6,25 @@ static const double SCALE_FACTOR = 0.05;
 
 MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
-    m_imageScene(new QGraphicsScene(this)) ,
+    m_scene(new QGraphicsScene(this)) ,
+    m_imageItem(new QGraphicsPixmapItem()) ,
     m_fitInView(Fit)
 {
-    m_imageScene->setBackgroundBrush(Qt::gray);
-    setScene(m_imageScene);
+    m_scene->setBackgroundBrush(Qt::gray);
+    m_scene->addItem(m_imageItem);
+    m_imageItem->setTransformationMode(Qt::SmoothTransformation);
+    setScene(m_scene);
 }
 
 void MainGraphicsView::paint(Image *image)
 {
     if (image) {
         QPixmap pixmap = QPixmap::fromImage(image->data());
-        m_imageScene->clear();
-        m_imageScene->setSceneRect(pixmap.rect());
-        QGraphicsPixmapItem *item = m_imageScene->addPixmap(pixmap);
-        item->setTransformationMode(Qt::SmoothTransformation);
 
+        // TODO: update info widget
+
+        m_scene->setSceneRect(pixmap.rect());
+        m_imageItem->setPixmap(pixmap);
         fitInViewIfNecessary();
     }
 }
@@ -34,12 +37,10 @@ void MainGraphicsView::paintThumbnail(Image *image)
         QPixmap fitThumbnail = rawThumbnail.scaled(
             viewSize, Qt::KeepAspectRatioByExpanding);
 
-        m_imageScene->clear();
-        m_imageScene->setSceneRect(fitThumbnail.rect());
+        // TODO: update info widget
 
-        QGraphicsPixmapItem *item = m_imageScene->addPixmap(fitThumbnail);
-        item->setTransformationMode(Qt::SmoothTransformation);
-
+        m_scene->setSceneRect(fitThumbnail.rect());
+        m_imageItem->setPixmap(fitThumbnail);
         fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
     }
 }
