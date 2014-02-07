@@ -74,3 +74,8 @@ void PlayList::addPath(const QUrl &url)
         }
     }
 }
+
+void PlayList::sortByName()
+{
+    // TODO sortByName
+}

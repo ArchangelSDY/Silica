@@ -13,6 +13,8 @@ public:
 
     void addPath(const QString &);
     void addPath(const QUrl &);
+
+    void sortByName();
 };
 
 #endif // PLAYLIST_H

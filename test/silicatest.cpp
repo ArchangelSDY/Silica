@@ -3,6 +3,7 @@
 #include <QTextCodec>
 
 #include "TestImageSource.h"
+#include "TestPlayList.h"
 
 int main(int argc, char **argv)
 {
@@ -15,6 +16,10 @@ int main(int argc, char **argv)
     {
         TestImageSource testImageSource;
         err = qMax(err, QTest::qExec(&testImageSource, app.arguments()));
+    }
+    {
+        TestPlayList testPlayList;
+        err = qMax(err, QTest::qExec(&testPlayList, app.arguments()));
     }
 
     if (err != 0) {
