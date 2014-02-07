@@ -75,7 +75,13 @@ void PlayList::addPath(const QUrl &url)
     }
 }
 
+static bool imageNameLessThan(const QSharedPointer<Image> &left,
+                              const QSharedPointer<Image> &right)
+{
+    return left->name() < right->name();
+}
+
 void PlayList::sortByName()
 {
-    // TODO sortByName
+    qSort(this->begin(), this->end(), imageNameLessThan);
 }
