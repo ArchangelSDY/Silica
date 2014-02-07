@@ -79,10 +79,10 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
                 this, SLOT(thumbnailLoaded()));
         connect(image, SIGNAL(loaded()), this, SLOT(imageLoaded()),
                 Qt::UniqueConnection);
+    }
 
+    if (image->status() == Image::NotLoad) {
         image->load();
-    } else {
-        image->load(Image::LowPriority);
     }
 
     return image;
