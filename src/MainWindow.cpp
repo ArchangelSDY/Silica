@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
     ui->centralWidget->layout()->setSpacing(0);
+    ui->gallery->setNavigator(&m_navigator);
     ui->sidebar->hide();
     statusBar()->hide();
 

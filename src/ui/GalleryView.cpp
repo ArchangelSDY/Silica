@@ -1,4 +1,5 @@
 #include <QLayout>
+#include <QMenu>
 
 #include "../Image.h"
 #include "GalleryItem.h"
@@ -7,6 +8,7 @@
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
+    m_navigator(0) ,
     m_playList(0) ,
     m_scene(new QGraphicsScene)
 {
@@ -18,6 +20,11 @@ GalleryView::GalleryView(QWidget *parent) :
 GalleryView::~GalleryView()
 {
     delete m_scene;
+}
+
+void GalleryView::setNavigator(Navigator *navigator)
+{
+    m_navigator = navigator;
 }
 
 void GalleryView::clear()
@@ -94,4 +101,26 @@ void GalleryView::resizeEvent(QResizeEvent *)
 void GalleryView::showEvent(QShowEvent *)
 {
     layout();
+}
+
+void GalleryView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    QMenu *sorts = menu.addMenu("Sort By");
+    QAction *sortByNameAct = sorts->addAction("Name");
+    connect(sortByNameAct, SIGNAL(triggered()),
+            this, SLOT(sortByName()));
+
+    menu.exec(event->globalPos());
+}
+
+void GalleryView::sortByName()
+{
+    if (!m_navigator) {
+        return;
+    }
+
+    PlayList pl = m_navigator->playList();
+    pl.sortByName();
+    m_navigator->setPlayList(pl);
 }
