@@ -39,7 +39,15 @@ void LoadThumbnailTask::run()
         buf.modtime = now;
         utime(m_thumbnailPath.toUtf8().data(), &buf);
 #endif
-        emit loaded(new QImage(m_thumbnailPath), m_makeImmediately);
+        QImage *image = new QImage(m_thumbnailPath);
+        if (!image->isNull()) {
+            emit loaded(image, m_makeImmediately);
+        } else {
+            // Broken thumbnail, delete it
+            delete image;
+            file.remove();
+            emit loaded(0, m_makeImmediately);
+        }
     } else {
         emit loaded(0, m_makeImmediately);
     }
