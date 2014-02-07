@@ -20,11 +20,9 @@ void MainGraphicsView::paint(Image *image)
 {
     if (image) {
         QPixmap pixmap = QPixmap::fromImage(image->data());
-
-        // TODO: update info widget
-
         m_scene->setSceneRect(pixmap.rect());
         m_imageItem->setPixmap(pixmap);
+
         fitInViewIfNecessary();
     }
 }
@@ -37,10 +35,9 @@ void MainGraphicsView::paintThumbnail(Image *image)
         QPixmap fitThumbnail = rawThumbnail.scaled(
             viewSize, Qt::KeepAspectRatioByExpanding);
 
-        // TODO: update info widget
-
         m_scene->setSceneRect(fitThumbnail.rect());
         m_imageItem->setPixmap(fitThumbnail);
+
         fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
     }
 }

@@ -30,9 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->hide();
 
     // Window background
-    QPalette newPalette(palette());
-    newPalette.setColor(QPalette::Background, Qt::gray);
-    setPalette(newPalette);
+    QPalette windowPalette(palette());
+    windowPalette.setColor(QPalette::Background, Qt::gray);
+    setPalette(windowPalette);
 
     // Move to screen center
     const QRect screen = QApplication::desktop()->screenGeometry();
@@ -215,6 +215,7 @@ void MainWindow::promptToSave()
 
 void MainWindow::imageLoaded(Image *image)
 {
+    // Title bar
     QString status;
     if (image->status() == Image::Loading) {
         status = "[Loading]";
@@ -226,8 +227,12 @@ void MainWindow::imageLoaded(Image *image)
 
     QString title;
     QTextStream(&title) << status << image->name();
-
     setWindowTitle(title);
+
+    // Info widget
+    ui->lblName->setText(image->name());
+    ui->lblWidth->setText(QString::number(image->data().width()));
+    ui->lblHeight->setText(QString::number(image->data().height()));
 }
 
 void MainWindow::playListChange(PlayList playList)
