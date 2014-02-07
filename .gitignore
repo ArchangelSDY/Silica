@@ -4,5 +4,6 @@
 *.swp
 *.swo
 *.a
+*.dylib
 *.pro.user
 Makefile
