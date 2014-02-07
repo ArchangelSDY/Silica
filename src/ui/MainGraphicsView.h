@@ -4,6 +4,8 @@
 #include <QGraphicsView>
 #include <QWheelEvent>
 
+#include "Image.h"
+
 class MainGraphicsView : public QGraphicsView
 {
     Q_OBJECT
@@ -20,11 +22,17 @@ public:
     void fitInViewIfNecessary();
     void toggleFitInView();
 
+private slots:
+    void paint(Image *image);
+    void paintThumbnail(Image *image);
+
 protected:
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
 
 private:
+    QGraphicsScene *m_imageScene;
+
     FitMode m_fitInView;
 };
 

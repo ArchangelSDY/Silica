@@ -27,8 +27,6 @@ signals:
     void transitToViewOnly();
 
 public slots:
-    void paint(Image *image);
-    void paintThumbnail(Image *image);
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);
     void navigationChange(int index);
@@ -36,6 +34,9 @@ public slots:
     void gallerySelectionChanged();
     void layoutForGalleryAndView();
     void statusBarMessageChanged(const QString & message);
+
+private slots:
+    void imageLoaded(Image *image);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
@@ -62,7 +63,6 @@ private:
     Navigator m_navigator;
     Database *m_database;
     CommandInterpreter m_commandInterpreter;
-    QGraphicsScene m_imageScene;
     InputMode m_inputMode;
     QStateMachine m_exploreStateMachine;
 };

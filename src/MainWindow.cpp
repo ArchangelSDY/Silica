@@ -38,12 +38,12 @@ MainWindow::MainWindow(QWidget *parent) :
     const QRect screen = QApplication::desktop()->screenGeometry();
     move(screen.center() - rect().center());
 
-    ui->graphicsView->setScene(&m_imageScene);
-    m_imageScene.setBackgroundBrush(Qt::gray);
-
-    connect(&m_navigator, SIGNAL(paint(Image *)), this, SLOT(paint(Image *)));
-    connect(&m_navigator, SIGNAL(paintThumbnail(Image*)),
-            this, SLOT(paintThumbnail(Image*)));
+    connect(&m_navigator, SIGNAL(paint(Image *)),
+            this, SLOT(imageLoaded(Image *)));
+    connect(&m_navigator, SIGNAL(paint(Image *)),
+            ui->graphicsView, SLOT(paint(Image *)));
+    connect(&m_navigator, SIGNAL(paintThumbnail(Image *)),
+            ui->graphicsView, SLOT(paintThumbnail(Image *)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -213,49 +213,21 @@ void MainWindow::promptToSave()
     }
 }
 
-void MainWindow::paint(Image *image)
+void MainWindow::imageLoaded(Image *image)
 {
-    if (image) {
-        QPixmap pixmap = QPixmap::fromImage(image->data());
-        m_imageScene.clear();
-        m_imageScene.setSceneRect(pixmap.rect());
-        QGraphicsPixmapItem *item = m_imageScene.addPixmap(pixmap);
-        item->setTransformationMode(Qt::SmoothTransformation);
-        ui->graphicsView->fitInViewIfNecessary();
-
-
-        QString status;
-        if (image->status() == Image::Loading) {
-            status = "[Loading]";
-        } else if (image->status() == Image::LoadError) {
-            status = "[Error]";
-        } else {
-            status = "";
-        }
-
-        QString title;
-        QTextStream(&title) << status << image->name();
-
-        setWindowTitle(title);
+    QString status;
+    if (image->status() == Image::Loading) {
+        status = "[Loading]";
+    } else if (image->status() == Image::LoadError) {
+        status = "[Error]";
+    } else {
+        status = "";
     }
-}
 
-void MainWindow::paintThumbnail(Image *image)
-{
-    if (image) {
-        const QSize &viewSize = ui->graphicsView->size();
-        QPixmap rawThumbnail = QPixmap::fromImage(image->thumbnail());
-        QPixmap fitThumbnail = rawThumbnail.scaled(
-            viewSize, Qt::KeepAspectRatioByExpanding);
+    QString title;
+    QTextStream(&title) << status << image->name();
 
-        m_imageScene.clear();
-        m_imageScene.setSceneRect(fitThumbnail.rect());
-
-        QGraphicsPixmapItem *item = m_imageScene.addPixmap(fitThumbnail);
-        item->setTransformationMode(Qt::SmoothTransformation);
-
-        ui->graphicsView->fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
-    }
+    setWindowTitle(title);
 }
 
 void MainWindow::playListChange(PlayList playList)

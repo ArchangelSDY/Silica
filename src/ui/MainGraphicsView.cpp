@@ -1,11 +1,47 @@
+#include <QGraphicsItem>
+
 #include "MainGraphicsView.h"
 
 static const double SCALE_FACTOR = 0.05;
 
 MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
+    m_imageScene(new QGraphicsScene(this)) ,
     m_fitInView(Fit)
 {
+    m_imageScene->setBackgroundBrush(Qt::gray);
+    setScene(m_imageScene);
+}
+
+void MainGraphicsView::paint(Image *image)
+{
+    if (image) {
+        QPixmap pixmap = QPixmap::fromImage(image->data());
+        m_imageScene->clear();
+        m_imageScene->setSceneRect(pixmap.rect());
+        QGraphicsPixmapItem *item = m_imageScene->addPixmap(pixmap);
+        item->setTransformationMode(Qt::SmoothTransformation);
+
+        fitInViewIfNecessary();
+    }
+}
+
+void MainGraphicsView::paintThumbnail(Image *image)
+{
+    if (image) {
+        const QSize &viewSize = size();
+        QPixmap rawThumbnail = QPixmap::fromImage(image->thumbnail());
+        QPixmap fitThumbnail = rawThumbnail.scaled(
+            viewSize, Qt::KeepAspectRatioByExpanding);
+
+        m_imageScene->clear();
+        m_imageScene->setSceneRect(fitThumbnail.rect());
+
+        QGraphicsPixmapItem *item = m_imageScene->addPixmap(fitThumbnail);
+        item->setTransformationMode(Qt::SmoothTransformation);
+
+        fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
+    }
 }
 
 void MainGraphicsView::wheelEvent(QWheelEvent *ev)
