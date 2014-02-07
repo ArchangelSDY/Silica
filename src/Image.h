@@ -6,9 +6,40 @@
 
 #include "ImageSource.h"
 
-struct LoadThumbnailResult {
-    QImage *thumbnail;
-    bool makeImmediately;
+class LoadImageTask : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    LoadImageTask(QSharedPointer<ImageSource> imageSource) :
+        QRunnable() ,
+        m_imageSource(imageSource) {}
+
+    void run();
+
+signals:
+    void loaded(QImage *image);
+
+private:
+    QSharedPointer<ImageSource> m_imageSource;
+};
+
+class LoadThumbnailTask : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    LoadThumbnailTask(QString thumbnailPath, bool makeImmediately) :
+        QRunnable() ,
+        m_thumbnailPath(thumbnailPath) ,
+        m_makeImmediately(makeImmediately) {}
+
+    void run();
+
+signals:
+    void loaded(QImage *thumbnail, bool makeImmediately);
+
+private:
+    QString m_thumbnailPath;
+    bool m_makeImmediately;
 };
 
 class Image : public QObject
@@ -53,8 +84,8 @@ signals:
     void thumbnailLoaded();
 
 public slots:
-    void readerFinished();
-    void thumbnailReaderFinished();
+    void imageReaderFinished(QImage *image);
+    void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
 
 private:
     void unloadIfNeeded();
@@ -68,10 +99,8 @@ private:
     QString m_thumbnailPath;
     int m_loadRequestsCount;
 
-    QFuture<QImage *> m_readerFuture;
-    QFutureWatcher<QImage *> m_readerWatcher;
-    QFuture<LoadThumbnailResult> m_thumbnailFuture;
-    QFutureWatcher<LoadThumbnailResult> m_thumbnailWatcher;
+    bool m_isLoadingImage;
+    bool m_isLoadingThumbnail;
 };
 
 #endif // IMAGE_H

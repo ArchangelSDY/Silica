@@ -1,4 +1,3 @@
-#include <QtConcurrent/QtConcurrent>
 #include <quazipfile.h>
 
 #include "Image.h"
@@ -7,33 +6,27 @@ static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
-static QImage *loadImageAtBackground(QSharedPointer<ImageSource> imageSource)
+void LoadImageTask::run()
 {
-    if (!imageSource.isNull() && imageSource->open()) {
-        QImageReader reader(imageSource->device());
+    if (!m_imageSource.isNull() && m_imageSource->open()) {
+        QImageReader reader(m_imageSource->device());
         QImage image = reader.read();
 
-        imageSource->close();
-        return new QImage(image);
+        m_imageSource->close();
+        emit loaded(new QImage(image));
     } else {
-        return new QImage();
+        emit loaded(new QImage());
     }
 }
 
-static struct LoadThumbnailResult loadThumbnailAtBackground(
-    QString thumbnailPath, bool makeImmediately)
+void LoadThumbnailTask::run()
 {
-    struct LoadThumbnailResult result;
-    result.makeImmediately = makeImmediately;
-
-    QFile file(thumbnailPath);
+    QFile file(m_thumbnailPath);
     if (file.exists()) {
-        result.thumbnail = new QImage(thumbnailPath);
+        emit loaded(new QImage(m_thumbnailPath), m_makeImmediately);
     } else {
-        result.thumbnail = 0;
+        emit loaded(0, m_makeImmediately);
     }
-
-    return result;
 }
 
 Image::Image(QUrl url, QObject *parent) :
@@ -42,13 +35,11 @@ Image::Image(QUrl url, QObject *parent) :
     m_imageSource(ImageSource::create(url)) ,
     m_image(new QImage()) ,
     m_thumbnail(new QImage()) ,
-    m_loadRequestsCount(0)
+    m_loadRequestsCount(0) ,
+    m_isLoadingImage(false) ,
+    m_isLoadingThumbnail(false)
 {
     computeThumbnailPath();
-
-    connect(&m_readerWatcher, SIGNAL(finished()), this, SLOT(readerFinished()));
-    connect(&m_thumbnailWatcher, SIGNAL(finished()),
-            this, SLOT(thumbnailReaderFinished()));
 }
 
 Image::~Image()
@@ -69,12 +60,16 @@ void Image::load()
     m_loadRequestsCount ++;
     m_status = Image::Loading;
 
-    if (m_readerFuture.isRunning()) {
+    if (m_isLoadingImage) {
         return;
     }
 
-    m_readerFuture = QtConcurrent::run(loadImageAtBackground, m_imageSource);
-    m_readerWatcher.setFuture(m_readerFuture);
+    m_isLoadingImage = true;
+
+    LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
+    connect(loadImageTask, SIGNAL(loaded(QImage *)),
+            this, SLOT(imageReaderFinished(QImage *)));
+    QThreadPool::globalInstance()->start(loadImageTask);
 }
 
 void Image::scheduleUnload()
@@ -93,10 +88,12 @@ void Image::unloadIfNeeded()
     }
 }
 
-void Image::readerFinished()
+void Image::imageReaderFinished(QImage *image)
 {
+    m_isLoadingImage = false;
+
     delete m_image;
-    m_image = m_readerFuture.result();
+    m_image = image;
     makeThumbnail();
 
     if (!m_image->isNull()) {
@@ -114,16 +111,16 @@ void Image::readerFinished()
     unloadIfNeeded();
 }
 
-void Image::thumbnailReaderFinished()
+void Image::thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately)
 {
-    const struct LoadThumbnailResult &result = m_thumbnailFuture.result();
+    m_isLoadingThumbnail = false;
 
-    if (result.thumbnail) {
+    if (thumbnail) {
         delete m_thumbnail;
-        m_thumbnail = result.thumbnail;
+        m_thumbnail = thumbnail;
 
         emit thumbnailLoaded();
-    } else if (m_thumbnailFuture.result().makeImmediately) {
+    } else if (makeImmediately) {
         load();
         scheduleUnload();   // Release memory after thumbnail generated
     }
@@ -136,13 +133,17 @@ void Image::loadThumbnail(bool makeImmediately)
         return;
     }
 
-    if (m_thumbnailFuture.isRunning()) {
+    if (m_isLoadingThumbnail) {
         return;
     }
 
-    m_thumbnailFuture = QtConcurrent::run(
-        loadThumbnailAtBackground, m_thumbnailPath, makeImmediately);
-    m_thumbnailWatcher.setFuture(m_thumbnailFuture);
+    m_isLoadingThumbnail = true;
+
+    LoadThumbnailTask *loadThumbnailTask =
+        new LoadThumbnailTask(m_thumbnailPath, makeImmediately);
+    connect(loadThumbnailTask, SIGNAL(loaded(QImage *, bool)),
+            this, SLOT(thumbnailReaderFinished(QImage *, bool)));
+    QThreadPool::globalInstance()->start(loadThumbnailTask);
 }
 
 void Image::makeThumbnail()
