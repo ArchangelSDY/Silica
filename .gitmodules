@@ -1,0 +1,3 @@
+[submodule "src/deps/Qt7z"]
+	path = src/deps/Qt7z
+	url = ssh://git@archangelsdy.com:9687/Qt7z
