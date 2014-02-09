@@ -13,7 +13,6 @@ public:
     virtual bool copy(const QString &destPath);
 private:
     QString m_zipPath;
-    QString m_imageName;
 };
 
 #endif // ZIPIMAGESOURCE_H

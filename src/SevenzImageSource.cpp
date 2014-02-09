@@ -8,7 +8,7 @@
 SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName)
 {
     m_packagePath = searchRealPath(packagePath);
-    m_imageName = imageName;
+    m_name = imageName;
 
     // Compute hash
     QString hashStr;
@@ -28,7 +28,7 @@ bool SevenzImageSource::open()
         return false;
     }
 
-    if (!pkg.extractFile(m_imageName, buffer)) {
+    if (!pkg.extractFile(m_name, buffer)) {
         pkg.close();
         delete buffer;
         return false;

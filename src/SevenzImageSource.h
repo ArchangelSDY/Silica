@@ -15,7 +15,6 @@ public:
     virtual bool copy(const QString &destPath);
 private:
     QString m_packagePath;
-    QString m_imageName;
 };
 
 #endif // SEVENZIMAGESOURCE_H
