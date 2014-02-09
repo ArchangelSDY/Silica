@@ -9,6 +9,7 @@
 #include "GlobalConfig.h"
 #include "ImageSource.h"
 #include "LocalImageSource.h"
+#include "SevenzImageSource.h"
 #include "ZipImageSource.h"
 
 ImageSource *ImageSource::create(QUrl url)
@@ -24,6 +25,15 @@ ImageSource *ImageSource::create(QUrl url)
         QString zipPath = zipUrl.toLocalFile();
 
         return new ZipImageSource(zipPath, imageName);
+    } else if (url.scheme() == "sevenz") {
+        QString imageName = url.fragment();
+
+        QUrl sevenzUrl = url;
+        sevenzUrl.setScheme("file");
+        sevenzUrl.setFragment("");
+        QString sevenzPath = sevenzUrl.toLocalFile();
+
+        return new SevenzImageSource(sevenzPath, imageName);
     } else {
         return 0;
     }

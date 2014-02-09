@@ -1,4 +1,5 @@
 #include <QDir>
+#include <Qt7zPackage.h>
 #include <quazip.h>
 
 #include "PlayList.h"
@@ -46,7 +47,7 @@ void PlayList::addPath(const QUrl &url)
     if (url.scheme() == "file") {
         QString path = url.toLocalFile();
         addPath(path);
-    } else if (url.scheme() == "zip") {
+    } else if (url.scheme() == "zip" || url.scheme() == "sevenz") {
         if (url.hasFragment()) {
             // Single file
             *this << QSharedPointer<Image>(new Image(url));
@@ -55,23 +56,52 @@ void PlayList::addPath(const QUrl &url)
             // FIXME: Should skip non image files
             QUrl fileUrl = url;
             fileUrl.setScheme("file");
-            QString zipPath = fileUrl.toLocalFile();
+            QString packagePath = fileUrl.toLocalFile();
 
-            QuaZip zip(zipPath);
-            bool success = zip.open(QuaZip::mdUnzip);
-
-            if (success) {
-                foreach(const QString &name, zip.getFileNameList()) {
-                    QUrl imageUrl = url;
-                    imageUrl.setFragment(name);
-
-                    *this << QSharedPointer<Image>(new Image(imageUrl));
-                }
-
-                zip.close();
+            QStringList fileNameList;
+            if (url.scheme() == "zip") {
+                fileNameList = getFileNameListInZip(packagePath);
+            } else if (url.scheme() == "sevenz") {
+                fileNameList = getFileNameListInSevenz(packagePath);
+            } else {
+                return;
             }
 
+            foreach(const QString &name, fileNameList) {
+                QUrl imageUrl = url;
+                imageUrl.setFragment(name);
+
+                *this << QSharedPointer<Image>(new Image(imageUrl));
+            }
         }
+    }
+}
+
+QStringList PlayList::getFileNameListInZip(const QString &zipPath)
+{
+    QuaZip zip(zipPath);
+    bool success = zip.open(QuaZip::mdUnzip);
+
+    if (success) {
+        QStringList fileNameList = zip.getFileNameList();
+        zip.close();
+        return fileNameList;
+    } else {
+        return QStringList();
+    }
+}
+
+QStringList PlayList::getFileNameListInSevenz(const QString &packagePath)
+{
+    Qt7zPackage pkg(packagePath);
+    bool success = pkg.open();
+
+    if (success) {
+        QStringList fileNameList = pkg.getFileNameList();
+        pkg.close();
+        return fileNameList;
+    } else {
+        return QStringList();
     }
 }
 

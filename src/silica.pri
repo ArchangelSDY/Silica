@@ -8,6 +8,7 @@ SOURCES += \
     $$PWD/MainWindow.cpp \
     $$PWD/Navigator.cpp \
     $$PWD/PlayList.cpp \
+    $$PWD/SevenzImageSource.cpp \
     $$PWD/ZipImageSource.cpp \
     $$PWD/db/*.cpp \
     $$PWD/ui/*.cpp
@@ -27,14 +28,22 @@ FORMS += $$PWD/*.ui
 
 RESOURCES += $$PWD/*.qrc
 
-INCLUDEPATH += $$PWD/deps/quazip/quazip
-DEPENDPATH += $$PWD/deps/quazip/quazip
+INCLUDEPATH += \
+    $$PWD/deps/quazip/quazip \
+    $$PWD/deps/Qt7z/Qt7z
+
+DEPENDPATH += \
+    $$PWD/deps/quazip/quazip \
+    $$PWD/deps/Qt7z/Qt7z
 
 macx {
     LIBS += -L/usr/local/opt/zlib/lib/ -lz
 
     LIBS += -L$$PWD/deps/quazip/quazip -lquazip
     PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a
+
+    LIBS += -L$$PWD/deps/Qt7z/Qt7z -lQt7z
+    PRE_TARGETDEPS += $$PWD/deps/Qt7z/Qt7z/libQt7z.a
 
     config.path = $$OUT_PWD/silica.app/Contents/MacOS/config/Asuna
     config.files = $$PWD/assets/Silica.ini
@@ -48,6 +57,9 @@ linux {
 
     LIBS += -L$$PWD/deps/quazip/quazip/ -lquazip
     PRE_TARGETDEPS += $$PWD/deps/quazip/quazip/libquazip.a
+
+    LIBS += -L$$PWD/deps/Qt7z/Qt7z -lQt7z
+    PRE_TARGETDEPS += $$PWD/deps/Qt7z/Qt7z/libQt7z.a
 }
 
 win32 {
@@ -68,6 +80,8 @@ win32 {
         LIBS += -L$$PWD/deps/build-quazip-win32-debug/quazip/debug/ -lquazip
         PRE_TARGETDEPS += $$PWD/deps/build-quazip-win32-debug/quazip/debug/quazip.lib
     }
+
+    # TODO: Add Qt7z
 
     runtime.path = $$OUT_PWD
     runtime.files = \

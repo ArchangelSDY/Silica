@@ -146,7 +146,9 @@ void MainWindow::processCommandLineOptions()
 
     PlayList playList;
     foreach (const QString& imagePath, imagePaths) {
-        if (imagePath.startsWith("file://") || imagePath.startsWith("zip://")) {
+        if (imagePath.startsWith("file://") ||
+            imagePath.startsWith("zip://") ||
+            imagePath.startsWith("sevenz://")) {
             playList.addPath(QUrl(imagePath));
         } else {
             playList.addPath(imagePath);
@@ -166,17 +168,19 @@ void MainWindow::promptToOpen()
 
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
         this, tr("Open"), QUrl::fromLocalFile(defaultDir),
-        "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip)");
+        "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip);;7z (*.7z)");
 
     if (images.count() == 0) {
         return;
     }
 
-    // Hack for zip
+    // Hack for zip and 7z
     // FIXME: Better way to handle this?
     for (QList<QUrl>::iterator i = images.begin(); i != images.end(); ++i) {
         if ((*i).path().endsWith(".zip")) {
             (*i).setScheme("zip");
+        } else if ((*i).path().endsWith(".7z")) {
+            (*i).setScheme("sevenz");
         }
     }
 
