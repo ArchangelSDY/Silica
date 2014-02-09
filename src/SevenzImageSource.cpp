@@ -1,4 +1,5 @@
 #include <QCryptographicHash>
+#include <QFile>
 #include <QTextStream>
 
 #include "Qt7zPackage.h"
@@ -41,6 +42,25 @@ bool SevenzImageSource::open()
 
 bool SevenzImageSource::copy(const QString &destPath)
 {
-    Q_UNIMPLEMENTED();
+    Qt7zPackage pkg(m_packagePath);
+    if (!pkg.open()) {
+        return false;
+    }
+
+    QFile *file = new QFile(destPath);
+    if (!file->open(QIODevice::WriteOnly)) {
+        delete file;
+        return false;
+    }
+
+    if (!pkg.extractFile(m_name, file)) {
+        pkg.close();
+        file->close();
+        delete file;
+        return false;
+    }
+
+    file->close();
+    delete file;
     return true;
 }

@@ -202,7 +202,9 @@ void MainWindow::promptToSave()
             GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
             Image *image = galleryItem->image();
             if (image) {
-                QString destPath = destDir + QDir::separator() + image->name();
+                QFileInfo imageFile(image->name()); // Remove dir in image name
+                QString destPath = destDir + QDir::separator() +
+                    imageFile.fileName();
                 bool success = image->copy(destPath);
                 QString msg;
                 if (success) {
