@@ -21,5 +21,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    return a.exec();
+    const int ret = a.exec();
+
+    QThreadPool::globalInstance()->clear();
+    return ret;
 }
