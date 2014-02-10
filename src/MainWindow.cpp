@@ -168,7 +168,7 @@ void MainWindow::promptToOpen()
 
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
         this, tr("Open"), QUrl::fromLocalFile(defaultDir),
-        "All (*.png *.jpg *.zip);;Images (*.png *.jpg);;Zip (*.zip);;7z (*.7z)");
+        "All (*.png *.jpg *.zip *.7z);;Images (*.png *.jpg);;Zip (*.zip);;7z (*.7z)");
 
     if (images.count() == 0) {
         return;
