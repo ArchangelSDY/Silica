@@ -42,6 +42,30 @@ private:
     bool m_makeImmediately;
 };
 
+class MakeThumbnailTask : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    MakeThumbnailTask(QImage *image, const QString &path) :
+        QRunnable() ,
+        m_image(image) ,
+        m_path(path) {}
+
+    ~MakeThumbnailTask()
+    {
+        delete m_image;
+    }
+
+    void run();
+
+signals:
+    void thumbnailMade(QImage *thumbnail);
+
+private:
+      QImage *m_image;
+      QString m_path;
+};
+
 class Image : public QObject
 {
     Q_OBJECT
@@ -93,6 +117,7 @@ signals:
 public slots:
     void imageReaderFinished(QImage *image);
     void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
+    void thumbnailMade(QImage *thumbnail);
 
 private:
     void unloadIfNeeded();
@@ -108,6 +133,7 @@ private:
 
     bool m_isLoadingImage;
     bool m_isLoadingThumbnail;
+    bool m_isMakingThumbnail;
 };
 
 #endif // IMAGE_H

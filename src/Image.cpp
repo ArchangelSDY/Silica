@@ -53,6 +53,21 @@ void LoadThumbnailTask::run()
     }
 }
 
+void MakeThumbnailTask::run()
+{
+    if (!m_image) {
+        emit thumbnailMade(0);
+        return;
+    }
+
+    int height = qMax<int>(
+        THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
+
+    QImage *thumbnail = new QImage(m_image->scaledToHeight(height));
+    thumbnail->save(m_path, "JPG");
+    emit thumbnailMade(thumbnail);
+}
+
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
@@ -61,7 +76,8 @@ Image::Image(QUrl url, QObject *parent) :
     m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
-    m_isLoadingThumbnail(false)
+    m_isLoadingThumbnail(false) ,
+    m_isMakingThumbnail(false)
 {
     computeThumbnailPath();
 }
@@ -118,7 +134,10 @@ void Image::imageReaderFinished(QImage *image)
 
     delete m_image;
     m_image = image;
-    makeThumbnail();
+
+    if (m_thumbnail->isNull()) {
+        makeThumbnail();
+    }
 
     if (!m_image->isNull()) {
         m_status = Image::LoadComplete;
@@ -174,17 +193,29 @@ void Image::makeThumbnail()
 {
     Q_ASSERT(m_image);
 
-    if (m_image->isNull()) {
+    if (m_image->isNull() || m_isMakingThumbnail) {
         return;
     }
 
-    int height = qMax<int>(
-        THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
+    m_isMakingThumbnail = true;
 
-    delete m_thumbnail;
-    m_thumbnail = new QImage(m_image->scaledToHeight(height));
-    m_thumbnail->save(m_thumbnailPath, "JPG");
-    emit thumbnailLoaded();
+    MakeThumbnailTask *makeThumbnailTask =
+        new MakeThumbnailTask(new QImage(*m_image), m_thumbnailPath);
+    connect(makeThumbnailTask, SIGNAL(thumbnailMade(QImage*)),
+            this, SLOT(thumbnailMade(QImage*)));
+    QThreadPool::globalInstance()->start(makeThumbnailTask);
+}
+
+void Image::thumbnailMade(QImage *thumbnail)
+{
+    if (thumbnail) {
+        delete m_thumbnail;
+        m_thumbnail = thumbnail;
+
+        emit thumbnailLoaded();
+    }
+
+    m_isMakingThumbnail = false;
 }
 
 void Image::computeThumbnailPath()
