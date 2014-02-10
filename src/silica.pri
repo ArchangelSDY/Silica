@@ -17,7 +17,8 @@ SOURCES += \
 HEADERS += \
     $$PWD/*.h \
     $$PWD/db/*.h \
-    $$PWD/ui/*.h
+    $$PWD/ui/*.h \
+    $$PWD/util/*.h
 
 INCLUDEPATH += \
     $$PWD \
