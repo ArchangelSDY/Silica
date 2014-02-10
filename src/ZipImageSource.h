@@ -3,6 +3,8 @@
 
 #include "ImageSource.h"
 
+class Qt7zPackage;
+
 class ZipImageSource : public ImageSource
 {
 public:

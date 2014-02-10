@@ -22,7 +22,8 @@ HEADERS += \
 INCLUDEPATH += \
     $$PWD \
     $$PWD/db \
-    $$PWD/ui
+    $$PWD/ui \
+    $$PWD/util
 
 FORMS += $$PWD/*.ui
 

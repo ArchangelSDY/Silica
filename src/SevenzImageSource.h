@@ -3,7 +3,10 @@
 
 #include <QBuffer>
 
+#include <FrequencyCache.h>
 #include "ImageSource.h"
+
+class Qt7zPackage;
 
 class SevenzImageSource : public ImageSource
 {
@@ -14,6 +17,8 @@ public:
 
     virtual bool copy(const QString &destPath);
 private:
+    static FrequencyCache<QString, QSharedPointer<Qt7zPackage> > m_packageCache;
+
     QString m_packagePath;
 };
 
