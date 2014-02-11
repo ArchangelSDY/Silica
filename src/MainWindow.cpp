@@ -5,8 +5,9 @@
 #include <QMessageBox>
 #include <QStatusBar>
 
-#include "db/AsunaDatabase.h"
+#include "AsunaDatabase.h"
 #include "GlobalConfig.h"
+#include "ImageSourceManager.h"
 #include "PlayList.h"
 #include "MainWindow.h"
 #include "GalleryItem.h"
@@ -145,10 +146,10 @@ void MainWindow::processCommandLineOptions()
     const QStringList imagePaths = parser.positionalArguments();
 
     PlayList playList;
+    QStringList urlPatterns = ImageSourceManager::instance()->urlPatterns();
     foreach (const QString& imagePath, imagePaths) {
-        if (imagePath.startsWith("file://") ||
-            imagePath.startsWith("zip://") ||
-            imagePath.startsWith("sevenz://")) {
+        QString pattern = imagePath.left(imagePath.indexOf("://"));
+        if (urlPatterns.contains(pattern)) {
             playList.addPath(QUrl(imagePath));
         } else {
             playList.addPath(imagePath);
@@ -168,7 +169,7 @@ void MainWindow::promptToOpen()
 
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
         this, tr("Open"), QUrl::fromLocalFile(defaultDir),
-        "All (*.png *.jpg *.zip *.7z);;Images (*.png *.jpg);;Zip (*.zip);;7z (*.7z)");
+        ImageSourceManager::instance()->fileDialogFilters());
 
     if (images.count() == 0) {
         return;

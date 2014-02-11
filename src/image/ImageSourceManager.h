@@ -17,6 +17,9 @@ public:
     ImageSource *create(const QUrl &url);
     ImageSource *create(const QString &path);
 
+    QStringList urlPatterns() const;
+    QString fileDialogFilters() const;
+
 private:
     explicit ImageSourceManager(QObject *parent = 0);
     void registerFactory(ImageSourceFactory *factory);
