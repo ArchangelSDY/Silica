@@ -2,6 +2,7 @@
 #define FREQUENCYCACHE_H
 
 #include <QHash>
+#include <QMutex>
 
 template <class K, class V>
 class FrequencyCache {
