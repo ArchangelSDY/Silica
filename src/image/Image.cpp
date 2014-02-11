@@ -72,7 +72,21 @@ void MakeThumbnailTask::run()
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
-    m_imageSource(ImageSourceManager::instance()->create(url)) ,
+    m_imageSource(ImageSourceManager::instance()->createSingle(url)) ,
+    m_image(new QImage()) ,
+    m_thumbnail(new QImage()) ,
+    m_loadRequestsCount(0) ,
+    m_isLoadingImage(false) ,
+    m_isLoadingThumbnail(false) ,
+    m_isMakingThumbnail(false)
+{
+    computeThumbnailPath();
+}
+
+Image::Image(ImageSource *imageSource, QObject *parent) :
+    QObject(parent) ,
+    m_status(Image::NotLoad) ,
+    m_imageSource(imageSource) ,
     m_image(new QImage()) ,
     m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,

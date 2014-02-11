@@ -1,7 +1,4 @@
-#include <QDir>
-#include <Qt7zPackage.h>
-#include <quazip.h>
-
+#include "ImageSourceManager.h"
 #include "PlayList.h"
 
 PlayList::PlayList(const QList<QUrl> &imageUrls)
@@ -13,28 +10,10 @@ PlayList::PlayList(const QList<QUrl> &imageUrls)
 
 void PlayList::addPath(const QString &path)
 {
-    QFileInfo file(path);
-
-    if (!file.exists()) {
-        return;
-    }
-
-    if (file.isDir()) {
-        QDir dir(path);
-
-        QStringList filters;
-        filters << "*.png" << "*.jpg";
-        dir.setNameFilters(filters);
-
-        if (dir.entryInfoList().length() > 0) {
-            foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
-                QUrl imageUrl = QUrl::fromLocalFile(
-                    fileInfo.absoluteFilePath());
-                *this << QSharedPointer<Image>(new Image(imageUrl));
-            }
-        }
-    } else {
-        *this << QSharedPointer<Image>(new Image(QUrl::fromLocalFile(path)));
+    QList<ImageSource *> imageSources =
+        ImageSourceManager::instance()->createMultiple(path);
+    foreach (ImageSource *imageSource, imageSources) {
+        *this << QSharedPointer<Image>(new Image(imageSource));
     }
 }
 
@@ -44,64 +23,10 @@ void PlayList::addPath(const QUrl &url)
         return;
     }
 
-    if (url.scheme() == "file") {
-        QString path = url.toLocalFile();
-        addPath(path);
-    } else if (url.scheme() == "zip" || url.scheme() == "sevenz") {
-        if (url.hasFragment()) {
-            // Single file
-            *this << QSharedPointer<Image>(new Image(url));
-        } else {
-            // Add all files in the zip
-            // FIXME: Should skip non image files
-            QUrl fileUrl = url;
-            fileUrl.setScheme("file");
-            QString packagePath = fileUrl.toLocalFile();
-
-            QStringList fileNameList;
-            if (url.scheme() == "zip") {
-                fileNameList = getFileNameListInZip(packagePath);
-            } else if (url.scheme() == "sevenz") {
-                fileNameList = getFileNameListInSevenz(packagePath);
-            } else {
-                return;
-            }
-
-            foreach(const QString &name, fileNameList) {
-                QUrl imageUrl = url;
-                imageUrl.setFragment(name);
-
-                *this << QSharedPointer<Image>(new Image(imageUrl));
-            }
-        }
-    }
-}
-
-QStringList PlayList::getFileNameListInZip(const QString &zipPath)
-{
-    QuaZip zip(zipPath);
-    bool success = zip.open(QuaZip::mdUnzip);
-
-    if (success) {
-        QStringList fileNameList = zip.getFileNameList();
-        zip.close();
-        return fileNameList;
-    } else {
-        return QStringList();
-    }
-}
-
-QStringList PlayList::getFileNameListInSevenz(const QString &packagePath)
-{
-    Qt7zPackage pkg(packagePath);
-    bool success = pkg.open();
-
-    if (success) {
-        QStringList fileNameList = pkg.getFileNameList();
-        pkg.close();
-        return fileNameList;
-    } else {
-        return QStringList();
+    QList<ImageSource *> imageSources =
+        ImageSourceManager::instance()->createMultiple(url);
+    foreach (ImageSource *imageSource, imageSources) {
+        *this << QSharedPointer<Image>(new Image(imageSource));
     }
 }
 

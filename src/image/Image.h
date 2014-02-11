@@ -71,6 +71,7 @@ class Image : public QObject
     Q_OBJECT
 public:
     explicit Image(QUrl url, QObject *parent = 0);
+    explicit Image(ImageSource *, QObject *parent = 0);
     ~Image();
 
     enum Status {

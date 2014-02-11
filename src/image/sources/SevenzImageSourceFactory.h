@@ -10,8 +10,10 @@ public:
     QString name() const;
     QString fileNamePattern() const;
     QString urlScheme() const;
-    ImageSource *create(const QUrl &url);
-    ImageSource *create(const QString &path);
+    ImageSource *createSingle(const QUrl &url);
+    ImageSource *createSingle(const QString &path);
+    QList<ImageSource *> createMultiple(const QUrl &url);
+    QList<ImageSource *> createMultiple(const QString &path);
 };
 
 #endif // SEVENZIMAGESOURCEFACTORY_H

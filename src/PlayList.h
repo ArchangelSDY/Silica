@@ -16,10 +16,6 @@ public:
 
     void sortByName();
     void sortByAspectRatio();
-
-private:
-    QStringList getFileNameListInZip(const QString &zipPath);
-    QStringList getFileNameListInSevenz(const QString &packagePath);
 };
 
 #endif // PLAYLIST_H

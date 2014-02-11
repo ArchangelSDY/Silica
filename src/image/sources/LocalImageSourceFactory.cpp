@@ -1,3 +1,5 @@
+#include <QDir>
+#include <QFileInfo>
 #include <QUrl>
 
 #include "LocalImageSource.h"
@@ -18,7 +20,7 @@ QString LocalImageSourceFactory::urlScheme() const
     return "file";
 }
 
-ImageSource *LocalImageSourceFactory::create(const QUrl &url)
+ImageSource *LocalImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
         return new LocalImageSource(url.toLocalFile());
@@ -27,7 +29,36 @@ ImageSource *LocalImageSourceFactory::create(const QUrl &url)
     }
 }
 
-ImageSource *LocalImageSourceFactory::create(const QString &path)
+ImageSource *LocalImageSourceFactory::createSingle(const QString &path)
 {
     return new LocalImageSource(path);
+}
+
+QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QUrl &url)
+{
+    return createMultiple(url.toLocalFile());
+}
+
+QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path)
+{
+    QList<ImageSource *> imageSources;
+    QFileInfo file(path);
+
+    if (!file.exists()) {
+        return imageSources;
+    }
+
+    if (file.isDir()) {
+        QDir dir(path);
+        QStringList filters = fileNamePattern().split(" ");
+        dir.setNameFilters(filters);
+
+        foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
+            imageSources << createSingle(fileInfo.absoluteFilePath());
+        }
+    } else {
+        imageSources << createSingle(path);
+    }
+
+    return imageSources;
 }

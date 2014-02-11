@@ -3,6 +3,7 @@
 
 #include "ImageSourceManager.h"
 #include "LocalImageSourceFactory.h"
+#include "SevenzImageSourceFactory.h"
 #include "ZipImageSourceFactory.h"
 
 ImageSourceManager *ImageSourceManager::m_instance = 0;
@@ -12,6 +13,7 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
 {
     registerFactory(new LocalImageSourceFactory());
     registerFactory(new ZipImageSourceFactory());
+    registerFactory(new SevenzImageSourceFactory());
 }
 
 ImageSourceManager *ImageSourceManager::instance()
@@ -31,22 +33,22 @@ ImageSourceManager::~ImageSourceManager()
     }
 }
 
-ImageSource *ImageSourceManager::create(const QUrl &url)
+ImageSource *ImageSourceManager::createSingle(const QUrl &url)
 {
     if (m_factories.contains(url.scheme())) {
         ImageSourceFactory *factory = m_factories.value(url.scheme());
-        return factory->create(url);
+        return factory->createSingle(url);
     } else {
         return 0;
     }
 }
 
-ImageSource *ImageSourceManager::create(const QString &path)
+ImageSource *ImageSourceManager::createSingle(const QString &path)
 {
     for (QHash<QString, ImageSourceFactory *>::iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         ImageSourceFactory *factory = it.value();
-        ImageSource *imageSource = factory->create(path);
+        ImageSource *imageSource = factory->createSingle(path);
 
         if (imageSource) {
             return imageSource;
@@ -54,6 +56,31 @@ ImageSource *ImageSourceManager::create(const QString &path)
     }
 
     return 0;
+}
+
+QList<ImageSource *> ImageSourceManager::createMultiple(const QUrl &url)
+{
+    if (m_factories.contains(url.scheme())) {
+        ImageSourceFactory *factory = m_factories.value(url.scheme());
+        return factory->createMultiple(url);
+    } else {
+        return QList<ImageSource *>();
+    }
+}
+
+QList<ImageSource *> ImageSourceManager::createMultiple(const QString &path)
+{
+    for (QHash<QString, ImageSourceFactory *>::iterator it = m_factories.begin();
+         it != m_factories.end(); ++it) {
+        ImageSourceFactory *factory = it.value();
+        QList<ImageSource *> imageSources = factory->createMultiple(path);
+
+        if (imageSources.count() > 0) {
+            return imageSources;
+        }
+    }
+
+    return QList<ImageSource *>();
 }
 
 QStringList ImageSourceManager::urlPatterns() const
