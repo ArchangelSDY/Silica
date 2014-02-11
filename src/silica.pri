@@ -1,18 +1,13 @@
 SOURCES += \
     $$PWD/CommandInterpreter.cpp \
     $$PWD/GlobalConfig.cpp \
-    $$PWD/image/Image.cpp \
-    $$PWD/image/ImagesCache.cpp \
-    $$PWD/image/ImageSource.cpp \
-    $$PWD/image/sources/LocalImageSource.cpp \
-    $$PWD/image/sources/SevenzImageSource.cpp \
-    $$PWD/image/sources/ZipImageSource.cpp \
     $$PWD/MainWindow.cpp \
     $$PWD/Navigator.cpp \
     $$PWD/PlayList.cpp \
     $$PWD/db/*.cpp \
+    $$PWD/image/*.cpp \
+    $$PWD/image/sources/*.cpp \
     $$PWD/ui/*.cpp
-
 
 HEADERS += \
     $$PWD/*.h \

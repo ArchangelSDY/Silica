@@ -9,6 +9,7 @@
 #include <quazipfile.h>
 
 #include "Image.h"
+#include "ImageSourceManager.h"
 
 static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
@@ -71,7 +72,7 @@ void MakeThumbnailTask::run()
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
-    m_imageSource(ImageSource::create(url)) ,
+    m_imageSource(ImageSourceManager::instance()->create(url)) ,
     m_image(new QImage()) ,
     m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,

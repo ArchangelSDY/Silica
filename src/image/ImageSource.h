@@ -7,9 +7,6 @@
 class ImageSource
 {
 public:
-    static ImageSource *create(QUrl url);
-    static ImageSource *create(QString path);
-
     virtual ~ImageSource();
 
     virtual bool open() = 0;
