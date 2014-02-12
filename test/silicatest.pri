@@ -8,9 +8,6 @@ HEADERS += \
     TestPlayList.h
 
 assets.files = $$PWD/assets/*
+assets.path = $$OUT_PWD/assets
 
-macx {
-    assets.path = $$OUT_PWD/silicatest.app/Contents/MacOS/assets
-
-    INSTALLS += assets
-}
+INSTALLS += assets

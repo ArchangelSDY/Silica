@@ -2,7 +2,8 @@
 #include <QTest>
 #include <QUrl>
 
-#include "../src/ImageSource.h"
+#include "../src/image/ImageSource.h"
+#include "../src/image/ImageSourceManager.h"
 
 #include "TestImageSource.h"
 
@@ -10,7 +11,8 @@ void TestImageSource::openAndClose()
 {
     QFETCH(QUrl, srcUrl);
 
-    ImageSource *imageSource = ImageSource::create(srcUrl);
+    ImageSource *imageSource =
+        ImageSourceManager::instance()->createSingle(srcUrl);
     QVERIFY(imageSource->open());
     QVERIFY(imageSource->device() != 0);
     QVERIFY(imageSource->device()->isOpen());
@@ -38,7 +40,8 @@ void TestImageSource::properties()
     QFETCH(QUrl, srcUrl);
     QFETCH(QString, name);
 
-    ImageSource *imageSource = ImageSource::create(srcUrl);
+    ImageSource *imageSource =
+        ImageSourceManager::instance()->createSingle(srcUrl);
     imageSource->open();
     QCOMPARE(imageSource->name(), name);
     QVERIFY(!imageSource->hash().isEmpty());
@@ -66,7 +69,8 @@ void TestImageSource::copy()
     QFETCH(QUrl, srcUrl);
     QTemporaryDir tmpDir;
 
-    ImageSource *imageSource = ImageSource::create(srcUrl);
+    ImageSource *imageSource =
+        ImageSourceManager::instance()->createSingle(srcUrl);
     imageSource->open();
 
     QString destPath = tmpDir.path() + QDir::separator() + imageSource->name();
