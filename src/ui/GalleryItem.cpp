@@ -1,4 +1,5 @@
 #include <QGraphicsScene>
+#include <QPainter>
 
 #include "GalleryItem.h"
 #include "../GlobalConfig.h"
@@ -6,16 +7,19 @@
 static const int PADDING = 10;
 static const int BORDER = 5;
 
-GalleryItem::GalleryItem(Image *image, QGraphicsItem *parent) :
+GalleryItem::GalleryItem(AbstractGalleryItemModel *model,
+                         QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
-    m_image(image)
+    m_model(model)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    if (m_image) {
-        connect(m_image, SIGNAL(thumbnailLoaded()),
+    if (m_model) {
+        m_model->setParent(this);
+
+        connect(m_model, SIGNAL(thumbnailLoaded()),
                 this, SLOT(thumbnailLoaded()));
-        m_image->loadThumbnail(true);
+        m_model->loadThumbnail();
     }
 }
 
@@ -26,41 +30,30 @@ QRectF GalleryItem::boundingRect() const
 
 void GalleryItem::thumbnailLoaded()
 {
-    if (!m_image) {
+    if (!m_model) {
         return;
     }
 
-    const QImage &thumbnailImage = m_image->thumbnail();
+    const QImage &thumbnailImage = m_model->thumbnail();
     if (!thumbnailImage.isNull()) {
         // Calculate image size and position
         const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-        m_imageSize.setWidth(itemSize.width() - 2 * PADDING);
-        m_imageSize.setHeight(itemSize.height() - 2 * PADDING);
+        m_thumbnailSize.setWidth(itemSize.width() - 2 * PADDING);
+        m_thumbnailSize.setHeight(itemSize.height() - 2 * PADDING);
 
-        m_imageSize = m_image->thumbnail().size().scaled(
-            m_imageSize, Qt::KeepAspectRatio);
+        m_thumbnailSize = thumbnailImage.size().scaled(
+            m_thumbnailSize, Qt::KeepAspectRatio);
 
-        m_imagePos.setX((itemSize.width() - m_imageSize.width()) / 2);
-        m_imagePos.setY((itemSize.height() - m_imageSize.height()) / 2);
+        m_thumbnailPos.setX((itemSize.width() - m_thumbnailSize.width()) / 2);
+        m_thumbnailPos.setY((itemSize.height() - m_thumbnailSize.height()) / 2);
 
-        m_borderRect.setX(m_imagePos.x() - BORDER);
-        m_borderRect.setY(m_imagePos.y() - BORDER);
-        m_borderRect.setWidth(m_imageSize.width() + 2 * BORDER);
-        m_borderRect.setHeight(m_imageSize.height() + 2 * BORDER);
+        m_borderRect.setX(m_thumbnailPos.x() - BORDER);
+        m_borderRect.setY(m_thumbnailPos.y() - BORDER);
+        m_borderRect.setWidth(m_thumbnailSize.width() + 2 * BORDER);
+        m_borderRect.setHeight(m_thumbnailSize.height() + 2 * BORDER);
 
         update(boundingRect());
     }
-}
-
-void GalleryItem::selectionChange(int index)
-{
-    index = scene()->items().length() - index - 1;
-    if (scene()->items().at(index) == this) {
-        setSelected(true);
-    } else {
-        setSelected(false);
-    }
-    update(boundingRect());
 }
 
 void GalleryItem::paint(QPainter *painter,
@@ -83,5 +76,6 @@ void GalleryItem::paint(QPainter *painter,
     painter->drawRoundedRect(m_borderRect, BORDER, BORDER);
 
     // Image
-    painter->drawImage(QRect(m_imagePos, m_imageSize), m_image->thumbnail());
+    painter->drawImage(QRect(m_thumbnailPos, m_thumbnailSize),
+                       m_model->thumbnail());
 }

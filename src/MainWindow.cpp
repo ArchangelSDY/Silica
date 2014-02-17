@@ -191,33 +191,34 @@ void MainWindow::promptToOpen()
 
 void MainWindow::promptToSave()
 {
-    if (ui->gallery->scene()->selectedItems().count() > 0) {
-        QString destDir = QFileDialog::getExistingDirectory(
-            this, "Save to", GlobalConfig::instance()->wallpaperDir());
+// FIXME: Reimplement this
+//    if (ui->gallery->scene()->selectedItems().count() > 0) {
+//        QString destDir = QFileDialog::getExistingDirectory(
+//            this, "Save to", GlobalConfig::instance()->wallpaperDir());
 
-        if (destDir.isEmpty()) {
-            return;
-        }
+//        if (destDir.isEmpty()) {
+//            return;
+//        }
 
-        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
-            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
-            Image *image = galleryItem->image();
-            if (image) {
-                QFileInfo imageFile(image->name()); // Remove dir in image name
-                QString destPath = destDir + QDir::separator() +
-                    imageFile.fileName();
-                bool success = image->copy(destPath);
-                QString msg;
-                if (success) {
-                    QTextStream(&msg) << image->name() << " saved!";
-                } else {
-                    QTextStream(&msg) << "Error occured when saving "
-                                      << image->name();
-                }
-                statusBar()->showMessage(msg, 2000);
-            }
-        }
-    }
+//        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
+//            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+//            Image *image = galleryItem->image();
+//            if (image) {
+//                QFileInfo imageFile(image->name()); // Remove dir in image name
+//                QString destPath = destDir + QDir::separator() +
+//                    imageFile.fileName();
+//                bool success = image->copy(destPath);
+//                QString msg;
+//                if (success) {
+//                    QTextStream(&msg) << image->name() << " saved!";
+//                } else {
+//                    QTextStream(&msg) << "Error occured when saving "
+//                                      << image->name();
+//                }
+//                statusBar()->showMessage(msg, 2000);
+//            }
+//        }
+//    }
 }
 
 void MainWindow::imageLoaded(Image *image)

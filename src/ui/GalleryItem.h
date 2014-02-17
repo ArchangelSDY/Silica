@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 
-#include "Image.h"
+#include "AbstractGalleryItemModel.h"
 
 class GalleryItem : public QObject, public QGraphicsItem
 {
@@ -11,24 +11,23 @@ class GalleryItem : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 
 public:
-    explicit GalleryItem(Image *image, QGraphicsItem *parent = 0);
+    explicit GalleryItem(AbstractGalleryItemModel *model,
+                         QGraphicsItem *parent = 0);
 
     virtual QRectF boundingRect() const;
-    Image* image() const { return m_image; }
 
 public slots:
     void thumbnailLoaded();
-    void selectionChange(int index);
 
 protected:
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *, QWidget *);
 
 private:
-    Image *m_image;
-    QSize m_imageSize;
+    AbstractGalleryItemModel *m_model;
+    QSize m_thumbnailSize;
     QRect m_borderRect;
-    QPoint m_imagePos;
+    QPoint m_thumbnailPos;
 };
 
 #endif // GALLERYITEM_H

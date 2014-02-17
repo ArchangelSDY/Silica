@@ -1,10 +1,11 @@
 #include <QLayout>
 #include <QMenu>
 
-#include "../Image.h"
 #include "GalleryItem.h"
 #include "GalleryView.h"
-#include "../GlobalConfig.h"
+#include "GlobalConfig.h"
+#include "Image.h"
+#include "ImageGalleryItemModel.h"
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
@@ -79,7 +80,8 @@ void GalleryView::playListAppend(PlayList appended)
         Image *image = appended.at(i).data();
 
         // Paint thumbnail
-        GalleryItem *item = new GalleryItem(image);
+        ImageGalleryItemModel *model = new ImageGalleryItemModel(image);
+        GalleryItem *item = new GalleryItem(model);
         m_scene->addItem(item);
     }
 
