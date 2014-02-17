@@ -1,16 +1,9 @@
-#include <QLayout>
-#include <QMenu>
-
 #include "GalleryItem.h"
 #include "GalleryView.h"
 #include "GlobalConfig.h"
-#include "Image.h"
-#include "ImageGalleryItemModel.h"
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
-    m_navigator(0) ,
-    m_playList(0) ,
     m_scene(new QGraphicsScene)
 {
     setDragMode(QGraphicsView::RubberBandDrag);
@@ -21,11 +14,6 @@ GalleryView::GalleryView(QWidget *parent) :
 GalleryView::~GalleryView()
 {
     delete m_scene;
-}
-
-void GalleryView::setNavigator(Navigator *navigator)
-{
-    m_navigator = navigator;
 }
 
 void GalleryView::clear()
@@ -68,33 +56,6 @@ void GalleryView::layout()
     setSceneRect(newSceneRect);
 }
 
-void GalleryView::playListChange(PlayList playList)
-{
-    clear();
-    playListAppend(playList);
-}
-
-void GalleryView::playListAppend(PlayList appended)
-{
-    for (int i = 0; i < appended.length(); ++i) {
-        Image *image = appended.at(i).data();
-
-        // Paint thumbnail
-        ImageGalleryItemModel *model = new ImageGalleryItemModel(image);
-        GalleryItem *item = new GalleryItem(model);
-        m_scene->addItem(item);
-    }
-
-    layout();
-}
-
-void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
-{
-    if (scene()->selectedItems().length() > 0) {
-        emit transitToView();
-    }
-}
-
 void GalleryView::resizeEvent(QResizeEvent *)
 {
     layout();
@@ -103,40 +64,4 @@ void GalleryView::resizeEvent(QResizeEvent *)
 void GalleryView::showEvent(QShowEvent *)
 {
     layout();
-}
-
-void GalleryView::contextMenuEvent(QContextMenuEvent *event)
-{
-    QMenu menu(this);
-    QMenu *sorts = menu.addMenu("Sort By");
-    QAction *byNameAct = sorts->addAction("Name");
-    connect(byNameAct, SIGNAL(triggered()),
-            this, SLOT(sortByName()));
-    QAction *byAspectRatioAct = sorts->addAction("Aspect Ratio");
-    connect(byAspectRatioAct, SIGNAL(triggered()),
-            this, SLOT(sortByAspectRatio()));
-
-    menu.exec(event->globalPos());
-}
-
-void GalleryView::sortByName()
-{
-    if (!m_navigator) {
-        return;
-    }
-
-    PlayList pl = m_navigator->playList();
-    pl.sortByName();
-    m_navigator->setPlayList(pl);
-}
-
-void GalleryView::sortByAspectRatio()
-{
-    if (!m_navigator) {
-        return;
-    }
-
-    PlayList pl = m_navigator->playList();
-    pl.sortByAspectRatio();
-    m_navigator->setPlayList(pl);
 }
