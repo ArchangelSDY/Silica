@@ -1,6 +1,7 @@
 #include <QCryptographicHash>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QUrl>
 
 #include "LocalImageSource.h"
 
@@ -18,6 +19,9 @@ LocalImageSource::LocalImageSource(QString path)
     QTextStream(&hashStr) << "local#" << m_path << "#" << m_name;
     m_hash = QCryptographicHash::hash(
         QByteArray(hashStr.toUtf8()), QCryptographicHash::Sha1).toHex();
+
+    // Compute url
+    m_url = QUrl::fromLocalFile(m_path);
 }
 
 bool LocalImageSource::open()

@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QThread>
+#include <QUrl>
 
 #include "Qt7zPackage.h"
 
@@ -20,6 +21,11 @@ SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName)
     QTextStream(&hashStr) <<  "sevenz#" << m_packagePath << "#" << m_name;
     m_hash = QCryptographicHash::hash(
         QByteArray(hashStr.toUtf8()), QCryptographicHash::Sha1).toHex();
+
+    // Compute url
+    m_url = QUrl::fromLocalFile(m_packagePath);
+    m_url.setScheme("7z");
+    m_url.setFragment(m_name);
 }
 
 bool SevenzImageSource::open()

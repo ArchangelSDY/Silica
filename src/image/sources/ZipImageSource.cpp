@@ -1,5 +1,6 @@
 #include <QCryptographicHash>
 #include <QTextStream>
+#include <QUrl>
 #include <quazipfile.h>
 
 #include "ZipImageSource.h"
@@ -14,6 +15,11 @@ ZipImageSource::ZipImageSource(QString zipPath, QString imageName)
     QTextStream(&hashStr) <<  "zip#" << m_zipPath << "#" << m_name;
     m_hash = QCryptographicHash::hash(
         QByteArray(hashStr.toUtf8()), QCryptographicHash::Sha1).toHex();
+
+    // Compute url
+    m_url = QUrl::fromLocalFile(m_zipPath);
+    m_url.setScheme("zip");
+    m_url.setFragment(m_name);
 }
 
 bool ZipImageSource::open()

@@ -1,3 +1,4 @@
+#include "LocalDatabase.h"
 #include "PlayListRecord.h"
 
 PlayListRecord::PlayListRecord(const QString &name,
@@ -14,7 +15,11 @@ PlayList *PlayListRecord::playList()
     if (!m_playList) {
         m_playList = new PlayList();
 
-        // TODO: Query image urls
+        QStringList imageUrls =
+            LocalDatabase::instance()->imageUrlsForPlayList(m_name);
+        foreach (const QString &imageUrl, imageUrls) {
+            m_playList->addPath(QUrl(imageUrl));
+        }
     }
 
     return m_playList;

@@ -100,6 +100,7 @@ public:
     QString name() const;
     QString thumbnailPath() const { return m_thumbnailPath; }
     qreal aspectRatio() const;
+    const ImageSource *source() const { return m_imageSource.data(); }
 
     void load(int priority = NormalPriority);
     void loadThumbnail(bool makeImmediately = false);

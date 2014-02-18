@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += testlib core gui network
+QT       += testlib core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

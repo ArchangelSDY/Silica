@@ -13,11 +13,13 @@ void TestLocalDatabase::playListsSaveAndLoad()
     PlayList pl(imageUrls);
     PlayListRecord record(name, pl[0]->thumbnailPath(), &pl);
 
-    bool ret = LocalDatabase::instance()->savePlayListRecord(record);
+    int recordsCountBefore = LocalDatabase::instance()->playListRecords().count();
+
+    bool ret = LocalDatabase::instance()->savePlayListRecord(&record);
     QVERIFY(ret);
 
     QList<PlayListRecord> records = LocalDatabase::instance()->playListRecords();
-    QCOMPARE(records.count(), 1);
+    QCOMPARE(records.count(), recordsCountBefore + 1);
 
     PlayListRecord &savedRecord = records[0];
     QCOMPARE(savedRecord.name(), name);
@@ -32,6 +34,6 @@ void TestLocalDatabase::playListsSaveAndLoad_data()
     const QString &currentDir = qApp->applicationDirPath();
 
     QTest::newRow("Normal")
-        << (QList<QUrl>() << QUrl("file:///" + currentDir + "/assets/me.jpg"))
+        << (QList<QUrl>() << QUrl("file://" + currentDir + "/assets/me.jpg"))
         << QString("Fav");
 }

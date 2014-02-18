@@ -3,6 +3,7 @@
 
 #include <QIODevice>
 #include <QSharedPointer>
+#include <QUrl>
 
 class ImageSource
 {
@@ -17,6 +18,7 @@ public:
     QIODevice *device() { return m_device.data(); }
     const QString name() const { return m_name; }
     const QByteArray hash() const { return m_hash; }
+    const QUrl &url() const { return m_url; }
 
     inline bool operator ==(const ImageSource &other)
     {
@@ -30,6 +32,7 @@ protected:
 
     QString m_name;
     QByteArray m_hash;
+    QUrl m_url;
     QSharedPointer<QIODevice> m_device;
 };
 
