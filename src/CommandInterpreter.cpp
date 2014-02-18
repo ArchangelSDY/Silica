@@ -1,6 +1,6 @@
 #include "CommandInterpreter.h"
 
-CommandInterpreter::CommandInterpreter(Navigator *navigator, Database *database,
+CommandInterpreter::CommandInterpreter(Navigator *navigator, RemoteDatabase *database,
                                        QObject *parent) :
     QObject(parent) ,
     m_navigator(navigator) ,

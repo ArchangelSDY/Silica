@@ -1,8 +1,8 @@
 #include <QCoreApplication>
 
-#include "Database.h"
+#include "RemoteDatabase.h"
 
-Database::Database(QObject *parent) :
+RemoteDatabase::RemoteDatabase(QObject *parent) :
     QObject(parent)
 {
     m_cache.setCacheDirectory(

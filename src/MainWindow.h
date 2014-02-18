@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 
 #include "CommandInterpreter.h"
-#include "Database.h"
+#include "RemoteDatabase.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -61,7 +61,7 @@ private:
     Ui::MainWindow *ui;
 
     Navigator m_navigator;
-    Database *m_database;
+    RemoteDatabase *m_database;
     CommandInterpreter m_commandInterpreter;
     InputMode m_inputMode;
     QStateMachine m_exploreStateMachine;

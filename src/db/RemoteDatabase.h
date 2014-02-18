@@ -8,11 +8,11 @@
 
 #include "../PlayList.h"
 
-class Database : public QObject
+class RemoteDatabase : public QObject
 {
     Q_OBJECT
 public:
-    explicit Database(QObject *parent = 0);
+    explicit RemoteDatabase(QObject *parent = 0);
 
     virtual void queryByTag(const QString &tag, int page = 1) = 0;
 

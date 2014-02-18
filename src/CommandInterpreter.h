@@ -3,14 +3,14 @@
 
 #include <QObject>
 
-#include "Database.h"
+#include "RemoteDatabase.h"
 #include "Navigator.h"
 
 class CommandInterpreter : public QObject
 {
     Q_OBJECT
 public:
-    explicit CommandInterpreter(Navigator *, Database *, QObject *parent = 0);
+    explicit CommandInterpreter(Navigator *, RemoteDatabase *, QObject *parent = 0);
 
     void keyPress(QKeyEvent *);
     void reset();
@@ -26,7 +26,7 @@ private:
     QString m_cmd;
 
     Navigator *m_navigator;
-    Database *m_database;
+    RemoteDatabase *m_database;
 };
 
 #endif // COMMANDINTERPRETER_H

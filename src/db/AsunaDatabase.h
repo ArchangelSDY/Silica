@@ -3,9 +3,9 @@
 
 #include <QSettings>
 
-#include "Database.h"
+#include "RemoteDatabase.h"
 
-class AsunaDatabase : public Database
+class AsunaDatabase : public RemoteDatabase
 {
 public:
     AsunaDatabase();
