@@ -98,6 +98,7 @@ public:
         return *m_thumbnail;
     }
     QString name() const;
+    QString thumbnailPath() const { return m_thumbnailPath; }
     qreal aspectRatio() const;
 
     void load(int priority = NormalPriority);

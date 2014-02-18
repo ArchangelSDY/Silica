@@ -1,10 +1,12 @@
 SOURCES += \
     silicatest.cpp \
     TestImageSource.cpp \
+    TestLocalDatabase.cpp \
     TestPlayList.cpp
 
 HEADERS += \
     TestImageSource.h \
+    TestLocalDatabase.h \
     TestPlayList.h
 
 assets.files = $$PWD/assets/*
