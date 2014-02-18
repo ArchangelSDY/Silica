@@ -5,6 +5,14 @@
 
 #include "TestLocalDatabase.h"
 
+void TestLocalDatabase::cleanup()
+{
+    QFile f("local.db");
+    if (f.exists()) {
+        f.remove();
+    }
+}
+
 void TestLocalDatabase::playListsSaveAndLoad()
 {
     QFETCH(QList<QUrl>, imageUrls);

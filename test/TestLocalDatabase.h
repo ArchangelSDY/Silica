@@ -7,6 +7,8 @@ class TestLocalDatabase : public QObject
 {
     Q_OBJECT
 private slots:
+    void cleanup();
+
     void playListsSaveAndLoad();
     void playListsSaveAndLoad_data();
 
