@@ -1,7 +1,7 @@
 #include <QTest>
 
-#include "LocalDatabase.h"
 #include "PlayList.h"
+#include "PlayListRecord.h"
 
 #include "TestLocalDatabase.h"
 
@@ -21,13 +21,11 @@ void TestLocalDatabase::playListsSaveAndLoad()
     PlayList pl(imageUrls);
     PlayListRecord record(name, pl[0]->thumbnailPath(), &pl);
 
-    int recordsCountBefore = LocalDatabase::instance()->playListRecords().count();
-
-    bool ret = LocalDatabase::instance()->savePlayListRecord(&record);
+    bool ret = record.saveToLocalDatabase();
     QVERIFY(ret);
 
-    QList<PlayListRecord> records = LocalDatabase::instance()->playListRecords();
-    QCOMPARE(records.count(), recordsCountBefore + 1);
+    QList<PlayListRecord> records = PlayListRecord::fromLocalDatabase();
+    QCOMPARE(records.count(), 1);
 
     PlayListRecord &savedRecord = records[0];
     QCOMPARE(savedRecord.name(), name);

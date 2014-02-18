@@ -17,6 +17,9 @@ public:
 
     PlayList *playList();
 
+    static QList<PlayListRecord> fromLocalDatabase();
+    bool saveToLocalDatabase();
+
 private:
     QString m_name;
     QString m_coverPath;

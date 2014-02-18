@@ -24,3 +24,13 @@ PlayList *PlayListRecord::playList()
 
     return m_playList;
 }
+
+QList<PlayListRecord> PlayListRecord::fromLocalDatabase()
+{
+    return LocalDatabase::instance()->playListRecords();
+}
+
+bool PlayListRecord::saveToLocalDatabase()
+{
+    return LocalDatabase::instance()->savePlayListRecord(this);
+}
