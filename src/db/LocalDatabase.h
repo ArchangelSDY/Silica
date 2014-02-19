@@ -10,9 +10,9 @@ class LocalDatabase : public QObject
 {
     Q_OBJECT
 public:
-    virtual QList<PlayListRecord> playListRecords() = 0;
-    virtual QStringList imageUrlsForPlayList(const QString &name) = 0;
-    virtual bool savePlayListRecord(PlayListRecord *playListRecord) = 0;
+    virtual QList<PlayListRecord> queryPlayListRecords() = 0;
+    virtual QStringList queryImageUrlsForPlayList(const QString &name) = 0;
+    virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
 
     static LocalDatabase *instance() { return m_instance; }
 

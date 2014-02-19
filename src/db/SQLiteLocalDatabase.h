@@ -11,9 +11,9 @@ class SQLiteLocalDatabase : public LocalDatabase
 public:
     SQLiteLocalDatabase();
 
-    QList<PlayListRecord> playListRecords();
-    QStringList imageUrlsForPlayList(const QString &name);
-    bool savePlayListRecord(PlayListRecord *playListRecord);
+    QList<PlayListRecord> queryPlayListRecords();
+    QStringList queryImageUrlsForPlayList(const QString &name);
+    bool insertPlayListRecord(PlayListRecord *playListRecord);
 
 private:
     void createTables();

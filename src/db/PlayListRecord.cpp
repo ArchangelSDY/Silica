@@ -16,7 +16,7 @@ PlayList *PlayListRecord::playList()
         m_playList = new PlayList();
 
         QStringList imageUrls =
-            LocalDatabase::instance()->imageUrlsForPlayList(m_name);
+            LocalDatabase::instance()->queryImageUrlsForPlayList(m_name);
         foreach (const QString &imageUrl, imageUrls) {
             m_playList->addPath(QUrl(imageUrl));
         }
@@ -27,10 +27,10 @@ PlayList *PlayListRecord::playList()
 
 QList<PlayListRecord> PlayListRecord::fromLocalDatabase()
 {
-    return LocalDatabase::instance()->playListRecords();
+    return LocalDatabase::instance()->queryPlayListRecords();
 }
 
 bool PlayListRecord::saveToLocalDatabase()
 {
-    return LocalDatabase::instance()->savePlayListRecord(this);
+    return LocalDatabase::instance()->insertPlayListRecord(this);
 }

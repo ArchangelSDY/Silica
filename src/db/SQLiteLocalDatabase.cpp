@@ -28,7 +28,7 @@ SQLiteLocalDatabase::SQLiteLocalDatabase()
     }
 }
 
-QList<PlayListRecord> SQLiteLocalDatabase::playListRecords()
+QList<PlayListRecord> SQLiteLocalDatabase::queryPlayListRecords()
 {
     QList<PlayListRecord> records;
 
@@ -46,7 +46,7 @@ QList<PlayListRecord> SQLiteLocalDatabase::playListRecords()
     return records;
 }
 
-QStringList SQLiteLocalDatabase::imageUrlsForPlayList(const QString &name)
+QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(const QString &name)
 {
     QStringList imageUrls;
 
@@ -81,7 +81,7 @@ QStringList SQLiteLocalDatabase::imageUrlsForPlayList(const QString &name)
     return imageUrls;
 }
 
-bool SQLiteLocalDatabase::savePlayListRecord(PlayListRecord *playListRecord)
+bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
 {
     if (!m_db.isOpen()) {
         return false;
