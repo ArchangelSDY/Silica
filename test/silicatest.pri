@@ -1,10 +1,12 @@
 SOURCES += \
     silicatest.cpp \
+    TestImage.cpp \
     TestImageSource.cpp \
     TestLocalDatabase.cpp \
     TestPlayList.cpp
 
 HEADERS += \
+    TestImage.h \
     TestImageSource.h \
     TestLocalDatabase.h \
     TestPlayList.h

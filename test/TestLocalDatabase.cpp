@@ -1,3 +1,4 @@
+#include <QtSql>
 #include <QTest>
 
 #include "LocalDatabase.h"
@@ -8,10 +9,14 @@
 
 void TestLocalDatabase::cleanupTestCase()
 {
-    QFile f("local.db");
-    if (f.exists()) {
-        f.remove();
-    }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
+    db.setDatabaseName("local.db");
+    db.open();
+    db.exec("delete from playlists");
+    db.exec("delete from playlist_images");
+    db.exec("delete from images");
+    db.close();
+    QSqlDatabase::removeDatabase("TestLocalDatabase");
 }
 
 void TestLocalDatabase::playListsSaveAndLoad()

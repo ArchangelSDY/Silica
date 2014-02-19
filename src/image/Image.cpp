@@ -8,6 +8,7 @@
 
 #include <quazipfile.h>
 
+#include "LocalDatabase.h"
 #include "Image.h"
 #include "ImageSourceManager.h"
 
@@ -226,6 +227,8 @@ void Image::thumbnailMade(QImage *thumbnail)
     if (thumbnail) {
         delete m_thumbnail;
         m_thumbnail = thumbnail;
+
+        LocalDatabase::instance()->insertImage(this);
 
         emit thumbnailLoaded();
     }
