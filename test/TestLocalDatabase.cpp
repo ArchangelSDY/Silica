@@ -1,11 +1,12 @@
 #include <QTest>
 
+#include "LocalDatabase.h"
 #include "PlayList.h"
 #include "PlayListRecord.h"
 
 #include "TestLocalDatabase.h"
 
-void TestLocalDatabase::cleanup()
+void TestLocalDatabase::cleanupTestCase()
 {
     QFile f("local.db");
     if (f.exists()) {
@@ -21,11 +22,13 @@ void TestLocalDatabase::playListsSaveAndLoad()
     PlayList pl(imageUrls);
     PlayListRecord record(name, pl[0]->thumbnailPath(), &pl);
 
+    int beforeCount = LocalDatabase::instance()->queryPlayListRecords().count();
+
     bool ret = record.saveToLocalDatabase();
     QVERIFY(ret);
 
     QList<PlayListRecord> records = PlayListRecord::fromLocalDatabase();
-    QCOMPARE(records.count(), 1);
+    QCOMPARE(records.count(), beforeCount + 1);
 
     PlayListRecord &savedRecord = records[0];
     QCOMPARE(savedRecord.name(), name);
@@ -39,7 +42,36 @@ void TestLocalDatabase::playListsSaveAndLoad_data()
     QTest::addColumn<QString>("name");
     const QString &currentDir = qApp->applicationDirPath();
 
-    QTest::newRow("Normal")
+    QTest::newRow("Basic")
         << (QList<QUrl>() << QUrl("file://" + currentDir + "/assets/me.jpg"))
         << QString("Fav");
+}
+
+void TestLocalDatabase::insertImage()
+{
+    QFETCH(QUrl, imageUrl);
+    QFETCH(int, deltaCount);
+
+    Image image(imageUrl);
+
+    int beforeCount = LocalDatabase::instance()->queryImagesCount();
+    bool ret = LocalDatabase::instance()->insertImage(&image);
+    QVERIFY(ret);
+    int afterCount = LocalDatabase::instance()->queryImagesCount();
+
+    QCOMPARE(afterCount - beforeCount, deltaCount);
+}
+
+void TestLocalDatabase::insertImage_data()
+{
+    QTest::addColumn<QUrl>("imageUrl");
+    QTest::addColumn<int>("deltaCount");
+    const QString &currentDir = qApp->applicationDirPath();
+
+    QTest::newRow("Basic")
+        << QUrl("file://" + currentDir + "/assets/me.jpg")
+        << 1;
+    QTest::newRow("Duplicate")
+        << QUrl("file://" + currentDir + "/assets/me.jpg")
+        << 0;
 }

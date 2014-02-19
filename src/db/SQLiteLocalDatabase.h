@@ -15,8 +15,11 @@ public:
     QStringList queryImageUrlsForPlayList(const QString &name);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
 
+    int queryImagesCount();
+    bool insertImage(Image *image);
+
 private:
-    void createTables();
+    void createTablesIfNecessary();
 
     QSqlDatabase m_db;
 };

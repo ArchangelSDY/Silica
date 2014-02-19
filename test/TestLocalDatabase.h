@@ -7,11 +7,13 @@ class TestLocalDatabase : public QObject
 {
     Q_OBJECT
 private slots:
-    void cleanup();
+    void cleanupTestCase();
 
     void playListsSaveAndLoad();
     void playListsSaveAndLoad_data();
 
+    void insertImage();
+    void insertImage_data();
 };
 
 #endif // TESTLOCALDATABASE_H

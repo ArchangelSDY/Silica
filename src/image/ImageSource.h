@@ -18,6 +18,7 @@ public:
     QIODevice *device() { return m_device.data(); }
     const QString name() const { return m_name; }
     const QByteArray hash() const { return m_hash; }
+    QString hashStr() const { return QString::fromUtf8(m_hash.toHex()); }
     const QUrl &url() const { return m_url; }
 
     inline bool operator ==(const ImageSource &other)
