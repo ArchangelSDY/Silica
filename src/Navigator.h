@@ -13,7 +13,7 @@ class Navigator : public QObject
 public:
     explicit Navigator(QObject *parent = 0);
 
-    const PlayList &playList() const { return m_playlist; }
+    PlayList *playList() { return &m_playlist; }
 
     void goPrev();
     void goNext();

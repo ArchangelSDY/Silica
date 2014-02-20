@@ -2,6 +2,7 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QStatusBar>
 
@@ -10,6 +11,7 @@
 #include "ImageGalleryItemModel.h"
 #include "ImageSourceManager.h"
 #include "PlayList.h"
+#include "PlayListRecord.h"
 #include "MainWindow.h"
 #include "GalleryItem.h"
 
@@ -225,7 +227,19 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSavePlayList()
 {
-    // TODO: promptToSavePlayList
+    QString name = QInputDialog::getText(this, "Save PlayList", "Name");
+    Image *image = m_navigator.currentImage();
+    if (!name.isEmpty() && image) {
+        PlayListRecord record(name, image->thumbnailPath(),
+                              m_navigator.playList());
+        if (record.saveToLocalDatabase()) {
+            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
+                                     2000);
+        } else {
+            statusBar()->showMessage(
+                QString("Failed to save playList %1!").arg(name), 2000);
+        }
+    }
 }
 
 void MainWindow::imageLoaded(Image *image)
@@ -290,7 +304,7 @@ void MainWindow::updateSidebarTitle()
     int index = m_navigator.currentIndex();
     QString title;
     QTextStream(&title) << PLAYLIST_TITLE_PREFIX << " - "
-        << (index + 1) << "/" << m_navigator.playList().count();
+        << (index + 1) << "/" << m_navigator.playList()->count();
     ui->sidebar->setWindowTitle(title);
 }
 
@@ -357,6 +371,9 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             break;
         case Qt::Key_S:
             promptToSaveImage();
+            break;
+        case Qt::Key_P:
+            promptToSavePlayList();
             break;
         case Qt::Key_T: {
             QDockWidget *sidebar = ui->sidebar;
