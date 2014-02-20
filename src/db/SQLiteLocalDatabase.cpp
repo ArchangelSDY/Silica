@@ -2,25 +2,31 @@
 
 const char *DB_NAME = "local.db";
 
+const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
+
 const char *SQL_CREATE_PLAYLISTS_TABLE = "create table playlists ("
         "id integer primary key autoincrement, "
         "name text,"
         "cover_path text)";
 
-const char *SQL_CREATE_PLAYLIST_IMAGE_TABLE = "create table playlist_images ("
+const char *SQL_CREATE_PLAYLIST_IMAGES_TABLE = "create table playlist_images ("
         "id integer primary key autoincrement, "
-        "playlist_id integer, "
-        "image_url text)";
+        "playlist_id integer references playlists on delete cascade, "
+        "image_id integer references images on delete cascade)";
 
-const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) values (?, ?)";
+const char *SQL_INSERT_PLAYLIST = "replace into playlists(name, cover_path) values (?, ?)";
 
-const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_url) values (?, ?)";
+const char *SQL_INSERT_PLAYLIST_IMAGES = "replace into playlist_images(playlist_id, image_id) values ("
+        "?, (select id from images where hash = ?))";
 
 const char *SQL_QUERY_PLAYLISTS = "select name, cover_path from playlists";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
-const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select playlist_id, image_url from playlist_images where playlist_id = ?";
+const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_NAME = "select images.url, playlists.name from images "
+        "left join playlist_images on images.id = playlist_images.image_id "
+        "join playlists on playlists.id = playlist_images.playlist_id "
+        "where playlists.name = ?";
 
 const char *SQL_CREATE_IMAGES_TABLE = "create table images ("
         "id integer primary key autoincrement, "
@@ -34,13 +40,17 @@ const char *SQL_INSERT_IMAGE = "replace into images(hash, name, url) values (?, 
 
 const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
 
+const char *SQL_QUERY_IMAGE_BY_HASH = "select url from images where hash = ? limit 1";
+
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(DB_NAME);
     if (!m_db.open()) {
         qWarning("Unable to local open database!");
+        return;
     }
+    m_db.exec(SQL_ENABLE_FOREIGN_KEYS);
 }
 
 void SQLiteLocalDatabase::createTablesIfNecessary()
@@ -55,7 +65,7 @@ void SQLiteLocalDatabase::createTablesIfNecessary()
     }
 
     if (!tables.contains("playlist_images")) {
-        if (!q.exec(SQL_CREATE_PLAYLIST_IMAGE_TABLE)) {
+        if (!q.exec(SQL_CREATE_PLAYLIST_IMAGES_TABLE)) {
             qWarning() << q.lastError() << q.lastQuery();
         }
     }
@@ -102,18 +112,8 @@ QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(const QString &name)
     createTablesIfNecessary();
 
     QSqlQuery q;
-    q.prepare(SQL_QUERY_PLAYLIST_ID_BY_NAME);
+    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_NAME);
     q.addBindValue(name);
-    if (!q.exec() || !q.first()) {
-        qWarning() << q.lastError();
-        qWarning() << q.lastQuery();
-        return imageUrls;
-    }
-
-    QVariant playListId = q.value(0);
-
-    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
-    q.addBindValue(playListId);
     if (!q.exec()) {
         qWarning() << q.lastError();
         qWarning() << q.lastQuery();
@@ -121,7 +121,7 @@ QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(const QString &name)
     }
 
     while (q.next()) {
-        QString imageUrl = q.value(1).toString();
+        QString imageUrl = q.value(0).toString();
         imageUrls << imageUrl;
     }
 
@@ -136,32 +136,38 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
 
     createTablesIfNecessary();
 
-    QSqlQuery q;
-    q.prepare(SQL_INSERT_PLAYLIST);
-    q.addBindValue(playListRecord->name());
-    q.addBindValue(playListRecord->coverPath());
-    if (!q.exec()) {
-        qWarning() << q.lastError();
+    // Insert playlist
+    QSqlQuery qInsertPlayList;
+    qInsertPlayList.prepare(SQL_INSERT_PLAYLIST);
+    qInsertPlayList.addBindValue(playListRecord->name());
+    qInsertPlayList.addBindValue(playListRecord->coverPath());
+    if (!qInsertPlayList.exec()) {
+        qWarning() << qInsertPlayList.lastError()
+                   << qInsertPlayList.lastQuery();
         return false;
     }
+    QVariant playListId = qInsertPlayList.lastInsertId();
 
-    QVariant playListId = q.lastInsertId();
-    q.prepare(SQL_INSERT_PLAYLIST_IMAGES);
-
-    QVariantList playListIds;
-    for (int i = 0; i < playListRecord->playList()->length(); ++i) {
-        playListIds << playListId;
-    }
-    q.addBindValue(playListIds);
-
-    QVariantList imageUrls;
+    // Insert images
     foreach (QSharedPointer<Image> image, *playListRecord->playList()) {
-        imageUrls << image->source()->url();
+        insertImage(image.data());
     }
-    q.addBindValue(imageUrls);
 
-    if (!q.execBatch()) {
-        qWarning() << q.lastError();
+    // Insert relationship records
+    QSqlQuery qInsertPlayListImages;
+    qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+    QVariantList playListIds;
+    QVariantList imageHashes;
+    foreach (QSharedPointer<Image> image, *playListRecord->playList()) {
+        playListIds << playListId;
+        imageHashes << image->source()->hashStr();
+    }
+    qInsertPlayListImages.addBindValue(playListIds);
+    qInsertPlayListImages.addBindValue(imageHashes);
+
+    if (!qInsertPlayListImages.execBatch()) {
+        qWarning() << qInsertPlayListImages.lastError()
+                   << qInsertPlayListImages.lastQuery();
         return false;
     }
 
@@ -190,10 +196,7 @@ bool SQLiteLocalDatabase::insertImage(Image *image)
         return false;
     }
 
-    QStringList tables = m_db.tables();
-    if (!tables.contains("images")) {
-        createTablesIfNecessary();
-    }
+    createTablesIfNecessary();
 
     QSqlQuery q;
     q.prepare(SQL_INSERT_IMAGE);
@@ -207,4 +210,25 @@ bool SQLiteLocalDatabase::insertImage(Image *image)
     }
 
     return true;
+}
+
+Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
+{
+    if (!m_db.isOpen()) {
+        return 0;
+    }
+
+    createTablesIfNecessary();
+
+    QSqlQuery q;
+    q.prepare(SQL_QUERY_IMAGE_BY_HASH);
+    q.addBindValue(hashStr);
+
+    if (!q.exec() || !q.first()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return 0;
+    } else {
+        QString urlStr = q.value(0).toString();
+        return new Image(QUrl(urlStr));
+    }
 }

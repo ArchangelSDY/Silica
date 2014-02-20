@@ -7,7 +7,7 @@
 
 #include "TestLocalDatabase.h"
 
-void TestLocalDatabase::cleanupTestCase()
+void TestLocalDatabase::initTestCase()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
     db.setDatabaseName("local.db");
@@ -55,28 +55,27 @@ void TestLocalDatabase::playListsSaveAndLoad_data()
 void TestLocalDatabase::insertImage()
 {
     QFETCH(QUrl, imageUrl);
-    QFETCH(int, deltaCount);
 
     Image image(imageUrl);
 
-    int beforeCount = LocalDatabase::instance()->queryImagesCount();
     bool ret = LocalDatabase::instance()->insertImage(&image);
     QVERIFY(ret);
-    int afterCount = LocalDatabase::instance()->queryImagesCount();
 
-    QCOMPARE(afterCount - beforeCount, deltaCount);
+    Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
+        image.source()->hashStr());
+    QVERIFY(insertedImage != 0);
+
+    QCOMPARE(insertedImage->name(), image.name());
+    delete insertedImage;
 }
 
 void TestLocalDatabase::insertImage_data()
 {
     QTest::addColumn<QUrl>("imageUrl");
-    QTest::addColumn<int>("deltaCount");
     const QString &currentDir = qApp->applicationDirPath();
 
     QTest::newRow("Basic")
-        << QUrl("file://" + currentDir + "/assets/me.jpg")
-        << 1;
+        << QUrl("file://" + currentDir + "/assets/me.jpg");
     QTest::newRow("Duplicate")
-        << QUrl("file://" + currentDir + "/assets/me.jpg")
-        << 0;
+        << QUrl("file://" + currentDir + "/assets/me.jpg");
 }

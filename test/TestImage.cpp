@@ -29,8 +29,6 @@ void TestImage::loadThumbnail()
 {
     QFETCH(QUrl, imageUrl);
 
-    int beforeImagesCount = LocalDatabase::instance()->queryImagesCount();
-
     Image image(imageUrl);
     QSignalSpy spyLoad(&image, SIGNAL(thumbnailLoaded()));
     image.loadThumbnail(true);
@@ -39,8 +37,11 @@ void TestImage::loadThumbnail()
     QVERIFY(!image.thumbnail().isNull());
     QVERIFY(image.thumbnail().width() > 0);
 
-    int afterImagesCount = LocalDatabase::instance()->queryImagesCount();
-    QCOMPARE(afterImagesCount, beforeImagesCount + 1);
+    Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
+        image.source()->hashStr());
+    QVERIFY(insertedImage !=  0);
+    QCOMPARE(insertedImage->name(), image.name());
+    delete insertedImage;
 }
 
 void TestImage::loadThumbnail_data()

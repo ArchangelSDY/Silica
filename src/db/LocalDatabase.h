@@ -16,6 +16,7 @@ public:
 
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
+    virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
 
     static LocalDatabase *instance() { return m_instance; }
 

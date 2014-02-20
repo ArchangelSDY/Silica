@@ -3,6 +3,7 @@
 
 #include <QtSql>
 
+#include "Image.h"
 #include "LocalDatabase.h"
 
 class SQLiteLocalDatabase : public LocalDatabase
@@ -17,6 +18,7 @@ public:
 
     int queryImagesCount();
     bool insertImage(Image *image);
+    Image *queryImageByHashStr(const QString &hashStr);
 
 private:
     void createTablesIfNecessary();
