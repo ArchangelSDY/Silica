@@ -16,6 +16,8 @@ public:
 
     virtual QRectF boundingRect() const;
 
+    AbstractGalleryItemModel *model() { return m_model; }
+
 public slots:
     void thumbnailLoaded();
 

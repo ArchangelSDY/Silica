@@ -7,6 +7,7 @@
 
 #include "AsunaDatabase.h"
 #include "GlobalConfig.h"
+#include "ImageGalleryItemModel.h"
 #include "ImageSourceManager.h"
 #include "PlayList.h"
 #include "MainWindow.h"
@@ -159,7 +160,7 @@ void MainWindow::processCommandLineOptions()
     m_navigator.setPlayList(playList);
 }
 
-void MainWindow::promptToOpen()
+void MainWindow::promptToOpenImage()
 {
     QString defaultDir;
     const QList<QString> &zipDirs = GlobalConfig::instance()->zipDirs();
@@ -189,36 +190,42 @@ void MainWindow::promptToOpen()
     m_navigator.setPlayList(playList);
 }
 
-void MainWindow::promptToSave()
+void MainWindow::promptToSaveImage()
 {
-// FIXME: Reimplement this
-//    if (ui->gallery->scene()->selectedItems().count() > 0) {
-//        QString destDir = QFileDialog::getExistingDirectory(
-//            this, "Save to", GlobalConfig::instance()->wallpaperDir());
+    if (ui->gallery->scene()->selectedItems().count() > 0) {
+        QString destDir = QFileDialog::getExistingDirectory(
+            this, "Save to", GlobalConfig::instance()->wallpaperDir());
 
-//        if (destDir.isEmpty()) {
-//            return;
-//        }
+        if (destDir.isEmpty()) {
+            return;
+        }
 
-//        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
-//            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
-//            Image *image = galleryItem->image();
-//            if (image) {
-//                QFileInfo imageFile(image->name()); // Remove dir in image name
-//                QString destPath = destDir + QDir::separator() +
-//                    imageFile.fileName();
-//                bool success = image->copy(destPath);
-//                QString msg;
-//                if (success) {
-//                    QTextStream(&msg) << image->name() << " saved!";
-//                } else {
-//                    QTextStream(&msg) << "Error occured when saving "
-//                                      << image->name();
-//                }
-//                statusBar()->showMessage(msg, 2000);
-//            }
-//        }
-//    }
+        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
+            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+            ImageGalleryItemModel *model =
+                static_cast<ImageGalleryItemModel *>(galleryItem->model());
+            Image *image = model->image();
+            if (image) {
+                QFileInfo imageFile(image->name()); // Remove dir in image name
+                QString destPath = destDir + QDir::separator() +
+                    imageFile.fileName();
+                bool success = image->copy(destPath);
+                QString msg;
+                if (success) {
+                    QTextStream(&msg) << image->name() << " saved!";
+                } else {
+                    QTextStream(&msg) << "Error occured when saving "
+                                      << image->name();
+                }
+                statusBar()->showMessage(msg, 2000);
+            }
+        }
+    }
+}
+
+void MainWindow::promptToSavePlayList()
+{
+    // TODO: promptToSavePlayList
 }
 
 void MainWindow::imageLoaded(Image *image)
@@ -336,7 +343,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             ui->graphicsView->fitInViewIfNecessary();
             break;
         case Qt::Key_O: {
-            promptToOpen();
+            promptToOpenImage();
             break;
         }
         case Qt::Key_G:
@@ -349,7 +356,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             emit transitToGalleryAndView();
             break;
         case Qt::Key_S:
-            promptToSave();
+            promptToSaveImage();
             break;
         case Qt::Key_T: {
             QDockWidget *sidebar = ui->sidebar;

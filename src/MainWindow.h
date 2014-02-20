@@ -45,8 +45,9 @@ protected:
 private:
     void initUIStateMachines();
     void processCommandLineOptions();
-    void promptToOpen();
-    void promptToSave();
+    void promptToOpenImage();
+    void promptToSaveImage();
+    void promptToSavePlayList();
 
     void handleControlKeyPress(QKeyEvent *);
     void handleCommandKeyPress(QKeyEvent *);

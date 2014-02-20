@@ -9,6 +9,8 @@ class ImageGalleryItemModel : public AbstractGalleryItemModel
 public:
     explicit ImageGalleryItemModel(Image *image, QObject *parent = 0);
 
+    Image *image() { return m_image; }
+
     void loadThumbnail();
     QImage thumbnail() const;
 
