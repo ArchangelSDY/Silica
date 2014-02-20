@@ -6,7 +6,7 @@ const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 
 const char *SQL_CREATE_PLAYLISTS_TABLE = "create table playlists ("
         "id integer primary key autoincrement, "
-        "name text,"
+        "name text unique,"
         "cover_path text)";
 
 const char *SQL_CREATE_PLAYLIST_IMAGES_TABLE = "create table playlist_images ("
