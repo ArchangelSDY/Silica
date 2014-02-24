@@ -43,7 +43,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 private:
-    void initUIStateMachines();
+    void setupExtraUi();
     void processCommandLineOptions();
     void promptToOpenImage();
     void promptToSaveImage();
@@ -65,7 +65,6 @@ private:
     RemoteDatabase *m_database;
     CommandInterpreter m_commandInterpreter;
     InputMode m_inputMode;
-    QStateMachine m_exploreStateMachine;
 };
 
 #endif // MAINWINDOW_H

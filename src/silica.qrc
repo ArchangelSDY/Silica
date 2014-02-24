@@ -2,4 +2,12 @@
     <qresource prefix="/">
         <file>res/warning.png</file>
     </qresource>
+    <qresource prefix="/toolbar">
+        <file>fav-active.png</file>
+        <file>fav.png</file>
+        <file>gallery-active.png</file>
+        <file>gallery.png</file>
+        <file>image-view-active.png</file>
+        <file>image-view.png</file>
+    </qresource>
 </RCC>

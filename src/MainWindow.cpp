@@ -5,6 +5,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QToolBar>
 
 #include "AsunaDatabase.h"
 #include "GlobalConfig.h"
@@ -27,16 +28,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_inputMode(InputMode_Control)
 {
     ui->setupUi(this);
-    ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
-    ui->centralWidget->layout()->setSpacing(0);
+    setupExtraUi();
+
     ui->gallery->setNavigator(&m_navigator);
     ui->sidebar->hide();
     statusBar()->hide();
-
-    // Window palette
-    QPalette windowPalette = palette();
-    windowPalette.setColor(QPalette::Window, Qt::gray);
-    setPalette(windowPalette);
 
     // Move to screen center
     const QRect screen = QApplication::desktop()->screenGeometry();
@@ -81,8 +77,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
             this, SLOT(updateStatus(QString)));
 
-    initUIStateMachines();
-
     processCommandLineOptions();
 }
 
@@ -92,52 +86,82 @@ MainWindow::~MainWindow()
     delete m_database;
 }
 
-void MainWindow::initUIStateMachines()
+void MainWindow::setupExtraUi()
 {
-    // Define states
-    QState *galleryOnly = new QState();
-    galleryOnly->assignProperty(ui->gallery, "visible", true);
-    galleryOnly->assignProperty(ui->gallery, "maximumWidth", QWIDGETSIZE_MAX);
-    galleryOnly->assignProperty(ui->graphicsView, "visible", false);
-    m_exploreStateMachine.addState(galleryOnly);
+    // Main window
+    ui->centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    ui->centralWidget->layout()->setSpacing(0);
+    setStyleSheet(
+        "QGraphicsView {"
+            "border: none; "
+        "}"
+    );
 
-    QState *viewOnly = new QState();
-    viewOnly->assignProperty(ui->gallery, "visible", false);
-    viewOnly->assignProperty(ui->graphicsView, "visible", true);
-    viewOnly->assignProperty(ui->graphicsView, "maximumWidth", QWIDGETSIZE_MAX);
-    m_exploreStateMachine.addState(viewOnly);
 
-    QState *galleryAndView = new QState();
-    galleryAndView->assignProperty(ui->gallery, "visible", true);
-    galleryAndView->assignProperty(ui->graphicsView, "visible", true);
-    connect(galleryAndView, SIGNAL(entered()),
-        this, SLOT(layoutForGalleryAndView()));
+    // Main toolbar
+    QToolBar *toolBar = new QToolBar(this);
+    toolBar->setFloatable(false);
+    toolBar->setMovable(false);
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setIconSize(QSize(24, 24));
+    toolBar->setStyleSheet(
+        "* {"
+            "color: #FFFFFF;"
+            "background-color: #3C414C;"
+            "border: none;"
+            "padding: 5px;"
+        "}"
+        "QToolBar {"
+            "border-right: 1px solid black;"
+        "}"
+    );
 
-    m_exploreStateMachine.addState(galleryAndView);
+    QActionGroup *toolBarActGrp = new QActionGroup(this);
+    QSignalMapper *toolBarSigMapper = new QSignalMapper(this);
+    connect(toolBarSigMapper, SIGNAL(mapped(int)),
+            ui->stackedViews, SLOT(setCurrentIndex(int)));
 
-    // Define transitions
-    viewOnly->addTransition(
-        this, SIGNAL(transitToGalleryOnly()), galleryOnly);
-    galleryAndView->addTransition(
-        this, SIGNAL(transitToGalleryOnly()), galleryOnly);
+    // Fav icon
+    QIcon toolBarFavIcon(":/toolbar/fav.png");
+    toolBarFavIcon.addFile(":/toolbar/fav-active.png",
+                           QSize(), QIcon::Active, QIcon::On);
+    QAction *actToolBarFav = toolBar->addAction(
+        toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
+    actToolBarFav->setCheckable(true);
+    toolBarActGrp->addAction(actToolBarFav);
+    toolBarSigMapper->setMapping(actToolBarFav, 0);
 
-    galleryOnly->addTransition(
-        this, SIGNAL(transitToViewOnly()), viewOnly);
-    galleryAndView->addTransition(
-        this, SIGNAL(transitToViewOnly()), viewOnly);
+    // Gallery icon
+    QIcon toolBarGalleryIcon(":/toolbar/gallery.png");
+    toolBarGalleryIcon.addFile(":/toolbar/gallery-active.png",
+                               QSize(), QIcon::Active, QIcon::On);
+    QAction *actToolBarGallery = toolBar->addAction(
+        toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
+    actToolBarGallery->setCheckable(true);
+    toolBarActGrp->addAction(actToolBarGallery);
+    toolBarSigMapper->setMapping(actToolBarGallery, 1);
 
-    viewOnly->addTransition(
-        this, SIGNAL(transitToGalleryAndView()), galleryAndView);
-    galleryOnly->addTransition(
-        this, SIGNAL(transitToGalleryAndView()), galleryAndView);
+    // Image icon
+    QIcon toolBarImageIcon(":/toolbar/image-view.png");
+    toolBarImageIcon.addFile(":/toolbar/image-view-active.png",
+                             QSize(), QIcon::Active, QIcon::On);
+    QAction *actToolBarImage = toolBar->addAction(
+        toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
+    actToolBarImage->setCheckable(true);
+    toolBarActGrp->addAction(actToolBarImage);
+    toolBarSigMapper->setMapping(actToolBarImage, 2);
 
-    galleryOnly->addTransition(
-        ui->gallery, SIGNAL(transitToView()), viewOnly);
-    galleryAndView->addTransition(
-        ui->gallery, SIGNAL(transitToView()), viewOnly);
+    actToolBarGallery->setChecked(true);
+    addToolBar(Qt::LeftToolBarArea, toolBar);
 
-    m_exploreStateMachine.setInitialState(galleryAndView);
-    m_exploreStateMachine.start();
+
+    // Stacked views
+    ui->pageFav->setLayout(new QGridLayout(ui->pageFav));
+    ui->pageFav->layout()->setMargin(0);
+    ui->pageGallery->layout()->setMargin(0);
+    connect(ui->gallery, SIGNAL(transitToView()),
+            actToolBarImage, SLOT(trigger()));
+    ui->pageImageView->layout()->setMargin(0);
 }
 
 void MainWindow::processCommandLineOptions()
