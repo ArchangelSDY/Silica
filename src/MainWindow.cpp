@@ -14,7 +14,6 @@
 #include "PlayList.h"
 #include "PlayListRecord.h"
 #include "MainWindow.h"
-#include "AbstractGalleryItem.h"
 
 #include "ui_MainWindow.h"
 

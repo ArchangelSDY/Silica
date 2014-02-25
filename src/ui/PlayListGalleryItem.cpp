@@ -7,7 +7,7 @@ static const int TITLE_HEIGHT = 25;
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          QGraphicsItem *parent) :
-    AbstractGalleryItem(parent) ,
+    QGraphicsItem(parent) ,
     m_record(record) ,
     m_image(0)
 {

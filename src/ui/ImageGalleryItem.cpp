@@ -8,7 +8,7 @@ static const int BORDER = 5;
 
 ImageGalleryItem::ImageGalleryItem(Image *image,
                                    QGraphicsItem *parent) :
-    AbstractGalleryItem(parent) ,
+    QGraphicsItem(parent) ,
     m_image(image)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);

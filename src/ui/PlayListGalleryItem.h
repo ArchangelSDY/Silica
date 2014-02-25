@@ -1,14 +1,16 @@
 #ifndef PLAYLISTGALLERYITEM_H
 #define PLAYLISTGALLERYITEM_H
 
-#include "AbstractGalleryItem.h"
+#include <QGraphicsItem>
+
 #include "PlayListRecord.h"
 
-class PlayListGalleryItem : public AbstractGalleryItem
+class PlayListGalleryItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit PlayListGalleryItem(PlayListRecord *record, QGraphicsItem *parent = 0);
+    explicit PlayListGalleryItem(PlayListRecord *record,
+                                 QGraphicsItem *parent = 0);
     ~PlayListGalleryItem();
 
     QRectF boundingRect() const;
@@ -22,6 +24,8 @@ private:
 
     PlayListRecord *m_record;
     QImage *m_image;
+    QSize m_thumbnailSize;
+    QPoint m_thumbnailPos;
     QRect m_titleRect;
 };
 
