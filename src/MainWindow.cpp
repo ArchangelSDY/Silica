@@ -151,17 +151,26 @@ void MainWindow::setupExtraUi()
     toolBarActGrp->addAction(actToolBarImage);
     toolBarSigMapper->setMapping(actToolBarImage, 2);
 
-    actToolBarGallery->setChecked(true);
+    actToolBarFav->setChecked(true);
     addToolBar(Qt::LeftToolBarArea, toolBar);
 
 
     // Stacked views
-    ui->pageFav->setLayout(new QGridLayout(ui->pageFav));
     ui->pageFav->layout()->setMargin(0);
     ui->pageGallery->layout()->setMargin(0);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             actToolBarImage, SLOT(trigger()));
     ui->pageImageView->layout()->setMargin(0);
+
+    // PlayList gallery
+    // TODO: Lazy load here
+    loadSavedPlayLists();
+}
+
+void MainWindow::loadSavedPlayLists()
+{
+    ui->playListGallery->setPlayListRecords(
+        PlayListRecord::fromLocalDatabase());
 }
 
 void MainWindow::processCommandLineOptions()
@@ -259,6 +268,9 @@ void MainWindow::promptToSavePlayList()
         if (record.saveToLocalDatabase()) {
             statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
                                      2000);
+
+            // Refresh playlist gallery
+            loadSavedPlayLists();
         } else {
             statusBar()->showMessage(
                 QString("Failed to save playList %1!").arg(name), 2000);

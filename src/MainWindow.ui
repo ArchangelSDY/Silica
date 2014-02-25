@@ -18,9 +18,15 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedViews">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="pageFav"/>
+      <widget class="QWidget" name="pageFav">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="PlayListGalleryView" name="playListGallery"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="pageGallery">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -165,6 +171,11 @@
    <class>ImageGalleryView</class>
    <extends>QGraphicsView</extends>
    <header>ui/ImageGalleryView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PlayListGalleryView</class>
+   <extends>QGraphicsView</extends>
+   <header>ui/PlayListGalleryView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

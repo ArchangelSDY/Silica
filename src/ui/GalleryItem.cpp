@@ -23,6 +23,13 @@ GalleryItem::GalleryItem(AbstractGalleryItemModel *model,
     }
 }
 
+GalleryItem::~GalleryItem()
+{
+    if (m_model) {
+        delete m_model;
+    }
+}
+
 QRectF GalleryItem::boundingRect() const
 {
     return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());

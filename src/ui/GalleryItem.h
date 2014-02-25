@@ -13,6 +13,7 @@ class GalleryItem : public QObject, public QGraphicsItem
 public:
     explicit GalleryItem(AbstractGalleryItemModel *model,
                          QGraphicsItem *parent = 0);
+    ~GalleryItem();
 
     virtual QRectF boundingRect() const;
 
