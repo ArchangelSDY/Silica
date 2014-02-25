@@ -1,4 +1,4 @@
-#include "GalleryItem.h"
+#include "AbstractGalleryItem.h"
 #include "GalleryView.h"
 #include "GlobalConfig.h"
 

@@ -9,12 +9,12 @@
 
 #include "AsunaDatabase.h"
 #include "GlobalConfig.h"
-#include "ImageGalleryItemModel.h"
+#include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
 #include "PlayList.h"
 #include "PlayListRecord.h"
 #include "MainWindow.h"
-#include "GalleryItem.h"
+#include "AbstractGalleryItem.h"
 
 #include "ui_MainWindow.h"
 
@@ -236,10 +236,9 @@ void MainWindow::promptToSaveImage()
         }
 
         foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
-            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
-            ImageGalleryItemModel *model =
-                static_cast<ImageGalleryItemModel *>(galleryItem->model());
-            Image *image = model->image();
+            ImageGalleryItem *imageGalleryItem =
+                static_cast<ImageGalleryItem *>(item);
+            Image *image = imageGalleryItem->image();
             if (image) {
                 QFileInfo imageFile(image->name()); // Remove dir in image name
                 QString destPath = destDir + QDir::separator() +

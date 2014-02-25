@@ -1,5 +1,4 @@
-#include "GalleryItem.h"
-#include "PlayListItemModel.h"
+#include "PlayListGalleryItem.h"
 #include "PlayListGalleryView.h"
 
 PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
@@ -12,8 +11,8 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord> records)
     clear();
 
     for (int i = 0; i < records.count(); ++i) {
-        PlayListItemModel *model = new PlayListItemModel(&records[i]);
-        GalleryItem *item = new GalleryItem(model);
+        PlayListGalleryItem *item = new PlayListGalleryItem(
+            new PlayListRecord(records[i]));
         m_scene->addItem(item);
     }
 

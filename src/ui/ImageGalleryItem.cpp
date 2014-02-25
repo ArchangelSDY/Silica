@@ -1,47 +1,31 @@
-#include <QGraphicsScene>
 #include <QPainter>
 
-#include "GalleryItem.h"
-#include "../GlobalConfig.h"
+#include "GlobalConfig.h"
+#include "ImageGalleryItem.h"
 
 static const int PADDING = 10;
 static const int BORDER = 5;
 
-GalleryItem::GalleryItem(AbstractGalleryItemModel *model,
-                         QGraphicsItem *parent) :
-    QGraphicsItem(parent) ,
-    m_model(model)
+ImageGalleryItem::ImageGalleryItem(Image *image,
+                                   QGraphicsItem *parent) :
+    AbstractGalleryItem(parent) ,
+    m_image(image)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    if (m_model) {
-        m_model->setParent(this);
-
-        connect(m_model, SIGNAL(thumbnailLoaded()),
-                this, SLOT(thumbnailLoaded()));
-        m_model->loadThumbnail();
-    }
+    connect(m_image, SIGNAL(thumbnailLoaded()),
+            this, SLOT(thumbnailLoaded()));
+    m_image->loadThumbnail();
 }
 
-GalleryItem::~GalleryItem()
-{
-    if (m_model) {
-        delete m_model;
-    }
-}
-
-QRectF GalleryItem::boundingRect() const
+QRectF ImageGalleryItem::boundingRect() const
 {
     return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());
 }
 
-void GalleryItem::thumbnailLoaded()
+void ImageGalleryItem::thumbnailLoaded()
 {
-    if (!m_model) {
-        return;
-    }
-
-    const QImage &thumbnailImage = m_model->thumbnail();
+    const QImage &thumbnailImage = m_image->thumbnail();
     if (!thumbnailImage.isNull()) {
         // Calculate image size and position
         const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
@@ -63,7 +47,7 @@ void GalleryItem::thumbnailLoaded()
     }
 }
 
-void GalleryItem::paint(QPainter *painter,
+void ImageGalleryItem::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *,
                         QWidget *)
 {
@@ -84,5 +68,5 @@ void GalleryItem::paint(QPainter *painter,
 
     // Image
     painter->drawImage(QRect(m_thumbnailPos, m_thumbnailSize),
-                       m_model->thumbnail());
+                       m_image->thumbnail());
 }

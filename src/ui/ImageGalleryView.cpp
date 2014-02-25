@@ -1,7 +1,6 @@
 #include <QMenu>
 
-#include "GalleryItem.h"
-#include "ImageGalleryItemModel.h"
+#include "ImageGalleryItem.h"
 #include "ImageGalleryView.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
@@ -28,8 +27,7 @@ void ImageGalleryView::playListAppend(PlayList appended)
         Image *image = appended.at(i).data();
 
         // Paint thumbnail
-        ImageGalleryItemModel *model = new ImageGalleryItemModel(image);
-        GalleryItem *item = new GalleryItem(model);
+        ImageGalleryItem *item = new ImageGalleryItem(image);
         m_scene->addItem(item);
     }
 
