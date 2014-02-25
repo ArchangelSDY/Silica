@@ -36,13 +36,6 @@ void ImageGalleryView::playListAppend(PlayList appended)
     layout();
 }
 
-void ImageGalleryView::mouseDoubleClickEvent(QMouseEvent *)
-{
-    if (scene()->selectedItems().length() > 0) {
-        emit transitToView();
-    }
-}
-
 void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);

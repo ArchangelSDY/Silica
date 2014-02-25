@@ -65,3 +65,10 @@ void GalleryView::showEvent(QShowEvent *)
 {
     layout();
 }
+
+void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
+{
+    if (scene()->selectedItems().length() > 0) {
+        emit mouseDoubleClicked();
+    }
+}

@@ -159,7 +159,7 @@ void MainWindow::setupExtraUi()
     ui->pageFav->setLayout(new QGridLayout(ui->pageFav));
     ui->pageFav->layout()->setMargin(0);
     ui->pageGallery->layout()->setMargin(0);
-    connect(ui->gallery, SIGNAL(transitToView()),
+    connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             actToolBarImage, SLOT(trigger()));
     ui->pageImageView->layout()->setMargin(0);
 }

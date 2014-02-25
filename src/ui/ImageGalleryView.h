@@ -11,9 +11,6 @@ public:
 
     void setNavigator(Navigator *navigator);
 
-signals:
-    void transitToView();
-
 public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);
@@ -22,7 +19,6 @@ public slots:
     void sortByAspectRatio();
 
 protected:
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
