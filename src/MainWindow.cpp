@@ -429,7 +429,7 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             case Qt::Key_R:
                 ui->graphicsView->rotate(90);
                 break;
-            case Qt::Key_F11:
+            case Qt::Key_F10:
                 if (!isFullScreen()) {
                     setWindowState(Qt::WindowFullScreen);
                 } else {
