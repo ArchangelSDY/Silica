@@ -33,6 +33,7 @@ public slots:
 private slots:
     void imageLoaded(Image *image);
     void loadSavedPlayLists();
+    void loadSelectedPlayList();
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);

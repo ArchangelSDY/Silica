@@ -15,6 +15,7 @@ public:
     ~PlayListGalleryItem();
 
     QRectF boundingRect() const;
+    PlayListRecord *record() { return m_record; }
 
 protected:
     virtual void paint(QPainter *painter,

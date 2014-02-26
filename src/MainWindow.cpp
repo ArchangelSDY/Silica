@@ -12,6 +12,7 @@
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
 #include "PlayList.h"
+#include "PlayListGalleryItem.h"
 #include "PlayListRecord.h"
 #include "MainWindow.h"
 
@@ -156,9 +157,15 @@ void MainWindow::setupExtraUi()
 
     // Stacked views
     ui->pageFav->layout()->setMargin(0);
+    connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
+            this, SLOT(loadSelectedPlayList()));
+    connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
+            actToolBarGallery, SLOT(trigger()));
+
     ui->pageGallery->layout()->setMargin(0);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             actToolBarImage, SLOT(trigger()));
+
     ui->pageImageView->layout()->setMargin(0);
 
     // PlayList gallery
@@ -170,6 +177,15 @@ void MainWindow::loadSavedPlayLists()
 {
     ui->playListGallery->setPlayListRecords(
         PlayListRecord::fromLocalDatabase());
+}
+
+void MainWindow::loadSelectedPlayList()
+{
+    if (ui->playListGallery->scene()->selectedItems().count() > 0) {
+        PlayListGalleryItem *selected = static_cast<PlayListGalleryItem *>(
+            ui->playListGallery->scene()->selectedItems()[0]);
+        m_navigator.setPlayList(*selected->record()->playList());
+    }
 }
 
 void MainWindow::processCommandLineOptions()
