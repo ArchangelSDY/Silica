@@ -37,6 +37,7 @@ private slots:
 protected:
     virtual void keyPressEvent(QKeyEvent *);
     virtual void resizeEvent(QResizeEvent *);
+    virtual void changeEvent(QEvent *);
 
 private:
     void setupExtraUi();
@@ -56,6 +57,7 @@ private:
     };
 
     Ui::MainWindow *ui;
+    QToolBar *m_toolBar;
 
     Navigator m_navigator;
     RemoteDatabase *m_database;

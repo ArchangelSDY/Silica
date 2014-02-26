@@ -23,6 +23,7 @@ static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
+    m_toolBar(0) ,
     m_database(new AsunaDatabase()) ,
     m_commandInterpreter(&m_navigator, m_database) ,
     m_inputMode(InputMode_Control)
@@ -99,12 +100,12 @@ void MainWindow::setupExtraUi()
 
 
     // Main toolbar
-    QToolBar *toolBar = new QToolBar(this);
-    toolBar->setFloatable(false);
-    toolBar->setMovable(false);
-    toolBar->setOrientation(Qt::Vertical);
-    toolBar->setIconSize(QSize(24, 24));
-    toolBar->setStyleSheet(
+    m_toolBar = new QToolBar(this);
+    m_toolBar->setFloatable(false);
+    m_toolBar->setMovable(false);
+    m_toolBar->setOrientation(Qt::Vertical);
+    m_toolBar->setIconSize(QSize(24, 24));
+    m_toolBar->setStyleSheet(
         "* {"
             "color: #FFFFFF;"
             "background-color: #3C414C;"
@@ -125,7 +126,7 @@ void MainWindow::setupExtraUi()
     QIcon toolBarFavIcon(":/res/toolbar/fav.png");
     toolBarFavIcon.addFile(":/res/toolbar/fav-active.png",
                            QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarFav = toolBar->addAction(
+    QAction *actToolBarFav = m_toolBar->addAction(
         toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
     actToolBarFav->setCheckable(true);
     actToolBarFav->setShortcut(Qt::CTRL + Qt::Key_1);
@@ -136,7 +137,7 @@ void MainWindow::setupExtraUi()
     QIcon toolBarGalleryIcon(":/res/toolbar/gallery.png");
     toolBarGalleryIcon.addFile(":/res/toolbar/gallery-active.png",
                                QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarGallery = toolBar->addAction(
+    QAction *actToolBarGallery = m_toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
     actToolBarGallery->setCheckable(true);
     actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
@@ -147,7 +148,7 @@ void MainWindow::setupExtraUi()
     QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
     toolBarImageIcon.addFile(":/res/toolbar/image-view-active.png",
                              QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarImage = toolBar->addAction(
+    QAction *actToolBarImage = m_toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
     actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
     actToolBarImage->setCheckable(true);
@@ -155,7 +156,7 @@ void MainWindow::setupExtraUi()
     toolBarSigMapper->setMapping(actToolBarImage, 2);
 
     actToolBarFav->setChecked(true);
-    addToolBar(Qt::LeftToolBarArea, toolBar);
+    addToolBar(Qt::LeftToolBarArea, m_toolBar);
 
 
     // Stacked views
@@ -481,6 +482,19 @@ void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     ui->graphicsView->fitInViewIfNecessary();
+}
+
+void MainWindow::changeEvent(QEvent *ev)
+{
+    if (ev->type() == QEvent::WindowStateChange) {
+        if (isFullScreen()) {
+            m_toolBar->hide();
+        } else {
+            m_toolBar->show();
+        }
+
+        ev->accept();
+    }
 }
 
 void MainWindow::statusBarMessageChanged(const QString & message)
