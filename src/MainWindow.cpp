@@ -279,9 +279,23 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSavePlayList()
 {
-    QString name = QInputDialog::getText(this, "Save PlayList", "Name");
     Image *image = m_navigator.currentImage();
-    if (!name.isEmpty() && image) {
+    if (!image) {
+        return;
+    }
+
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Save PlayList");
+    dialog.setLabelText("Name");
+    dialog.setComboBoxEditable(true);
+
+    QString sourceUrl = image->source()->url().toString();
+    dialog.setComboBoxItems(sourceUrl.split(QRegularExpression("[/#]")));
+
+    dialog.exec();
+
+    QString name = dialog.textValue();
+    if (!name.isEmpty()) {
         PlayListRecord record(name, image->thumbnailPath(),
                               m_navigator.playList());
         if (record.saveToLocalDatabase()) {
