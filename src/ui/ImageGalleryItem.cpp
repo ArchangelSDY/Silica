@@ -1,3 +1,4 @@
+#include <QGraphicsScene>
 #include <QPainter>
 
 #include "GlobalConfig.h"
@@ -53,12 +54,14 @@ void ImageGalleryItem::paint(QPainter *painter,
 {
     painter->setRenderHints(
         QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter->setBrush(scene()->palette().foreground());
+    painter->setBackground(scene()->palette().background());
 
     // Background
     if (isSelected()) {
-        painter->fillRect(boundingRect(), Qt::darkCyan);
+        painter->drawRect(boundingRect());
     } else {
-        painter->fillRect(boundingRect(), Qt::gray);
+        painter->eraseRect(boundingRect());
     }
 
     // Border

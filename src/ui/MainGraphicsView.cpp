@@ -10,7 +10,7 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_imageItem(new QGraphicsPixmapItem()) ,
     m_fitInView(Fit)
 {
-    m_scene->setBackgroundBrush(Qt::gray);
+    m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
     m_imageItem->setTransformationMode(Qt::SmoothTransformation);
     setScene(m_scene);

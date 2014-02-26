@@ -8,7 +8,13 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene(new QGraphicsScene)
 {
     setDragMode(QGraphicsView::RubberBandDrag);
-    m_scene->setBackgroundBrush(Qt::gray);
+
+    QPalette palette;
+    palette.setBrush(QPalette::Background, QColor("#323A44"));
+    palette.setBrush(QPalette::Foreground, QColor("#71929E"));
+    m_scene->setPalette(palette);
+    m_scene->setBackgroundBrush(palette.background());
+
     setScene(m_scene);
 }
 

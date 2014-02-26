@@ -1,10 +1,11 @@
+#include <QGraphicsScene>
 #include <QPainter>
 
 #include "GlobalConfig.h"
 #include "PlayListGalleryItem.h"
 
 static const int TITLE_HEIGHT = 25;
-static const int BORDER = 5;
+static const int BORDER = 1;
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          QGraphicsItem *parent) :
@@ -65,26 +66,27 @@ void PlayListGalleryItem::paint(QPainter *painter,
 {
     painter->setRenderHints(
         QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter->setPen(Qt::NoPen);
+    painter->setBackground(scene()->palette().background());
+    painter->setBrush(scene()->palette().foreground());
 
     // Background
     if (isSelected()) {
         QRadialGradient gradient(boundingRect().center(),
                                  boundingRect().width());
-        gradient.setColorAt(0, Qt::darkCyan);
+        gradient.setColorAt(0, painter->brush().color());
         gradient.setColorAt(1, Qt::transparent);
         painter->setBrush(gradient);
-        painter->setPen(Qt::NoPen);
 
         painter->fillRect(boundingRect(), QBrush(gradient));
     } else {
-        painter->fillRect(boundingRect(), Qt::gray);
+        painter->eraseRect(boundingRect());
     }
 
     // Image
     painter->drawImage(m_innerRect, *m_image, m_coverSourcePaintRect);
 
     // Title
-    painter->setPen(Qt::NoPen);
     painter->setBrush(QColor(255, 255, 255, 200));
     painter->drawRect(m_titleRect);
     painter->setPen(Qt::black);
