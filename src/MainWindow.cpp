@@ -145,6 +145,10 @@ void MainWindow::setupExtraUi()
     m_toolBarActs->addAction(actToolBarGallery);
     toolBarSigMapper->setMapping(actToolBarGallery, 1);
 
+    // Switch to gallery view on playlist changed
+    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
+            actToolBarGallery, SLOT(trigger()));
+
     // Image icon
     QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
     toolBarImageIcon.addFile(":/res/toolbar/image-view-active.png",
