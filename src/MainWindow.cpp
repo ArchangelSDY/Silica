@@ -128,6 +128,7 @@ void MainWindow::setupExtraUi()
     QAction *actToolBarFav = toolBar->addAction(
         toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
     actToolBarFav->setCheckable(true);
+    actToolBarFav->setShortcut(Qt::CTRL + Qt::Key_1);
     toolBarActGrp->addAction(actToolBarFav);
     toolBarSigMapper->setMapping(actToolBarFav, 0);
 
@@ -138,6 +139,7 @@ void MainWindow::setupExtraUi()
     QAction *actToolBarGallery = toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
     actToolBarGallery->setCheckable(true);
+    actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
     toolBarActGrp->addAction(actToolBarGallery);
     toolBarSigMapper->setMapping(actToolBarGallery, 1);
 
@@ -147,6 +149,7 @@ void MainWindow::setupExtraUi()
                              QSize(), QIcon::Active, QIcon::On);
     QAction *actToolBarImage = toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
+    actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
     actToolBarImage->setCheckable(true);
     toolBarActGrp->addAction(actToolBarImage);
     toolBarSigMapper->setMapping(actToolBarImage, 2);
@@ -394,73 +397,75 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
 
 void MainWindow::handleControlKeyPress(QKeyEvent *ev)
 {
-    switch (ev->key()) {
-        case Qt::Key_J:
-        case Qt::Key_Space:
-            m_navigator.goNext();
-            break;
-        case Qt::Key_K:
-            m_navigator.goPrev();
-            break;
-        case Qt::Key_F:
-            ui->graphicsView->toggleFitInView();
-            ui->graphicsView->fitInViewIfNecessary();
-            break;
-        case Qt::Key_O: {
-            promptToOpenImage();
-            break;
-        }
-        case Qt::Key_S:
-            promptToSaveImage();
-            break;
-        case Qt::Key_P:
-            promptToSavePlayList();
-            break;
-        case Qt::Key_T: {
-            QDockWidget *sidebar = ui->sidebar;
-            sidebar->setVisible(!sidebar->isVisible());
-            break;
-        }
-        case Qt::Key_R:
-            ui->graphicsView->rotate(90);
-            break;
-        case Qt::Key_F11:
-            if (!isFullScreen()) {
-                setWindowState(Qt::WindowFullScreen);
-            } else {
-                setWindowState(Qt::WindowNoState);
+    if (ev->modifiers() == Qt::NoModifier) {
+        switch (ev->key()) {
+            case Qt::Key_J:
+            case Qt::Key_Space:
+                m_navigator.goNext();
+                break;
+            case Qt::Key_K:
+                m_navigator.goPrev();
+                break;
+            case Qt::Key_F:
+                ui->graphicsView->toggleFitInView();
+                ui->graphicsView->fitInViewIfNecessary();
+                break;
+            case Qt::Key_O: {
+                promptToOpenImage();
+                break;
             }
-            break;
-        case Qt::Key_Escape:
-            if (QMessageBox::question(this, "Exit", "Exit?") ==
-                    QMessageBox::Yes) {
-                QApplication::exit();
+            case Qt::Key_S:
+                promptToSaveImage();
+                break;
+            case Qt::Key_P:
+                promptToSavePlayList();
+                break;
+            case Qt::Key_T: {
+                QDockWidget *sidebar = ui->sidebar;
+                sidebar->setVisible(!sidebar->isVisible());
+                break;
             }
-            break;
-        case Qt::Key_Slash:
-            m_inputMode = InputMode_Command;
-            handleCommandKeyPress(ev);
-            break;
-        case Qt::Key_Home:
-            m_navigator.goFirst();
-            break;
-        case Qt::Key_End:
-            m_navigator.goLast();
-            break;
-        case Qt::Key_1:
-        case Qt::Key_2:
-        case Qt::Key_3:
-        case Qt::Key_4:
-        case Qt::Key_5:
-        case Qt::Key_6:
-        case Qt::Key_7:
-        case Qt::Key_8:
-        case Qt::Key_9:
-            ui->graphicsView->fitGridInView(ev->text().toInt());
-            break;
-    }
+            case Qt::Key_R:
+                ui->graphicsView->rotate(90);
+                break;
+            case Qt::Key_F11:
+                if (!isFullScreen()) {
+                    setWindowState(Qt::WindowFullScreen);
+                } else {
+                    setWindowState(Qt::WindowNoState);
+                }
+                break;
+            case Qt::Key_Escape:
+                if (QMessageBox::question(this, "Exit", "Exit?") ==
+                        QMessageBox::Yes) {
+                    QApplication::exit();
+                }
+                break;
+            case Qt::Key_Slash:
+                m_inputMode = InputMode_Command;
+                handleCommandKeyPress(ev);
+                break;
+            case Qt::Key_Home:
+                m_navigator.goFirst();
+                break;
+            case Qt::Key_End:
+                m_navigator.goLast();
+                break;
+            case Qt::Key_1:
+            case Qt::Key_2:
+            case Qt::Key_3:
+            case Qt::Key_4:
+            case Qt::Key_5:
+            case Qt::Key_6:
+            case Qt::Key_7:
+            case Qt::Key_8:
+            case Qt::Key_9:
+                ui->graphicsView->fitGridInView(ev->text().toInt());
+                break;
+        }
 
-    ev->accept();
+        ev->accept();
+    }
 }
 
 void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
