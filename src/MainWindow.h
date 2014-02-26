@@ -21,11 +21,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-signals:
-    void transitToGalleryOnly();
-    void transitToGalleryAndView();
-    void transitToViewOnly();
-
 public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);

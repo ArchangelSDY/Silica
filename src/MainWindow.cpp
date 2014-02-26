@@ -394,15 +394,6 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             promptToOpenImage();
             break;
         }
-        case Qt::Key_G:
-            emit transitToGalleryOnly();
-            break;
-        case Qt::Key_V:
-            emit transitToViewOnly();
-            break;
-        case Qt::Key_B:
-            emit transitToGalleryAndView();
-            break;
         case Qt::Key_S:
             promptToSaveImage();
             break;
