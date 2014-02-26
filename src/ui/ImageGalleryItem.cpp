@@ -15,7 +15,7 @@ ImageGalleryItem::ImageGalleryItem(Image *image,
 
     connect(m_image, SIGNAL(thumbnailLoaded()),
             this, SLOT(thumbnailLoaded()));
-    m_image->loadThumbnail();
+    m_image->loadThumbnail(true);
 }
 
 QRectF ImageGalleryItem::boundingRect() const
