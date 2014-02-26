@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QActionGroup>
 #include <QMainWindow>
 #include <QGraphicsScene>
 
@@ -50,6 +51,7 @@ private:
     void handleCommandKeyPress(QKeyEvent *);
 
     void updateSidebarTitle();
+    void switchViews();
 
     enum InputMode {
         InputMode_Control,
@@ -58,6 +60,7 @@ private:
 
     Ui::MainWindow *ui;
     QToolBar *m_toolBar;
+    QActionGroup *m_toolBarActs;
 
     Navigator m_navigator;
     RemoteDatabase *m_database;

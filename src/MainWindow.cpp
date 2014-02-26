@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
     m_toolBar(0) ,
+    m_toolBarActs(0) ,
     m_database(new AsunaDatabase()) ,
     m_commandInterpreter(&m_navigator, m_database) ,
     m_inputMode(InputMode_Control)
@@ -117,7 +118,7 @@ void MainWindow::setupExtraUi()
         "}"
     );
 
-    QActionGroup *toolBarActGrp = new QActionGroup(this);
+    m_toolBarActs = new QActionGroup(this);
     QSignalMapper *toolBarSigMapper = new QSignalMapper(this);
     connect(toolBarSigMapper, SIGNAL(mapped(int)),
             ui->stackedViews, SLOT(setCurrentIndex(int)));
@@ -130,7 +131,7 @@ void MainWindow::setupExtraUi()
         toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
     actToolBarFav->setCheckable(true);
     actToolBarFav->setShortcut(Qt::CTRL + Qt::Key_1);
-    toolBarActGrp->addAction(actToolBarFav);
+    m_toolBarActs->addAction(actToolBarFav);
     toolBarSigMapper->setMapping(actToolBarFav, 0);
 
     // Gallery icon
@@ -141,7 +142,7 @@ void MainWindow::setupExtraUi()
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
     actToolBarGallery->setCheckable(true);
     actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
-    toolBarActGrp->addAction(actToolBarGallery);
+    m_toolBarActs->addAction(actToolBarGallery);
     toolBarSigMapper->setMapping(actToolBarGallery, 1);
 
     // Image icon
@@ -152,7 +153,7 @@ void MainWindow::setupExtraUi()
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
     actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
     actToolBarImage->setCheckable(true);
-    toolBarActGrp->addAction(actToolBarImage);
+    m_toolBarActs->addAction(actToolBarImage);
     toolBarSigMapper->setMapping(actToolBarImage, 2);
 
     actToolBarFav->setChecked(true);
@@ -421,6 +422,9 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
             case Qt::Key_P:
                 promptToSavePlayList();
                 break;
+            case Qt::Key_G:
+                switchViews();
+                break;
             case Qt::Key_T: {
                 QDockWidget *sidebar = ui->sidebar;
                 sidebar->setVisible(!sidebar->isVisible());
@@ -477,6 +481,15 @@ void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
     } else {
         m_commandInterpreter.keyPress(ev);
     }
+}
+
+void MainWindow::switchViews()
+{
+    QAction *currentAct = m_toolBarActs->checkedAction();
+    int currentIndex = m_toolBarActs->actions().indexOf(currentAct);
+    int nextIndex = (currentIndex + 1) % m_toolBarActs->actions().count();
+    QAction *nextAct = m_toolBarActs->actions()[nextIndex];
+    nextAct->trigger();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)
