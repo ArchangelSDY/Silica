@@ -13,7 +13,7 @@ public:
     SQLiteLocalDatabase();
 
     QList<PlayListRecord> queryPlayListRecords();
-    QStringList queryImageUrlsForPlayList(const QString &name);
+    QStringList queryImageUrlsForPlayList(int playListId);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
 
     int queryImagesCount();

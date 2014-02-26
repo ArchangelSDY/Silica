@@ -9,6 +9,9 @@ public:
     PlayListRecord(const QString &name, const QString &coverPath,
         PlayList *playList = 0);
 
+    int id() const { return m_id; }
+    void setId(int id) { m_id = id; }
+
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }
 
@@ -21,6 +24,7 @@ public:
     bool saveToLocalDatabase();
 
 private:
+    int m_id;
     QString m_name;
     QString m_coverPath;
     PlayList *m_playList;

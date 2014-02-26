@@ -6,7 +6,7 @@ const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 
 const char *SQL_CREATE_PLAYLISTS_TABLE = "create table playlists ("
         "id integer primary key autoincrement, "
-        "name text unique,"
+        "name text,"
         "cover_path text)";
 
 const char *SQL_CREATE_PLAYLIST_IMAGES_TABLE = "create table playlist_images ("
@@ -14,19 +14,19 @@ const char *SQL_CREATE_PLAYLIST_IMAGES_TABLE = "create table playlist_images ("
         "playlist_id integer references playlists on delete cascade, "
         "image_id integer references images on delete cascade)";
 
-const char *SQL_INSERT_PLAYLIST = "replace into playlists(name, cover_path) values (?, ?)";
+const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) values (?, ?)";
 
-const char *SQL_INSERT_PLAYLIST_IMAGES = "replace into playlist_images(playlist_id, image_id) values ("
+const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
         "?, (select id from images where hash = ?))";
 
-const char *SQL_QUERY_PLAYLISTS = "select name, cover_path from playlists";
+const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path from playlists";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
-const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_NAME = "select images.url, playlists.name from images "
+const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.name from images "
         "left join playlist_images on images.id = playlist_images.image_id "
         "join playlists on playlists.id = playlist_images.playlist_id "
-        "where playlists.name = ?";
+        "where playlists.id = ?";
 
 const char *SQL_CREATE_IMAGES_TABLE = "create table images ("
         "id integer primary key autoincrement, "
@@ -36,7 +36,7 @@ const char *SQL_CREATE_IMAGES_TABLE = "create table images ("
 
 const char *SQL_CREATE_IMAGES_INDEX = "create index images_index_hash on images (hash)";
 
-const char *SQL_INSERT_IMAGE = "replace into images(hash, name, url) values (?, ?, ?)";
+const char *SQL_INSERT_IMAGE = "insert into images(hash, name, url) values (?, ?, ?)";
 
 const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
 
@@ -93,15 +93,19 @@ QList<PlayListRecord> SQLiteLocalDatabase::queryPlayListRecords()
 
     QSqlQuery q(SQL_QUERY_PLAYLISTS);
     while (q.next()) {
-        QString name = q.value(0).toString();
-        QString coverPath = q.value(1).toString();
-        records << PlayListRecord(name, coverPath);
+        int id = q.value(0).toInt();
+        QString name = q.value(1).toString();
+        QString coverPath = q.value(2).toString();
+
+        PlayListRecord record(name, coverPath);
+        record.setId(id);
+        records << record;
     }
 
     return records;
 }
 
-QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(const QString &name)
+QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(int playListId)
 {
     QStringList imageUrls;
 
@@ -112,8 +116,8 @@ QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(const QString &name)
     createTablesIfNecessary();
 
     QSqlQuery q;
-    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_NAME);
-    q.addBindValue(name);
+    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
+    q.addBindValue(playListId);
     if (!q.exec()) {
         qWarning() << q.lastError();
         qWarning() << q.lastQuery();
