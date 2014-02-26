@@ -121,8 +121,8 @@ void MainWindow::setupExtraUi()
             ui->stackedViews, SLOT(setCurrentIndex(int)));
 
     // Fav icon
-    QIcon toolBarFavIcon(":/toolbar/fav.png");
-    toolBarFavIcon.addFile(":/toolbar/fav-active.png",
+    QIcon toolBarFavIcon(":/res/toolbar/fav.png");
+    toolBarFavIcon.addFile(":/res/toolbar/fav-active.png",
                            QSize(), QIcon::Active, QIcon::On);
     QAction *actToolBarFav = toolBar->addAction(
         toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
@@ -131,8 +131,8 @@ void MainWindow::setupExtraUi()
     toolBarSigMapper->setMapping(actToolBarFav, 0);
 
     // Gallery icon
-    QIcon toolBarGalleryIcon(":/toolbar/gallery.png");
-    toolBarGalleryIcon.addFile(":/toolbar/gallery-active.png",
+    QIcon toolBarGalleryIcon(":/res/toolbar/gallery.png");
+    toolBarGalleryIcon.addFile(":/res/toolbar/gallery-active.png",
                                QSize(), QIcon::Active, QIcon::On);
     QAction *actToolBarGallery = toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
@@ -141,8 +141,8 @@ void MainWindow::setupExtraUi()
     toolBarSigMapper->setMapping(actToolBarGallery, 1);
 
     // Image icon
-    QIcon toolBarImageIcon(":/toolbar/image-view.png");
-    toolBarImageIcon.addFile(":/toolbar/image-view-active.png",
+    QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
+    toolBarImageIcon.addFile(":/res/toolbar/image-view-active.png",
                              QSize(), QIcon::Active, QIcon::On);
     QAction *actToolBarImage = toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
