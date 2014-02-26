@@ -1,4 +1,5 @@
-#include "AbstractGalleryItem.h"
+#include <QGraphicsItem>
+
 #include "GalleryView.h"
 #include "GlobalConfig.h"
 
