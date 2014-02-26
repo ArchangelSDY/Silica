@@ -27,7 +27,6 @@ public slots:
     void navigationChange(int index);
     void updateStatus(QString message);
     void gallerySelectionChanged();
-    void layoutForGalleryAndView();
     void statusBarMessageChanged(const QString & message);
 
 private slots:
