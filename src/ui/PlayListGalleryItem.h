@@ -25,8 +25,8 @@ private:
 
     PlayListRecord *m_record;
     QImage *m_image;
-    QSize m_thumbnailSize;
-    QPoint m_thumbnailPos;
+    QRect m_innerRect;
+    QRect m_coverSourcePaintRect;
     QRect m_titleRect;
 };
 

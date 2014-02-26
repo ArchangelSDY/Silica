@@ -4,6 +4,7 @@
 #include "PlayListGalleryItem.h"
 
 static const int TITLE_HEIGHT = 25;
+static const int BORDER = 5;
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          QGraphicsItem *parent) :
@@ -33,19 +34,22 @@ void PlayListGalleryItem::loadThumbnail()
     m_image = new QImage(m_record->coverPath());
 
     // Calculate image size and position
-    const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-    m_thumbnailSize.setWidth(itemSize.width());
-    m_thumbnailSize.setHeight(itemSize.height());
+    QSize margins(2 * BORDER, 2 * BORDER);
+    m_innerRect.setSize(GlobalConfig::instance()->galleryItemSize() - margins);
+    m_innerRect.translate(BORDER, BORDER);
+    const QSize &coverSize = m_image->size();
 
-    m_thumbnailSize = m_image->size().scaled(
-        m_thumbnailSize, Qt::KeepAspectRatio);
+    QSize sourcePaintSize = m_innerRect.size().scaled(
+        coverSize, Qt::KeepAspectRatio);
+    m_coverSourcePaintRect.setSize(sourcePaintSize);
+    m_coverSourcePaintRect.translate(
+        (coverSize.width() - sourcePaintSize.width()) / 2,
+        (coverSize.height() - sourcePaintSize.height()) / 2
+    );
 
-    m_thumbnailPos.setX((itemSize.width() - m_thumbnailSize.width()) / 2);
-    m_thumbnailPos.setY((itemSize.height() - m_thumbnailSize.height()) / 2);
-
-    int titleY = m_thumbnailPos.y() + m_thumbnailSize.height() - TITLE_HEIGHT;
-    m_titleRect.setRect(m_thumbnailPos.x(), titleY,
-                        m_thumbnailSize.width(), TITLE_HEIGHT);
+    m_titleRect.setRect(m_innerRect.x(),
+                        m_innerRect.y() + m_innerRect.height() - TITLE_HEIGHT,
+                        m_innerRect.width(), TITLE_HEIGHT);
 
     update(boundingRect());
 }
@@ -64,14 +68,20 @@ void PlayListGalleryItem::paint(QPainter *painter,
 
     // Background
     if (isSelected()) {
-        painter->fillRect(boundingRect(), Qt::darkCyan);
+        QRadialGradient gradient(boundingRect().center(),
+                                 boundingRect().width());
+        gradient.setColorAt(0, Qt::darkCyan);
+        gradient.setColorAt(1, Qt::transparent);
+        painter->setBrush(gradient);
+        painter->setPen(Qt::NoPen);
+
+        painter->fillRect(boundingRect(), QBrush(gradient));
     } else {
         painter->fillRect(boundingRect(), Qt::gray);
     }
 
     // Image
-    painter->drawImage(QRect(m_thumbnailPos, m_thumbnailSize),
-                       *m_image);
+    painter->drawImage(m_innerRect, *m_image, m_coverSourcePaintRect);
 
     // Title
     painter->setPen(Qt::NoPen);
