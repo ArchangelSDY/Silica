@@ -12,6 +12,13 @@ public:
 
 public slots:
     void setPlayListRecords(QList<PlayListRecord> records);
+
+private slots:
+    void removeSelectedItems();
+
+protected:
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void contextMenuEvent(QContextMenuEvent *event);
 };
 
 #endif // PLAYLISTGALLERYVIEW_H
