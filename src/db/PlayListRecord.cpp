@@ -35,3 +35,8 @@ bool PlayListRecord::saveToLocalDatabase()
 {
     return LocalDatabase::instance()->insertPlayListRecord(this);
 }
+
+bool PlayListRecord::remove()
+{
+    return LocalDatabase::instance()->removePlayListRecord(this);
+}

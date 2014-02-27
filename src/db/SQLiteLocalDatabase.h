@@ -15,6 +15,7 @@ public:
     QList<PlayListRecord> queryPlayListRecords();
     QStringList queryImageUrlsForPlayList(int playListId);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
+    bool removePlayListRecord(PlayListRecord *playListRecord);
 
     int queryImagesCount();
     bool insertImage(Image *image);

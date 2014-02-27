@@ -52,6 +52,37 @@ void TestLocalDatabase::playListsSaveAndLoad_data()
         << QString("Fav");
 }
 
+void TestLocalDatabase::playListRemove()
+{
+    QList<QUrl> imageUrls;
+    imageUrls << QUrl("file:///me.jpg");
+    PlayList pl(imageUrls);
+    PlayListRecord record("test_remove", "cover.jpg", &pl);
+    record.saveToLocalDatabase();
+
+    QList<PlayListRecord> recordsAfterSave = PlayListRecord::fromLocalDatabase();
+    QList<PlayListRecord>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  it->name() != "test_remove") {
+        it++;
+    }
+
+    if (it == recordsAfterSave.end()) {
+        QFAIL("Cannot find saved playlist.");
+        return;
+    }
+
+    bool ok = it->remove();
+    QCOMPARE(ok, true);
+
+    QList<PlayListRecord> recordsAfterRemove = PlayListRecord::fromLocalDatabase();
+    it = recordsAfterRemove.begin();
+    while (it != recordsAfterRemove.end() && it->name() != "test_remove") {
+        it++;
+    }
+
+    QCOMPARE(it, recordsAfterRemove.end());
+}
+
 void TestLocalDatabase::insertImage()
 {
     QFETCH(QUrl, imageUrl);
@@ -75,7 +106,5 @@ void TestLocalDatabase::insertImage_data()
     const QString &currentDir = qApp->applicationDirPath();
 
     QTest::newRow("Basic")
-        << QUrl("file://" + currentDir + "/assets/me.jpg");
-    QTest::newRow("Duplicate")
-        << QUrl("file://" + currentDir + "/assets/me.jpg");
+        << QUrl("file://" + currentDir + "/assets/insert_image.jpg");
 }

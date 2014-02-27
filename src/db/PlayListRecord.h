@@ -22,6 +22,7 @@ public:
 
     static QList<PlayListRecord> fromLocalDatabase();
     bool saveToLocalDatabase();
+    bool remove();
 
 private:
     int m_id;

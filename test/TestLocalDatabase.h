@@ -11,6 +11,7 @@ private slots:
 
     void playListsSaveAndLoad();
     void playListsSaveAndLoad_data();
+    void playListRemove();
 
     void insertImage();
     void insertImage_data();
