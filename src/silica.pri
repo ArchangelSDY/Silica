@@ -7,7 +7,8 @@ SOURCES += \
     $$PWD/db/*.cpp \
     $$PWD/image/*.cpp \
     $$PWD/image/sources/*.cpp \
-    $$PWD/ui/*.cpp
+    $$PWD/ui/*.cpp \
+    $$PWD/ui/renderers/*.cpp
 
 HEADERS += \
     $$PWD/*.h \
@@ -15,6 +16,7 @@ HEADERS += \
     $$PWD/image/*.h \
     $$PWD/image/sources/*.h \
     $$PWD/ui/*.h \
+    $$PWD/ui/renderers/*.h \
     $$PWD/util/*.h
 
 INCLUDEPATH += \
@@ -23,6 +25,7 @@ INCLUDEPATH += \
     $$PWD/image \
     $$PWD/image/sources \
     $$PWD/ui \
+    $$PWD/ui/renderers \
     $$PWD/util
 
 FORMS += $$PWD/*.ui

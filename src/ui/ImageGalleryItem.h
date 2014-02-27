@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 
+#include "AbstractGalleryItemRenderer.h"
 #include "Image.h"
 
 class ImageGalleryItem : public QObject, public QGraphicsItem
@@ -12,6 +13,7 @@ class ImageGalleryItem : public QObject, public QGraphicsItem
 public:
     explicit ImageGalleryItem(Image *image,
                               QGraphicsItem *parent = 0);
+    ~ImageGalleryItem();
 
     QRectF boundingRect() const;
     Image *image() { return m_image; }
@@ -25,9 +27,7 @@ protected:
 
 private:
     Image *m_image;
-    QSize m_thumbnailSize;
-    QPoint m_thumbnailPos;
-    QRect m_borderRect;
+    AbstractGalleryItemRenderer *m_renderer;
 };
 
 #endif // IMAGEGALLERYITEM_H
