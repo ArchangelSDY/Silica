@@ -11,13 +11,13 @@ public:
 
     void setImage(const QImage *image);
 
-    virtual QRectF boundingRect() const { return m_boundingRect; }
+    virtual QRect boundingRect() const { return m_boundingRect; }
     virtual void layout() = 0;
     virtual void paint(QPainter *painter) = 0;
 
 protected:
     AbstractGalleryItemRenderer *m_parentRenderer;
-    QRectF m_boundingRect;
+    QRect m_boundingRect;
     const QImage *m_image;
 };
 

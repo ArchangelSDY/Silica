@@ -2,18 +2,16 @@
 #include <QPainter>
 
 #include "CompactImageRenderer.h"
+#include "CompactTitleRenderer.h"
 #include "GlobalConfig.h"
 #include "PlayListGalleryItem.h"
-
-static const int TITLE_HEIGHT = 25;
-static const int BORDER = 1;
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
     m_record(record) ,
     m_image(0) ,
-    m_renderer(new CompactImageRenderer())
+    m_renderer(new CompactTitleRenderer(record->name(), new CompactImageRenderer()))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
@@ -37,10 +35,6 @@ void PlayListGalleryItem::loadThumbnail()
     m_image = new QImage(m_record->coverPath());
     m_renderer->setImage(const_cast<QImage *>(m_image));
     m_renderer->layout();
-
-//    m_titleRect.setRect(m_innerRect.x(),
-//                        m_innerRect.y() + m_innerRect.height() - TITLE_HEIGHT,
-//                        m_innerRect.width(), TITLE_HEIGHT);
 
     update(boundingRect());
 }
@@ -74,12 +68,4 @@ void PlayListGalleryItem::paint(QPainter *painter,
     }
 
     m_renderer->paint(painter);
-
-    // Title
-//    painter->setBrush(QColor(255, 255, 255, 200));
-//    painter->drawRect(m_titleRect);
-//    painter->setPen(Qt::black);
-
-//    painter->drawText(m_titleRect, Qt::AlignCenter | Qt::AlignHCenter,
-//                      m_record->name());
 }
