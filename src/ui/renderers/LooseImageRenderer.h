@@ -7,7 +7,7 @@
 class LooseImageRenderer : public AbstractGalleryItemRenderer
 {
 public:
-    LooseImageRenderer(Image *image);
+    LooseImageRenderer();
 
     virtual void layout();
     virtual void paint(QPainter *painter);
@@ -16,7 +16,6 @@ private:
     static const int PADDING;
     static const int BORDER;
 
-    Image *m_image;
     QRect m_imageRect;
     QRect m_borderRect;
 };

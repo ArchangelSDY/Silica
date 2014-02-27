@@ -4,22 +4,20 @@
 const int LooseImageRenderer::PADDING = 10;
 const int LooseImageRenderer::BORDER = 5;
 
-LooseImageRenderer::LooseImageRenderer(Image *image) :
-    AbstractGalleryItemRenderer() ,
-    m_image(image)
+LooseImageRenderer::LooseImageRenderer() :
+    AbstractGalleryItemRenderer()
 {
 }
 
 void LooseImageRenderer::layout()
 {
-    const QImage &image = m_image->thumbnail();
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
     QSize sizeWithoutPadding(
         itemSize.width() - 2 * LooseImageRenderer::PADDING,
         itemSize.height() - 2 * LooseImageRenderer::PADDING
     );
     m_imageRect.setSize(
-        image.size().scaled(sizeWithoutPadding, Qt::KeepAspectRatio));
+        m_image->size().scaled(sizeWithoutPadding, Qt::KeepAspectRatio));
 
     m_imageRect.moveTo(
         (itemSize.width() - m_imageRect.width()) / 2,
@@ -30,10 +28,16 @@ void LooseImageRenderer::layout()
         QSize(2 * LooseImageRenderer::BORDER, 2 * LooseImageRenderer::BORDER));
     m_borderRect.moveTo(m_imageRect.topLeft() -
         QPoint(LooseImageRenderer::BORDER, LooseImageRenderer::BORDER));
+
+    m_boundingRect = m_borderRect;
 }
 
 void LooseImageRenderer::paint(QPainter *painter)
 {
+    if (!m_image) {
+        return;
+    }
+
     painter->setRenderHints(
         QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
@@ -44,5 +48,5 @@ void LooseImageRenderer::paint(QPainter *painter)
         LooseImageRenderer::BORDER, LooseImageRenderer::BORDER);
 
     // Image
-    painter->drawImage(m_imageRect, m_image->thumbnail());
+    painter->drawImage(m_imageRect, *m_image);
 }

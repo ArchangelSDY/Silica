@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 
+#include "AbstractGalleryItemRenderer.h"
 #include "PlayListRecord.h"
 
 class PlayListGalleryItem : public QObject, public QGraphicsItem
@@ -26,9 +27,7 @@ private:
 
     PlayListRecord *m_record;
     QImage *m_image;
-    QRect m_innerRect;
-    QRect m_coverSourcePaintRect;
-    QRect m_titleRect;
+    AbstractGalleryItemRenderer *m_renderer;
 };
 
 #endif // PLAYLISTGALLERYITEM_H

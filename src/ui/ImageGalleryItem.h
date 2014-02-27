@@ -27,6 +27,7 @@ protected:
 
 private:
     Image *m_image;
+    QImage *m_thumbnail;
     AbstractGalleryItemRenderer *m_renderer;
 };
 

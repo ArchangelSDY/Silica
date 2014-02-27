@@ -1,6 +1,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 
+#include "CompactImageRenderer.h"
 #include "GlobalConfig.h"
 #include "PlayListGalleryItem.h"
 
@@ -11,7 +12,8 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
     m_record(record) ,
-    m_image(0)
+    m_image(0) ,
+    m_renderer(new CompactImageRenderer())
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
@@ -33,24 +35,12 @@ void PlayListGalleryItem::loadThumbnail()
     }
 
     m_image = new QImage(m_record->coverPath());
+    m_renderer->setImage(const_cast<QImage *>(m_image));
+    m_renderer->layout();
 
-    // Calculate image size and position
-    QSize margins(2 * BORDER, 2 * BORDER);
-    m_innerRect.setSize(GlobalConfig::instance()->galleryItemSize() - margins);
-    m_innerRect.translate(BORDER, BORDER);
-    const QSize &coverSize = m_image->size();
-
-    QSize sourcePaintSize = m_innerRect.size().scaled(
-        coverSize, Qt::KeepAspectRatio);
-    m_coverSourcePaintRect.setSize(sourcePaintSize);
-    m_coverSourcePaintRect.translate(
-        (coverSize.width() - sourcePaintSize.width()) / 2,
-        (coverSize.height() - sourcePaintSize.height()) / 2
-    );
-
-    m_titleRect.setRect(m_innerRect.x(),
-                        m_innerRect.y() + m_innerRect.height() - TITLE_HEIGHT,
-                        m_innerRect.width(), TITLE_HEIGHT);
+//    m_titleRect.setRect(m_innerRect.x(),
+//                        m_innerRect.y() + m_innerRect.height() - TITLE_HEIGHT,
+//                        m_innerRect.width(), TITLE_HEIGHT);
 
     update(boundingRect());
 }
@@ -83,14 +73,13 @@ void PlayListGalleryItem::paint(QPainter *painter,
         painter->eraseRect(boundingRect());
     }
 
-    // Image
-    painter->drawImage(m_innerRect, *m_image, m_coverSourcePaintRect);
+    m_renderer->paint(painter);
 
     // Title
-    painter->setBrush(QColor(255, 255, 255, 200));
-    painter->drawRect(m_titleRect);
-    painter->setPen(Qt::black);
+//    painter->setBrush(QColor(255, 255, 255, 200));
+//    painter->drawRect(m_titleRect);
+//    painter->setPen(Qt::black);
 
-    painter->drawText(m_titleRect, Qt::AlignCenter | Qt::AlignHCenter,
-                      m_record->name());
+//    painter->drawText(m_titleRect, Qt::AlignCenter | Qt::AlignHCenter,
+//                      m_record->name());
 }

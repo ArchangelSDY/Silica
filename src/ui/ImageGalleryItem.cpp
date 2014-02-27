@@ -12,7 +12,8 @@ ImageGalleryItem::ImageGalleryItem(Image *image,
                                    QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
     m_image(image) ,
-    m_renderer(new LooseImageRenderer(image))
+    m_thumbnail(0) ,
+    m_renderer(new LooseImageRenderer())
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
@@ -24,6 +25,9 @@ ImageGalleryItem::ImageGalleryItem(Image *image,
 ImageGalleryItem::~ImageGalleryItem()
 {
     delete m_renderer;
+    if (m_thumbnail) {
+        delete m_thumbnail;
+    }
 }
 
 QRectF ImageGalleryItem::boundingRect() const
@@ -35,6 +39,8 @@ void ImageGalleryItem::thumbnailLoaded()
 {
     const QImage &thumbnailImage = m_image->thumbnail();
     if (!thumbnailImage.isNull()) {
+        m_thumbnail = new QImage(thumbnailImage);
+        m_renderer->setImage(const_cast<QImage *>(m_thumbnail));
         m_renderer->layout();
         update(boundingRect());
     }
