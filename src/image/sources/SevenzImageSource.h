@@ -18,6 +18,7 @@ public:
     virtual bool copy(const QString &destPath);
 private:
     static FrequencyCache<QString, QSharedPointer<Qt7zPackage> > m_packageCache;
+    static QMutex m_mutex;
 
     QString m_packagePath;
 };

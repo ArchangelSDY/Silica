@@ -2,7 +2,6 @@
 #define FREQUENCYCACHE_H
 
 #include <QHash>
-#include <QMutex>
 
 template <class K, class V>
 class FrequencyCache {
@@ -20,7 +19,6 @@ private:
     int m_capacity;
     QHash<K, int> m_frequency;
     QHash<K, V> m_hash;
-    QMutex m_mutex;
 };
 
 template <class K, class V>
@@ -38,8 +36,6 @@ FrequencyCache<K, V>::~FrequencyCache()
 template <class K, class V>
 void FrequencyCache<K, V>::clear()
 {
-    QMutexLocker locker(&m_mutex);
-
     m_hash.clear();
     m_frequency.clear();
 }
@@ -56,8 +52,6 @@ void FrequencyCache<K, V>::trim()
                  leastVisited = it;
              }
         }
-
-        QMutexLocker locker(&m_mutex);
 
         m_hash.remove(leastVisited.key());
         m_frequency.remove(leastVisited.key());

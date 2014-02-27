@@ -11,6 +11,8 @@
 FrequencyCache<QString, QSharedPointer<Qt7zPackage> >
     SevenzImageSource::m_packageCache(QThread::idealThreadCount());
 
+QMutex SevenzImageSource::m_mutex;
+
 SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName)
 {
     m_packagePath = searchRealPath(packagePath);
@@ -43,6 +45,7 @@ bool SevenzImageSource::open()
     hashBuilder << QString::number(threadId, 16)
                 << "#" << m_packagePath;
 
+    m_mutex.lock();
     QSharedPointer<Qt7zPackage> pkg = m_packageCache.find(hash);
     if (pkg.isNull()) {
         pkg = QSharedPointer<Qt7zPackage>(new Qt7zPackage(m_packagePath));
@@ -51,6 +54,7 @@ bool SevenzImageSource::open()
             m_packageCache.insert(hash, pkg);
         }
     }
+    m_mutex.unlock();
 
     if (!pkg->isOpen()) {
         delete buffer;
