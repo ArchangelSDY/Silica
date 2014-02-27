@@ -7,6 +7,13 @@ AbstractGalleryItemRenderer::AbstractGalleryItemRenderer(
 {
 }
 
+AbstractGalleryItemRenderer::~AbstractGalleryItemRenderer()
+{
+    if (m_parentRenderer) {
+        delete m_parentRenderer;
+    }
+}
+
 void AbstractGalleryItemRenderer::setImage(const QImage *image)
 {
     m_image = image;

@@ -7,7 +7,7 @@ class AbstractGalleryItemRenderer
 {
 public:
     AbstractGalleryItemRenderer(AbstractGalleryItemRenderer *parentRenderer = 0);
-    virtual ~AbstractGalleryItemRenderer() {}
+    virtual ~AbstractGalleryItemRenderer();
 
     void setImage(const QImage *image);
 
