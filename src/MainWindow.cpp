@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             &m_navigator, SLOT(goIndex(int)));
 
-    // Navigation binding for galery
+    // Navigation binding for gallery
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
 
@@ -174,6 +174,8 @@ void MainWindow::setupExtraUi()
     ui->pageGallery->layout()->setMargin(0);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             actToolBarImage, SLOT(trigger()));
+    connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
+            actToolBarGallery, SLOT(trigger()));
 
     ui->pageImageView->layout()->setMargin(0);
 

@@ -73,6 +73,11 @@ void MainGraphicsView::resizeEvent(QResizeEvent *)
     fitInViewIfNecessary();
 }
 
+void MainGraphicsView::mouseDoubleClickEvent(QMouseEvent *)
+{
+    emit mouseDoubleClicked();
+}
+
 void MainGraphicsView::fitGridInView(int grid)
 {
     qreal width = sceneRect().width() / 3;

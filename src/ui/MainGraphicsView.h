@@ -22,6 +22,9 @@ public:
     void fitInViewIfNecessary();
     void toggleFitInView();
 
+signals:
+    void mouseDoubleClicked();
+
 private slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
@@ -29,6 +32,7 @@ private slots:
 protected:
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
+    virtual void mouseDoubleClickEvent(QMouseEvent *);
 
 private:
     QGraphicsScene *m_scene;
