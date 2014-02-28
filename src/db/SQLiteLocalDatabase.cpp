@@ -1,3 +1,4 @@
+#include "PlayList.h"
 #include "SQLiteLocalDatabase.h"
 
 const char *DB_NAME = "local.db";

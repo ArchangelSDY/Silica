@@ -4,6 +4,7 @@
 #include <QList>
 #include <QObject>
 
+#include "Image.h"
 #include "PlayListRecord.h"
 
 class LocalDatabase : public QObject

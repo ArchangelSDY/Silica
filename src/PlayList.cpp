@@ -1,7 +1,13 @@
 #include "ImageSourceManager.h"
 #include "PlayList.h"
 
-PlayList::PlayList(const QList<QUrl> &imageUrls)
+PlayList::PlayList() :
+    m_record(0)
+{
+}
+
+PlayList::PlayList(const QList<QUrl> &imageUrls) :
+    m_record(0)
 {
     foreach(const QUrl &imageUrl, imageUrls) {
         addPath(imageUrl);

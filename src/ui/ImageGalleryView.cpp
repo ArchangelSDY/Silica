@@ -55,7 +55,25 @@ void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
+    if (m_navigator->playList()->record() != 0) {
+        QAction *actSetAsCover =
+            menu.addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
+        if (scene()->selectedItems().count() == 0) {
+            actSetAsCover->setEnabled(false);
+        }
+    }
+
     menu.exec(event->globalPos());
+}
+
+void ImageGalleryView::mousePressEvent(QMouseEvent *ev)
+{
+    if (ev->button() == Qt::RightButton) {
+        ev->accept();
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(ev);
 }
 
 void ImageGalleryView::sortByName()
@@ -101,4 +119,18 @@ void ImageGalleryView::setLooseRenderer()
 void ImageGalleryView::setCompactRenderer()
 {
     setRendererFactory(new CompactRendererFactory());
+}
+
+void ImageGalleryView::setAsCover()
+{
+    if (scene()->selectedItems().count() > 0) {
+        ImageGalleryItem *item =
+            static_cast<ImageGalleryItem *>(scene()->selectedItems()[0]);
+        PlayListRecord *record = m_navigator->playList()->record();
+
+        if (record) {
+             record->setCoverPath(item->image()->thumbnailPath());
+             record->save();
+        }
+    }
 }

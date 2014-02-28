@@ -24,8 +24,11 @@ private slots:
     void setLooseRenderer();
     void setCompactRenderer();
 
+    void setAsCover();
+
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 
 private:
     void setRendererFactory(AbstractRendererFactory *factory);

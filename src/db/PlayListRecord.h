@@ -1,7 +1,9 @@
 #ifndef PLAYLISTRECORD_H
 #define PLAYLISTRECORD_H
 
-#include "PlayList.h"
+#include <QString>
+
+class PlayList;
 
 class PlayListRecord
 {
