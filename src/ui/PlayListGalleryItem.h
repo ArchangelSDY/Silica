@@ -18,15 +18,14 @@ public:
     QRectF boundingRect() const;
     PlayListRecord *record() { return m_record; }
 
-    void layout();
+private slots:
+    void loadThumbnail();
 
 protected:
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *, QWidget *);
 
 private:
-    void loadThumbnail();
-
     PlayListRecord *m_record;
     QImage *m_image;
     AbstractGalleryItemRenderer *m_renderer;

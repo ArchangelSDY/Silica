@@ -64,7 +64,6 @@ void PlayListGalleryView::renameSelectedItem()
         if (!newName.isEmpty()) {
             record->setName(newName);
             record->save();
-            item->layout();
         }
     }
 }

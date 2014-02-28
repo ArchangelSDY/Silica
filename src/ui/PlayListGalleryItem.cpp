@@ -15,6 +15,8 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
+    connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
+
     loadThumbnail();
 }
 
@@ -34,19 +36,14 @@ void PlayListGalleryItem::loadThumbnail()
     }
 
     m_image = new QImage(m_record->coverPath());
-    m_renderer->setImage(const_cast<QImage *>(m_image));
 
-    layout();
-}
-
-void PlayListGalleryItem::layout()
-{
     delete m_renderer;
     m_renderer = new CompactTitleRenderer(m_record->name(),
         new CompactImageRenderer());
-    m_renderer->setImage(m_image);
+    m_renderer->setImage(const_cast<QImage *>(m_image));
     m_renderer->layout();
-    update(boundingRect());
+
+    update();
 }
 
 QRectF PlayListGalleryItem::boundingRect() const

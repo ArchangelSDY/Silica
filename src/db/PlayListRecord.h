@@ -1,15 +1,17 @@
 #ifndef PLAYLISTRECORD_H
 #define PLAYLISTRECORD_H
 
+#include <QObject>
 #include <QString>
 
 class PlayList;
 
-class PlayListRecord
+class PlayListRecord : public QObject
 {
+    Q_OBJECT
 public:
     PlayListRecord(const QString &name, const QString &coverPath,
-        PlayList *playList = 0);
+        PlayList *playList = 0, QObject *parent = 0);
 
     int id() const { return m_id; }
     void setId(int id) { m_id = id; }
@@ -25,6 +27,9 @@ public:
     static QList<PlayListRecord *> all();
     bool save();
     bool remove();
+
+signals:
+    void saved();
 
 private:
     static const int EMPTY_ID = -1;
