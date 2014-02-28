@@ -25,6 +25,8 @@ const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists wher
 
 const char *SQL_REMOVE_PLAYLIST_BY_ID = "delete from playlists where id = ?";
 
+const char *SQL_UPDATE_PLAYLIST_BY_ID = "update playlists set name = ?, cover_path = ? where id = ?";
+
 const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.name from images "
         "left join playlist_images on images.id = playlist_images.image_id "
         "join playlists on playlists.id = playlist_images.playlist_id "
@@ -184,6 +186,16 @@ bool SQLiteLocalDatabase::removePlayListRecord(PlayListRecord *playListRecord)
 {
     QSqlQuery q;
     q.prepare(SQL_REMOVE_PLAYLIST_BY_ID);
+    q.addBindValue(playListRecord->id());
+    return q.exec();
+}
+
+bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
+{
+    QSqlQuery q;
+    q.prepare(SQL_UPDATE_PLAYLIST_BY_ID);
+    q.addBindValue(playListRecord->name());
+    q.addBindValue(playListRecord->coverPath());
     q.addBindValue(playListRecord->id());
     return q.exec();
 }

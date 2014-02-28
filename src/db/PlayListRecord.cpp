@@ -4,7 +4,7 @@
 PlayListRecord::PlayListRecord(const QString &name,
                                const QString &coverPath,
                                PlayList *playList) :
-    m_id(0) ,
+    m_id(PlayListRecord::EMPTY_ID) ,
     m_name(name) ,
     m_coverPath(coverPath) ,
     m_playList(playList)
@@ -33,7 +33,11 @@ QList<PlayListRecord> PlayListRecord::all()
 
 bool PlayListRecord::save()
 {
-    return LocalDatabase::instance()->insertPlayListRecord(this);
+    if (m_id == PlayListRecord::EMPTY_ID) {
+        return LocalDatabase::instance()->insertPlayListRecord(this);
+    } else {
+        return LocalDatabase::instance()->updatePlayListRecord(this);
+    }
 }
 
 bool PlayListRecord::remove()

@@ -25,6 +25,8 @@ public:
     bool remove();
 
 private:
+    static const int EMPTY_ID = -1;
+
     int m_id;
     QString m_name;
     QString m_coverPath;

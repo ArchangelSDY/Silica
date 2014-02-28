@@ -83,6 +83,41 @@ void TestLocalDatabase::playListRemove()
     QCOMPARE(it, recordsAfterRemove.end());
 }
 
+void TestLocalDatabase::playListUpdate()
+{
+    QList<QUrl> imageUrls;
+    imageUrls << QUrl("file:///me.jpg");
+    PlayList pl(imageUrls);
+    PlayListRecord record("test_update", "cover.jpg", &pl);
+    record.save();
+
+    QList<PlayListRecord> recordsAfterSave = PlayListRecord::all();
+    QList<PlayListRecord>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  it->name() != "test_update") {
+        it++;
+    }
+
+    if (it == recordsAfterSave.end()) {
+        QFAIL("Cannot find saved playlist.");
+        return;
+    }
+
+    PlayListRecord &savedRecord = *it;
+    savedRecord.setCoverPath("new_cover.jpg");
+    savedRecord.setName("test_update_new");
+    bool ok = savedRecord.save();
+
+    QCOMPARE(ok, true);
+
+    QList<PlayListRecord> recordsAfterUpdate = PlayListRecord::all();
+    it = recordsAfterUpdate.begin();
+    while (it != recordsAfterUpdate.end() && it->name() != "test_update_new") {
+        it++;
+    }
+
+    QCOMPARE(it->coverPath(), QString("new_cover.jpg"));
+}
+
 void TestLocalDatabase::insertImage()
 {
     QFETCH(QUrl, imageUrl);
