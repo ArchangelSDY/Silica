@@ -30,6 +30,14 @@ ImageGalleryItem::~ImageGalleryItem()
     }
 }
 
+void ImageGalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
+{
+    delete m_renderer;
+    m_renderer = renderer;
+    m_renderer->setImage(m_thumbnail);
+    m_renderer->layout();
+}
+
 QRectF ImageGalleryItem::boundingRect() const
 {
     return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());

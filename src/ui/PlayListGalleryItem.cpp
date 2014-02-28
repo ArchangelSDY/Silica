@@ -24,6 +24,7 @@ PlayListGalleryItem::~PlayListGalleryItem()
     if (m_image) {
         delete m_image;
     }
+    delete m_renderer;
 }
 
 void PlayListGalleryItem::loadThumbnail()

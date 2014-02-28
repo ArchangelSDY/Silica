@@ -1,7 +1,9 @@
 #include <QMenu>
 
+#include "CompactImageRenderer.h"
 #include "ImageGalleryItem.h"
 #include "ImageGalleryView.h"
+#include "LooseImageRenderer.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
@@ -37,13 +39,14 @@ void ImageGalleryView::playListAppend(PlayList appended)
 void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
-    QMenu *sorts = menu.addMenu("Sort By");
-    QAction *byNameAct = sorts->addAction("Name");
-    connect(byNameAct, SIGNAL(triggered()),
-            this, SLOT(sortByName()));
-    QAction *byAspectRatioAct = sorts->addAction("Aspect Ratio");
-    connect(byAspectRatioAct, SIGNAL(triggered()),
-            this, SLOT(sortByAspectRatio()));
+
+    QMenu *sorts = menu.addMenu(tr("Sort By"));
+    sorts->addAction(tr("Name"), this, SLOT(sortByName()));
+    sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
+
+    QMenu *renderers = menu.addMenu(tr("Layout"));
+    renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
+    renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
     menu.exec(event->globalPos());
 }
@@ -68,4 +71,23 @@ void ImageGalleryView::sortByAspectRatio()
     PlayList pl(*m_navigator->playList());
     pl.sortByAspectRatio();
     m_navigator->setPlayList(pl);
+}
+
+
+void ImageGalleryView::setLooseRenderer()
+{
+    foreach (QGraphicsItem *item, scene()->items()) {
+        ImageGalleryItem *imageItem = static_cast<ImageGalleryItem *>(item);
+        imageItem->setRenderer(new LooseImageRenderer());
+    }
+    update();
+}
+
+void ImageGalleryView::setCompactRenderer()
+{
+    foreach (QGraphicsItem *item, scene()->items()) {
+        ImageGalleryItem *imageItem = static_cast<ImageGalleryItem *>(item);
+        imageItem->setRenderer(new CompactImageRenderer());
+    }
+    update();
 }

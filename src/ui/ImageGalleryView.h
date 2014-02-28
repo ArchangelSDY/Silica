@@ -1,6 +1,7 @@
 #ifndef IMAGEGALLERYVIEW_H
 #define IMAGEGALLERYVIEW_H
 
+#include "AbstractGalleryItemRenderer.h"
 #include "GalleryView.h"
 
 class ImageGalleryView : public GalleryView
@@ -15,8 +16,12 @@ public slots:
     void playListChange(PlayList playList);
     void playListAppend(PlayList appended);
 
+private slots:
     void sortByName();
     void sortByAspectRatio();
+
+    void setLooseRenderer();
+    void setCompactRenderer();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);

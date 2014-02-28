@@ -18,6 +18,8 @@ public:
     QRectF boundingRect() const;
     Image *image() { return m_image; }
 
+    void setRenderer(AbstractGalleryItemRenderer *renderer);
+
 private slots:
     void thumbnailLoaded();
 
