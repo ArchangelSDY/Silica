@@ -20,8 +20,8 @@ public:
 
     PlayList *playList();
 
-    static QList<PlayListRecord> fromLocalDatabase();
-    bool saveToLocalDatabase();
+    static QList<PlayListRecord> all();
+    bool save();
     bool remove();
 
 private:

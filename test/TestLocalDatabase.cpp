@@ -29,10 +29,10 @@ void TestLocalDatabase::playListsSaveAndLoad()
 
     int beforeCount = LocalDatabase::instance()->queryPlayListRecords().count();
 
-    bool ret = record.saveToLocalDatabase();
+    bool ret = record.save();
     QVERIFY(ret);
 
-    QList<PlayListRecord> records = PlayListRecord::fromLocalDatabase();
+    QList<PlayListRecord> records = PlayListRecord::all();
     QCOMPARE(records.count(), beforeCount + 1);
 
     PlayListRecord &savedRecord = records[0];
@@ -58,9 +58,9 @@ void TestLocalDatabase::playListRemove()
     imageUrls << QUrl("file:///me.jpg");
     PlayList pl(imageUrls);
     PlayListRecord record("test_remove", "cover.jpg", &pl);
-    record.saveToLocalDatabase();
+    record.save();
 
-    QList<PlayListRecord> recordsAfterSave = PlayListRecord::fromLocalDatabase();
+    QList<PlayListRecord> recordsAfterSave = PlayListRecord::all();
     QList<PlayListRecord>::iterator it = recordsAfterSave.begin();
     while (it != recordsAfterSave.end() &&  it->name() != "test_remove") {
         it++;
@@ -74,7 +74,7 @@ void TestLocalDatabase::playListRemove()
     bool ok = it->remove();
     QCOMPARE(ok, true);
 
-    QList<PlayListRecord> recordsAfterRemove = PlayListRecord::fromLocalDatabase();
+    QList<PlayListRecord> recordsAfterRemove = PlayListRecord::all();
     it = recordsAfterRemove.begin();
     while (it != recordsAfterRemove.end() && it->name() != "test_remove") {
         it++;

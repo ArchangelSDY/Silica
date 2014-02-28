@@ -187,7 +187,7 @@ void MainWindow::setupExtraUi()
 void MainWindow::loadSavedPlayLists()
 {
     ui->playListGallery->setPlayListRecords(
-        PlayListRecord::fromLocalDatabase());
+        PlayListRecord::all());
 }
 
 void MainWindow::loadSelectedPlayList()
@@ -304,7 +304,7 @@ void MainWindow::promptToSavePlayList()
     if (!name.isEmpty()) {
         PlayListRecord record(name, image->thumbnailPath(),
                               m_navigator.playList());
-        if (record.saveToLocalDatabase()) {
+        if (record.save()) {
             statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
                                      2000);
 
