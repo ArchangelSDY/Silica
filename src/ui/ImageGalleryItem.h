@@ -12,6 +12,7 @@ class ImageGalleryItem : public QObject, public QGraphicsItem
     Q_INTERFACES(QGraphicsItem)
 public:
     explicit ImageGalleryItem(Image *image,
+                              AbstractGalleryItemRenderer *renderer,
                               QGraphicsItem *parent = 0);
     ~ImageGalleryItem();
 

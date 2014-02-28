@@ -9,11 +9,12 @@ static const int PADDING = 10;
 static const int BORDER = 5;
 
 ImageGalleryItem::ImageGalleryItem(Image *image,
+                                   AbstractGalleryItemRenderer *renderer,
                                    QGraphicsItem *parent) :
     QGraphicsItem(parent) ,
     m_image(image) ,
     m_thumbnail(0) ,
-    m_renderer(new LooseImageRenderer())
+    m_renderer(renderer)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
