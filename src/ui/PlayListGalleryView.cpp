@@ -1,5 +1,6 @@
 #include <QInputDialog>
 #include <QMenu>
+#include <QMessageBox>
 
 #include "PlayListGalleryItem.h"
 #include "PlayListGalleryView.h"
@@ -71,13 +72,16 @@ void PlayListGalleryView::renameSelectedItem()
 void PlayListGalleryView::removeSelectedItems()
 {
     if (scene()->selectedItems().count() > 0) {
-        foreach (QGraphicsItem *item, scene()->selectedItems()) {
-            PlayListGalleryItem *playListItem =
-                static_cast<PlayListGalleryItem *>(item);
-            playListItem->record()->remove();
-            scene()->removeItem(item);
-        }
+        if (QMessageBox::question(this,
+            tr("Remove"), tr("Remove this playlist?")) == QMessageBox::Yes) {
+            foreach (QGraphicsItem *item, scene()->selectedItems()) {
+                PlayListGalleryItem *playListItem =
+                    static_cast<PlayListGalleryItem *>(item);
+                playListItem->record()->remove();
+                scene()->removeItem(item);
+            }
 
-        layout();
+            layout();
+        }
     }
 }
