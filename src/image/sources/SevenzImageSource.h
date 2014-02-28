@@ -2,6 +2,7 @@
 #define SEVENZIMAGESOURCE_H
 
 #include <QBuffer>
+#include <QMutex>
 
 #include <FrequencyCache.h>
 #include "ImageSource.h"
