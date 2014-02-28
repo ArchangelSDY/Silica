@@ -35,8 +35,17 @@ void PlayListGalleryItem::loadThumbnail()
 
     m_image = new QImage(m_record->coverPath());
     m_renderer->setImage(const_cast<QImage *>(m_image));
-    m_renderer->layout();
 
+    layout();
+}
+
+void PlayListGalleryItem::layout()
+{
+    delete m_renderer;
+    m_renderer = new CompactTitleRenderer(m_record->name(),
+        new CompactImageRenderer());
+    m_renderer->setImage(m_image);
+    m_renderer->layout();
     update(boundingRect());
 }
 

@@ -1,3 +1,4 @@
+#include <QInputDialog>
 #include <QMenu>
 
 #include "PlayListGalleryItem.h"
@@ -24,9 +25,15 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord> records)
 void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
+
+    QAction *actRename =
+        menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
+    if (scene()->selectedItems().count() == 0) {
+        actRename->setEnabled(false);
+    }
+
     QAction *actRemove =
         menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
-
     if (scene()->selectedItems().count() == 0) {
         actRemove->setEnabled(false);
     }
@@ -42,6 +49,25 @@ void PlayListGalleryView::mousePressEvent(QMouseEvent *ev)
     }
 
     QGraphicsView::mousePressEvent(ev);
+}
+
+void PlayListGalleryView::renameSelectedItem()
+{
+    if (scene()->selectedItems().count() > 0) {
+        PlayListGalleryItem *item =
+            static_cast<PlayListGalleryItem *>(scene()->selectedItems()[0]);
+        PlayListRecord *record = item->record();
+
+        QString newName = QInputDialog::getText(
+            0, "Rename PlayList", "New Name",
+            QLineEdit::Normal, record->name());
+
+        if (!newName.isEmpty()) {
+            record->setName(newName);
+            record->save();
+            item->layout();
+        }
+    }
 }
 
 void PlayListGalleryView::removeSelectedItems()

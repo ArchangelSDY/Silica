@@ -18,6 +18,8 @@ public:
     QRectF boundingRect() const;
     PlayListRecord *record() { return m_record; }
 
+    void layout();
+
 protected:
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *, QWidget *);

@@ -14,6 +14,7 @@ public slots:
     void setPlayListRecords(QList<PlayListRecord> records);
 
 private slots:
+    void renameSelectedItem();
     void removeSelectedItems();
 
 protected:
