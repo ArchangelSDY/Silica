@@ -86,9 +86,9 @@ void SQLiteLocalDatabase::createTablesIfNecessary()
     }
 }
 
-QList<PlayListRecord> SQLiteLocalDatabase::queryPlayListRecords()
+QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
 {
-    QList<PlayListRecord> records;
+    QList<PlayListRecord *> records;
 
     if (!m_db.isOpen()) {
         return records;
@@ -102,8 +102,8 @@ QList<PlayListRecord> SQLiteLocalDatabase::queryPlayListRecords()
         QString name = q.value(1).toString();
         QString coverPath = q.value(2).toString();
 
-        PlayListRecord record(name, coverPath);
-        record.setId(id);
+        PlayListRecord *record = new PlayListRecord(name, coverPath);
+        record->setId(id);
         records << record;
     }
 

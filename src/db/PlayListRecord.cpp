@@ -28,7 +28,7 @@ PlayList *PlayListRecord::playList()
     return m_playList;
 }
 
-QList<PlayListRecord> PlayListRecord::all()
+QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();
 }

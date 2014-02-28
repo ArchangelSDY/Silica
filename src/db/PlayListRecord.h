@@ -22,7 +22,7 @@ public:
 
     PlayList *playList();
 
-    static QList<PlayListRecord> all();
+    static QList<PlayListRecord *> all();
     bool save();
     bool remove();
 

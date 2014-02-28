@@ -9,13 +9,12 @@ PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
 {
 }
 
-void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord> records)
+void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
 {
     clear();
 
     for (int i = 0; i < records.count(); ++i) {
-        PlayListGalleryItem *item = new PlayListGalleryItem(
-            new PlayListRecord(records[i]));
+        PlayListGalleryItem *item = new PlayListGalleryItem(records[i]);
         m_scene->addItem(item);
     }
 

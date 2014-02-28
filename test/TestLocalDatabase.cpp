@@ -32,13 +32,17 @@ void TestLocalDatabase::playListsSaveAndLoad()
     bool ret = record.save();
     QVERIFY(ret);
 
-    QList<PlayListRecord> records = PlayListRecord::all();
+    QList<PlayListRecord *> records = PlayListRecord::all();
     QCOMPARE(records.count(), beforeCount + 1);
 
-    PlayListRecord &savedRecord = records[0];
-    QCOMPARE(savedRecord.name(), name);
-    QCOMPARE(savedRecord.coverPath(), pl[0]->thumbnailPath());
-    QCOMPARE(savedRecord.playList()->count(), pl.count());
+    PlayListRecord *savedRecord = records[0];
+    QCOMPARE(savedRecord->name(), name);
+    QCOMPARE(savedRecord->coverPath(), pl[0]->thumbnailPath());
+    QCOMPARE(savedRecord->playList()->count(), pl.count());
+
+    while (!records.isEmpty()) {
+        delete records.takeFirst();
+    }
 }
 
 void TestLocalDatabase::playListsSaveAndLoad_data()
@@ -60,9 +64,9 @@ void TestLocalDatabase::playListRemove()
     PlayListRecord record("test_remove", "cover.jpg", &pl);
     record.save();
 
-    QList<PlayListRecord> recordsAfterSave = PlayListRecord::all();
-    QList<PlayListRecord>::iterator it = recordsAfterSave.begin();
-    while (it != recordsAfterSave.end() &&  it->name() != "test_remove") {
+    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
+    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_remove") {
         it++;
     }
 
@@ -71,12 +75,12 @@ void TestLocalDatabase::playListRemove()
         return;
     }
 
-    bool ok = it->remove();
+    bool ok = (*it)->remove();
     QCOMPARE(ok, true);
 
-    QList<PlayListRecord> recordsAfterRemove = PlayListRecord::all();
+    QList<PlayListRecord *> recordsAfterRemove = PlayListRecord::all();
     it = recordsAfterRemove.begin();
-    while (it != recordsAfterRemove.end() && it->name() != "test_remove") {
+    while (it != recordsAfterRemove.end() && (*it)->name() != "test_remove") {
         it++;
     }
 
@@ -91,9 +95,9 @@ void TestLocalDatabase::playListUpdate()
     PlayListRecord record("test_update", "cover.jpg", &pl);
     record.save();
 
-    QList<PlayListRecord> recordsAfterSave = PlayListRecord::all();
-    QList<PlayListRecord>::iterator it = recordsAfterSave.begin();
-    while (it != recordsAfterSave.end() &&  it->name() != "test_update") {
+    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
+    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_update") {
         it++;
     }
 
@@ -102,20 +106,20 @@ void TestLocalDatabase::playListUpdate()
         return;
     }
 
-    PlayListRecord &savedRecord = *it;
-    savedRecord.setCoverPath("new_cover.jpg");
-    savedRecord.setName("test_update_new");
-    bool ok = savedRecord.save();
+    PlayListRecord *savedRecord = *it;
+    savedRecord->setCoverPath("new_cover.jpg");
+    savedRecord->setName("test_update_new");
+    bool ok = savedRecord->save();
 
     QCOMPARE(ok, true);
 
-    QList<PlayListRecord> recordsAfterUpdate = PlayListRecord::all();
+    QList<PlayListRecord *> recordsAfterUpdate = PlayListRecord::all();
     it = recordsAfterUpdate.begin();
-    while (it != recordsAfterUpdate.end() && it->name() != "test_update_new") {
+    while (it != recordsAfterUpdate.end() && (*it)->name() != "test_update_new") {
         it++;
     }
 
-    QCOMPARE(it->coverPath(), QString("new_cover.jpg"));
+    QCOMPARE((*it)->coverPath(), QString("new_cover.jpg"));
 }
 
 void TestLocalDatabase::insertImage()

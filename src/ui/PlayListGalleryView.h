@@ -11,7 +11,7 @@ public:
     explicit PlayListGalleryView(QWidget *parent = 0);
 
 public slots:
-    void setPlayListRecords(QList<PlayListRecord> records);
+    void setPlayListRecords(QList<PlayListRecord *> records);
 
 private slots:
     void renameSelectedItem();

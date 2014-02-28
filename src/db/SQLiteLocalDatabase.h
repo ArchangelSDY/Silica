@@ -12,7 +12,7 @@ class SQLiteLocalDatabase : public LocalDatabase
 public:
     SQLiteLocalDatabase();
 
-    QList<PlayListRecord> queryPlayListRecords();
+    QList<PlayListRecord *> queryPlayListRecords();
     QStringList queryImageUrlsForPlayList(int playListId);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
