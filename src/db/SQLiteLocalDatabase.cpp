@@ -11,7 +11,7 @@ const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) value
 const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
         "?, (select id from images where hash = ?))";
 
-const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path from playlists";
+const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path from playlists order by name";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
