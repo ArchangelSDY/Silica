@@ -180,6 +180,12 @@ void MainWindow::setupExtraUi()
     ui->pageImageView->layout()->setMargin(0);
 
 
+    // Image view
+    // TODO: Cannot make it expand so have to resize manually.
+    // Should fix this hack in the future
+    ui->graphicsView->resize(size());
+
+
     // PlayList gallery
     // TODO: Lazy load here
     loadSavedPlayLists();
