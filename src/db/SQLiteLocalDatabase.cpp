@@ -26,7 +26,7 @@ const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.
         "join playlists on playlists.id = playlist_images.playlist_id "
         "where playlists.id = ?";
 
-const char *SQL_INSERT_IMAGE = "insert into images(hash, name, url) values (?, ?, ?)";
+const char *SQL_INSERT_IMAGE = "insert or ignore into images(hash, name, url) values (?, ?, ?)";
 
 const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
 
