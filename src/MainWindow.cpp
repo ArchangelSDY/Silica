@@ -25,6 +25,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
+    m_actToolBarFav(0) ,
+    m_actToolBarGallery(0) ,
+    m_actToolBarImage(0) ,
     m_database(new AsunaDatabase()) ,
     m_commandInterpreter(&m_navigator, m_database) ,
     m_inputMode(InputMode_Control)
@@ -127,40 +130,37 @@ void MainWindow::setupExtraUi()
     QIcon toolBarFavIcon(":/res/toolbar/fav.png");
     toolBarFavIcon.addFile(":/res/toolbar/fav-active.png",
                            QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarFav = m_toolBar->addAction(
+    m_actToolBarFav = m_toolBar->addAction(
         toolBarFavIcon, tr("Favourite"), toolBarSigMapper, SLOT(map()));
-    actToolBarFav->setCheckable(true);
-    actToolBarFav->setShortcut(Qt::CTRL + Qt::Key_1);
-    m_toolBarActs->addAction(actToolBarFav);
-    toolBarSigMapper->setMapping(actToolBarFav, 0);
+    m_actToolBarFav->setCheckable(true);
+    m_actToolBarFav->setShortcut(Qt::CTRL + Qt::Key_1);
+    m_toolBarActs->addAction(m_actToolBarFav);
+    toolBarSigMapper->setMapping(m_actToolBarFav, 0);
 
     // Gallery icon
     QIcon toolBarGalleryIcon(":/res/toolbar/gallery.png");
     toolBarGalleryIcon.addFile(":/res/toolbar/gallery-active.png",
                                QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarGallery = m_toolBar->addAction(
+    m_actToolBarGallery = m_toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
-    actToolBarGallery->setCheckable(true);
-    actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
-    m_toolBarActs->addAction(actToolBarGallery);
-    toolBarSigMapper->setMapping(actToolBarGallery, 1);
-
-    // Switch to gallery view on playlist changed
-    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
-            actToolBarGallery, SLOT(trigger()));
+    m_actToolBarGallery->setCheckable(true);
+    m_actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
+    m_toolBarActs->addAction(m_actToolBarGallery);
+    toolBarSigMapper->setMapping(m_actToolBarGallery, 1);
 
     // Image icon
     QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
     toolBarImageIcon.addFile(":/res/toolbar/image-view-active.png",
                              QSize(), QIcon::Active, QIcon::On);
-    QAction *actToolBarImage = m_toolBar->addAction(
+    m_actToolBarImage = m_toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
-    actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
-    actToolBarImage->setCheckable(true);
-    m_toolBarActs->addAction(actToolBarImage);
-    toolBarSigMapper->setMapping(actToolBarImage, 2);
+    m_actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
+    m_actToolBarImage->setCheckable(true);
+    m_toolBarActs->addAction(m_actToolBarImage);
+    toolBarSigMapper->setMapping(m_actToolBarImage, 2);
 
-    actToolBarFav->setChecked(true);
+    // Fav view is the default
+    m_actToolBarFav->setChecked(true);
     addToolBar(Qt::LeftToolBarArea, m_toolBar);
 
 
@@ -169,15 +169,16 @@ void MainWindow::setupExtraUi()
     connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadSelectedPlayList()));
     connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
-            actToolBarGallery, SLOT(trigger()));
+            m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageGallery->layout()->setMargin(0);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
-            actToolBarImage, SLOT(trigger()));
+            m_actToolBarImage, SLOT(trigger()));
     connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
-            actToolBarGallery, SLOT(trigger()));
+            m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageImageView->layout()->setMargin(0);
+
 
     // PlayList gallery
     // TODO: Lazy load here
@@ -344,6 +345,11 @@ void MainWindow::playListChange(PlayList playList)
     ui->playListWidget->clear();
 
     playListAppend(playList);
+
+    // Switch to gallery view if playlist is not empty
+    if (!playList.isEmpty()) {
+        m_actToolBarGallery->trigger();
+    }
 }
 
 void MainWindow::playListAppend(PlayList appended)

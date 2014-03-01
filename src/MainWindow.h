@@ -61,6 +61,9 @@ private:
     Ui::MainWindow *ui;
     QToolBar *m_toolBar;
     QActionGroup *m_toolBarActs;
+    QAction *m_actToolBarFav;
+    QAction *m_actToolBarGallery;
+    QAction *m_actToolBarImage;
 
     Navigator m_navigator;
     RemoteDatabase *m_database;
