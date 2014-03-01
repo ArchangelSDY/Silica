@@ -34,11 +34,13 @@ RESOURCES += $$PWD/*.qrc
 
 INCLUDEPATH += \
     $$PWD/deps/quazip/quazip \
-    $$PWD/deps/Qt7z/Qt7z
+    $$PWD/deps/Qt7z/Qt7z \
+    $$PWD/deps/QtDBMigration/src
 
 DEPENDPATH += \
     $$PWD/deps/quazip/quazip \
-    $$PWD/deps/Qt7z/Qt7z
+    $$PWD/deps/Qt7z/Qt7z \
+    $$PWD/deps/QtDBMigration/src
 
 macx {
     LIBS += -L/usr/local/opt/zlib/lib/ -lz
@@ -48,6 +50,9 @@ macx {
 
     LIBS += -L$$PWD/deps/Qt7z/Qt7z -lQt7z
     PRE_TARGETDEPS += $$PWD/deps/Qt7z/Qt7z/libQt7z.a
+
+    LIBS += -L$$PWD/deps/QtDBMigration/src -lQtDBMigration
+    PRE_TARGETDEPS += $$PWD/deps/QtDBMigration/src/libQtDBMigration.a
 
     config.path = $$OUT_PWD/silica.app/Contents/MacOS/config/Asuna
     config.files = $$PWD/assets/Silica.ini
@@ -64,6 +69,9 @@ linux {
 
     LIBS += -L$$PWD/deps/Qt7z/Qt7z -lQt7z
     PRE_TARGETDEPS += $$PWD/deps/Qt7z/Qt7z/libQt7z.a
+
+    LIBS += -L$$PWD/deps/QtDBMigration/src -lQtDBMigration
+    PRE_TARGETDEPS += $$PWD/deps/QtDBMigration/src/libQtDBMigration.a
 }
 
 win32 {
@@ -86,6 +94,7 @@ win32 {
     }
 
     # TODO: Add Qt7z
+    # TODO: Add QtDBMigration
 
     runtime.path = $$OUT_PWD
     runtime.files = \

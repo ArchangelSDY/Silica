@@ -1,3 +1,6 @@
 [submodule "src/deps/Qt7z"]
 	path = src/deps/Qt7z
 	url = ssh://git@archangelsdy.com:9687/Qt7z
+[submodule "src/deps/QtDBMigration"]
+	path = src/deps/QtDBMigration
+	url = ssh://git@archangelsdy.com:9687/QtDBMigration
