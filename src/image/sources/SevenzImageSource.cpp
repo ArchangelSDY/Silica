@@ -26,7 +26,7 @@ SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName)
 
     // Compute url
     m_url = QUrl::fromLocalFile(m_packagePath);
-    m_url.setScheme("7z");
+    m_url.setScheme("sevenz");
     m_url.setFragment(m_name);
 }
 
