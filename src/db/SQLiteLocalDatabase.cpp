@@ -4,8 +4,6 @@
 #include "PlayList.h"
 #include "SQLiteLocalDatabase.h"
 
-const char *DB_NAME = "local.db";
-
 const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 
 const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) values (?, ?)";
@@ -35,7 +33,7 @@ const char *SQL_QUERY_IMAGE_BY_HASH = "select url from images where hash = ? lim
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName(DB_NAME);
+    m_db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
     if (!m_db.open()) {
         qWarning("Unable to local open database!");
         return;

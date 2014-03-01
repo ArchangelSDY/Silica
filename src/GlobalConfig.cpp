@@ -39,6 +39,9 @@ void GlobalConfig::load()
     m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
     qDebug() << "WallpaperDir: " << m_wallpaperDir;
 
+    // Local database path
+    m_localDatabasePath = qApp->applicationDirPath() + "/local.db";
+
     // Migration config path
     m_migrationConfigPath = qApp->applicationDirPath() + "/migration.json";
 

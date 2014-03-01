@@ -12,6 +12,7 @@ public:
 
     QList<QString> zipDirs() const { return m_zipDirs; }
     const QString &wallpaperDir() const { return m_wallpaperDir; }
+    const QString &localDatabasePath() const { return m_localDatabasePath; }
     const QString &migrationConfigPath() const { return m_migrationConfigPath; }
     const QSize &galleryItemSize() const { return m_galleryItemSize; }
 private:
@@ -22,6 +23,7 @@ private:
     static GlobalConfig *m_instance;
     QList<QString> m_zipDirs;
     QString m_wallpaperDir;
+    QString m_localDatabasePath;
     QString m_migrationConfigPath;
     QSize m_galleryItemSize;
 };
