@@ -15,3 +15,8 @@ assets.files = $$PWD/assets/*
 assets.path = $$OUT_PWD/assets
 
 INSTALLS += assets
+
+migration.files = $$PWD/../src/assets/migration.json
+migration.path = $$OUT_PWD
+
+INSTALLS += migration

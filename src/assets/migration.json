@@ -1,0 +1,24 @@
+{
+    "schemaVersions": [
+        {
+            "version": 0,
+            "applySql": "create table playlists (id integer primary key autoincrement, name text, cover_path text)",
+            "revertSql": "drop table playlists"
+        },
+        {
+            "version": 1,
+            "applySql": "create table playlist_images (id integer primary key autoincrement, playlist_id integer references playlists on delete cascade, image_id integer references images on delete cascade)",
+            "revertSql": "drop table playlist_images"
+        },
+        {
+            "version": 2,
+            "applySql": "create table images (id integer primary key autoincrement, hash text unique, name text, url text)",
+            "revertSql": "drop table images"
+        },
+        {
+            "version": 3,
+            "applySql": "create index images_index_hash on images (hash)",
+            "revertSql": "drop index images_index_hash"
+        }
+    ]
+}

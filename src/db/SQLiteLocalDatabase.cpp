@@ -1,19 +1,12 @@
+#include "QtDBMigration.h"
+
+#include "GlobalConfig.h"
 #include "PlayList.h"
 #include "SQLiteLocalDatabase.h"
 
 const char *DB_NAME = "local.db";
 
 const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
-
-const char *SQL_CREATE_PLAYLISTS_TABLE = "create table playlists ("
-        "id integer primary key autoincrement, "
-        "name text,"
-        "cover_path text)";
-
-const char *SQL_CREATE_PLAYLIST_IMAGES_TABLE = "create table playlist_images ("
-        "id integer primary key autoincrement, "
-        "playlist_id integer references playlists on delete cascade, "
-        "image_id integer references images on delete cascade)";
 
 const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) values (?, ?)";
 
@@ -33,14 +26,6 @@ const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.
         "join playlists on playlists.id = playlist_images.playlist_id "
         "where playlists.id = ?";
 
-const char *SQL_CREATE_IMAGES_TABLE = "create table images ("
-        "id integer primary key autoincrement, "
-        "hash text unique, "
-        "name text, "
-        "url text)";
-
-const char *SQL_CREATE_IMAGES_INDEX = "create index images_index_hash on images (hash)";
-
 const char *SQL_INSERT_IMAGE = "insert into images(hash, name, url) values (?, ?, ?)";
 
 const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
@@ -55,35 +40,13 @@ SQLiteLocalDatabase::SQLiteLocalDatabase()
         qWarning("Unable to local open database!");
         return;
     }
+
+    QtDBMigration migration(GlobalConfig::instance()->migrationConfigPath());
+    if (!migration.migrate()) {
+        qCritical() << "Fail to migrate local database!";
+    }
+
     m_db.exec(SQL_ENABLE_FOREIGN_KEYS);
-}
-
-void SQLiteLocalDatabase::createTablesIfNecessary()
-{
-    QStringList tables = m_db.tables();
-    QSqlQuery q;
-
-    if (!tables.contains("playlists")) {
-        if (!q.exec(SQL_CREATE_PLAYLISTS_TABLE)) {
-            qWarning() << q.lastError() << q.lastQuery();
-        }
-    }
-
-    if (!tables.contains("playlist_images")) {
-        if (!q.exec(SQL_CREATE_PLAYLIST_IMAGES_TABLE)) {
-            qWarning() << q.lastError() << q.lastQuery();
-        }
-    }
-
-    if (!tables.contains("images")) {
-        if (!q.exec(SQL_CREATE_IMAGES_TABLE)) {
-            qWarning() << q.lastError() << q.lastQuery();
-        }
-
-        if (!q.exec(SQL_CREATE_IMAGES_INDEX)) {
-            qWarning() << q.lastError() << q.lastQuery();
-        }
-    }
 }
 
 QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
@@ -93,8 +56,6 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
     if (!m_db.isOpen()) {
         return records;
     }
-
-    createTablesIfNecessary();
 
     QSqlQuery q(SQL_QUERY_PLAYLISTS);
     while (q.next()) {
@@ -118,8 +79,6 @@ QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(int playListId)
         return imageUrls;
     }
 
-    createTablesIfNecessary();
-
     QSqlQuery q;
     q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
     q.addBindValue(playListId);
@@ -142,8 +101,6 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     if (!m_db.isOpen()) {
         return false;
     }
-
-    createTablesIfNecessary();
 
     // Insert playlist
     QSqlQuery qInsertPlayList;
@@ -207,8 +164,6 @@ int SQLiteLocalDatabase::queryImagesCount()
         return 0;
     }
 
-    createTablesIfNecessary();
-
     QSqlQuery q(SQL_QUERY_IMAGES_COUNT);
     if (q.first()) {
         return q.value(0).toInt();
@@ -222,8 +177,6 @@ bool SQLiteLocalDatabase::insertImage(Image *image)
     if (!m_db.isOpen()) {
         return false;
     }
-
-    createTablesIfNecessary();
 
     QSqlQuery q;
     q.prepare(SQL_INSERT_IMAGE);
@@ -244,8 +197,6 @@ Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
     if (!m_db.isOpen()) {
         return 0;
     }
-
-    createTablesIfNecessary();
 
     QSqlQuery q;
     q.prepare(SQL_QUERY_IMAGE_BY_HASH);

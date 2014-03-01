@@ -23,8 +23,6 @@ public:
     Image *queryImageByHashStr(const QString &hashStr);
 
 private:
-    void createTablesIfNecessary();
-
     QSqlDatabase m_db;
 };
 

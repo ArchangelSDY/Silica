@@ -21,7 +21,7 @@ public:
     virtual bool insertImage(Image *image) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
 
-    static LocalDatabase *instance() { return m_instance; }
+    static LocalDatabase *instance();
 
 protected:
     LocalDatabase(QObject *parent = 0);

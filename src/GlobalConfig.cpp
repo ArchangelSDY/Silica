@@ -1,6 +1,6 @@
-#include <QSettings>
-
+#include <QApplication>
 #include <QDebug>
+#include <QSettings>
 
 #include "GlobalConfig.h"
 
@@ -38,6 +38,9 @@ void GlobalConfig::load()
     // Wallpaper dir
     m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
     qDebug() << "WallpaperDir: " << m_wallpaperDir;
+
+    // Migration config path
+    m_migrationConfigPath = qApp->applicationDirPath() + "/migration.json";
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
