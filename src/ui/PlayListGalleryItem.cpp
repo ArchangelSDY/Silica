@@ -14,6 +14,7 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
     m_renderer(new CompactTitleRenderer(record->name(), new CompactImageRenderer()))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setToolTip(m_record->name());
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
 
