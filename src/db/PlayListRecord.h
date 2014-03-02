@@ -23,6 +23,7 @@ public:
     void setCoverPath(const QString &coverPath) { m_coverPath = coverPath; }
 
     PlayList *playList();
+    int coverIndex();
 
     static QList<PlayListRecord *> all();
     bool save();
@@ -33,10 +34,12 @@ signals:
 
 private:
     static const int EMPTY_ID = -1;
+    static const int EMPTY_COVER_INDEX = -1;
 
     int m_id;
     QString m_name;
     QString m_coverPath;
+    int m_coverIndex;
     PlayList *m_playList;
 };
 

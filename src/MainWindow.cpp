@@ -206,9 +206,19 @@ void MainWindow::loadSavedPlayLists()
 void MainWindow::loadSelectedPlayList()
 {
     if (ui->playListGallery->scene()->selectedItems().count() > 0) {
-        PlayListGalleryItem *selected = static_cast<PlayListGalleryItem *>(
+        PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(
             ui->playListGallery->scene()->selectedItems()[0]);
-        m_navigator.setPlayList(*selected->record()->playList());
+        m_navigator.setPlayList(*playListItem->record()->playList());
+
+        // Select cover image
+        const QList<QGraphicsItem *> &galleryItems =
+            ui->gallery->scene()->items(Qt::AscendingOrder);
+        int coverIndex = playListItem->record()->coverIndex();
+        if (coverIndex >=0 && coverIndex < galleryItems.count()) {
+            QGraphicsItem *coverImageItem = galleryItems.at(coverIndex);
+            ui->gallery->scene()->clearSelection();
+            coverImageItem->setSelected(true);
+        }
     }
 }
 
