@@ -10,6 +10,10 @@ CompactImageRenderer::CompactImageRenderer() :
 
 void CompactImageRenderer::layout()
 {
+    if (!m_image) {
+        return;
+    }
+
     QSize margins(2 * CompactImageRenderer::BORDER, 2 * CompactImageRenderer::BORDER);
     m_imageRect.setSize(GlobalConfig::instance()->galleryItemSize() - margins);
     m_imageRect.moveTo(BORDER, BORDER);

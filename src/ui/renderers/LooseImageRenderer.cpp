@@ -11,6 +11,10 @@ LooseImageRenderer::LooseImageRenderer() :
 
 void LooseImageRenderer::layout()
 {
+    if (!m_image) {
+        return;
+    }
+
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
     QSize sizeWithoutPadding(
         itemSize.width() - 2 * LooseImageRenderer::PADDING,
