@@ -4,6 +4,7 @@
 #include <QGraphicsPixmapItem>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QStackedLayout>
 #include <QStatusBar>
 #include <QToolBar>
 
@@ -185,14 +186,11 @@ void MainWindow::setupExtraUi()
     // QStackedViews won't layout hidden views but paintThumbnail happens
     // before showEvent so that view size is incorretly small.
     //
-    // There are two ways to solve this:
-    // 1. retrigger thumbnail paint after showEvent and resize thumbnail to
-    // correct size.
-    // 2. Reimplement QStackedLayout to layout hidden views.
-    //
-    // However, the below maybe the fastest hack to solve this.
-    ui->graphicsView->resize(size());
-
+    // By setting stackingMode to StackAll, we force all stacked views to be
+    // visible so that their layouts are correctly set.
+    QStackedLayout *stackedLayout =
+        static_cast<QStackedLayout *>(ui->stackedViews->layout());
+    stackedLayout->setStackingMode(QStackedLayout::StackAll);
 
     // PlayList gallery
     // TODO: Lazy load here
