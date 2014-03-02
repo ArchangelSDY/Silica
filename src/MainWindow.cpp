@@ -181,8 +181,16 @@ void MainWindow::setupExtraUi()
 
 
     // Image view
-    // TODO: Cannot make it expand so have to resize manually.
-    // Should fix this hack in the future
+
+    // QStackedViews won't layout hidden views but paintThumbnail happens
+    // before showEvent so that view size is incorretly small.
+    //
+    // There are two ways to solve this:
+    // 1. retrigger thumbnail paint after showEvent and resize thumbnail to
+    // correct size.
+    // 2. Reimplement QStackedLayout to layout hidden views.
+    //
+    // However, the below maybe the fastest hack to solve this.
     ui->graphicsView->resize(size());
 
 
