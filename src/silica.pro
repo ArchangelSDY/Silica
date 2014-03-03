@@ -30,7 +30,15 @@ macx {
 }
 
 linux {
-    # TODO: Install config/migration
+    config.path = $$OUT_PWD/config/Asuna
+    config.files = $$PWD/assets/Silica.ini
+
+    INSTALLS += config
+
+    migration.path = $$OUT_PWD
+    migration.files = $$PWD/assets/migration.json
+
+    INSTALLS += migration
 }
 
 win32 {
