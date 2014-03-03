@@ -1,7 +1,8 @@
 #include "LooseImageRenderer.h"
+#include "LooseImageBackgroundRenderer.h"
 #include "LooseRendererFactory.h"
 
-AbstractGalleryItemRenderer *LooseRendererFactory::createRenderer()
+AbstractGalleryItemRenderer *LooseRendererFactory::createForImageGallery()
 {
-    return new LooseImageRenderer();
+    return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }

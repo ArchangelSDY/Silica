@@ -36,7 +36,7 @@ void ImageGalleryView::playListAppend(PlayList appended)
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(
-            image, m_rendererFactory->createRenderer());
+            image, m_rendererFactory->createForImageGallery());
         m_scene->addItem(item);
     }
 
@@ -106,7 +106,7 @@ void ImageGalleryView::setRendererFactory(AbstractRendererFactory *factory)
     // Update renderers for each item
     foreach (QGraphicsItem *item, scene()->items()) {
         ImageGalleryItem *imageItem = static_cast<ImageGalleryItem *>(item);
-        imageItem->setRenderer(m_rendererFactory->createRenderer());
+        imageItem->setRenderer(m_rendererFactory->createForImageGallery());
     }
     update();
 }

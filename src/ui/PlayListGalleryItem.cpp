@@ -4,6 +4,8 @@
 #include "CompactImageRenderer.h"
 #include "CompactTitleRenderer.h"
 #include "GlobalConfig.h"
+#include "LooseImageRenderer.h"
+#include "LooseImageBackgroundRenderer.h"
 #include "PlayListGalleryItem.h"
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
@@ -11,7 +13,8 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
     QGraphicsItem(parent) ,
     m_record(record) ,
     m_image(0) ,
-    m_renderer(new CompactTitleRenderer(record->name(), new CompactImageRenderer()))
+    // m_renderer(new CompactTitleRenderer(record->name(), new CompactImageRenderer())
+    m_renderer(new LooseImageBackgroundRenderer(new LooseImageRenderer()))
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setToolTip(m_record->name());
@@ -39,8 +42,12 @@ void PlayListGalleryItem::loadThumbnail()
     m_image = new QImage(m_record->coverPath());
 
     delete m_renderer;
-    m_renderer = new CompactTitleRenderer(m_record->name(),
-        new CompactImageRenderer());
+//    TODO: Add title
+//    m_renderer = new CompactTitleRenderer(m_record->name(),
+//        new CompactImageRenderer());
+
+    m_renderer = new LooseImageBackgroundRenderer(
+        new LooseImageRenderer());
     m_renderer->setImage(const_cast<QImage *>(m_image));
     m_renderer->layout();
 

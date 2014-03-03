@@ -6,7 +6,7 @@
 class LooseRendererFactory : public AbstractRendererFactory
 {
 public:
-    AbstractGalleryItemRenderer *createRenderer();
+    AbstractGalleryItemRenderer *createForImageGallery();
 };
 
 #endif // LOOSERENDERERFACTORY_H

@@ -6,7 +6,7 @@
 class CompactRendererFactory : public AbstractRendererFactory
 {
 public:
-    AbstractGalleryItemRenderer *createRenderer();
+    AbstractGalleryItemRenderer *createForImageGallery();
 };
 
 #endif // COMPACTRENDERERFACTORY_H

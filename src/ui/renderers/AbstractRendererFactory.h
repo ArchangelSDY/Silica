@@ -6,7 +6,7 @@
 class AbstractRendererFactory
 {
 public:
-    virtual AbstractGalleryItemRenderer *createRenderer() = 0;
+    virtual AbstractGalleryItemRenderer *createForImageGallery() = 0;
     virtual ~AbstractRendererFactory() {}
 };
 

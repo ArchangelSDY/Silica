@@ -1,7 +1,7 @@
 #include "CompactImageRenderer.h"
 #include "CompactRendererFactory.h"
 
-AbstractGalleryItemRenderer *CompactRendererFactory::createRenderer()
+AbstractGalleryItemRenderer *CompactRendererFactory::createForImageGallery()
 {
     return new CompactImageRenderer();
 }
