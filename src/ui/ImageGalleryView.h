@@ -21,9 +21,6 @@ private slots:
     void sortByName();
     void sortByAspectRatio();
 
-    void setLooseRenderer();
-    void setCompactRenderer();
-
     void setAsCover();
 
 protected:
@@ -31,11 +28,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
 
 private:
-    void setRendererFactory(AbstractRendererFactory *factory);
-
     Navigator *m_navigator;
     PlayList *m_playList;
-    AbstractRendererFactory *m_rendererFactory;
 };
 
 #endif // IMAGEGALLERYVIEW_H

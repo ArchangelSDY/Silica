@@ -4,5 +4,11 @@
 
 AbstractGalleryItemRenderer *LooseRendererFactory::createForImageGallery()
 {
+    return new LooseImageRenderer();
+}
+
+AbstractGalleryItemRenderer *LooseRendererFactory::createForPlayListGallery(
+    const QString &)
+{
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }

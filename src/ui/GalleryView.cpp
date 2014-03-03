@@ -1,7 +1,10 @@
 #include <QGraphicsItem>
 
+#include "CompactRendererFactory.h"
+#include "GalleryItem.h"
 #include "GalleryView.h"
 #include "GlobalConfig.h"
+#include "LooseRendererFactory.h"
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
@@ -78,4 +81,28 @@ void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
     if (scene()->selectedItems().length() > 0) {
         emit mouseDoubleClicked();
     }
+}
+
+void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
+{
+    delete m_rendererFactory;
+    m_rendererFactory = factory;
+
+    // Update renderers for each item
+    foreach (QGraphicsItem *item, scene()->items()) {
+        GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+        galleryItem->setRendererFactory(m_rendererFactory);
+    }
+
+    update();
+}
+
+void GalleryView::setLooseRenderer()
+{
+    setRendererFactory(new LooseRendererFactory());
+}
+
+void GalleryView::setCompactRenderer()
+{
+    setRendererFactory(new CompactRendererFactory());
 }

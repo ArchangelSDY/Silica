@@ -4,22 +4,22 @@
 #include <QGraphicsItem>
 
 #include "AbstractGalleryItemRenderer.h"
+#include "GalleryItem.h"
 #include "Image.h"
 
-class ImageGalleryItem : public QObject, public QGraphicsItem
+class ImageGalleryItem : public QObject, public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
     explicit ImageGalleryItem(Image *image,
-                              AbstractGalleryItemRenderer *renderer,
+                              AbstractRendererFactory *rendererFactory,
                               QGraphicsItem *parent = 0);
-    ~ImageGalleryItem();
 
     QRectF boundingRect() const;
     Image *image() { return m_image; }
 
-    void setRenderer(AbstractGalleryItemRenderer *renderer);
+    void setRendererFactory(AbstractRendererFactory *factory);
 
 private slots:
     void thumbnailLoaded();
@@ -30,8 +30,6 @@ protected:
 
 private:
     Image *m_image;
-    QImage *m_thumbnail;
-    AbstractGalleryItemRenderer *m_renderer;
 };
 
 #endif // IMAGEGALLERYITEM_H

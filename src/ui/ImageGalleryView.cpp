@@ -8,9 +8,9 @@
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_navigator(0) ,
-    m_playList(0) ,
-    m_rendererFactory(new LooseRendererFactory())
+    m_playList(0)
 {
+    m_rendererFactory = new LooseRendererFactory();
 }
 
 ImageGalleryView::~ImageGalleryView()
@@ -35,8 +35,7 @@ void ImageGalleryView::playListAppend(PlayList appended)
         Image *image = appended.at(i).data();
 
         // Paint thumbnail
-        ImageGalleryItem *item = new ImageGalleryItem(
-            image, m_rendererFactory->createForImageGallery());
+        ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
         m_scene->addItem(item);
     }
 
@@ -96,29 +95,6 @@ void ImageGalleryView::sortByAspectRatio()
     PlayList pl(*m_navigator->playList());
     pl.sortByAspectRatio();
     m_navigator->setPlayList(pl);
-}
-
-void ImageGalleryView::setRendererFactory(AbstractRendererFactory *factory)
-{
-    delete m_rendererFactory;
-    m_rendererFactory = factory;
-
-    // Update renderers for each item
-    foreach (QGraphicsItem *item, scene()->items()) {
-        ImageGalleryItem *imageItem = static_cast<ImageGalleryItem *>(item);
-        imageItem->setRenderer(m_rendererFactory->createForImageGallery());
-    }
-    update();
-}
-
-void ImageGalleryView::setLooseRenderer()
-{
-    setRendererFactory(new LooseRendererFactory());
-}
-
-void ImageGalleryView::setCompactRenderer()
-{
-    setRendererFactory(new CompactRendererFactory());
 }
 
 void ImageGalleryView::setAsCover()

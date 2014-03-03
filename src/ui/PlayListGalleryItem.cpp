@@ -9,15 +9,14 @@
 #include "PlayListGalleryItem.h"
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
+                                         AbstractRendererFactory *rendererFactory,
                                          QGraphicsItem *parent) :
-    QGraphicsItem(parent) ,
-    m_record(record) ,
-    m_image(0) ,
-    // m_renderer(new CompactTitleRenderer(record->name(), new CompactImageRenderer())
-    m_renderer(new LooseImageBackgroundRenderer(new LooseImageRenderer()))
+    GalleryItem(rendererFactory, parent) ,
+    m_record(record)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setToolTip(m_record->name());
+    setRenderer(m_rendererFactory->createForPlayListGallery(m_record->name()));
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
 
@@ -27,31 +26,27 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
 PlayListGalleryItem::~PlayListGalleryItem()
 {
     delete m_record;
-    if (m_image) {
-        delete m_image;
-    }
-    delete m_renderer;
 }
 
 void PlayListGalleryItem::loadThumbnail()
 {
-    if (m_image) {
-        delete m_image;
+    if (!m_rendererFactory) {
+        return;
     }
 
-    m_image = new QImage(m_record->coverPath());
+    if (m_thumbnail) {
+        delete m_thumbnail;
+    }
+    m_thumbnail = new QImage(m_record->coverPath());
 
-    delete m_renderer;
-//    TODO: Add title
-//    m_renderer = new CompactTitleRenderer(m_record->name(),
-//        new CompactImageRenderer());
+    // Replace with new render since cover image has changed
+    setRenderer(m_rendererFactory->createForPlayListGallery(m_record->name()));
+}
 
-    m_renderer = new LooseImageBackgroundRenderer(
-        new LooseImageRenderer());
-    m_renderer->setImage(const_cast<QImage *>(m_image));
-    m_renderer->layout();
-
-    update();
+void PlayListGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
+{
+    m_rendererFactory = factory;
+    setRenderer(m_rendererFactory->createForPlayListGallery(m_record->name()));
 }
 
 QRectF PlayListGalleryItem::boundingRect() const

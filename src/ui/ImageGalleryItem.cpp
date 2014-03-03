@@ -9,34 +9,23 @@ static const int PADDING = 10;
 static const int BORDER = 5;
 
 ImageGalleryItem::ImageGalleryItem(Image *image,
-                                   AbstractGalleryItemRenderer *renderer,
+                                   AbstractRendererFactory *rendererFactory,
                                    QGraphicsItem *parent) :
-    QGraphicsItem(parent) ,
-    m_image(image) ,
-    m_thumbnail(0) ,
-    m_renderer(renderer)
+    GalleryItem(rendererFactory, parent) ,
+    m_image(image)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setRenderer(m_rendererFactory->createForImageGallery());
 
     connect(m_image, SIGNAL(thumbnailLoaded()),
             this, SLOT(thumbnailLoaded()));
     m_image->loadThumbnail(true);
 }
 
-ImageGalleryItem::~ImageGalleryItem()
+void ImageGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 {
-    delete m_renderer;
-    if (m_thumbnail) {
-        delete m_thumbnail;
-    }
-}
-
-void ImageGalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
-{
-    delete m_renderer;
-    m_renderer = renderer;
-    m_renderer->setImage(m_thumbnail);
-    m_renderer->layout();
+    m_rendererFactory = factory;
+    setRenderer(m_rendererFactory->createForImageGallery());
 }
 
 QRectF ImageGalleryItem::boundingRect() const

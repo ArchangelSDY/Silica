@@ -2,12 +2,15 @@
 #include <QMenu>
 #include <QMessageBox>
 
+#include "CompactRendererFactory.h"
+#include "LooseRendererFactory.h"
 #include "PlayListGalleryItem.h"
 #include "PlayListGalleryView.h"
 
 PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     GalleryView(parent)
 {
+    m_rendererFactory = new CompactRendererFactory();
 }
 
 void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
@@ -15,7 +18,8 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
     clear();
 
     for (int i = 0; i < records.count(); ++i) {
-        PlayListGalleryItem *item = new PlayListGalleryItem(records[i]);
+        PlayListGalleryItem *item = new PlayListGalleryItem(records[i],
+            m_rendererFactory);
         m_scene->addItem(item);
     }
 
@@ -37,6 +41,12 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     if (scene()->selectedItems().count() == 0) {
         actRemove->setEnabled(false);
     }
+
+    menu.addSeparator();
+
+    QMenu *renderers = menu.addMenu(tr("Layout"));
+    renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
+    renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
     menu.exec(event->globalPos());
 }

@@ -3,6 +3,7 @@
 
 #include <QGraphicsView>
 
+#include "AbstractRendererFactory.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -16,6 +17,10 @@ public:
 signals:
     void mouseDoubleClicked();
 
+protected slots:
+    void setLooseRenderer();
+    void setCompactRenderer();
+
 protected:
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
@@ -24,7 +29,10 @@ protected:
     virtual void clear();
     virtual void layout();
 
+    void setRendererFactory(AbstractRendererFactory *factory);
+
     QGraphicsScene *m_scene;
+    AbstractRendererFactory *m_rendererFactory;
 };
 
 #endif // GALLERYVIEW_H
