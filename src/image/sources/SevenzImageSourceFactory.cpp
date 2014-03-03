@@ -1,3 +1,5 @@
+#include <QFileInfo>
+#include <QImageReader>
 #include <QUrl>
 #include <Qt7zPackage.h>
 
@@ -23,13 +25,19 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
         QString imageName = url.fragment();
+        QFileInfo imageFile(imageName);
+        if (QImageReader::supportedImageFormats().contains(
+                imageFile.suffix().toUtf8())) {
+            QUrl sevenzUrl = url;
+            sevenzUrl.setScheme("file");
+            sevenzUrl.setFragment("");
+            QString sevenzPath = sevenzUrl.toLocalFile();
 
-        QUrl sevenzUrl = url;
-        sevenzUrl.setScheme("file");
-        sevenzUrl.setFragment("");
-        QString sevenzPath = sevenzUrl.toLocalFile();
-
-        return new SevenzImageSource(sevenzPath, imageName);
+            return new SevenzImageSource(sevenzPath, imageName);
+        } else {
+            // Unsupported image format
+            return 0;
+        }
     } else {
         return 0;
     }
@@ -50,7 +58,6 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         imageSources << createSingle(url);
     } else {
         // Add all files in the 7z package
-        // TODO: Should skip non image files
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
@@ -65,7 +72,10 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
                 QUrl imageUrl = url;
                 imageUrl.setFragment(name);
 
-                imageSources << createSingle(imageUrl);
+                ImageSource *source = createSingle(imageUrl);
+                if (source) {
+                    imageSources << source;
+                }
             }
 
             pkg.close();

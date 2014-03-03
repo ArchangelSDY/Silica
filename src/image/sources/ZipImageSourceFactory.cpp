@@ -1,3 +1,5 @@
+#include <QFileInfo>
+#include <QImageReader>
 #include <QUrl>
 #include <quazip.h>
 
@@ -23,13 +25,19 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
         QString imageName = url.fragment();
+        QFileInfo imageFile(imageName);
+        if (QImageReader::supportedImageFormats().contains(
+                imageFile.suffix().toUtf8())) {
+            QUrl zipUrl = url;
+            zipUrl.setScheme("file");
+            zipUrl.setFragment("");
+            QString zipPath = zipUrl.toLocalFile();
 
-        QUrl zipUrl = url;
-        zipUrl.setScheme("file");
-        zipUrl.setFragment("");
-        QString zipPath = zipUrl.toLocalFile();
-
-        return new ZipImageSource(zipPath, imageName);
+            return new ZipImageSource(zipPath, imageName);
+        } else {
+            // Unsupported image format
+            return 0;
+        }
     } else {
         return 0;
     }
@@ -50,7 +58,6 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
         imageSources << createSingle(url);
     } else {
         // Add all files in the zip
-        // TODO: Should skip non image files
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
@@ -65,7 +72,10 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
                 QUrl imageUrl = url;
                 imageUrl.setFragment(name);
 
-                imageSources << createSingle(imageUrl);
+                ImageSource *source = createSingle(imageUrl);
+                if (source) {
+                    imageSources << source;
+                }
             }
 
             zip.close();
