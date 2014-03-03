@@ -451,7 +451,11 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         switch (ev->key()) {
             case Qt::Key_J:
             case Qt::Key_Space:
-                m_navigator.goNext();
+                if (m_navigator.isAutoNavigating()) {
+                    m_navigator.stopAutoNavigation();
+                } else {
+                    m_navigator.goNext();
+                }
                 break;
             case Qt::Key_K:
                 m_navigator.goPrev();
@@ -503,6 +507,12 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
                 break;
             case Qt::Key_End:
                 m_navigator.goLast();
+                break;
+            case Qt::Key_Period:
+                m_navigator.startAutoNavigation(Navigator::NormalDirection);
+                break;
+            case Qt::Key_Comma:
+                m_navigator.startAutoNavigation(Navigator::ReverseDirection);
                 break;
             case Qt::Key_1:
             case Qt::Key_2:

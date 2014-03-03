@@ -11,6 +11,9 @@ Navigator::Navigator(QObject *parent) :
     m_reverseNavigation(false) ,
     m_cachedImages(MAX_CACHE)
 {
+    m_autoNavigationTimer.setInterval(Navigator::DEFAULT_AUTO_NAVIGATION_INTERVAL);
+    connect(&m_autoNavigationTimer, SIGNAL(timeout()),
+            this, SLOT(goFastForward()));
 }
 
 void Navigator::reset()
@@ -160,6 +163,39 @@ void Navigator::thumbnailLoaded()
 
         if (image == m_currentImage) {
             emit paintThumbnail(image);
+        }
+    }
+}
+
+void Navigator::startAutoNavigation(Direction direction)
+{
+    m_reverseNavigation = (direction == ReverseDirection);
+    m_autoNavigationTimer.start();
+}
+
+void Navigator::stopAutoNavigation()
+{
+    m_autoNavigationTimer.stop();
+}
+
+void Navigator::setAutoNavigationInterval(int msec)
+{
+    m_autoNavigationTimer.setInterval(msec);
+}
+
+void Navigator::goFastForward()
+{
+    if (!m_reverseNavigation) {
+        if (m_currentIndex < m_playlist.count() - 1) {
+            goNext();
+        } else {
+            stopAutoNavigation();
+        }
+    } else {
+        if (m_currentIndex > 0) {
+            goPrev();
+        } else {
+            stopAutoNavigation();
         }
     }
 }

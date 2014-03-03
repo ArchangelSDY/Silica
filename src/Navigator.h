@@ -11,6 +11,13 @@ class Navigator : public QObject
 {
     Q_OBJECT
 public:
+    enum Direction {
+        NormalDirection = 0,
+        ReverseDirection = 1,
+    };
+
+    static const int DEFAULT_AUTO_NAVIGATION_INTERVAL = 200;
+
     explicit Navigator(QObject *parent = 0);
 
     PlayList *playList() { return &m_playlist; }
@@ -23,6 +30,10 @@ public:
     Image* currentImage() const { return m_currentImage; }
     int currentIndex() { return m_currentIndex; }
 
+    bool isAutoNavigating() const { return m_autoNavigationTimer.isActive(); }
+    void setAutoNavigationInterval(int msec);
+    void startAutoNavigation(Direction direction = NormalDirection);
+    void stopAutoNavigation();
 
 signals:
     void paint(Image *image);
@@ -41,6 +52,9 @@ public slots:
     void imageLoaded();
     void thumbnailLoaded();
 
+private slots:
+    void goFastForward();
+
 private:
     Image* loadIndex(int index, bool shouldPaint);
     void preload();
@@ -51,6 +65,7 @@ private:
     bool m_reverseNavigation;
     ImagesCache m_cachedImages;
     PlayList m_playlist;
+    QTimer m_autoNavigationTimer;
 };
 
 #endif // NAVIGATOR_H
