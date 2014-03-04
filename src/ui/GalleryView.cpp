@@ -89,6 +89,8 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
             scene()->selectedItems().length() > 0) {
         event->accept();
         emit enterItem();
+    } else {
+        QGraphicsView::keyPressEvent(event);
     }
 }
 
