@@ -91,41 +91,38 @@ void MainGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
     // Auto navigation speed
     int currentNavInterval = m_navigator->autoNavigationInterval();
-    QMenu *autoNavigation = menu->addMenu("Auto Speed");
-    QActionGroup *autoNavigationGroup = new QActionGroup(menu);
+    QMenu *autoNavMenu = menu->addMenu("Auto Speed");
+    QActionGroup *autoNavGrp = new QActionGroup(menu);
     QSignalMapper *autoNavSigMap = new QSignalMapper(menu);
     connect(autoNavSigMap, SIGNAL(mapped(int)),
             m_navigator, SLOT(setAutoNavigationInterval(int)));
 
-    QAction *fastAutoNavigation = autoNavigation->addAction("Fast");
-    fastAutoNavigation->setCheckable(true);
-    fastAutoNavigation->setChecked(
+    QAction *fastAutoNav = autoNavMenu->addAction(
+        "Fast", autoNavSigMap, SLOT(map()));
+    fastAutoNav->setCheckable(true);
+    fastAutoNav->setChecked(
         currentNavInterval == Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
-    autoNavigationGroup->addAction(fastAutoNavigation);
-    connect(fastAutoNavigation, SIGNAL(triggered(bool)),
-            autoNavSigMap, SLOT(map()));
+    autoNavGrp->addAction(fastAutoNav);
     autoNavSigMap->setMapping(
-        fastAutoNavigation, Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
+        fastAutoNav, Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
 
-    QAction *mediumAutoNavigation = autoNavigation->addAction("Medium");
-    mediumAutoNavigation->setCheckable(true);
-    mediumAutoNavigation->setChecked(
+    QAction *mediumAutoNav = autoNavMenu->addAction(
+        "Medium", autoNavSigMap, SLOT(map()));
+    mediumAutoNav->setCheckable(true);
+    mediumAutoNav->setChecked(
         currentNavInterval == Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
-    autoNavigationGroup->addAction(mediumAutoNavigation);
-    connect(mediumAutoNavigation, SIGNAL(triggered(bool)),
-            autoNavSigMap, SLOT(map()));
+    autoNavGrp->addAction(mediumAutoNav);
     autoNavSigMap->setMapping(
-        mediumAutoNavigation, Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
+        mediumAutoNav, Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
 
-    QAction *slowAutoNavigation = autoNavigation->addAction("Slow");
-    slowAutoNavigation->setCheckable(true);
-    slowAutoNavigation->setChecked(
+    QAction *slowAutoNavi = autoNavMenu->addAction(
+        "Slow", autoNavSigMap, SLOT(map()));
+    slowAutoNavi->setCheckable(true);
+    slowAutoNavi->setChecked(
         currentNavInterval == Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
-    autoNavigationGroup->addAction(slowAutoNavigation);
-    connect(slowAutoNavigation, SIGNAL(triggered(bool)),
-            autoNavSigMap, SLOT(map()));
+    autoNavGrp->addAction(slowAutoNavi);
     autoNavSigMap->setMapping(
-        slowAutoNavigation, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
+        slowAutoNavi, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
 
     menu->exec(event->globalPos());
 }
