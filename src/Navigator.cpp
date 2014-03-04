@@ -197,13 +197,13 @@ void Navigator::setAutoNavigationInterval(int msec)
 void Navigator::goFastForward()
 {
     if (!m_reverseNavigation) {
-        if (m_currentIndex < m_playlist.count() - 1) {
+        if (m_currentIndex < m_playlist.count() - 1 || m_isLooping) {
             goNext();
         } else {
             stopAutoNavigation();
         }
     } else {
-        if (m_currentIndex > 0) {
+        if (m_currentIndex > 0 || m_isLooping) {
             goPrev();
         } else {
             stopAutoNavigation();
