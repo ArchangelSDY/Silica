@@ -37,6 +37,8 @@ public:
     void startAutoNavigation(Direction direction = NormalDirection);
     void stopAutoNavigation();
 
+    bool isLooping() const { return m_isLooping; }
+
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
@@ -55,6 +57,7 @@ public slots:
     void thumbnailLoaded();
 
     void setAutoNavigationInterval(int msec);
+    void setLoop(bool loop);
 
 private slots:
     void goFastForward();
@@ -67,6 +70,7 @@ private:
     int m_currentIndex;
     Image* m_currentImage;
     bool m_reverseNavigation;
+    bool m_isLooping;
     ImagesCache m_cachedImages;
     PlayList m_playlist;
     QTimer m_autoNavigationTimer;

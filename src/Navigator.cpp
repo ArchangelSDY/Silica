@@ -9,6 +9,7 @@ Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
     m_reverseNavigation(false) ,
+    m_isLooping(true) ,
     m_cachedImages(MAX_CACHE)
 {
     m_autoNavigationTimer.setInterval(Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
@@ -67,7 +68,11 @@ void Navigator::clearPlayList()
 Image* Navigator::loadIndex(int index, bool shouldPaint)
 {
     if (index < 0 || index >= m_playlist.count()) {
-        return 0;
+        if (!m_isLooping) {
+            return 0;
+        } else {
+            index = (index + m_playlist.count()) % m_playlist.count();
+        }
     }
 
     Image *image = m_cachedImages.at(index);
@@ -121,6 +126,9 @@ void Navigator::goPrev()
     if (m_currentIndex > 0) {
         m_reverseNavigation = true;
         goIndex(m_currentIndex - 1);
+    } else if (m_isLooping) {
+        m_reverseNavigation = true;
+        goIndex(m_playlist.count() - 1);
     }
 }
 
@@ -129,6 +137,9 @@ void Navigator::goNext()
     if (m_currentIndex < m_playlist.count() - 1) {
         m_reverseNavigation = false;
         goIndex(m_currentIndex + 1);
+    } else if (m_isLooping) {
+        m_reverseNavigation = false;
+        goIndex(0);
     }
 }
 
@@ -198,4 +209,9 @@ void Navigator::goFastForward()
             stopAutoNavigation();
         }
     }
+}
+
+void Navigator::setLoop(bool shouldLoop)
+{
+    m_isLooping = shouldLoop;
 }
