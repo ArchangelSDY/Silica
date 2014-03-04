@@ -330,7 +330,7 @@ void MainWindow::promptToSavePlayList()
     dialog.exec();
 
     QString name = dialog.textValue();
-    if (!name.isEmpty()) {
+    if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
         PlayListRecord record(name, image->thumbnailPath(),
                               m_navigator.playList());
         if (record.save()) {
