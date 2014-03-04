@@ -353,8 +353,13 @@ void MainWindow::imageLoaded(Image *image)
         status = "";
     }
 
+    QString progress;
+    QTextStream(&progress) << "["
+        << (m_navigator.currentIndex() + 1) << "/"
+        << m_navigator.playList()->count() << "] ";
+
     QString title;
-    QTextStream(&title) << status << image->name();
+    QTextStream(&title) << status << progress << image->name();
     setWindowTitle(title);
 
     // Info widget
