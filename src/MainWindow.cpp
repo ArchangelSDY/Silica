@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupExtraUi();
 
     ui->gallery->setNavigator(&m_navigator);
+    ui->graphicsView->setNavigator(&m_navigator);
     ui->sidebar->hide();
     statusBar()->hide();
 

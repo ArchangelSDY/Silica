@@ -5,6 +5,7 @@
 #include <QWheelEvent>
 
 #include "Image.h"
+#include "Navigator.h"
 
 class MainGraphicsView : public QGraphicsView
 {
@@ -17,6 +18,8 @@ public:
     };
 
     explicit MainGraphicsView(QWidget *parent = 0);
+
+    void setNavigator(Navigator *navigator);
 
     void fitGridInView(int grid);
     void fitInViewIfNecessary();
@@ -33,8 +36,10 @@ protected:
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
+    virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
+    Navigator *m_navigator;
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
 

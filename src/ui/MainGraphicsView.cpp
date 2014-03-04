@@ -1,4 +1,6 @@
 #include <QGraphicsItem>
+#include <QMenu>
+#include <QSignalMapper>
 
 #include "MainGraphicsView.h"
 
@@ -14,6 +16,11 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_scene->addItem(m_imageItem);
     m_imageItem->setTransformationMode(Qt::SmoothTransformation);
     setScene(m_scene);
+}
+
+void MainGraphicsView::setNavigator(Navigator *navigator)
+{
+    m_navigator = navigator;
 }
 
 void MainGraphicsView::paint(Image *image)
@@ -76,6 +83,51 @@ void MainGraphicsView::resizeEvent(QResizeEvent *)
 void MainGraphicsView::mouseDoubleClickEvent(QMouseEvent *)
 {
     emit mouseDoubleClicked();
+}
+
+void MainGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = new QMenu(this);
+
+    // Auto navigation speed
+    int currentNavInterval = m_navigator->autoNavigationInterval();
+    QMenu *autoNavigation = menu->addMenu("Auto Speed");
+    QActionGroup *autoNavigationGroup = new QActionGroup(menu);
+    QSignalMapper *autoNavSigMap = new QSignalMapper(menu);
+    connect(autoNavSigMap, SIGNAL(mapped(int)),
+            m_navigator, SLOT(setAutoNavigationInterval(int)));
+
+    QAction *fastAutoNavigation = autoNavigation->addAction("Fast");
+    fastAutoNavigation->setCheckable(true);
+    fastAutoNavigation->setChecked(
+        currentNavInterval == Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
+    autoNavigationGroup->addAction(fastAutoNavigation);
+    connect(fastAutoNavigation, SIGNAL(triggered(bool)),
+            autoNavSigMap, SLOT(map()));
+    autoNavSigMap->setMapping(
+        fastAutoNavigation, Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
+
+    QAction *mediumAutoNavigation = autoNavigation->addAction("Medium");
+    mediumAutoNavigation->setCheckable(true);
+    mediumAutoNavigation->setChecked(
+        currentNavInterval == Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
+    autoNavigationGroup->addAction(mediumAutoNavigation);
+    connect(mediumAutoNavigation, SIGNAL(triggered(bool)),
+            autoNavSigMap, SLOT(map()));
+    autoNavSigMap->setMapping(
+        mediumAutoNavigation, Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
+
+    QAction *slowAutoNavigation = autoNavigation->addAction("Slow");
+    slowAutoNavigation->setCheckable(true);
+    slowAutoNavigation->setChecked(
+        currentNavInterval == Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
+    autoNavigationGroup->addAction(slowAutoNavigation);
+    connect(slowAutoNavigation, SIGNAL(triggered(bool)),
+            autoNavSigMap, SLOT(map()));
+    autoNavSigMap->setMapping(
+        slowAutoNavigation, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
+
+    menu->exec(event->globalPos());
 }
 
 void MainGraphicsView::fitGridInView(int grid)

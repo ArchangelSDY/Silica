@@ -16,7 +16,9 @@ public:
         ReverseDirection = 1,
     };
 
-    static const int DEFAULT_AUTO_NAVIGATION_INTERVAL = 200;
+    static const int FAST_AUTO_NAVIGATION_INTERVAL = 200;
+    static const int MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
+    static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
     explicit Navigator(QObject *parent = 0);
 
@@ -31,7 +33,7 @@ public:
     int currentIndex() { return m_currentIndex; }
 
     bool isAutoNavigating() const { return m_autoNavigationTimer.isActive(); }
-    void setAutoNavigationInterval(int msec);
+    int autoNavigationInterval() const { return m_autoNavigationTimer.interval(); }
     void startAutoNavigation(Direction direction = NormalDirection);
     void stopAutoNavigation();
 
@@ -51,6 +53,8 @@ public slots:
 
     void imageLoaded();
     void thumbnailLoaded();
+
+    void setAutoNavigationInterval(int msec);
 
 private slots:
     void goFastForward();

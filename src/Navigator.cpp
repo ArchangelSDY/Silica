@@ -11,7 +11,7 @@ Navigator::Navigator(QObject *parent) :
     m_reverseNavigation(false) ,
     m_cachedImages(MAX_CACHE)
 {
-    m_autoNavigationTimer.setInterval(Navigator::DEFAULT_AUTO_NAVIGATION_INTERVAL);
+    m_autoNavigationTimer.setInterval(Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
     connect(&m_autoNavigationTimer, SIGNAL(timeout()),
             this, SLOT(goFastForward()));
 }
