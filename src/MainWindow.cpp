@@ -458,7 +458,11 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
                 }
                 break;
             case Qt::Key_K:
-                m_navigator.goPrev();
+                if (m_navigator.isAutoNavigating()) {
+                    m_navigator.stopAutoNavigation();
+                } else {
+                    m_navigator.goPrev();
+                }
                 break;
             case Qt::Key_F:
                 ui->graphicsView->toggleFitInView();
