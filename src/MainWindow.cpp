@@ -320,7 +320,12 @@ void MainWindow::promptToSavePlayList()
     dialog.setComboBoxEditable(true);
 
     QString sourceUrl = image->source()->url().toString();
-    dialog.setComboBoxItems(sourceUrl.split(QRegularExpression("[/#]")));
+    QStringList defaultNames = sourceUrl.split(QRegularExpression("[/#]"));
+    dialog.setComboBoxItems(defaultNames);
+
+    if (defaultNames.count() >= 2) {
+        dialog.setTextValue(defaultNames[defaultNames.count() - 2]);
+    }
 
     dialog.exec();
 
