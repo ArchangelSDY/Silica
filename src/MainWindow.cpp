@@ -168,13 +168,13 @@ void MainWindow::setupExtraUi()
 
     // Stacked views
     ui->pageFav->layout()->setMargin(0);
-    connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
+    connect(ui->playListGallery, SIGNAL(enterItem()),
             this, SLOT(loadSelectedPlayList()));
-    connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
+    connect(ui->playListGallery, SIGNAL(enterItem()),
             m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageGallery->layout()->setMargin(0);
-    connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
+    connect(ui->gallery, SIGNAL(enterItem()),
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
             m_actToolBarGallery, SLOT(trigger()));

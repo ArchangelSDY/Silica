@@ -79,7 +79,16 @@ void GalleryView::showEvent(QShowEvent *)
 void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
 {
     if (scene()->selectedItems().length() > 0) {
-        emit mouseDoubleClicked();
+        emit enterItem();
+    }
+}
+
+void GalleryView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return &&
+            scene()->selectedItems().length() > 0) {
+        event->accept();
+        emit enterItem();
     }
 }
 

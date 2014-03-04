@@ -15,7 +15,7 @@ public:
     ~GalleryView();
 
 signals:
-    void mouseDoubleClicked();
+    void enterItem();
 
 protected slots:
     void setLooseRenderer();
@@ -25,6 +25,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
+    virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void clear();
     virtual void layout();
