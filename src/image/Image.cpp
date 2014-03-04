@@ -65,7 +65,8 @@ void MakeThumbnailTask::run()
     int height = qMax<int>(
         THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
 
-    QImage *thumbnail = new QImage(m_image->scaledToHeight(height));
+    QImage *thumbnail = new QImage(m_image->scaledToHeight(height,
+        Qt::SmoothTransformation));
     thumbnail->save(m_path, "JPG");
     emit thumbnailMade(thumbnail);
 }
