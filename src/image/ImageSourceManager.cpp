@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <QThreadPool>
 #include <QUrl>
 
 #include "ImageSourceManager.h"
@@ -106,6 +107,16 @@ QString ImageSourceManager::fileDialogFilters() const
     parts.prepend(partForAll);
 
     return parts.join(";;");
+}
+
+void ImageSourceManager::clearCache()
+{
+    for (QHash<QString, ImageSourceFactory *>::iterator it = m_factories.begin();
+            it != m_factories.end(); ++it) {
+        it.value()->clearCache();
+    }
+
+    QThreadPool::globalInstance()->clear();
 }
 
 void ImageSourceManager::registerFactory(ImageSourceFactory *factory)

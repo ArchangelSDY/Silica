@@ -1,10 +1,16 @@
 #include <QFileInfo>
 #include <QImageReader>
+#include <QThread>
 #include <QUrl>
 #include <Qt7zPackage.h>
 
 #include "SevenzImageSource.h"
 #include "SevenzImageSourceFactory.h"
+
+FrequencyCache<QString, QSharedPointer<Qt7zPackage> >
+    SevenzImageSourceFactory::m_packageCache(QThread::idealThreadCount());
+
+QMutex SevenzImageSourceFactory::m_mutex;
 
 QString SevenzImageSourceFactory::name() const
 {
@@ -33,7 +39,7 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
             sevenzUrl.setFragment("");
             QString sevenzPath = sevenzUrl.toLocalFile();
 
-            return new SevenzImageSource(sevenzPath, imageName);
+            return new SevenzImageSource(sevenzPath, imageName, this);
         } else {
             // Unsupported image format
             return 0;
@@ -90,4 +96,11 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QString &pat
     Q_UNUSED(path);
     Q_UNIMPLEMENTED();
     return QList<ImageSource *>();
+}
+
+void SevenzImageSourceFactory::clearCache()
+{
+    m_mutex.lock();
+    m_packageCache.clear();
+    m_mutex.unlock();
 }

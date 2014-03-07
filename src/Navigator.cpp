@@ -1,3 +1,4 @@
+#include "ImageSourceManager.h"
 #include "Navigator.h"
 
 static const int MAX_PRELOAD = 5;
@@ -24,6 +25,9 @@ void Navigator::reset()
     m_currentIndex = -1;
     m_reverseNavigation = false;
     m_playlist.clear();
+
+    // Notify to clear image source cache
+    ImageSourceManager::instance()->clearCache();
 }
 
 void Navigator::preload()

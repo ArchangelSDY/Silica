@@ -8,12 +8,10 @@
 
 #include "SevenzImageSource.h"
 
-FrequencyCache<QString, QSharedPointer<Qt7zPackage> >
-    SevenzImageSource::m_packageCache(QThread::idealThreadCount());
-
-QMutex SevenzImageSource::m_mutex;
-
-SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName)
+SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName,
+                                     SevenzImageSourceFactory *factory) :
+    ImageSource() ,
+    m_factory(factory)
 {
     m_packagePath = searchRealPath(packagePath);
     m_name = imageName;
@@ -45,16 +43,16 @@ bool SevenzImageSource::open()
     hashBuilder << QString::number(threadId, 16)
                 << "#" << m_packagePath;
 
-    m_mutex.lock();
-    QSharedPointer<Qt7zPackage> pkg = m_packageCache.find(hash);
+    m_factory->m_mutex.lock();
+    QSharedPointer<Qt7zPackage> pkg = m_factory->m_packageCache.find(hash);
     if (pkg.isNull()) {
         pkg = QSharedPointer<Qt7zPackage>(new Qt7zPackage(m_packagePath));
         pkg->open();
         if (pkg->isOpen()) {
-            m_packageCache.insert(hash, pkg);
+           m_factory->m_packageCache.insert(hash, pkg);
         }
     }
-    m_mutex.unlock();
+    m_factory->m_mutex.unlock();
 
     if (!pkg->isOpen()) {
         delete buffer;

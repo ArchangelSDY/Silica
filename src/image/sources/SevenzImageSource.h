@@ -2,26 +2,24 @@
 #define SEVENZIMAGESOURCE_H
 
 #include <QBuffer>
-#include <QMutex>
 
-#include <FrequencyCache.h>
 #include "ImageSource.h"
+#include "SevenzImageSourceFactory.h"
 
 class Qt7zPackage;
 
 class SevenzImageSource : public ImageSource
 {
 public:
-    SevenzImageSource(QString packagePath, QString imageName);
+    SevenzImageSource(QString packagePath, QString imageName,
+                      SevenzImageSourceFactory *factory);
 
     virtual bool open();
 
     virtual bool copy(const QString &destPath);
 private:
-    static FrequencyCache<QString, QSharedPointer<Qt7zPackage> > m_packageCache;
-    static QMutex m_mutex;
-
     QString m_packagePath;
+    SevenzImageSourceFactory *m_factory;
 };
 
 #endif // SEVENZIMAGESOURCE_H

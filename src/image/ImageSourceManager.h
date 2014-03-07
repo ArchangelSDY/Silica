@@ -22,6 +22,8 @@ public:
     QStringList urlPatterns() const;
     QString fileDialogFilters() const;
 
+    void clearCache();
+
 private:
     explicit ImageSourceManager(QObject *parent = 0);
     void registerFactory(ImageSourceFactory *factory);

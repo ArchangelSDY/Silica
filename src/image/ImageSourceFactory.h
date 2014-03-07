@@ -18,6 +18,8 @@ public:
     virtual ImageSource *createSingle(const QString &path) = 0;
     virtual QList<ImageSource *> createMultiple(const QUrl &url) = 0;
     virtual QList<ImageSource *> createMultiple(const QString &path) = 0;
+
+    virtual void clearCache() {}
 };
 
 #endif // IMAGESOURCEFACTORY_H
