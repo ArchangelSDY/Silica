@@ -11,6 +11,8 @@ private slots:
     void cleanup();
     void loadThumbnail();
     void loadThumbnail_data();
+    void hotspots();
+    void hotspots_data();
 };
 
 #endif // TESTIMAGE_H

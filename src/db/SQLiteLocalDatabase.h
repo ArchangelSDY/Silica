@@ -22,6 +22,10 @@ public:
     bool insertImage(Image *image);
     Image *queryImageByHashStr(const QString &hashStr);
 
+    bool insertImageHotspot(ImageHotspot *hotspot);
+    bool removeImageHotspot(ImageHotspot *hotspot);
+    QList<ImageHotspot *> queryImageHotspots(Image *image);
+
 private:
     QSqlDatabase m_db;
 };

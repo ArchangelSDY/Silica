@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtGui>
 
+#include "ImageHotspot.h"
 #include "ImageSource.h"
 
 class LoadImageTask : public QObject, public QRunnable
@@ -69,6 +70,8 @@ private:
 class Image : public QObject
 {
     Q_OBJECT
+
+    friend class ImageHotspot;
 public:
     explicit Image(QUrl url, QObject *parent = 0);
     explicit Image(ImageSource *, QObject *parent = 0);
@@ -106,6 +109,8 @@ public:
     void loadThumbnail(bool makeImmediately = false);
     void scheduleUnload();
 
+    QList<ImageHotspot *> hotspots() { return m_hotspots; }
+
     bool copy(const QString &destPath);
 
     inline bool operator ==(const Image &other)
@@ -117,6 +122,8 @@ signals:
     void loaded();
     void thumbnailLoaded();
 
+    void hotpotsLoaded();
+
 public slots:
     void imageReaderFinished(QImage *image);
     void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
@@ -126,6 +133,8 @@ private:
     void unloadIfNeeded();
     void makeThumbnail();
     void computeThumbnailPath();
+
+    void loadHotspots();
 
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
@@ -137,6 +146,8 @@ private:
     bool m_isLoadingImage;
     bool m_isLoadingThumbnail;
     bool m_isMakingThumbnail;
+
+    QList<ImageHotspot *> m_hotspots;
 };
 
 #endif // IMAGE_H

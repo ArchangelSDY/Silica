@@ -34,6 +34,13 @@ const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
 
 const char *SQL_QUERY_IMAGE_BY_HASH = "select url from images where hash = ? limit 1";
 
+const char *SQL_INSERT_IMAGE_HOTSPOT = "insert into image_hotspots(image_hash, left, top, width, height) "
+        "values (?, ?, ?, ?, ?)";
+
+const char *SQL_REMOVE_IMAGE_HOTSPOT_BY_ID = "delete from image_hotspots where id = ?";
+
+const char *SQL_QUERY_IMAGE_HOTSPOTS = "select id, left, top, width, height from image_hotspots where image_hash = ?";
+
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -224,4 +231,73 @@ Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
         QString urlStr = q.value(0).toString();
         return new Image(QUrl(urlStr));
     }
+}
+
+bool SQLiteLocalDatabase::insertImageHotspot(ImageHotspot *hotspot)
+{
+    if (!m_db.isOpen()) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_INSERT_IMAGE_HOTSPOT);
+    QRect rect = hotspot->rect();
+    q.addBindValue(hotspot->image()->source()->hashStr());
+    q.addBindValue(rect.left());
+    q.addBindValue(rect.top());
+    q.addBindValue(rect.width());
+    q.addBindValue(rect.height());
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
+}
+
+bool SQLiteLocalDatabase::removeImageHotspot(ImageHotspot *hotspot)
+{
+    if (!m_db.isOpen()) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_REMOVE_IMAGE_HOTSPOT_BY_ID);
+    q.addBindValue(hotspot->id());
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
+}
+
+QList<ImageHotspot *> SQLiteLocalDatabase::queryImageHotspots(Image *image)
+{
+    QList<ImageHotspot *> hotspots;
+
+    if (!m_db.isOpen()) {
+        return hotspots;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_QUERY_IMAGE_HOTSPOTS);
+    q.addBindValue(image->source()->hashStr());
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return hotspots;
+    }
+
+    while (q.next()) {
+        int left = q.value("left").toInt();
+        int top = q.value("top").toInt();
+        int width = q.value("width").toInt();
+        int height = q.value("height").toInt();
+        hotspots << new ImageHotspot(image, QRect(left, top, width, height));
+    }
+
+    return hotspots;
 }

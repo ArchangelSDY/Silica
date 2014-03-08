@@ -83,6 +83,8 @@ Image::Image(QUrl url, QObject *parent) :
     m_isMakingThumbnail(false)
 {
     computeThumbnailPath();
+
+    loadHotspots();
 }
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
@@ -97,6 +99,8 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_isMakingThumbnail(false)
 {
     computeThumbnailPath();
+
+    loadHotspots();
 }
 
 Image::~Image()
@@ -109,6 +113,10 @@ Image::~Image()
 
     if (m_thumbnail) {
         delete m_thumbnail;
+    }
+
+    while (!m_hotspots.isEmpty()) {
+        delete m_hotspots.takeFirst();
     }
 }
 
@@ -299,4 +307,14 @@ bool Image::copy(const QString &destPath)
     } else {
         return false;
     }
+}
+
+void Image::loadHotspots()
+{
+    while (!m_hotspots.isEmpty()) {
+        delete m_hotspots.takeFirst();
+    }
+
+    m_hotspots = LocalDatabase::instance()->queryImageHotspots(this);
+    emit hotpotsLoaded();
 }

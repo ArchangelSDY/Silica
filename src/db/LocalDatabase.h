@@ -5,6 +5,7 @@
 #include <QObject>
 
 #include "Image.h"
+#include "ImageHotspot.h"
 #include "PlayListRecord.h"
 
 class LocalDatabase : public QObject
@@ -20,6 +21,10 @@ public:
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
+
+    virtual bool insertImageHotspot(ImageHotspot *hotspot) = 0;
+    virtual bool removeImageHotspot(ImageHotspot *hotspot) = 0;
+    virtual QList<ImageHotspot *> queryImageHotspots(Image *image) = 0;
 
     static LocalDatabase *instance();
 
