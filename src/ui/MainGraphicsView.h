@@ -25,6 +25,10 @@ public:
     void fitInViewIfNecessary();
     void toggleFitInView();
 
+    bool isHotspotsEditing() const { return m_isHotspotsEditing; }
+    void enterHotspotsEditing();
+    void leaveHotspotsEditing();
+
 signals:
     void mouseDoubleClicked();
 
@@ -32,10 +36,15 @@ private slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
 
+    void createHotspotsAreas();
+
 protected:
     virtual void showEvent(QShowEvent *event);
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
@@ -46,6 +55,21 @@ private:
     bool m_shouldRepaintThumbnailOnShown;
 
     FitMode m_fitInView;
+
+    enum HotspotsEditingState {
+        HotspotsSelecting,
+        HotspotsConfirming,
+    };
+
+    bool m_isHotspotsEditing;
+    HotspotsEditingState m_hotspotsEditingState;
+    QGraphicsRectItem *m_hotspotsSelectingArea;
+    QGraphicsItemGroup *m_hotspotsAreas;
+
+    void setHotspotsSelectingAreaPos(const QPointF &pos);
+    void enterHotspotsConfirming();
+    void leaveHotspotsConfirming();
+    void saveHotspot();
 };
 
 #endif // MAINGRAPHICSVIEW_H

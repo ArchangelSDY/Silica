@@ -110,6 +110,7 @@ public:
     void scheduleUnload();
 
     QList<ImageHotspot *> hotspots() { return m_hotspots; }
+    void loadHotspots();
 
     bool copy(const QString &destPath);
 
@@ -133,8 +134,6 @@ private:
     void unloadIfNeeded();
     void makeThumbnail();
     void computeThumbnailPath();
-
-    void loadHotspots();
 
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;

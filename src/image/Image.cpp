@@ -83,8 +83,6 @@ Image::Image(QUrl url, QObject *parent) :
     m_isMakingThumbnail(false)
 {
     computeThumbnailPath();
-
-    loadHotspots();
 }
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
@@ -99,8 +97,6 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_isMakingThumbnail(false)
 {
     computeThumbnailPath();
-
-    loadHotspots();
 }
 
 Image::~Image()
