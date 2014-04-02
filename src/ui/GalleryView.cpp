@@ -107,7 +107,7 @@ void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
         galleryItem->setRendererFactory(m_rendererFactory);
     }
 
-    update();
+    viewport()->update();
 }
 
 void GalleryView::setLooseRenderer()
