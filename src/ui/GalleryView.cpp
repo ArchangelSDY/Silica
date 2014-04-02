@@ -1,3 +1,4 @@
+#include <QGLWidget>
 #include <QGraphicsItem>
 
 #include "CompactRendererFactory.h"
@@ -10,6 +11,7 @@ GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene)
 {
+    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     setDragMode(QGraphicsView::RubberBandDrag);
 
     QPalette palette;

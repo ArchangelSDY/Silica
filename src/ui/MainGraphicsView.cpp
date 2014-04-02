@@ -10,6 +10,7 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene(this)) ,
     m_imageItem(new QGraphicsPixmapItem()) ,
+    m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit)
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
@@ -26,6 +27,8 @@ void MainGraphicsView::setNavigator(Navigator *navigator)
 void MainGraphicsView::paint(Image *image)
 {
     if (image) {
+        m_shouldRepaintThumbnailOnShown = false;
+
         QPixmap pixmap = QPixmap::fromImage(image->data());
         m_scene->setSceneRect(pixmap.rect());
         m_imageItem->setPixmap(pixmap);
@@ -37,15 +40,31 @@ void MainGraphicsView::paint(Image *image)
 void MainGraphicsView::paintThumbnail(Image *image)
 {
     if (image) {
-        const QSize &viewSize = size();
-        QPixmap rawThumbnail = QPixmap::fromImage(image->thumbnail());
-        QPixmap fitThumbnail = rawThumbnail.scaled(
-            viewSize, Qt::KeepAspectRatioByExpanding);
+        if (isVisible()) {
+            m_shouldRepaintThumbnailOnShown = false;
 
-        m_scene->setSceneRect(fitThumbnail.rect());
-        m_imageItem->setPixmap(fitThumbnail);
+            const QSize &viewSize = size();
+            QPixmap rawThumbnail = QPixmap::fromImage(image->thumbnail());
+            QPixmap fitThumbnail = rawThumbnail.scaled(
+                viewSize, Qt::KeepAspectRatioByExpanding);
 
-        fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
+            m_scene->setSceneRect(fitThumbnail.rect());
+            m_imageItem->setPixmap(fitThumbnail);
+
+            fitInView(fitThumbnail.rect(), Qt::KeepAspectRatio);
+        } else {
+            // QStackedViews won't layout hidden views but paintThumbnail may
+            // happen before showEvent. In this case, view size is incorretly
+            // small. So we have to paint thumbnail after showEvent.
+            m_shouldRepaintThumbnailOnShown = true;
+        }
+    }
+}
+
+void MainGraphicsView::showEvent(QShowEvent *)
+{
+    if (m_shouldRepaintThumbnailOnShown) {
+        paintThumbnail(m_navigator->currentImage());
     }
 }
 

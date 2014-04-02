@@ -33,6 +33,7 @@ private slots:
     void paintThumbnail(Image *image);
 
 protected:
+    virtual void showEvent(QShowEvent *event);
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
@@ -42,6 +43,7 @@ private:
     Navigator *m_navigator;
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
+    bool m_shouldRepaintThumbnailOnShown;
 
     FitMode m_fitInView;
 };

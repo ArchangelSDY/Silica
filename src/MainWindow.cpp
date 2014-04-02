@@ -182,17 +182,6 @@ void MainWindow::setupExtraUi()
     ui->pageImageView->layout()->setMargin(0);
 
 
-    // Image view
-
-    // QStackedViews won't layout hidden views but paintThumbnail happens
-    // before showEvent so that view size is incorretly small.
-    //
-    // By setting stackingMode to StackAll, we force all stacked views to be
-    // visible so that their layouts are correctly set.
-    QStackedLayout *stackedLayout =
-        static_cast<QStackedLayout *>(ui->stackedViews->layout());
-    stackedLayout->setStackingMode(QStackedLayout::StackAll);
-
     // PlayList gallery
     // TODO: Lazy load here
     loadSavedPlayLists();
