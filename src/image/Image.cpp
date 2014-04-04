@@ -207,7 +207,8 @@ void Image::loadThumbnail(bool makeImmediately)
     connect(loadThumbnailTask, SIGNAL(loaded(QImage *, bool)),
             this, SLOT(thumbnailReaderFinished(QImage *, bool)));
     QThreadPool::globalInstance()->reserveThread();
-    QThreadPool::globalInstance()->start(loadThumbnailTask);
+    // Thumbnail loading should be low priority
+    QThreadPool::globalInstance()->start(loadThumbnailTask, LowPriority);
 }
 
 void Image::makeThumbnail()
