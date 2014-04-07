@@ -31,6 +31,24 @@ int PlayListRecord::coverIndex()
     return m_coverIndex;
 }
 
+bool PlayListRecord::save()
+{
+    bool ok = false;
+    if (m_id == PlayListRecord::EMPTY_ID) {
+        ok = LocalDatabase::instance()->insertPlayListRecord(this);
+    } else {
+        ok = LocalDatabase::instance()->updatePlayListRecord(this);
+    }
+
+    emit saved();
+    return ok;
+}
+
+bool PlayListRecord::remove()
+{
+    return LocalDatabase::instance()->removePlayListRecord(this);
+}
+
 QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();

@@ -32,8 +32,8 @@ public:
     int coverIndex();
 
     virtual PlayList *playList() = 0;
-    virtual bool save() = 0;
-    virtual bool remove() = 0;
+    virtual bool save();
+    virtual bool remove();
 
     static QList<PlayListRecord *> all();
     static PlayListRecord *create(PlayListType type,

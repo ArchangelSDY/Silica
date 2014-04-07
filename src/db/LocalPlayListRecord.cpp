@@ -26,21 +26,3 @@ PlayList *LocalPlayListRecord::playList()
 
     return m_playList;
 }
-
-bool LocalPlayListRecord::save()
-{
-    bool ok = false;
-    if (m_id == PlayListRecord::EMPTY_ID) {
-        ok = LocalDatabase::instance()->insertPlayListRecord(this);
-    } else {
-        ok = LocalDatabase::instance()->updatePlayListRecord(this);
-    }
-
-    emit saved();
-    return ok;
-}
-
-bool LocalPlayListRecord::remove()
-{
-    return LocalDatabase::instance()->removePlayListRecord(this);
-}

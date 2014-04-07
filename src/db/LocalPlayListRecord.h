@@ -11,8 +11,6 @@ public:
         PlayList *playList = 0, QObject *parent = 0);
 
     PlayList *playList();
-    bool save();
-    bool remove();
 };
 
 #endif // LOCALPLAYLISTRECORD_H
