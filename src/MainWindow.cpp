@@ -12,9 +12,9 @@
 #include "GlobalConfig.h"
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
+#include "LocalPlayListRecord.h"
 #include "PlayList.h"
 #include "PlayListGalleryItem.h"
-#include "PlayListRecord.h"
 #include "MainWindow.h"
 
 #include "ui_MainWindow.h"
@@ -320,7 +320,7 @@ void MainWindow::promptToSavePlayList()
 
     QString name = dialog.textValue();
     if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
-        PlayListRecord record(name, image->thumbnailPath(),
+        LocalPlayListRecord record(name, image->thumbnailPath(),
                               m_navigator.playList());
         if (record.save()) {
             statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),

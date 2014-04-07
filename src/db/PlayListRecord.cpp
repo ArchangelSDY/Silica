@@ -1,4 +1,5 @@
 #include "LocalDatabase.h"
+#include "LocalPlayListRecord.h"
 #include "PlayList.h"
 #include "PlayListRecord.h"
 
@@ -13,22 +14,6 @@ PlayListRecord::PlayListRecord(const QString &name,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_playList(playList)
 {
-}
-
-PlayList *PlayListRecord::playList()
-{
-    if (!m_playList) {
-        m_playList = new PlayList();
-        m_playList->setRecord(this);
-
-        QStringList imageUrls =
-            LocalDatabase::instance()->queryImageUrlsForPlayList(m_id);
-        foreach (const QString &imageUrl, imageUrls) {
-            m_playList->addPath(QUrl(imageUrl));
-        }
-    }
-
-    return m_playList;
 }
 
 int PlayListRecord::coverIndex()
@@ -51,20 +36,12 @@ QList<PlayListRecord *> PlayListRecord::all()
     return LocalDatabase::instance()->queryPlayListRecords();
 }
 
-bool PlayListRecord::save()
+PlayListRecord *PlayListRecord::create(PlayListType type, const QString &name,
+                                       const QString &coverPath)
 {
-    bool ok = false;
-    if (m_id == PlayListRecord::EMPTY_ID) {
-        ok = LocalDatabase::instance()->insertPlayListRecord(this);
+    if (type == PlayListRecord::LocalPlayList) {
+        return new LocalPlayListRecord(name, coverPath);
     } else {
-        ok = LocalDatabase::instance()->updatePlayListRecord(this);
+        return 0;
     }
-
-    emit saved();
-    return ok;
-}
-
-bool PlayListRecord::remove()
-{
-    return LocalDatabase::instance()->removePlayListRecord(this);
 }

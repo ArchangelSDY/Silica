@@ -6,12 +6,12 @@
 
 const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 
-const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path) values (?, ?)";
+const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path, type) values (?, ?, ?)";
 
 const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
         "?, (select id from images where hash = ?))";
 
-const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path from playlists order by name";
+const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path, type from playlists order by name";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
@@ -60,10 +60,14 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         int id = q.value(0).toInt();
         QString name = q.value(1).toString();
         QString coverPath = q.value(2).toString();
+        PlayListRecord::PlayListType type =
+            static_cast<PlayListRecord::PlayListType>(q.value(3).toInt());
 
-        PlayListRecord *record = new PlayListRecord(name, coverPath);
-        record->setId(id);
-        records << record;
+        PlayListRecord *record = PlayListRecord::create(type, name, coverPath);
+        if (record) {
+            record->setId(id);
+            records << record;
+        }
     }
 
     return records;
@@ -105,6 +109,7 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     qInsertPlayList.prepare(SQL_INSERT_PLAYLIST);
     qInsertPlayList.addBindValue(playListRecord->name());
     qInsertPlayList.addBindValue(playListRecord->coverPath());
+    qInsertPlayList.addBindValue(static_cast<int>(playListRecord->type()));
     if (!qInsertPlayList.exec()) {
         qWarning() << qInsertPlayList.lastError()
                    << qInsertPlayList.lastQuery();

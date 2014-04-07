@@ -22,23 +22,35 @@ public:
     QString coverPath() const { return m_coverPath; }
     void setCoverPath(const QString &coverPath) { m_coverPath = coverPath; }
 
-    PlayList *playList();
+    enum PlayListType {
+        LocalPlayList,
+        RemotePlayList,
+    };
+
+    PlayListType type() const { return m_type; }
+
     int coverIndex();
 
+    virtual PlayList *playList() = 0;
+    virtual bool save() = 0;
+    virtual bool remove() = 0;
+
     static QList<PlayListRecord *> all();
-    bool save();
-    bool remove();
+    static PlayListRecord *create(PlayListType type,
+                                  const QString &name,
+                                  const QString &coverPath);
 
 signals:
     void saved();
 
-private:
+protected:
     static const int EMPTY_ID = -1;
     static const int EMPTY_COVER_INDEX = -1;
 
     int m_id;
     QString m_name;
     QString m_coverPath;
+    PlayListType m_type;
     int m_coverIndex;
     PlayList *m_playList;
 };

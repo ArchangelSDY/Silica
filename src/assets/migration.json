@@ -19,6 +19,21 @@
             "version": 3,
             "applySql": "create index images_index_hash on images (hash)",
             "revertSql": "drop index images_index_hash"
+        },
+        {
+            "version": 4,
+            "applySql": "create table image_hotspots (id integer primary key autoincrement, image_hash text, left integer, top integer, width integer, height integer)",
+            "revertSql": "drop table image_hotspots"
+        },
+        {
+            "version": 5,
+            "applySql": "create index image_hotspots_image_hash on image_hotspots (image_hash)",
+            "revertSql": "drop index image_hotspots_image_hash"
+        },
+        {
+            "version": 6,
+            "applySql": "alter table playlists add column type integer not null default 0",
+            "revertSql": ""
         }
     ]
 }
