@@ -118,8 +118,10 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     QVariant playListId = qInsertPlayList.lastInsertId();
 
     // Insert images
-    foreach (QSharedPointer<Image> image, *playListRecord->playList()) {
-        insertImage(image.data());
+    PlayList *pl = playListRecord->playList();
+    PlayList::const_iterator it;
+    for (it = pl->begin(); it != pl->end(); ++it) {
+        insertImage(it->data());
     }
 
     // Insert relationship records
@@ -127,9 +129,9 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
     QVariantList playListIds;
     QVariantList imageHashes;
-    foreach (QSharedPointer<Image> image, *playListRecord->playList()) {
+    for (it = pl->begin(); it != pl->end(); ++it) {
         playListIds << playListId;
-        imageHashes << image->source()->hashStr();
+        imageHashes << it->data()->source()->hashStr();
     }
     qInsertPlayListImages.addBindValue(playListIds);
     qInsertPlayListImages.addBindValue(imageHashes);

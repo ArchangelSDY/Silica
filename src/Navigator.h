@@ -21,8 +21,9 @@ public:
     static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
     explicit Navigator(QObject *parent = 0);
+    ~Navigator();
 
-    PlayList *playList() { return &m_playlist; }
+    PlayList *playList() { return m_playList; }
 
     void goPrev();
     void goNext();
@@ -42,13 +43,13 @@ public:
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-    void playListChange(PlayList playList);
-    void playListAppend(PlayList appended);
+    void playListChange(PlayList *playList);
+    void playListAppend(PlayList *appended);
     void navigationChange(int index);
 
 public slots:
-    void setPlayList(const PlayList &);
-    void appendPlayList(const PlayList &);
+    void setPlayList(PlayList *);
+    void appendPlayList(PlayList *);
     void clearPlayList();
 
     void goIndex(int index);
@@ -72,7 +73,7 @@ private:
     bool m_reverseNavigation;
     bool m_isLooping;
     ImagesCache m_cachedImages;
-    PlayList m_playlist;
+    PlayList *m_playList;
     QTimer m_autoNavigationTimer;
 };
 

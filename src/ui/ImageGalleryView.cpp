@@ -23,16 +23,16 @@ void ImageGalleryView::setNavigator(Navigator *navigator)
     m_navigator = navigator;
 }
 
-void ImageGalleryView::playListChange(PlayList playList)
+void ImageGalleryView::playListChange(PlayList *playList)
 {
     clear();
     playListAppend(playList);
 }
 
-void ImageGalleryView::playListAppend(PlayList appended)
+void ImageGalleryView::playListAppend(PlayList *appended)
 {
-    for (int i = 0; i < appended.length(); ++i) {
-        Image *image = appended.at(i).data();
+    for (int i = 0; i < appended->count(); ++i) {
+        Image *image = appended->at(i).data();
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
@@ -77,24 +77,28 @@ void ImageGalleryView::mousePressEvent(QMouseEvent *ev)
 
 void ImageGalleryView::sortByName()
 {
-    if (!m_navigator) {
+    if (!m_navigator || !m_navigator->playList()) {
         return;
     }
 
-    PlayList pl(*m_navigator->playList());
-    pl.sortByName();
-    m_navigator->setPlayList(pl);
+    // PlayList pl(*m_navigator->playList());
+    // pl.sortByName();
+    // m_navigator->setPlayList(pl);
+    // FIXME
+    m_navigator->playList()->sortByName();
 }
 
 void ImageGalleryView::sortByAspectRatio()
 {
-    if (!m_navigator) {
+    if (!m_navigator || !m_navigator->playList()) {
         return;
     }
 
-    PlayList pl(*m_navigator->playList());
-    pl.sortByAspectRatio();
-    m_navigator->setPlayList(pl);
+//    PlayList pl(*m_navigator->playList());
+//    pl.sortByAspectRatio();
+//    m_navigator->setPlayList(pl);
+    // FIXME
+    m_navigator->playList()->sortByAspectRatio();
 }
 
 void ImageGalleryView::setAsCover()

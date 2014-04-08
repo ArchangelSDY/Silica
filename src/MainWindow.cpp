@@ -55,16 +55,16 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
-    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
-            this, SLOT(playListChange(PlayList)));
-    connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
-            this, SLOT(playListAppend(PlayList)));
+    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+            this, SLOT(playListChange(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListAppend(PlayList *)),
+            this, SLOT(playListAppend(PlayList *)));
 
     // Update gallery
-    connect(&m_navigator, SIGNAL(playListChange(PlayList)),
-            ui->gallery, SLOT(playListChange(PlayList)));
-    connect(&m_navigator, SIGNAL(playListAppend(PlayList)),
-            ui->gallery, SLOT(playListAppend(PlayList)));
+    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+            ui->gallery, SLOT(playListChange(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListAppend(PlayList *)),
+            ui->gallery, SLOT(playListAppend(PlayList *)));
 
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
@@ -195,7 +195,7 @@ void MainWindow::loadSelectedPlayList()
     if (ui->playListGallery->scene()->selectedItems().count() > 0) {
         PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(
             ui->playListGallery->scene()->selectedItems()[0]);
-        m_navigator.setPlayList(*playListItem->record()->playList());
+        m_navigator.setPlayList(playListItem->record()->playList());
 
         // Select cover image
         const QList<QGraphicsItem *> &galleryItems =
@@ -217,14 +217,14 @@ void MainWindow::processCommandLineOptions()
     parser.process(*QCoreApplication::instance());
     const QStringList imagePaths = parser.positionalArguments();
 
-    PlayList playList;
+    PlayList *playList = new PlayList();
     QStringList urlPatterns = ImageSourceManager::instance()->urlPatterns();
     foreach (const QString& imagePath, imagePaths) {
         QString pattern = imagePath.left(imagePath.indexOf("://"));
         if (urlPatterns.contains(pattern)) {
-            playList.addPath(QUrl(imagePath));
+            playList->addPath(QUrl(imagePath));
         } else {
-            playList.addPath(imagePath);
+            playList->addPath(imagePath);
         }
     }
 
@@ -257,7 +257,7 @@ void MainWindow::promptToOpenImage()
         }
     }
 
-    PlayList playList(images);
+    PlayList *playList = new PlayList(images);
     m_navigator.setPlayList(playList);
 }
 
@@ -359,23 +359,24 @@ void MainWindow::imageLoaded(Image *image)
     ui->lblHeight->setText(QString::number(image->data().height()));
 }
 
-void MainWindow::playListChange(PlayList playList)
+void MainWindow::playListChange(PlayList *playList)
 {
     ui->playListWidget->clear();
 
     playListAppend(playList);
 
     // Switch to gallery view if playlist is not empty
-    if (!playList.isEmpty()) {
+    if (!playList->isEmpty()) {
         m_actToolBarGallery->trigger();
     }
 }
 
-void MainWindow::playListAppend(PlayList appended)
+void MainWindow::playListAppend(PlayList *appended)
 {
     QListWidget *list = ui->playListWidget;
-    foreach (const QSharedPointer<Image> &image, appended) {
-        list->addItem(image->name());
+    PlayList::const_iterator it = appended->begin();
+    for (; it != appended->end(); ++it) {
+        list->addItem(it->data()->name());
     }
 
     updateSidebarTitle();

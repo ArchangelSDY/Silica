@@ -2,23 +2,16 @@
 #include "PlayList.h"
 
 PlayList::PlayList() :
-    m_record(0) ,
-    m_eventEmitter(new PlayListEventEmitter())
+    m_record(0)
 {
 }
 
 PlayList::PlayList(const QList<QUrl> &imageUrls) :
-    m_record(0) ,
-    m_eventEmitter(new PlayListEventEmitter())
+    m_record(0)
 {
     foreach(const QUrl &imageUrl, imageUrls) {
         addPath(imageUrl);
     }
-}
-
-PlayList::~PlayList()
-{
-    delete m_eventEmitter;
 }
 
 void PlayList::addPath(const QString &path)
@@ -51,7 +44,9 @@ static bool imageNameLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByName()
 {
-    qSort(this->begin(), this->end(), imageNameLessThan);
+    // qSort(this->begin(), this->end(), imageNameLessThan);
+    qSort(m_images.begin(), m_images.end(), imageNameLessThan);
+    // TODO: emit signal itemChanged
 }
 
 static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
@@ -62,5 +57,7 @@ static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByAspectRatio()
 {
-    qSort(this->begin(), this->end(), imageAspectRatioLessThan);
+    // qSort(this->begin(), this->end(), imageAspectRatioLessThan);
+    qSort(m_images.begin(), m_images.end(), imageAspectRatioLessThan);
+    // TODO: emit signal itesChanged
 }

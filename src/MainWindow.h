@@ -22,8 +22,8 @@ public:
     ~MainWindow();
 
 public slots:
-    void playListChange(PlayList playList);
-    void playListAppend(PlayList appended);
+    void playListChange(PlayList *playList);
+    void playListAppend(PlayList *appended);
     void navigationChange(int index);
     void updateStatus(QString message);
     void gallerySelectionChanged();

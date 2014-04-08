@@ -46,11 +46,11 @@ void ImagesQuery::parseReply(QNetworkReply *reply)
     }
 }
 
-PlayList ImagesQuery::playList()
+PlayList *ImagesQuery::playList()
 {
-    PlayList pl;
+    PlayList *pl = new PlayList();
     while (!m_queuedImages.isEmpty()) {
-        pl << m_queuedImages.dequeue();
+        pl->append(m_queuedImages.dequeue());
     }
     return pl;
 }

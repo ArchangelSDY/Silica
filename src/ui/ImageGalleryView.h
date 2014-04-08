@@ -14,8 +14,8 @@ public:
     void setNavigator(Navigator *navigator);
 
 public slots:
-    void playListChange(PlayList playList);
-    void playListAppend(PlayList appended);
+    void playListChange(PlayList *playList);
+    void playListAppend(PlayList *appended);
 
 private slots:
     void sortByName();

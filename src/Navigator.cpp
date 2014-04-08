@@ -11,11 +11,19 @@ Navigator::Navigator(QObject *parent) :
     m_currentIndex(-1) ,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
-    m_cachedImages(MAX_CACHE)
+    m_cachedImages(MAX_CACHE) ,
+    m_playList(0)
 {
     m_autoNavigationTimer.setInterval(Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
     connect(&m_autoNavigationTimer, SIGNAL(timeout()),
             this, SLOT(goFastForward()));
+}
+
+Navigator::~Navigator()
+{
+    if (m_playList) {
+        delete m_playList;
+    }
 }
 
 void Navigator::reset()
@@ -24,7 +32,11 @@ void Navigator::reset()
     m_currentImage = 0;
     m_currentIndex = -1;
     m_reverseNavigation = false;
-    m_playlist.clear();
+    if (m_playList) {
+        m_playList->clear();
+        delete m_playList;
+        m_playList = 0;
+    }
 
     // Notify to clear image source cache
     ImageSourceManager::instance()->clearCache();
@@ -39,50 +51,53 @@ void Navigator::preload()
     }
 }
 
-void Navigator::setPlayList(const PlayList &playList)
+void Navigator::setPlayList(PlayList *playList)
 {
     reset();
 
-    m_playlist = playList;
-    emit playListChange(m_playlist);
+    m_playList = playList;
+    emit playListChange(m_playList);
 
     goIndex(0);
 }
 
-void Navigator::appendPlayList(const PlayList &playList)
+void Navigator::appendPlayList(PlayList *playList)
 {
     // If empty, load the first one
-    bool shouldGoFirst = (m_playlist.count() == 0);
+    bool shouldGoFirst = (m_playList->count() == 0);
 
-    m_playlist.append(playList);
+    m_playList->append(playList);
     emit playListAppend(playList);
 
     if (shouldGoFirst) {
         goIndex(0);
     }
+
+    // Appended playlist is no longer needed
+    delete playList;
 }
 
 void Navigator::clearPlayList()
 {
     reset();
 
-    emit playListChange(m_playlist);
+    emit playListChange(m_playList);
 }
 
 Image* Navigator::loadIndex(int index, bool shouldPaint)
 {
-    if (index < 0 || index >= m_playlist.count()) {
+    if (index < 0 || index >= m_playList->count()) {
         if (!m_isLooping) {
             return 0;
         } else {
-            index = (index + m_playlist.count()) % m_playlist.count();
+            index = (index + m_playList->count()) % m_playList->count();
         }
     }
 
     Image *image = m_cachedImages.at(index);
 
     if (!image) {
-        image = m_playlist[index].data();
+        image = (*m_playList)[index].data();
         m_cachedImages.insert(index, image);
     }
 
@@ -102,7 +117,7 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
 
 void Navigator::goIndex(int index)
 {
-    if (index < 0 || index >= m_playlist.count() || index == m_currentIndex) {
+    if (index < 0 || index >= m_playList->count() || index == m_currentIndex) {
         return;
     }
 
@@ -132,13 +147,13 @@ void Navigator::goPrev()
         goIndex(m_currentIndex - 1);
     } else if (m_isLooping) {
         m_reverseNavigation = true;
-        goIndex(m_playlist.count() - 1);
+        goIndex(m_playList->count() - 1);
     }
 }
 
 void Navigator::goNext()
 {
-    if (m_currentIndex < m_playlist.count() - 1) {
+    if (m_currentIndex < m_playList->count() - 1) {
         m_reverseNavigation = false;
         goIndex(m_currentIndex + 1);
     } else if (m_isLooping) {
@@ -156,7 +171,7 @@ void Navigator::goFirst()
 void Navigator::goLast()
 {
     m_reverseNavigation = true;
-    goIndex(m_playlist.count() - 1);
+    goIndex(m_playList->count() - 1);
 }
 
 void Navigator::imageLoaded()
@@ -201,7 +216,7 @@ void Navigator::setAutoNavigationInterval(int msec)
 void Navigator::goFastForward()
 {
     if (!m_reverseNavigation) {
-        if (m_currentIndex < m_playlist.count() - 1 || m_isLooping) {
+        if (m_currentIndex < m_playList->count() - 1 || m_isLooping) {
             goNext();
         } else {
             stopAutoNavigation();

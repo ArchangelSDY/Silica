@@ -10,7 +10,7 @@ class ImagesQuery : public AbstractQuery
 public:
     explicit ImagesQuery(QString tag, QObject *parent = 0);
 
-    PlayList playList();
+    PlayList *playList();
 
 protected:
     void parseReply(QNetworkReply *);
