@@ -81,10 +81,6 @@ void ImageGalleryView::sortByName()
         return;
     }
 
-    // PlayList pl(*m_navigator->playList());
-    // pl.sortByName();
-    // m_navigator->setPlayList(pl);
-    // FIXME
     m_navigator->playList()->sortByName();
 }
 
@@ -94,10 +90,6 @@ void ImageGalleryView::sortByAspectRatio()
         return;
     }
 
-//    PlayList pl(*m_navigator->playList());
-//    pl.sortByAspectRatio();
-//    m_navigator->setPlayList(pl);
-    // FIXME
     m_navigator->playList()->sortByAspectRatio();
 }
 

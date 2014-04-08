@@ -88,6 +88,9 @@ public:
         return m_images.isEmpty();
     }
 
+signals:
+    void itemsChanged();
+
 private:
     QList<QSharedPointer<Image> > m_images;
     PlayListRecord *m_record;

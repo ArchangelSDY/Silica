@@ -56,6 +56,7 @@ void Navigator::setPlayList(PlayList *playList)
     reset();
 
     m_playList = playList;
+    connect(m_playList, SIGNAL(itemsChanged()), this, SLOT(reloadPlayList()));
     emit playListChange(m_playList);
 
     goIndex(0);
@@ -74,13 +75,19 @@ void Navigator::appendPlayList(PlayList *playList)
     }
 
     // Appended playlist is no longer needed
-    delete playList;
+    // FIXME
+    // delete playList;
 }
 
 void Navigator::clearPlayList()
 {
     reset();
 
+    emit playListChange(m_playList);
+}
+
+void Navigator::reloadPlayList()
+{
     emit playListChange(m_playList);
 }
 

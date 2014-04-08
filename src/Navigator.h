@@ -51,6 +51,7 @@ public slots:
     void setPlayList(PlayList *);
     void appendPlayList(PlayList *);
     void clearPlayList();
+    void reloadPlayList();
 
     void goIndex(int index);
 

@@ -44,9 +44,8 @@ static bool imageNameLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByName()
 {
-    // qSort(this->begin(), this->end(), imageNameLessThan);
     qSort(m_images.begin(), m_images.end(), imageNameLessThan);
-    // TODO: emit signal itemChanged
+    emit itemsChanged();
 }
 
 static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
@@ -57,7 +56,6 @@ static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByAspectRatio()
 {
-    // qSort(this->begin(), this->end(), imageAspectRatioLessThan);
     qSort(m_images.begin(), m_images.end(), imageAspectRatioLessThan);
-    // TODO: emit signal itesChanged
+    emit itemsChanged();
 }
