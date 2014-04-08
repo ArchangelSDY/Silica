@@ -2,16 +2,23 @@
 #include "PlayList.h"
 
 PlayList::PlayList() :
-    m_record(0)
+    m_record(0) ,
+    m_eventEmitter(new PlayListEventEmitter())
 {
 }
 
 PlayList::PlayList(const QList<QUrl> &imageUrls) :
-    m_record(0)
+    m_record(0) ,
+    m_eventEmitter(new PlayListEventEmitter())
 {
     foreach(const QUrl &imageUrl, imageUrls) {
         addPath(imageUrl);
     }
+}
+
+PlayList::~PlayList()
+{
+    delete m_eventEmitter;
 }
 
 void PlayList::addPath(const QString &path)

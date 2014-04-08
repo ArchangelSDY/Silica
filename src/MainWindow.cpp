@@ -8,7 +8,6 @@
 #include <QStatusBar>
 #include <QToolBar>
 
-#include "AsunaDatabase.h"
 #include "GlobalConfig.h"
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
@@ -29,8 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_actToolBarFav(0) ,
     m_actToolBarGallery(0) ,
     m_actToolBarImage(0) ,
-    m_database(new AsunaDatabase()) ,
-    m_commandInterpreter(&m_navigator, m_database) ,
+    m_commandInterpreter(&m_navigator) ,
     m_inputMode(InputMode_Control)
 {
     ui->setupUi(this);
@@ -79,8 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
 
-    connect(m_database, SIGNAL(gotPlayList(PlayList)),
-            &m_navigator, SLOT(appendPlayList(PlayList)));
+//    connect(m_database, SIGNAL(gotPlayList(PlayList)),
+//            &m_navigator, SLOT(appendPlayList(PlayList)));
     connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
             this, SLOT(updateStatus(QString)));
 
@@ -90,7 +88,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete m_database;
 }
 
 void MainWindow::setupExtraUi()

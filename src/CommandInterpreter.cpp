@@ -1,10 +1,8 @@
 #include "CommandInterpreter.h"
 
-CommandInterpreter::CommandInterpreter(Navigator *navigator, RemoteDatabase *database,
-                                       QObject *parent) :
+CommandInterpreter::CommandInterpreter(Navigator *navigator, QObject *parent) :
     QObject(parent) ,
-    m_navigator(navigator) ,
-    m_database(database)
+    m_navigator(navigator)
 {
 }
 
@@ -28,7 +26,8 @@ void CommandInterpreter::run()
     if (m_cmd.startsWith("/")) {
         QString tag = m_cmd.mid(1);
         m_navigator->clearPlayList();
-        m_database->queryByTag(tag);
+        // FIXME
+        // m_database->queryByTag(tag);
     }
 }
 

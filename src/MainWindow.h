@@ -6,7 +6,6 @@
 #include <QGraphicsScene>
 
 #include "CommandInterpreter.h"
-#include "RemoteDatabase.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -66,7 +65,6 @@ private:
     QAction *m_actToolBarImage;
 
     Navigator m_navigator;
-    RemoteDatabase *m_database;
     CommandInterpreter m_commandInterpreter;
     InputMode m_inputMode;
 };
