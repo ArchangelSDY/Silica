@@ -23,16 +23,18 @@ void ImageGalleryView::setNavigator(Navigator *navigator)
     m_navigator = navigator;
 }
 
-void ImageGalleryView::playListChange(PlayList *playList)
+void ImageGalleryView::playListChange()
 {
     clear();
-    playListAppend(playList);
+
+    playListAppend(0);
 }
 
-void ImageGalleryView::playListAppend(PlayList *appended)
+void ImageGalleryView::playListAppend(int start)
 {
-    for (int i = 0; i < appended->count(); ++i) {
-        Image *image = appended->at(i).data();
+    PlayList *pl = m_navigator->playList();
+    for (int i = start; i < pl->count(); ++i) {
+        Image *image = pl->at(i).data();
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);

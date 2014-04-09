@@ -55,16 +55,16 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
-    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
-            this, SLOT(playListChange(PlayList *)));
-    connect(&m_navigator, SIGNAL(playListAppend(PlayList *)),
-            this, SLOT(playListAppend(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListChange()),
+            this, SLOT(playListChange()));
+    connect(&m_navigator, SIGNAL(playListAppend(int)),
+            this, SLOT(playListAppend(int)));
 
     // Update gallery
-    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
-            ui->gallery, SLOT(playListChange(PlayList *)));
-    connect(&m_navigator, SIGNAL(playListAppend(PlayList *)),
-            ui->gallery, SLOT(playListAppend(PlayList *)));
+    connect(&m_navigator, SIGNAL(playListChange()),
+            ui->gallery, SLOT(playListChange()));
+    connect(&m_navigator, SIGNAL(playListAppend(int)),
+            ui->gallery, SLOT(playListAppend(int)));
 
     connect(&m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
@@ -195,6 +195,7 @@ void MainWindow::loadSelectedPlayList()
     if (ui->playListGallery->scene()->selectedItems().count() > 0) {
         PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(
             ui->playListGallery->scene()->selectedItems()[0]);
+        // Navigator doesn't take ownership of PlayList in this case
         m_navigator.setPlayList(playListItem->record()->playList());
 
         // Select cover image
@@ -258,7 +259,8 @@ void MainWindow::promptToOpenImage()
     }
 
     PlayList *playList = new PlayList(images);
-    m_navigator.setPlayList(playList);
+    // Navigator takes ownership of PlayList in this case
+    m_navigator.setPlayList(playList, true);
 }
 
 void MainWindow::promptToSaveImage()
@@ -359,24 +361,25 @@ void MainWindow::imageLoaded(Image *image)
     ui->lblHeight->setText(QString::number(image->data().height()));
 }
 
-void MainWindow::playListChange(PlayList *playList)
+void MainWindow::playListChange()
 {
-    ui->playListWidget->clear();
-
-    playListAppend(playList);
-
     // Switch to gallery view if playlist is not empty
-    if (!playList->isEmpty()) {
+    if (!m_navigator.playList()->isEmpty()) {
         m_actToolBarGallery->trigger();
     }
+
+    ui->playListWidget->clear();
+
+    playListAppend(0);
 }
 
-void MainWindow::playListAppend(PlayList *appended)
+void MainWindow::playListAppend(int start)
 {
+    PlayList *pl = m_navigator.playList();
+
     QListWidget *list = ui->playListWidget;
-    PlayList::const_iterator it = appended->begin();
-    for (; it != appended->end(); ++it) {
-        list->addItem(it->data()->name());
+    for (int i = start; i < pl->count(); ++i) {
+        list->addItem(pl->at(i).data()->name());
     }
 
     updateSidebarTitle();

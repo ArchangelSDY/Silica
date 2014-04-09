@@ -22,14 +22,15 @@ public:
     ~MainWindow();
 
 public slots:
-    void playListChange(PlayList *playList);
-    void playListAppend(PlayList *appended);
     void navigationChange(int index);
     void updateStatus(QString message);
     void gallerySelectionChanged();
     void statusBarMessageChanged(const QString & message);
 
 private slots:
+    void playListChange();
+    void playListAppend(int start);
+
     void imageLoaded(Image *image);
     void loadSavedPlayLists();
     void loadSelectedPlayList();

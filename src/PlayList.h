@@ -35,31 +35,44 @@ public:
 
     inline void append(const QSharedPointer<Image> &image)
     {
+        int start = count();
         m_images.append(image);
+        emit itemsAppended(start);
     }
     inline void append(const QList<QSharedPointer<Image> > &images)
     {
+        int start = count();
         m_images.append(images);
+        emit itemsAppended(start);
     }
     inline void append(PlayList *playList)
     {
+        int start = count();
         m_images.append(playList->m_images);
+        emit itemsAppended(start);
     }
 
     inline QList<QSharedPointer<Image> > &operator<<(
             const QSharedPointer<Image> &image)
     {
-        return m_images << image;
+        int start = count();
+        QList<QSharedPointer<Image> > &ret =  m_images << image;
+        emit itemsAppended(start);
+        return ret;
     }
     inline QList<QSharedPointer<Image> > &operator<<(
             const QList<QSharedPointer<Image> > &images)
     {
-        return m_images << images;
+        int start = count();
+        QList<QSharedPointer<Image> > &ret = m_images << images;
+        emit itemsAppended(start);
+        return ret;
     }
 
     inline void clear()
     {
         m_images.clear();
+        emit itemsChanged();
     }
 
     inline QSharedPointer<Image> &operator[](int i)
@@ -90,6 +103,7 @@ public:
 
 signals:
     void itemsChanged();
+    void itemsAppended(int start);
 
 private:
     QList<QSharedPointer<Image> > m_images;

@@ -43,14 +43,14 @@ public:
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-    void playListChange(PlayList *playList);
-    void playListAppend(PlayList *appended);
+    void playListChange();
+    void playListAppend(int start);
     void navigationChange(int index);
 
 public slots:
-    void setPlayList(PlayList *);
-    void appendPlayList(PlayList *);
-    void clearPlayList();
+    void setPlayList(PlayList *, bool takeOwnership = false);
+    // void appendPlayList(PlayList *);
+    // void clearPlayList();
     void reloadPlayList();
 
     void goIndex(int index);
@@ -62,6 +62,8 @@ public slots:
     void setLoop(bool loop);
 
 private slots:
+    void playListAppended(int start);
+
     void goFastForward();
 
 private:
@@ -75,6 +77,7 @@ private:
     bool m_isLooping;
     ImagesCache m_cachedImages;
     PlayList *m_playList;
+    bool m_ownPlayList;
     QTimer m_autoNavigationTimer;
 };
 

@@ -25,7 +25,7 @@ void CommandInterpreter::run()
     // Query images
     if (m_cmd.startsWith("/")) {
         QString tag = m_cmd.mid(1);
-        m_navigator->clearPlayList();
+        // m_navigator->clearPlayList();
         // FIXME
         // m_database->queryByTag(tag);
     }
