@@ -12,9 +12,10 @@
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
 #include "LocalPlayListRecord.h"
+#include "MainWindow.h"
 #include "PlayList.h"
 #include "PlayListGalleryItem.h"
-#include "MainWindow.h"
+#include "RemotePlayListRecord.h"
 
 #include "ui_MainWindow.h"
 
@@ -295,7 +296,7 @@ void MainWindow::promptToSaveImage()
     }
 }
 
-void MainWindow::promptToSavePlayList()
+void MainWindow::promptToSaveLocalPlayList()
 {
     Image *image = m_navigator.currentImage();
     if (!image) {
@@ -330,6 +331,24 @@ void MainWindow::promptToSavePlayList()
         } else {
             statusBar()->showMessage(
                 QString("Failed to save playList %1!").arg(name), 2000);
+        }
+    }
+}
+
+void MainWindow::promptToSaveRemotePlayList()
+{
+    QString tags = QInputDialog::getText(this, "New Remote PlayList", "Tag");
+    if (!tags.isEmpty()) {
+        RemotePlayListRecord record(tags);
+        if (record.save()) {
+            statusBar()->showMessage(QString("PlayList %1 saved!").arg(tags),
+                                     2000);
+
+            // Refresh playlist gallery
+            loadSavedPlayLists();
+        } else {
+            statusBar()->showMessage(
+                QString("Failed to save playList %1!").arg(tags), 2000);
         }
     }
 }
@@ -477,7 +496,10 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
                 promptToSaveImage();
                 break;
             case Qt::Key_P:
-                promptToSavePlayList();
+                promptToSaveLocalPlayList();
+                break;
+            case Qt::Key_N:
+                promptToSaveRemotePlayList();
                 break;
             case Qt::Key_G:
                 switchViews();

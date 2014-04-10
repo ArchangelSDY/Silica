@@ -38,6 +38,9 @@ void PlayListGalleryItem::loadThumbnail()
         delete m_thumbnail;
     }
     m_thumbnail = new QImage(m_record->coverPath());
+    if (m_thumbnail->isNull()) {
+        m_thumbnail->load(":/res/album.png");
+    }
 
     // Replace with new render since cover image has changed
     setRenderer(m_rendererFactory->createForPlayListGallery(m_record->name()));

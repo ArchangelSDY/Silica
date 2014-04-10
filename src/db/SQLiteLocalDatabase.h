@@ -13,7 +13,7 @@ public:
     SQLiteLocalDatabase();
 
     QList<PlayListRecord *> queryPlayListRecords();
-    QStringList queryImageUrlsForPlayList(int playListId);
+    QStringList queryImageUrlsForLocalPlayListRecord(int playListId);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);

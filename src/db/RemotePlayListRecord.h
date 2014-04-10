@@ -8,8 +8,9 @@ class RemotePlayListRecord : public PlayListRecord
 {
     Q_OBJECT
 public:
-    explicit RemotePlayListRecord(const QString &name, const QString &coverPath,
-                                  PlayList *playList = 0, QObject *parent = 0);
+    explicit RemotePlayListRecord(const QString &name,
+                                  const QString &coverPath = QString(),
+                                  QObject *parent = 0);
 
     PlayList *playList();
 

@@ -4,9 +4,8 @@
 
 RemotePlayListRecord::RemotePlayListRecord(const QString &name,
                                            const QString &coverPath,
-                                           PlayList *playList,
                                            QObject *parent) :
-    PlayListRecord(name, coverPath, playList, parent) ,
+    PlayListRecord(name, coverPath, 0, parent) ,
     m_query(0)
 {
     m_type = PlayListRecord::RemotePlayList;
@@ -32,6 +31,7 @@ PlayList *RemotePlayListRecord::playList()
 void RemotePlayListRecord::gotPlayList()
 {
     Q_ASSERT(m_query);
+    Q_ASSERT(m_playList);
 
     PlayList *toBeAppended = m_query->playList();
     if (toBeAppended) {

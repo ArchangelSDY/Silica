@@ -7,5 +7,6 @@
         <file>res/toolbar/gallery.png</file>
         <file>res/toolbar/image-view-active.png</file>
         <file>res/toolbar/image-view.png</file>
+        <file>res/album.png</file>
     </qresource>
 </RCC>

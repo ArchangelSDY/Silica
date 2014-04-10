@@ -2,6 +2,7 @@
 #include "LocalPlayListRecord.h"
 #include "PlayList.h"
 #include "PlayListRecord.h"
+#include "RemotePlayListRecord.h"
 
 PlayListRecord::PlayListRecord(const QString &name,
                                const QString &coverPath,
@@ -59,6 +60,8 @@ PlayListRecord *PlayListRecord::create(PlayListType type, const QString &name,
 {
     if (type == PlayListRecord::LocalPlayList) {
         return new LocalPlayListRecord(name, coverPath);
+    } else if (type == PlayListRecord::RemotePlayList) {
+        return new RemotePlayListRecord(name, coverPath);
     } else {
         return 0;
     }

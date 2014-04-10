@@ -45,7 +45,8 @@ private:
     void processCommandLineOptions();
     void promptToOpenImage();
     void promptToSaveImage();
-    void promptToSavePlayList();
+    void promptToSaveLocalPlayList();
+    void promptToSaveRemotePlayList();
 
     void handleControlKeyPress(QKeyEvent *);
     void handleCommandKeyPress(QKeyEvent *);

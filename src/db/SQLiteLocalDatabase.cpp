@@ -73,7 +73,8 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
     return records;
 }
 
-QStringList SQLiteLocalDatabase::queryImageUrlsForPlayList(int playListId)
+QStringList SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
+    int playListId)
 {
     QStringList imageUrls;
 
@@ -117,29 +118,32 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     }
     QVariant playListId = qInsertPlayList.lastInsertId();
 
-    // Insert images
-    PlayList *pl = playListRecord->playList();
-    PlayList::const_iterator it;
-    for (it = pl->begin(); it != pl->end(); ++it) {
-        insertImage(it->data());
-    }
+    // Only Local PlayList Record needs inserting related images
+    if (playListRecord->type() == PlayListRecord::LocalPlayList) {
+        // Insert images
+        PlayList *pl = playListRecord->playList();
+        PlayList::const_iterator it;
+        for (it = pl->begin(); it != pl->end(); ++it) {
+            insertImage(it->data());
+        }
 
-    // Insert relationship records
-    QSqlQuery qInsertPlayListImages;
-    qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
-    QVariantList playListIds;
-    QVariantList imageHashes;
-    for (it = pl->begin(); it != pl->end(); ++it) {
-        playListIds << playListId;
-        imageHashes << it->data()->source()->hashStr();
-    }
-    qInsertPlayListImages.addBindValue(playListIds);
-    qInsertPlayListImages.addBindValue(imageHashes);
+        // Insert relationship records
+        QSqlQuery qInsertPlayListImages;
+        qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+        QVariantList playListIds;
+        QVariantList imageHashes;
+        for (it = pl->begin(); it != pl->end(); ++it) {
+            playListIds << playListId;
+            imageHashes << it->data()->source()->hashStr();
+        }
+        qInsertPlayListImages.addBindValue(playListIds);
+        qInsertPlayListImages.addBindValue(imageHashes);
 
-    if (!qInsertPlayListImages.execBatch()) {
-        qWarning() << qInsertPlayListImages.lastError()
-                   << qInsertPlayListImages.lastQuery();
-        return false;
+        if (!qInsertPlayListImages.execBatch()) {
+            qWarning() << qInsertPlayListImages.lastError()
+                       << qInsertPlayListImages.lastQuery();
+            return false;
+        }
     }
 
     return true;
