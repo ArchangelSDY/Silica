@@ -9,8 +9,8 @@ class TestLocalDatabase : public QObject
 private slots:
     void initTestCase();
 
-    void playListsSaveAndLoad();
-    void playListsSaveAndLoad_data();
+    void localPlayListsSaveAndLoad();
+    void localPlayListsSaveAndLoad_data();
     void playListRemove();
     void playListUpdate();
 

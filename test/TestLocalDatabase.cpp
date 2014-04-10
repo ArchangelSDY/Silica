@@ -2,8 +2,10 @@
 #include <QTest>
 
 #include "LocalDatabase.h"
+#include "LocalPlayListRecord.h"
 #include "PlayList.h"
 #include "PlayListRecord.h"
+#include "RemotePlayListRecord.h"
 
 #include "TestLocalDatabase.h"
 
@@ -19,13 +21,13 @@ void TestLocalDatabase::initTestCase()
     QSqlDatabase::removeDatabase("TestLocalDatabase");
 }
 
-void TestLocalDatabase::playListsSaveAndLoad()
+void TestLocalDatabase::localPlayListsSaveAndLoad()
 {
     QFETCH(QList<QUrl>, imageUrls);
     QFETCH(QString, name);
 
     PlayList pl(imageUrls);
-    PlayListRecord record(name, pl[0]->thumbnailPath(), &pl);
+    LocalPlayListRecord record(name, pl[0]->thumbnailPath(), &pl);
 
     int beforeCount = LocalDatabase::instance()->queryPlayListRecords().count();
 
@@ -45,7 +47,7 @@ void TestLocalDatabase::playListsSaveAndLoad()
     }
 }
 
-void TestLocalDatabase::playListsSaveAndLoad_data()
+void TestLocalDatabase::localPlayListsSaveAndLoad_data()
 {
     QTest::addColumn<QList<QUrl> >("imageUrls");
     QTest::addColumn<QString>("name");
@@ -61,7 +63,7 @@ void TestLocalDatabase::playListRemove()
     QList<QUrl> imageUrls;
     imageUrls << QUrl("file:///me.jpg");
     PlayList pl(imageUrls);
-    PlayListRecord record("test_remove", "cover.jpg", &pl);
+    LocalPlayListRecord record("test_remove", "cover.jpg", &pl);
     record.save();
 
     QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
@@ -92,7 +94,7 @@ void TestLocalDatabase::playListUpdate()
     QList<QUrl> imageUrls;
     imageUrls << QUrl("file:///me.jpg");
     PlayList pl(imageUrls);
-    PlayListRecord record("test_update", "cover.jpg", &pl);
+    LocalPlayListRecord record("test_update", "cover.jpg", &pl);
     record.save();
 
     QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
