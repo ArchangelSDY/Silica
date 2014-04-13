@@ -11,6 +11,7 @@ PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     GalleryView(parent)
 {
     m_rendererFactory = new CompactRendererFactory();
+    m_enableGrouping = true;
 }
 
 void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
