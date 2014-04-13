@@ -15,6 +15,8 @@ public:
 
     virtual void setRendererFactory(AbstractRendererFactory *factory) = 0;
 
+    virtual QString group() const { return QString(); }
+
 protected:
     void setRenderer(AbstractGalleryItemRenderer *renderer);
 

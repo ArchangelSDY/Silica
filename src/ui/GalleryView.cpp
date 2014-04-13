@@ -9,7 +9,8 @@
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
-    m_scene(new QGraphicsScene)
+    m_scene(new QGraphicsScene) ,
+    m_enableGrouping(false)
 {
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     setDragMode(QGraphicsView::RubberBandDrag);
@@ -39,7 +40,7 @@ void GalleryView::clear()
 
 void GalleryView::layout()
 {
-    if (!isVisible()) {
+    if (!isVisible() || m_scene->items().length() == 0) {
         return;
     }
 
@@ -51,20 +52,40 @@ void GalleryView::layout()
         return;
     }
 
-    int maxRows = items.length() / maxColumns + 1;
+    qreal curRow = 0, curColumn = -1;
+    QString curGroup = static_cast<GalleryItem *>(items[0])->group();
+    for (int i = 0; i < items.length(); ++i) {
+        GalleryItem *item = static_cast<GalleryItem *>(items[i]);
 
-    for (int i = m_scene->items().length() - 1; i >= 0; --i) {
-        QGraphicsItem *item = items[i];
+        bool shouldBreakLine = false;
+        // Break line if exceeds columns limit
+        if (curColumn == maxColumns - 1) {
+            shouldBreakLine = true;
+        }
 
-        // Position
-        qreal x = i % maxColumns * galleryItemSize.width();
-        qreal y = i / maxColumns * galleryItemSize.height();
+        // Break line if group changs
+        if (m_enableGrouping && item->group() != curGroup) {
+            curRow += 0.5;    // Add additional half line
+
+            shouldBreakLine = true;
+        }
+        curGroup = item->group();
+
+        if (shouldBreakLine) {
+            curRow += 1;
+            curColumn = 0;
+        } else {
+            curColumn += 1;
+        }
+
+        qreal x = curColumn * galleryItemSize.width();
+        qreal y = curRow * galleryItemSize.height();
         item->setPos(x, y);
     }
 
-    QRect newSceneRect(0, 0,
+    QRectF newSceneRect(0, 0,
         maxColumns * galleryItemSize.width(),
-        maxRows * galleryItemSize.height());
+        (curRow + 1) * galleryItemSize.height());
     setSceneRect(newSceneRect);
 }
 

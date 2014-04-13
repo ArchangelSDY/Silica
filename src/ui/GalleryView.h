@@ -34,6 +34,7 @@ protected:
 
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;
+    bool m_enableGrouping;
 };
 
 #endif // GALLERYVIEW_H

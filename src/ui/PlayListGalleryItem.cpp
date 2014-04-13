@@ -82,3 +82,8 @@ void PlayListGalleryItem::paint(QPainter *painter,
 
     m_renderer->paint(painter);
 }
+
+QString PlayListGalleryItem::group() const
+{
+    return QString::number(m_record->type());
+}
