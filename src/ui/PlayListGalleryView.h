@@ -10,6 +10,9 @@ class PlayListGalleryView : public GalleryView
 public:
     explicit PlayListGalleryView(QWidget *parent = 0);
 
+signals:
+    void promptToSaveRemotePlayList();
+
 public slots:
     void setPlayListRecords(QList<PlayListRecord *> records);
 

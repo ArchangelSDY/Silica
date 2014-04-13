@@ -34,6 +34,8 @@ private slots:
     void loadSavedPlayLists();
     void loadSelectedPlayList();
 
+    void promptToSaveRemotePlayList();
+
 protected:
     virtual void keyPressEvent(QKeyEvent *);
     virtual void resizeEvent(QResizeEvent *);
@@ -45,7 +47,6 @@ private:
     void promptToOpenImage();
     void promptToSaveImage();
     void promptToSaveLocalPlayList();
-    void promptToSaveRemotePlayList();
 
     void updateSidebarTitle();
     void switchViews();

@@ -174,6 +174,8 @@ void MainWindow::setupExtraUi()
 
 
     // PlayList gallery
+    connect(ui->playListGallery, SIGNAL(promptToSaveRemotePlayList()),
+            this, SLOT(promptToSaveRemotePlayList()));
     // TODO: Lazy load here
     loadSavedPlayLists();
 }
@@ -477,9 +479,6 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             case Qt::Key_P:
                 promptToSaveLocalPlayList();
-                break;
-            case Qt::Key_N:
-                promptToSaveRemotePlayList();
                 break;
             case Qt::Key_G:
                 switchViews();

@@ -30,6 +30,10 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
 
+    QMenu *menuNew = menu.addMenu(tr("New"));
+    menuNew->addAction(tr("Remote PlayList"), this,
+        SIGNAL(promptToSaveRemotePlayList()));
+
     QAction *actRename =
         menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
     if (scene()->selectedItems().count() == 0) {
