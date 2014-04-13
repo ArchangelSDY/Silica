@@ -78,8 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
 
-//    connect(m_database, SIGNAL(gotPlayList(PlayList)),
-//            &m_navigator, SLOT(appendPlayList(PlayList)));
     connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
             this, SLOT(updateStatus(QString)));
 

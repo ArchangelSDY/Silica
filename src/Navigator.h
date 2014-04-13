@@ -49,8 +49,6 @@ signals:
 
 public slots:
     void setPlayList(PlayList *, bool takeOwnership = false);
-    // void appendPlayList(PlayList *);
-    // void clearPlayList();
     void reloadPlayList();
 
     void goIndex(int index);

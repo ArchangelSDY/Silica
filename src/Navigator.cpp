@@ -83,15 +83,6 @@ void Navigator::playListAppended(int start)
     }
 }
 
-/*
-void Navigator::clearPlayList()
-{
-    reset();
-
-    emit playListChange();
-}
-*/
-
 void Navigator::reloadPlayList()
 {
     emit playListChange();
