@@ -1,5 +1,4 @@
 SOURCES += \
-    $$PWD/CommandInterpreter.cpp \
     $$PWD/GlobalConfig.cpp \
     $$PWD/MainWindow.cpp \
     $$PWD/Navigator.cpp \

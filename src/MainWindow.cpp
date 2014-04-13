@@ -28,9 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_toolBarActs(0) ,
     m_actToolBarFav(0) ,
     m_actToolBarGallery(0) ,
-    m_actToolBarImage(0) ,
-    m_commandInterpreter(&m_navigator) ,
-    m_inputMode(InputMode_Control)
+    m_actToolBarImage(0)
 {
     ui->setupUi(this);
     setupExtraUi();
@@ -77,9 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Navigation binding for gallery
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
-
-    connect(&m_commandInterpreter, SIGNAL(commandChange(QString)),
-            this, SLOT(updateStatus(QString)));
 
     processCommandLineOptions();
 }
@@ -452,19 +447,6 @@ void MainWindow::gallerySelectionChanged()
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
-    if (m_inputMode == InputMode_Control) {
-        handleControlKeyPress(ev);
-    } else if (m_inputMode == InputMode_Command) {
-        handleCommandKeyPress(ev);
-
-        if (m_commandInterpreter.isEmpty()) {
-            m_inputMode = InputMode_Control;
-        }
-    }
-}
-
-void MainWindow::handleControlKeyPress(QKeyEvent *ev)
-{
     if (ev->modifiers() == Qt::NoModifier) {
         switch (ev->key()) {
             case Qt::Key_J:
@@ -523,10 +505,6 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
                     QApplication::exit();
                 }
                 break;
-            case Qt::Key_Slash:
-                m_inputMode = InputMode_Command;
-                handleCommandKeyPress(ev);
-                break;
             case Qt::Key_Home:
                 m_navigator.goFirst();
                 break;
@@ -553,16 +531,6 @@ void MainWindow::handleControlKeyPress(QKeyEvent *ev)
         }
 
         ev->accept();
-    }
-}
-
-void MainWindow::handleCommandKeyPress(QKeyEvent *ev)
-{
-    if (ev->key() == Qt::Key_Escape) {
-        m_inputMode = InputMode_Control;
-        m_commandInterpreter.reset();
-    } else {
-        m_commandInterpreter.keyPress(ev);
     }
 }
 

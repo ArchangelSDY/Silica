@@ -5,7 +5,6 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 
-#include "CommandInterpreter.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -48,16 +47,8 @@ private:
     void promptToSaveLocalPlayList();
     void promptToSaveRemotePlayList();
 
-    void handleControlKeyPress(QKeyEvent *);
-    void handleCommandKeyPress(QKeyEvent *);
-
     void updateSidebarTitle();
     void switchViews();
-
-    enum InputMode {
-        InputMode_Control,
-        InputMode_Command,
-    };
 
     Ui::MainWindow *ui;
     QToolBar *m_toolBar;
@@ -67,8 +58,6 @@ private:
     QAction *m_actToolBarImage;
 
     Navigator m_navigator;
-    CommandInterpreter m_commandInterpreter;
-    InputMode m_inputMode;
 };
 
 #endif // MAINWINDOW_H
