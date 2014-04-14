@@ -32,6 +32,9 @@ protected:
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
+    void toggleGrouping();
+    virtual void sortByGroup(QList<QGraphicsItem *> *) {}
+
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;
     bool m_enableGrouping;

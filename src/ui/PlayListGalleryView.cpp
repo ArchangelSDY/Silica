@@ -7,8 +7,28 @@
 #include "PlayListGalleryItem.h"
 #include "PlayListGalleryView.h"
 
+static bool playListTypeLessThan(QGraphicsItem *left,
+                                 QGraphicsItem *right)
+
+{
+    PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
+    PlayListGalleryItem *rightItem = static_cast<PlayListGalleryItem *>(right);
+
+    int leftRecordType = leftItem->record()->type();
+    int rightRecordType = rightItem->record()->type();
+
+    if (leftRecordType < rightRecordType) {
+        return true;
+    } else if (leftRecordType > rightRecordType) {
+        return false;
+    } else {
+        return leftItem->record()->name() < rightItem->record()->name();
+    }
+}
+
 PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
-    GalleryView(parent)
+    GalleryView(parent) ,
+    m_groupLessThan(playListTypeLessThan)
 {
     m_rendererFactory = new CompactRendererFactory();
     m_enableGrouping = true;
@@ -52,6 +72,12 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     QMenu *renderers = menu.addMenu(tr("Layout"));
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
+
+    QMenu *groups = menu.addMenu(tr("Group By"));
+    QAction *actGroupByType =
+        groups->addAction(tr("Type"), this, SLOT(groupByType()));
+    actGroupByType->setCheckable(true);
+    actGroupByType->setChecked(m_enableGrouping);
 
     menu.exec(event->globalPos());
 }
@@ -99,4 +125,15 @@ void PlayListGalleryView::removeSelectedItems()
             layout();
         }
     }
+}
+
+void PlayListGalleryView::sortByGroup(QList<QGraphicsItem *> *items)
+{
+    qSort(items->begin(), items->end(), m_groupLessThan);
+}
+
+void PlayListGalleryView::groupByType()
+{
+    m_groupLessThan = playListTypeLessThan;
+    toggleGrouping();
 }

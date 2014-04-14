@@ -20,9 +20,16 @@ private slots:
     void renameSelectedItem();
     void removeSelectedItems();
 
+    void groupByType();
+
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);
+
+    void sortByGroup(QList<QGraphicsItem *> *items);
+
+private:
+    bool (*m_groupLessThan)(QGraphicsItem *, QGraphicsItem *);
 };
 
 #endif // PLAYLISTGALLERYVIEW_H

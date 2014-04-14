@@ -44,12 +44,15 @@ void GalleryView::layout()
         return;
     }
 
-    const QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
     const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
-
     int maxColumns = width() / galleryItemSize.width();
     if (maxColumns == 0) {
         return;
+    }
+
+    QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
+    if (m_enableGrouping) {
+        sortByGroup(&items);
     }
 
     qreal curRow = 0, curColumn = -1;
@@ -139,4 +142,10 @@ void GalleryView::setLooseRenderer()
 void GalleryView::setCompactRenderer()
 {
     setRendererFactory(new CompactRendererFactory());
+}
+
+void GalleryView::toggleGrouping()
+{
+    m_enableGrouping = !m_enableGrouping;
+    layout();
 }
