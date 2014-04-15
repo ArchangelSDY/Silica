@@ -26,12 +26,24 @@ static bool playListTypeLessThan(QGraphicsItem *left,
     }
 }
 
+static bool playListNameLessThan(QGraphicsItem *left,
+                                 QGraphicsItem *right)
+
+{
+    PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
+    PlayListGalleryItem *rightItem = static_cast<PlayListGalleryItem *>(right);
+
+    const QString &leftName = leftItem->record()->name();
+    const QString &rightName = rightItem->record()->name();
+
+    return leftName < rightName;
+}
+
 PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_groupLessThan(playListTypeLessThan)
 {
     m_rendererFactory = new CompactRendererFactory();
-    m_enableGrouping = true;
 }
 
 void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
@@ -74,10 +86,20 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
     QMenu *groups = menu.addMenu(tr("Group By"));
+    QAction *actDisableGrouping =
+        groups->addAction(tr("None"), this, SLOT(disableGrouping()));
+    actDisableGrouping->setCheckable(true);
+    actDisableGrouping->setChecked(!m_enableGrouping);
     QAction *actGroupByType =
         groups->addAction(tr("Type"), this, SLOT(groupByType()));
     actGroupByType->setCheckable(true);
-    actGroupByType->setChecked(m_enableGrouping);
+    actGroupByType->setChecked(
+        m_enableGrouping && m_groupLessThan == playListTypeLessThan);
+    QAction *actGroupByName =
+        groups->addAction(tr("Name"), this, SLOT(groupByName()));
+    actGroupByName->setCheckable(true);
+    actGroupByName->setChecked(
+        m_enableGrouping && m_groupLessThan == playListNameLessThan);
 
     menu.exec(event->globalPos());
 }
@@ -127,6 +149,18 @@ void PlayListGalleryView::removeSelectedItems()
     }
 }
 
+QString PlayListGalleryView::groupForItem(QGraphicsItem *rawItem)
+{
+    PlayListGalleryItem *item = static_cast<PlayListGalleryItem *>(rawItem);
+    if (m_groupLessThan == playListTypeLessThan) {
+        return QString::number(item->record()->type());
+    } else if (m_groupLessThan == playListNameLessThan) {
+        return item->record()->name().left(5);
+    } else {
+        return QString();
+    }
+}
+
 void PlayListGalleryView::sortByGroup(QList<QGraphicsItem *> *items)
 {
     qSort(items->begin(), items->end(), m_groupLessThan);
@@ -135,5 +169,11 @@ void PlayListGalleryView::sortByGroup(QList<QGraphicsItem *> *items)
 void PlayListGalleryView::groupByType()
 {
     m_groupLessThan = playListTypeLessThan;
-    toggleGrouping();
+    enableGrouping();
+}
+
+void PlayListGalleryView::groupByName()
+{
+    m_groupLessThan = playListNameLessThan;
+    enableGrouping();
 }

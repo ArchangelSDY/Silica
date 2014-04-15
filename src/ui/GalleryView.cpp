@@ -7,6 +7,8 @@
 #include "GlobalConfig.h"
 #include "LooseRendererFactory.h"
 
+static const qreal GROUP_PADDING_ROW = 0.1;
+
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
@@ -56,7 +58,7 @@ void GalleryView::layout()
     }
 
     qreal curRow = 0, curColumn = -1;
-    QString curGroup = static_cast<GalleryItem *>(items[0])->group();
+    QString curGroup = groupForItem(static_cast<GalleryItem *>(items[0]));
     for (int i = 0; i < items.length(); ++i) {
         GalleryItem *item = static_cast<GalleryItem *>(items[i]);
 
@@ -67,12 +69,12 @@ void GalleryView::layout()
         }
 
         // Break line if group changs
-        if (m_enableGrouping && item->group() != curGroup) {
-            curRow += 0.5;    // Add additional half line
+        if (m_enableGrouping && groupForItem(item) != curGroup) {
+            curRow += GROUP_PADDING_ROW;    // Add additional padding row
 
             shouldBreakLine = true;
         }
-        curGroup = item->group();
+        curGroup = groupForItem(item);
 
         if (shouldBreakLine) {
             curRow += 1;
@@ -144,8 +146,14 @@ void GalleryView::setCompactRenderer()
     setRendererFactory(new CompactRendererFactory());
 }
 
-void GalleryView::toggleGrouping()
+void GalleryView::enableGrouping()
 {
-    m_enableGrouping = !m_enableGrouping;
+    m_enableGrouping = true;
+    layout();
+}
+
+void GalleryView::disableGrouping()
+{
+    m_enableGrouping = false;
     layout();
 }

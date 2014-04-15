@@ -21,6 +21,9 @@ protected slots:
     void setLooseRenderer();
     void setCompactRenderer();
 
+    void enableGrouping();
+    void disableGrouping();
+
 protected:
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
@@ -32,7 +35,7 @@ protected:
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
-    void toggleGrouping();
+    virtual QString groupForItem(QGraphicsItem *) { return QString(); }
     virtual void sortByGroup(QList<QGraphicsItem *> *) {}
 
     QGraphicsScene *m_scene;

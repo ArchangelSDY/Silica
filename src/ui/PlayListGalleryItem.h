@@ -22,8 +22,6 @@ public:
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
-    QString group() const;
-
 private slots:
     void loadThumbnail();
 

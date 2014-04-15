@@ -21,11 +21,13 @@ private slots:
     void removeSelectedItems();
 
     void groupByType();
+    void groupByName();
 
 protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
+    QString groupForItem(QGraphicsItem *);
     void sortByGroup(QList<QGraphicsItem *> *items);
 
 private:
