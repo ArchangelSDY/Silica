@@ -188,17 +188,27 @@ void MainWindow::loadSavedPlayLists()
 
 void MainWindow::loadSelectedPlayList()
 {
-    if (ui->playListGallery->scene()->selectedItems().count() > 0) {
-        PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(
-            ui->playListGallery->scene()->selectedItems()[0]);
-        // Navigator doesn't take ownership of PlayList in this case
-        m_navigator.setPlayList(playListItem->record()->playList());
+    QList<QGraphicsItem *> selectedItems =
+        ui->playListGallery->scene()->selectedItems();
+    if (selectedItems.count() > 0) {
+        PlayList *pl = new PlayList();
+        foreach (QGraphicsItem *item, selectedItems) {
+            PlayListGalleryItem *playListItem =
+                static_cast<PlayListGalleryItem *>(item);
+            pl->append(playListItem->record()->playList());
+        }
 
-        // Select cover image
+        // Navigator should take ownership of PlayList in this case
+        m_navigator.setPlayList(pl);
+
+        // Make cover image of first playlist item selected
+        PlayListGalleryItem *firstItem =
+            static_cast<PlayListGalleryItem *>(selectedItems[0]);
+        int coverIndex = firstItem->record()->coverIndex();
+
         const QList<QGraphicsItem *> &galleryItems =
             ui->gallery->scene()->items(Qt::AscendingOrder);
-        int coverIndex = playListItem->record()->coverIndex();
-        if (coverIndex >=0 && coverIndex < galleryItems.count()) {
+        if (coverIndex >= 0 && coverIndex < galleryItems.count()) {
             QGraphicsItem *coverImageItem = galleryItems.at(coverIndex);
             ui->gallery->scene()->clearSelection();
             coverImageItem->setSelected(true);
