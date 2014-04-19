@@ -45,11 +45,16 @@ public:
         m_images.append(images);
         emit itemsAppended(start);
     }
-    inline void append(PlayList *playList)
+    inline void append(PlayList *playList, bool watching = false)
     {
         int start = count();
         m_images.append(playList->m_images);
         emit itemsAppended(start);
+
+        if (watching) {
+            connect(playList, SIGNAL(itemsAppended(int)),
+                    this, SLOT(watchedPlayListAppended(int)));
+        }
     }
 
     inline QList<QSharedPointer<Image> > &operator<<(
@@ -104,6 +109,9 @@ public:
 signals:
     void itemsChanged();
     void itemsAppended(int start);
+
+private slots:
+    void watchedPlayListAppended(int start);
 
 private:
     QList<QSharedPointer<Image> > m_images;

@@ -195,7 +195,10 @@ void MainWindow::loadSelectedPlayList()
         foreach (QGraphicsItem *item, selectedItems) {
             PlayListGalleryItem *playListItem =
                 static_cast<PlayListGalleryItem *>(item);
-            pl->append(playListItem->record()->playList());
+
+            // Should watch sub playlists changes
+            PlayList *recordPlayList = playListItem->record()->playList();
+            pl->append(recordPlayList, true);
         }
 
         // If only one item is selected, use its PlayListRecord

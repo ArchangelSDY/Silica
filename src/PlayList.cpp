@@ -36,6 +36,16 @@ void PlayList::addPath(const QUrl &url)
     }
 }
 
+void PlayList::watchedPlayListAppended(int start)
+{
+    int oldCount = count();
+    PlayList *watched = static_cast<PlayList *>(sender());
+    for (int i = start; i < watched->count(); ++i) {
+        m_images << watched->at(i);
+    }
+    emit itemsAppended(oldCount);
+}
+
 static bool imageNameLessThan(const QSharedPointer<Image> &left,
                               const QSharedPointer<Image> &right)
 {
