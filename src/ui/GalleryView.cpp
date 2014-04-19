@@ -119,8 +119,18 @@ void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
 
 void GalleryView::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Return &&
-            scene()->selectedItems().length() > 0) {
+    if (event->key() == Qt::Key_Return) {
+        // If not item is selected, select the first one
+        if (scene()->selectedItems().count() == 0) {
+            const QList<QGraphicsItem *> &items =
+                scene()->items(Qt::AscendingOrder);
+            if (items.count() > 0) {
+                items[0]->setSelected(true);
+            } else {
+                return;
+            }
+        }
+
         event->accept();
         emit enterItem();
     } else {
