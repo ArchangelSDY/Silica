@@ -47,4 +47,10 @@ void GlobalConfig::load()
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
+
+#ifdef ENABLE_OPENGL
+    qDebug() << "OpenGL Enabled";
+#else
+    qDebug() << "OpenGL Disabled";
+#endif
 }

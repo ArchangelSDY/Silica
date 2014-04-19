@@ -1,4 +1,7 @@
+#ifdef ENABLE_OPENGL
 #include <QGLWidget>
+#endif
+
 #include <QGraphicsItem>
 
 #include "CompactRendererFactory.h"
@@ -14,7 +17,10 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene(new QGraphicsScene) ,
     m_enableGrouping(false)
 {
+#ifdef ENABLE_OPENGL
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+#endif
+
     setDragMode(QGraphicsView::RubberBandDrag);
 
     QPalette palette;

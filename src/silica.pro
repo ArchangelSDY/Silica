@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network sql opengl
+QT       += core gui network sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,6 +16,10 @@ include(silica.pri)
 SOURCES += main.cpp
 
 DEFINES += QUAZIP_STATIC
+
+# DEFINES += ENABLE_OPENGL
+
+contains(DEFINES, "ENABLE_OPENGL") : QT += opengl
 
 macx {
     config.path = $$OUT_PWD/silica.app/Contents/MacOS/config/Asuna
