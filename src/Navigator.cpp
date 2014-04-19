@@ -119,16 +119,16 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     return image;
 }
 
-void Navigator::goIndex(int index)
+bool Navigator::goIndex(int index)
 {
     if (index < 0 || index >= m_playList->count() || index == m_currentIndex) {
-        return;
+        return false;
     }
 
     // Load and paint
     Image *image = loadIndex(index, true);
-    if (!image) {
-        return;
+    if (!image || image->status() == Image::LoadError) {
+        return false;
     }
 
     m_currentIndex = index;
@@ -142,28 +142,38 @@ void Navigator::goIndex(int index)
     }
 
     preload();
+
+    return true;
+}
+
+void Navigator::goIndexUntilSuccess(int index, int delta)
+{
+    int failedCount = 0;
+    while (failedCount < m_playList->count()) {
+        // Normalize index
+        if (index < 0 || index >= m_playList->count()) {
+            index = (index + m_playList->count()) % m_playList->count();
+        }
+
+        bool success = goIndex(index);
+        if (success) {
+            m_reverseNavigation = (delta < 0);
+            return;
+        } else {
+            failedCount ++;
+            index += delta;
+        }
+    }
 }
 
 void Navigator::goPrev()
 {
-    if (m_currentIndex > 0) {
-        m_reverseNavigation = true;
-        goIndex(m_currentIndex - 1);
-    } else if (m_isLooping) {
-        m_reverseNavigation = true;
-        goIndex(m_playList->count() - 1);
-    }
+    goIndexUntilSuccess(m_currentIndex - 1, -1);
 }
 
 void Navigator::goNext()
 {
-    if (m_currentIndex < m_playList->count() - 1) {
-        m_reverseNavigation = false;
-        goIndex(m_currentIndex + 1);
-    } else if (m_isLooping) {
-        m_reverseNavigation = false;
-        goIndex(0);
-    }
+    goIndexUntilSuccess(m_currentIndex + 1, 1);
 }
 
 void Navigator::goFirst()

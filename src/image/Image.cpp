@@ -138,7 +138,10 @@ void Image::scheduleUnload()
 void Image::unloadIfNeeded()
 {
     if (m_loadRequestsCount == 0) {
-        m_status = Image::NotLoad;
+        // If error, keep this state to prevent further try
+        if (m_status != Image::LoadError) {
+            m_status = Image::NotLoad;
+        }
         delete m_image;
         m_image = new QImage();
     } else {

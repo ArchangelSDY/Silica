@@ -51,7 +51,7 @@ public slots:
     void setPlayList(PlayList *, bool takeOwnership = false);
     void reloadPlayList();
 
-    void goIndex(int index);
+    bool goIndex(int index);
 
     void imageLoaded();
     void thumbnailLoaded();
@@ -66,6 +66,8 @@ private slots:
 
 private:
     Image* loadIndex(int index, bool shouldPaint);
+    void goIndexUntilSuccess(int index, int delta);
+
     void preload();
     void reset();
 
