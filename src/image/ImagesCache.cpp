@@ -42,6 +42,7 @@ void ImagesCache::trim(int index)
         return;
     }
 
+    // TODO: Delta may be incorrect in looping mode
     int min = m_images.lastKey();
     int minDelta = qAbs(index - min);
     int max = m_images.firstKey();
