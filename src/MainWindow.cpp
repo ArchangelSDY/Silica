@@ -198,6 +198,13 @@ void MainWindow::loadSelectedPlayList()
             pl->append(playListItem->record()->playList());
         }
 
+        // If only one item is selected, use its PlayListRecord
+        if (selectedItems.count() == 1) {
+            PlayListGalleryItem *firstPlayListItem =
+                static_cast<PlayListGalleryItem *>(selectedItems[0]);
+            pl->setRecord(firstPlayListItem->record());
+        }
+
         // Navigator should take ownership of PlayList in this case
         m_navigator.setPlayList(pl);
 
