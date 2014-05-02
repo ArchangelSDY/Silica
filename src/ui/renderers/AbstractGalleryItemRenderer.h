@@ -12,8 +12,8 @@ public:
     void setImage(const QImage *image);
 
     virtual QRect boundingRect() const { return m_boundingRect; }
-    virtual void layout() = 0;
-    virtual void paint(QPainter *painter) = 0;
+    virtual void layout();
+    virtual void paint(QPainter *painter);
 
 protected:
     AbstractGalleryItemRenderer *m_parentRenderer;

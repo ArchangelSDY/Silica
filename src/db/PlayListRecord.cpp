@@ -12,6 +12,7 @@ PlayListRecord::PlayListRecord(const QString &name,
     m_id(PlayListRecord::EMPTY_ID) ,
     m_name(name) ,
     m_coverPath(coverPath) ,
+    m_count(PlayListRecord::EMPTY_COUNT) ,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_playList(playList)
 {

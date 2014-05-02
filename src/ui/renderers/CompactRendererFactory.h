@@ -7,7 +7,8 @@ class CompactRendererFactory : public AbstractRendererFactory
 {
 public:
     AbstractGalleryItemRenderer *createForImageGallery();
-    AbstractGalleryItemRenderer *createForPlayListGallery(const QString &title);
+    AbstractGalleryItemRenderer *createForPlayListGallery(
+        const QString &title, const int count);
 };
 
 #endif // COMPACTRENDERERFACTORY_H

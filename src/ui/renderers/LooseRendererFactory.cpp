@@ -8,7 +8,7 @@ AbstractGalleryItemRenderer *LooseRendererFactory::createForImageGallery()
 }
 
 AbstractGalleryItemRenderer *LooseRendererFactory::createForPlayListGallery(
-    const QString &)
+    const QString &, const int)
 {
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }

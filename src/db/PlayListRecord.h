@@ -16,6 +16,9 @@ public:
     int id() const { return m_id; }
     void setId(int id) { m_id = id; }
 
+    int count() const { return m_count; }
+    void setCount(int count) { m_count = count; }
+
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }
 
@@ -46,11 +49,13 @@ signals:
 protected:
     static const int EMPTY_ID = -1;
     static const int EMPTY_COVER_INDEX = -1;
+    static const int EMPTY_COUNT = -1;
 
     int m_id;
     QString m_name;
     QString m_coverPath;
     PlayListType m_type;
+    int m_count;
     int m_coverIndex;
     PlayList *m_playList;
 };

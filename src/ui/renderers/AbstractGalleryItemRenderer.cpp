@@ -21,3 +21,17 @@ void AbstractGalleryItemRenderer::setImage(const QImage *image)
         m_parentRenderer->setImage(image);
     }
 }
+
+void AbstractGalleryItemRenderer::layout()
+{
+    if (m_parentRenderer) {
+        m_parentRenderer->layout();
+    }
+}
+
+void AbstractGalleryItemRenderer::paint(QPainter *painter)
+{
+    if (m_parentRenderer) {
+        m_parentRenderer->paint(painter);
+    }
+}

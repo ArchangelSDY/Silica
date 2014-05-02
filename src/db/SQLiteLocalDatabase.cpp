@@ -11,7 +11,11 @@ const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path, type)
 const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
         "?, (select id from images where hash = ?))";
 
-const char *SQL_QUERY_PLAYLISTS = "select id, name, cover_path, type from playlists order by name";
+const char *SQL_QUERY_PLAYLISTS =
+    "select playlists.id, playlists.name, playlists.cover_path, playlists.type, "
+    "count(playlists.id) from playlist_images left join playlists "
+    "on playlist_images.playlist_id = playlists.id "
+    "group by playlists.id order by playlists.name";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
@@ -62,10 +66,12 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         QString coverPath = q.value(2).toString();
         PlayListRecord::PlayListType type =
             static_cast<PlayListRecord::PlayListType>(q.value(3).toInt());
+        int count = q.value(4).toInt();
 
         PlayListRecord *record = PlayListRecord::create(type, name, coverPath);
         if (record) {
             record->setId(id);
+            record->setCount(count);
             records << record;
         }
     }

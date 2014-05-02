@@ -1,3 +1,4 @@
+#include "CompactCountRenderer.h"
 #include "CompactImageRenderer.h"
 #include "CompactRendererFactory.h"
 #include "CompactTitleRenderer.h"
@@ -8,7 +9,9 @@ AbstractGalleryItemRenderer *CompactRendererFactory::createForImageGallery()
 }
 
 AbstractGalleryItemRenderer *CompactRendererFactory::createForPlayListGallery(
-    const QString &title)
+    const QString &title, const int count)
 {
-    return new CompactTitleRenderer(title, new CompactImageRenderer());
+    return new CompactCountRenderer(count,
+        new CompactTitleRenderer(title,
+        new CompactImageRenderer()));
 }

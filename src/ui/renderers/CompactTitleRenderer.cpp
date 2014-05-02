@@ -26,6 +26,7 @@ void CompactTitleRenderer::layout()
                         CompactTitleRenderer::TITLE_HEIGHT);
     m_textRect = m_titleRect.translated(
         CompactTitleRenderer::TITLE_LEFT_PADDING, 0);
+    m_boundingRect = parentBoundingRect;
 }
 
 void CompactTitleRenderer::paint(QPainter *painter)
