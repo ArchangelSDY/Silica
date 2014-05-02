@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
     const QRect screen = QApplication::desktop()->screenGeometry();
     move(screen.center() - rect().center());
 
+    // Maximize on start
+    showMaximized();
+
     connect(&m_navigator, SIGNAL(paint(Image *)),
             this, SLOT(imageLoaded(Image *)));
     connect(&m_navigator, SIGNAL(paint(Image *)),
