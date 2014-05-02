@@ -17,7 +17,7 @@ public:
     void setId(int id) { m_id = id; }
 
     int count() const { return m_count; }
-    void setCount(int count) { m_count = count; }
+    void setCount(int count);
 
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }

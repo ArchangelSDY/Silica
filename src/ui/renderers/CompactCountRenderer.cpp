@@ -12,12 +12,12 @@ CompactCountRenderer::CompactCountRenderer(
 
 void CompactCountRenderer::paint(QPainter *painter)
 {
-    if (m_count < 0) {
-        return;
-    }
-
     if (m_parentRenderer) {
         m_parentRenderer->paint(painter);
+    }
+
+    if (m_count < 0) {
+        return;
     }
 
     const QRect &parentBounding = m_parentRenderer->boundingRect();

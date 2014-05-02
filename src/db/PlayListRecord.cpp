@@ -18,6 +18,16 @@ PlayListRecord::PlayListRecord(const QString &name,
 {
 }
 
+void PlayListRecord::setCount(int count)
+{
+    // RemotePlayList does not have a fixed count
+    if (m_type == PlayListRecord::RemotePlayList) {
+        return;
+    }
+
+    m_count = count;
+}
+
 int PlayListRecord::coverIndex()
 {
     if (m_coverIndex == PlayListRecord::EMPTY_COVER_INDEX) {

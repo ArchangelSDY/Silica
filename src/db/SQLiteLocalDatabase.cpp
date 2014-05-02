@@ -13,7 +13,7 @@ const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_i
 
 const char *SQL_QUERY_PLAYLISTS =
     "select playlists.id, playlists.name, playlists.cover_path, playlists.type, "
-    "count(playlists.id) from playlist_images left join playlists "
+    "count(playlists.id) from playlists left outer join playlist_images "
     "on playlist_images.playlist_id = playlists.id "
     "group by playlists.id order by playlists.name";
 
