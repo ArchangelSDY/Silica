@@ -138,9 +138,22 @@ void PlayListGalleryView::renameSelectedItem()
 void PlayListGalleryView::removeSelectedItems()
 {
     if (scene()->selectedItems().count() > 0) {
-        if (QMessageBox::question(this,
-            tr("Remove"), tr("Remove this playlist?")) == QMessageBox::Yes) {
-            foreach (QGraphicsItem *item, scene()->selectedItems()) {
+        QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+
+        // Build message with playlists names
+        QStringList playListNames;
+        foreach(QGraphicsItem *item, selectedItems) {
+            PlayListGalleryItem *playListItem =
+                static_cast<PlayListGalleryItem *>(item);
+            playListNames.append(playListItem->record()->name());
+        }
+        QString msg = tr("Remove %1 playlist: \n%2 ?")
+            .arg(playListNames.count())
+            .arg(playListNames.join("\n"));
+
+        if (QMessageBox::question(
+                this, tr("Remove"), msg) == QMessageBox::Yes) {
+            foreach (QGraphicsItem *item, selectedItems) {
                 PlayListGalleryItem *playListItem =
                     static_cast<PlayListGalleryItem *>(item);
                 playListItem->record()->remove();
