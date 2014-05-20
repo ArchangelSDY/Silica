@@ -234,6 +234,9 @@ void MainGraphicsView::toggleFitInView()
 void MainGraphicsView::createHotspotsAreas()
 {
     if (m_hotspotsAreas) {
+        foreach (QGraphicsItem *item, m_hotspotsAreas->childItems()) {
+            m_scene->removeItem(item);
+        }
         m_scene->destroyItemGroup(m_hotspotsAreas);
     }
 
