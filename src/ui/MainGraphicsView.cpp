@@ -308,7 +308,9 @@ void MainGraphicsView::leaveHotspotsConfirming()
 
 void MainGraphicsView::saveHotspot()
 {
-    ImageHotspot hotspot(m_navigator->currentImage(),
-                         m_hotspotsSelectingArea->rect().toAlignedRect());
+    QRectF rect = m_hotspotsSelectingArea->rect();
+    rect.moveTo(m_hotspotsSelectingArea->pos());
+
+    ImageHotspot hotspot(m_navigator->currentImage(), rect.toAlignedRect());
     hotspot.save();
 }
