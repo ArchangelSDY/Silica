@@ -8,25 +8,18 @@ static const double SCALE_FACTOR = 0.05;
 
 MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
+    m_navigator(0) ,
     m_scene(new QGraphicsScene(this)) ,
     m_imageItem(new QGraphicsPixmapItem()) ,
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit) ,
-    m_isHotspotsEditing(false) ,
-    m_hotspotsSelectingArea(new QGraphicsRectItem()) ,
-    m_hotspotsAreas(0)
+    m_hotspotsEditor(new HotspotsEditor(m_scene, &m_navigator))
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
     m_imageItem->setTransformationMode(Qt::SmoothTransformation);
 
-    // TODO: remove magic
     setMouseTracking(true);
-    QSizeF defaultHotspotSize = qApp->primaryScreen()->size() / 3;
-    m_hotspotsSelectingArea->setRect(QRectF(QPointF(), defaultHotspotSize));
-    m_hotspotsSelectingArea->setBrush(QColor("#AA0000AA"));
-    m_hotspotsSelectingArea->hide();
-    m_scene->addItem(m_hotspotsSelectingArea);
 
     setScene(m_scene);
 }
@@ -113,35 +106,32 @@ void MainGraphicsView::resizeEvent(QResizeEvent *)
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event)
 {
-    if (m_isHotspotsEditing) {
-        if (event->key() == Qt::Key_Escape) {
-            leaveHotspotsConfirming();
-            event->accept();
-            return;
-        } else if (event->key() == Qt::Key_Return) {
-            // Save area
-            saveHotspot();
-            leaveHotspotsConfirming();
-            event->accept();
-            return;
-        }
-    }
+    m_hotspotsEditor->keyPressEvent(event);
 
-    QGraphicsView::keyPressEvent(event);
+    if (!event->isAccepted()) {
+        QGraphicsView::keyPressEvent(event);
+    }
 }
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_isHotspotsEditing && m_hotspotsEditingState == HotspotsSelecting) {
-        QPointF pos = mapToScene(event->pos());
-        setHotspotsSelectingAreaPos(pos);
+    if (m_hotspotsEditor->isEditing()) {
+        m_hotspotsEditor->mouseMoveEvent(event);
+    }
+
+    if (!event->isAccepted()) {
+        QGraphicsView::mouseMoveEvent(event);
     }
 }
 
-void MainGraphicsView::mousePressEvent(QMouseEvent *)
+void MainGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    if (m_isHotspotsEditing && m_hotspotsEditingState == HotspotsSelecting) {
-        enterHotspotsConfirming();
+    if (m_hotspotsEditor->isEditing()) {
+        m_hotspotsEditor->mousePressEvent(event);
+    }
+
+    if (!event->isAccepted()) {
+        QGraphicsView::mousePressEvent(event);
     }
 }
 
@@ -229,91 +219,4 @@ void MainGraphicsView::fitInViewIfNecessary()
 void MainGraphicsView::toggleFitInView()
 {
     m_fitInView = static_cast<MainGraphicsView::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
-}
-
-void MainGraphicsView::createHotspotsAreas()
-{
-    if (m_hotspotsAreas) {
-        foreach (QGraphicsItem *item, m_hotspotsAreas->childItems()) {
-            m_scene->removeItem(item);
-        }
-        m_scene->destroyItemGroup(m_hotspotsAreas);
-    }
-
-    QList<ImageHotspot *> hotspots = m_navigator->currentImage()->hotspots();
-    QList<QGraphicsItem *> hotspotsAreas;
-    foreach (ImageHotspot *hotspot, hotspots) {
-        QGraphicsRectItem *item = new QGraphicsRectItem(hotspot->rect());
-        item->setBrush(QColor("#AA0000AA"));    // TODO: magic
-        hotspotsAreas << item;
-    }
-    m_hotspotsAreas = m_scene->createItemGroup(hotspotsAreas);
-}
-
-void MainGraphicsView::setHotspotsSelectingAreaPos(const QPointF &pos)
-{
-    QRectF rect = m_hotspotsSelectingArea->rect();
-    QRectF sceneRect = m_scene->sceneRect();
-
-    rect.moveTo(pos - m_hotspotsSelectingArea->rect().center());
-
-    if (rect.left() < 0) {
-        rect.setLeft(0);
-    }
-    if (rect.right() > sceneRect.right()) {
-        rect.moveRight(sceneRect.width());
-    }
-    if (rect.top() < 0) {
-        rect.setTop(0);
-    }
-    if (rect.bottom() > sceneRect.bottom()) {
-        rect.moveBottom(sceneRect.bottom());
-    }
-
-    m_hotspotsSelectingArea->setPos(rect.topLeft());
-}
-
-void MainGraphicsView::enterHotspotsEditing()
-{
-    m_isHotspotsEditing = true;
-    m_hotspotsEditingState = HotspotsSelecting;
-
-    connect(m_navigator->currentImage(), SIGNAL(hotpotsLoaded()),
-            this, SLOT(createHotspotsAreas()),
-            static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
-    m_navigator->currentImage()->loadHotspots();
-
-    m_hotspotsSelectingArea->show();
-}
-
-void MainGraphicsView::leaveHotspotsEditing()
-{
-    m_hotspotsSelectingArea->hide();
-
-    m_scene->destroyItemGroup(m_hotspotsAreas);
-    m_hotspotsAreas = 0;
-
-    disconnect(m_navigator->currentImage(), SIGNAL(hotpotsLoaded()),
-               this, SLOT(createHotspotsAreas()));
-}
-
-void MainGraphicsView::enterHotspotsConfirming()
-{
-    m_hotspotsEditingState = HotspotsConfirming;
-    m_hotspotsSelectingArea->setBrush(QColor("#AAAA0000")); // TODO: magic
-}
-
-void MainGraphicsView::leaveHotspotsConfirming()
-{
-    m_hotspotsSelectingArea->setBrush(QColor("#AA0000AA")); // TODO: magic
-    m_hotspotsEditingState = HotspotsSelecting;
-}
-
-void MainGraphicsView::saveHotspot()
-{
-    QRectF rect = m_hotspotsSelectingArea->rect();
-    rect.moveTo(m_hotspotsSelectingArea->pos());
-
-    ImageHotspot hotspot(m_navigator->currentImage(), rect.toAlignedRect());
-    hotspot.save();
 }

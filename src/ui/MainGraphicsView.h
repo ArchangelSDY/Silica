@@ -4,6 +4,7 @@
 #include <QGraphicsView>
 #include <QWheelEvent>
 
+#include "HotspotsEditor.h"
 #include "Image.h"
 #include "Navigator.h"
 
@@ -25,9 +26,7 @@ public:
     void fitInViewIfNecessary();
     void toggleFitInView();
 
-    bool isHotspotsEditing() const { return m_isHotspotsEditing; }
-    void enterHotspotsEditing();
-    void leaveHotspotsEditing();
+    HotspotsEditor *hotspotsEditor() { return m_hotspotsEditor; }
 
 signals:
     void mouseDoubleClicked();
@@ -35,8 +34,6 @@ signals:
 private slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-
-    void createHotspotsAreas();
 
 protected:
     virtual void showEvent(QShowEvent *event);
@@ -56,20 +53,7 @@ private:
 
     FitMode m_fitInView;
 
-    enum HotspotsEditingState {
-        HotspotsSelecting,
-        HotspotsConfirming,
-    };
-
-    bool m_isHotspotsEditing;
-    HotspotsEditingState m_hotspotsEditingState;
-    QGraphicsRectItem *m_hotspotsSelectingArea;
-    QGraphicsItemGroup *m_hotspotsAreas;
-
-    void setHotspotsSelectingAreaPos(const QPointF &pos);
-    void enterHotspotsConfirming();
-    void leaveHotspotsConfirming();
-    void saveHotspot();
+    HotspotsEditor *m_hotspotsEditor;
 };
 
 #endif // MAINGRAPHICSVIEW_H

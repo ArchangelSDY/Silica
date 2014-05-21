@@ -489,9 +489,6 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                     m_navigator.goPrev();
                 }
                 break;
-            case Qt::Key_E:
-                ui->graphicsView->enterHotspotsEditing();
-                break;
             case Qt::Key_F:
                 ui->graphicsView->toggleFitInView();
                 ui->graphicsView->fitInViewIfNecessary();
@@ -524,16 +521,13 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                     setWindowState(Qt::WindowNoState);
                 }
                 break;
-            case Qt::Key_Escape:
-                if (ui->graphicsView->isHotspotsEditing()) {
-                    ui->graphicsView->leaveHotspotsEditing();
-                } else {
-                    if (QMessageBox::question(this, "Exit", "Exit?") ==
-                            QMessageBox::Yes) {
-                        QApplication::exit();
-                    }
+            case Qt::Key_Escape: {
+                if (QMessageBox::question(this, "Exit", "Exit?") ==
+                        QMessageBox::Yes) {
+                    QApplication::exit();
                 }
                 break;
+            }
             case Qt::Key_Home:
                 m_navigator.goFirst();
                 break;
