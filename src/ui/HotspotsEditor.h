@@ -31,13 +31,17 @@ private:
         HotspotsDeleting,
     };
 
+    static const QColor HotspotColorDefault;
+    static const QColor HotspotColorSelecting;
+    static const QColor HotspotColorFocused;
+
     void setHotspotsSelectingAreaPos(const QPointF &pos);
     void enterHotspotsConfirming();
     void leaveHotspotsConfirming();
     void enterHotspotsDeleting();
     void leaveHotspotsDeleting();
     void destroyHotspotsAreas();
-    void confirmHotspotDeleting(const QPointF &pos);
+    void confirmHotspotDeleting(const QPoint &pos);
     void saveHotspot();
 
     QGraphicsScene *m_scene;

@@ -11,6 +11,7 @@ public:
     ImageHotspot(Image *image, const QRect &rect);
 
     int id() const { return m_id; }
+    void setId(int id) { m_id = id; }
     Image *image() { return m_image; }
     QRect rect() const { return m_rect; }
 

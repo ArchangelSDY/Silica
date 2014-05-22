@@ -1,8 +1,13 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsView>
+#include <QMessageBox>
 
 #include "HotspotsEditor.h"
 #include "ImageHotspot.h"
+
+const QColor HotspotsEditor::HotspotColorDefault = QColor("#AA0000AA");
+const QColor HotspotsEditor::HotspotColorSelecting = QColor("#AA00AAAA");
+const QColor HotspotsEditor::HotspotColorFocused = QColor("#AAAA0000");
 
 HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_scene(scene) ,
@@ -11,10 +16,9 @@ HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_hotspotsSelectingArea(new QGraphicsRectItem()) ,
     m_hotspotsAreas(0)
 {
-    // TODO: remove magic
     QSizeF defaultHotspotSize = qApp->primaryScreen()->size() / 3;
     m_hotspotsSelectingArea->setRect(QRectF(QPointF(), defaultHotspotSize));
-    m_hotspotsSelectingArea->setBrush(QColor("#AA0000AA"));
+    m_hotspotsSelectingArea->setBrush(HotspotColorSelecting);
     m_hotspotsSelectingArea->hide();
     m_hotspotsSelectingArea->setZValue(10);     // Make it on the top
     m_scene->addItem(m_hotspotsSelectingArea);
@@ -35,16 +39,22 @@ void HotspotsEditor::keyPressEvent(QKeyEvent *event)
             } else if (m_hotspotsEditingState == HotspotsConfirming) {
                 leaveHotspotsConfirming();
                 event->accept();
+            } else if (m_hotspotsEditingState == HotspotsDeleting) {
+                leaveHotspotsDeleting();
+                event->accept();
             }
         } else if (event->key() == Qt::Key_Return) {    // Press 'Return' to commit
-            // Save area
-            saveHotspot();
-            leaveHotspotsConfirming();
-            event->accept();
+            if (m_hotspotsEditingState == HotspotsConfirming) {
+                // Save area
+                saveHotspot();
+                leaveHotspotsConfirming();
+                event->accept();
+            }
         } else if (event->key() == Qt::Key_D) {         // Press 'D' to enter deleting mode
-            // TODO: enter deleting
-            qDebug() << "D";
-            event->accept();;
+            if (m_hotspotsEditingState == HotspotsSelecting) {
+                enterHotspotsDeleting();
+                event->accept();
+            }
         }
     }
 }
@@ -84,7 +94,7 @@ void HotspotsEditor::createHotspotsAreas()
     QList<QGraphicsItem *> hotspotsAreas;
     foreach (ImageHotspot *hotspot, hotspots) {
         QGraphicsRectItem *item = new QGraphicsRectItem(hotspot->rect());
-        item->setBrush(QColor("#AA0000AA"));    // TODO: magic
+        item->setBrush(QColor(HotspotColorDefault));
         hotspotsAreas << item;
     }
     m_hotspotsAreas = m_scene->createItemGroup(hotspotsAreas);
@@ -140,13 +150,13 @@ void HotspotsEditor::leaveHotspotsEditing()
 void HotspotsEditor::enterHotspotsConfirming()
 {
     m_hotspotsEditingState = HotspotsConfirming;
-    m_hotspotsSelectingArea->setBrush(QColor("#AAAA0000")); // TODO: magic
+    m_hotspotsSelectingArea->setBrush(HotspotColorFocused);
 }
 
 void HotspotsEditor::leaveHotspotsConfirming()
 {
     m_hotspotsEditingState = HotspotsSelecting;
-    m_hotspotsSelectingArea->setBrush(QColor("#AA0000AA")); // TODO: magic
+    m_hotspotsSelectingArea->setBrush(HotspotColorSelecting);
 }
 
 void HotspotsEditor::enterHotspotsDeleting()
@@ -172,21 +182,36 @@ void HotspotsEditor::destroyHotspotsAreas()
     }
 }
 
-void HotspotsEditor::confirmHotspotDeleting(const QPointF &pos)
+void HotspotsEditor::confirmHotspotDeleting(const QPoint &pos)
 {
-//    QGraphicsItem *rawItem = m_scene->itemAt(pos);
-//    if (rawItem && rawItem->type() == QGraphicsRectItem::Type) {
-//        QGraphicsRectItem *item = static_cast<QGraphicsRectItem *>(rawItem);
+    Q_ASSERT(m_scene->views().count() > 0);
 
-//        // TODO: confirm
-//        QList<ImageHotspot *> hotspots = m_navigator->currentImage()->hotspots();
-//        for (int i = 0; i < hotspots.count(); ++i) {
-//            if (hotspots[i]->rect() == item->rect().toAlignedRect()) {
-//                hotspots[i]->remove();
-//                break;
-//            }
-//        }
-//    }
+    QGraphicsView *view = m_scene->views()[0];
+    QPointF realPos = view->mapToScene(pos);
+    QGraphicsItem *rawItem = m_scene->itemAt(realPos.toPoint(),
+                                             view->transform());
+
+    if (rawItem && rawItem->type() == QGraphicsRectItem::Type) {
+        QGraphicsRectItem *item = static_cast<QGraphicsRectItem *>(rawItem);
+        item->setBrush(HotspotColorFocused);
+
+        if (QMessageBox::question(view, tr("Removing Hotspot"),
+                tr("Remove this?")) == QMessageBox::Yes) {
+            QList<ImageHotspot *> hotspots =
+                (*m_navigator)->currentImage()->hotspots();
+            for (int i = 0; i < hotspots.count(); ++i) {
+                if (hotspots[i]->rect() == item->rect().toAlignedRect()) {
+                    hotspots[i]->remove();
+                    break;
+                }
+            }
+
+            // Refresh areas
+            createHotspotsAreas();
+        } else {
+            item->setBrush(HotspotColorDefault);
+        }
+    }
 }
 
 void HotspotsEditor::saveHotspot()

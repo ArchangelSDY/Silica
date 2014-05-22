@@ -253,6 +253,9 @@ bool SQLiteLocalDatabase::insertImageHotspot(ImageHotspot *hotspot)
         return false;
     }
 
+    int id = q.lastInsertId().toInt();
+    hotspot->setId(id);
+
     return true;
 }
 
@@ -292,11 +295,15 @@ QList<ImageHotspot *> SQLiteLocalDatabase::queryImageHotspots(Image *image)
     }
 
     while (q.next()) {
+        int id = q.value("id").toInt();
         int left = q.value("left").toInt();
         int top = q.value("top").toInt();
         int width = q.value("width").toInt();
         int height = q.value("height").toInt();
-        hotspots << new ImageHotspot(image, QRect(left, top, width, height));
+        ImageHotspot *hotspot =
+            new ImageHotspot(image, QRect(left, top, width, height));
+        hotspot->setId(id);
+        hotspots << hotspot;
     }
 
     return hotspots;
