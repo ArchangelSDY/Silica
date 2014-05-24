@@ -34,6 +34,7 @@ private:
     static const QColor HotspotColorDefault;
     static const QColor HotspotColorSelecting;
     static const QColor HotspotColorFocused;
+    static const QColor HotspotColorMask;
 
     void setHotspotsSelectingAreaPos(const QPoint &pos);
     void destroyHotspotsAreas();

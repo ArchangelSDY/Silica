@@ -9,6 +9,7 @@
 const QColor HotspotsEditor::HotspotColorDefault = QColor("#AA0000AA");
 const QColor HotspotsEditor::HotspotColorSelecting = QColor("#AA00AAAA");
 const QColor HotspotsEditor::HotspotColorFocused = QColor("#AAAA0000");
+const QColor HotspotsEditor::HotspotColorMask = QColor("#AA000000");
 
 HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_scene(scene) ,
