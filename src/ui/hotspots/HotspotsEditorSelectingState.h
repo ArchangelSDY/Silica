@@ -19,6 +19,11 @@ protected:
     void onEntry();
     void onExit();
 
+private:
+    void setSelectingAreaSize();
+    void scaleUpSelectingArea();
+    void scaleDownSelectingArea();
+
 };
 
 #endif // HOTSPOTSEDITORSELECTINGSTATE_H

@@ -13,15 +13,13 @@ const QColor HotspotsEditor::HotspotColorFocused = QColor("#AAAA0000");
 HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_scene(scene) ,
     m_navigator(navigator) ,
-    m_hotspotsSelectingArea(new QGraphicsRectItem()) ,
-    m_hotspotsAreas(0)
+    m_selectingArea(new QGraphicsRectItem()) ,
+    m_hotspotsAreas(0) ,
+    m_selectingAreaRatio(3)
 {
-    QSizeF defaultHotspotSize = qApp->primaryScreen()->size() / 3;
-    m_hotspotsSelectingArea->setRect(QRectF(QPointF(), defaultHotspotSize));
-    m_hotspotsSelectingArea->setBrush(HotspotColorSelecting);
-    m_hotspotsSelectingArea->hide();
-    m_hotspotsSelectingArea->setZValue(10);     // Make it on the top
-    m_scene->addItem(m_hotspotsSelectingArea);
+    m_selectingArea->hide();
+    m_selectingArea->setZValue(10);     // Make it on the top
+    m_scene->addItem(m_selectingArea);
 
     m_statesMgr.moveTo(new HotspotsEditorDisabledState(&m_statesMgr, this));
 }
@@ -66,10 +64,10 @@ void HotspotsEditor::setHotspotsSelectingAreaPos(const QPoint &rawPos)
     QGraphicsView *view = m_scene->views()[0];
     QPointF pos = view->mapToScene(rawPos);
 
-    QRectF rect = m_hotspotsSelectingArea->rect();
+    QRectF rect = m_selectingArea->rect();
     QRectF sceneRect = m_scene->sceneRect();
 
-    rect.moveTo(pos - m_hotspotsSelectingArea->rect().center());
+    rect.moveTo(pos - m_selectingArea->rect().center());
 
     if (rect.left() < 0) {
         rect.setLeft(0);
@@ -84,7 +82,7 @@ void HotspotsEditor::setHotspotsSelectingAreaPos(const QPoint &rawPos)
         rect.moveBottom(sceneRect.bottom());
     }
 
-    m_hotspotsSelectingArea->setPos(rect.topLeft());
+    m_selectingArea->setPos(rect.topLeft());
 }
 
 void HotspotsEditor::destroyHotspotsAreas()
@@ -132,8 +130,8 @@ void HotspotsEditor::confirmHotspotDeleting(const QPoint &pos)
 
 void HotspotsEditor::saveHotspot()
 {
-    QRectF rect = m_hotspotsSelectingArea->rect();
-    rect.moveTo(m_hotspotsSelectingArea->pos());
+    QRectF rect = m_selectingArea->rect();
+    rect.moveTo(m_selectingArea->pos());
 
     ImageHotspot hotspot((*m_navigator)->currentImage(), rect.toAlignedRect());
     hotspot.save();

@@ -24,12 +24,12 @@ void HotspotsEditorConfirmingState::keyPressEvent(QKeyEvent *event)
 
 void HotspotsEditorConfirmingState::onEntry()
 {
-    m_editor->m_hotspotsSelectingArea->setBrush(
+    m_editor->m_selectingArea->setBrush(
         HotspotsEditor::HotspotColorFocused);
-    m_editor->m_hotspotsSelectingArea->show();
+    m_editor->m_selectingArea->show();
 }
 
 void HotspotsEditorConfirmingState::onExit()
 {
-    m_editor->m_hotspotsSelectingArea->hide();
+    m_editor->m_selectingArea->hide();
 }

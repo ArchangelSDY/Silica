@@ -42,9 +42,11 @@ private:
 
     QGraphicsScene *m_scene;
     Navigator **m_navigator;
-    QGraphicsRectItem *m_hotspotsSelectingArea;
-    QGraphicsItemGroup *m_hotspotsAreas;
+
     ViewStateManager m_statesMgr;
+    QGraphicsRectItem *m_selectingArea;
+    QGraphicsItemGroup *m_hotspotsAreas;
+    int m_selectingAreaRatio;
 };
 
 #endif // HOTSPOTSEDITOR_H
