@@ -3,15 +3,21 @@
 
 #include <QGraphicsScene>
 
+#include "HotspotsEditorViewState.h"
 #include "Navigator.h"
+#include "ViewStateManager.h"
 
 class HotspotsEditor : public QObject
 {
     Q_OBJECT
+
+    friend class HotspotsEditorDisabledState;
+    friend class HotspotsEditorSelectingState;
+    friend class HotspotsEditorConfirmingState;
+    friend class HotspotsEditorDeletingState;
+
 public:
     HotspotsEditor(QGraphicsScene *scene, Navigator **navigator);
-
-    bool isEditing() const { return m_hotspotsEditingState != HotspotsNotEditing; }
 
     void keyPressEvent(QKeyEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -24,31 +30,21 @@ private slots:
     void createHotspotsAreas();
 
 private:
-    enum HotspotsEditingState {
-        HotspotsNotEditing,
-        HotspotsSelecting,
-        HotspotsConfirming,
-        HotspotsDeleting,
-    };
 
     static const QColor HotspotColorDefault;
     static const QColor HotspotColorSelecting;
     static const QColor HotspotColorFocused;
 
-    void setHotspotsSelectingAreaPos(const QPointF &pos);
-    void enterHotspotsConfirming();
-    void leaveHotspotsConfirming();
-    void enterHotspotsDeleting();
-    void leaveHotspotsDeleting();
+    void setHotspotsSelectingAreaPos(const QPoint &pos);
     void destroyHotspotsAreas();
     void confirmHotspotDeleting(const QPoint &pos);
     void saveHotspot();
 
     QGraphicsScene *m_scene;
     Navigator **m_navigator;
-    HotspotsEditingState m_hotspotsEditingState;
     QGraphicsRectItem *m_hotspotsSelectingArea;
     QGraphicsItemGroup *m_hotspotsAreas;
+    ViewStateManager m_statesMgr;
 };
 
 #endif // HOTSPOTSEDITOR_H

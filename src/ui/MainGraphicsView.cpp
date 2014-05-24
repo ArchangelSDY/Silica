@@ -115,9 +115,7 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *event)
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_hotspotsEditor->isEditing()) {
-        m_hotspotsEditor->mouseMoveEvent(event);
-    }
+    m_hotspotsEditor->mouseMoveEvent(event);
 
     if (!event->isAccepted()) {
         QGraphicsView::mouseMoveEvent(event);
@@ -126,9 +124,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void MainGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    if (m_hotspotsEditor->isEditing()) {
-        m_hotspotsEditor->mousePressEvent(event);
-    }
+    m_hotspotsEditor->mousePressEvent(event);
 
     if (!event->isAccepted()) {
         QGraphicsView::mousePressEvent(event);
