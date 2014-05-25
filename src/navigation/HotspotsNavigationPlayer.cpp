@@ -18,7 +18,9 @@ void HotspotsNavigationPlayer::goNext()
         if (m_curHotspotIndex >= hotspots.count() - 1) {
             m_navigator->goIndexUntilSuccess(
                 m_navigator->currentIndex() + 1, 1);
-            m_curHotspotIndex = 0;
+
+            // Next go will show first hotspot
+            m_curHotspotIndex = -1;
         } else {
             m_curHotspotIndex ++;
             ImageHotspot *hotspot = hotspots[m_curHotspotIndex];
@@ -40,7 +42,9 @@ void HotspotsNavigationPlayer::goPrev()
 
             Image *nextImage = m_navigator->currentImage();
             nextImage->loadHotspots();
-            m_curHotspotIndex = nextImage->hotspots().count() - 1;
+
+            // Next go will show last hotspot
+            m_curHotspotIndex = nextImage->hotspots().count();
         } else {
             m_curHotspotIndex --;
             ImageHotspot *hotspot = hotspots[m_curHotspotIndex];

@@ -47,7 +47,7 @@ private:
     ViewStateManager m_statesMgr;
     QGraphicsRectItem *m_selectingArea;
     QGraphicsItemGroup *m_hotspotsAreas;
-    int m_selectingAreaRatio;
+    int m_selectingAreaExpanding;
 };
 
 #endif // HOTSPOTSEDITOR_H

@@ -16,7 +16,7 @@ HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_navigator(navigator) ,
     m_selectingArea(new QGraphicsRectItem()) ,
     m_hotspotsAreas(0) ,
-    m_selectingAreaRatio(3)
+    m_selectingAreaExpanding(0)
 {
     m_selectingArea->hide();
     m_selectingArea->setZValue(10);     // Make it on the top

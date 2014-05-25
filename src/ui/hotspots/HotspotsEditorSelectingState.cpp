@@ -62,6 +62,7 @@ void HotspotsEditorSelectingState::onEntry()
 void HotspotsEditorSelectingState::onExit()
 {
     m_editor->m_selectingArea->hide();
+    m_editor->m_selectingAreaExpanding = 0; // Reset before editing next image
 }
 
 void HotspotsEditorSelectingState::setSelectingAreaSize()
@@ -70,25 +71,34 @@ void HotspotsEditorSelectingState::setSelectingAreaSize()
     QGraphicsView *view = scene->views()[0];
 
     QSize size = view->size();
-    size /= m_editor->m_selectingAreaRatio;
+    size += QSize(m_editor->m_selectingAreaExpanding,
+                  m_editor->m_selectingAreaExpanding);
 
+    // Hotspot must be bigger than view, or image will be over scaled.
+    size = size.expandedTo(view->size());
+
+    // Hotspot must be smaller than scene, or image cannot fulfill the view.
     QSize sceneSize = scene->sceneRect().toAlignedRect().size();
-    QSize boundedSize = size.boundedTo(sceneSize);
+    size = size.boundedTo(sceneSize);
 
-    m_editor->m_selectingArea->setRect(QRect(QPoint(), boundedSize));
+    m_editor->m_selectingArea->setRect(QRect(QPoint(), size));
 }
 
 void HotspotsEditorSelectingState::scaleUpSelectingArea()
 {
-    if (m_editor->m_selectingAreaRatio > 1) {
-        m_editor->m_selectingAreaRatio --;
-        setSelectingAreaSize();
-    }
+    m_editor->m_selectingAreaExpanding += selectingAreaScaleDelta();
+    setSelectingAreaSize();
 }
 
 void HotspotsEditorSelectingState::scaleDownSelectingArea()
 {
-    m_editor->m_selectingAreaRatio ++;
+    m_editor->m_selectingAreaExpanding -= selectingAreaScaleDelta();
     setSelectingAreaSize();
+}
+
+int HotspotsEditorSelectingState::selectingAreaScaleDelta()
+{
+    Image *image = (*(m_editor->m_navigator))->currentImage();
+    return image->data().width() / 15;
 }
 

@@ -23,7 +23,7 @@ private:
     void setSelectingAreaSize();
     void scaleUpSelectingArea();
     void scaleDownSelectingArea();
-
+    int selectingAreaScaleDelta();
 };
 
 #endif // HOTSPOTSEDITORSELECTINGSTATE_H
