@@ -84,7 +84,11 @@ void HotspotsEditorSelectingState::onEntry()
 
 void HotspotsEditorSelectingState::onExit()
 {
-    m_curImage = 0;
+    if (m_curImage) {
+        disconnect(m_curImage, SIGNAL(hotpotsLoaded()),
+                m_editor, SLOT(createHotspotsAreas()));
+        m_curImage = 0;
+    }
     m_editor->m_selectingArea->hide();
 }
 
