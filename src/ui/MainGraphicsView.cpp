@@ -176,7 +176,7 @@ void MainGraphicsView::contextMenuEvent(QContextMenuEvent *event)
         currentNavInterval == Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
     autoNavGrp->addAction(slowAutoNavi);
     autoNavSigMap->setMapping(
-        slowAutoNavi, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
+        slowAutoNavi, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);    
 
     // Loop
     QAction *loop = menu->addAction("Loop", m_navigator, SLOT(setLoop(bool)));

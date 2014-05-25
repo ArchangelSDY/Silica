@@ -12,6 +12,8 @@ public:
     void goNext();
     void goPrev();
 
+    Type type() const { return AbstractNavigationPlayer::NormalType; }
+
 };
 
 #endif // NORMALNAVIGATIONPLAYER_H

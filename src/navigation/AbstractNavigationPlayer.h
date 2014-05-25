@@ -14,6 +14,13 @@ public:
     virtual void goNext() = 0;
     virtual void goPrev() = 0;
 
+    enum Type {
+        NormalType,
+        HotspotsType,
+    };
+
+    virtual Type type() const = 0;
+
 protected:
     Navigator *m_navigator;
 

@@ -43,12 +43,16 @@ public:
 
     bool isLooping() const { return m_isLooping; }
 
+    void setPlayer(AbstractNavigationPlayer *player);
+    AbstractNavigationPlayer *player() { return m_player; }
+
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
     void playListChange();
     void playListAppend(int start);
     void navigationChange(int index);
+    void fitInView(QRectF rect);
 
 public slots:
     void setPlayList(PlayList *, bool takeOwnership = false);

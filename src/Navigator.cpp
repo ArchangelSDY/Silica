@@ -252,3 +252,9 @@ void Navigator::setLoop(bool shouldLoop)
 {
     m_isLooping = shouldLoop;
 }
+
+void Navigator::setPlayer(AbstractNavigationPlayer *player)
+{
+    delete m_player;
+    m_player = player;
+}

@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QInputDialog>
+#include <QMenuBar>
 #include <QMessageBox>
 #include <QStackedLayout>
 #include <QStatusBar>
@@ -12,6 +13,7 @@
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
 #include "LocalPlayListRecord.h"
+#include "MainMenuBarManager.h"
 #include "MainWindow.h"
 #include "PlayList.h"
 #include "PlayListGalleryItem.h"
@@ -98,6 +100,11 @@ void MainWindow::setupExtraUi()
         "}"
     );
 
+    // Main menu bar
+    MainMenuBarManager::Context menuBarCtx;
+    menuBarCtx.menuBar = menuBar();
+    menuBarCtx.navigator = &m_navigator;
+    new MainMenuBarManager(menuBarCtx, this);
 
     // Main toolbar
     m_toolBar = new QToolBar(this);
