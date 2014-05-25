@@ -80,7 +80,8 @@ Image::Image(QUrl url, QObject *parent) :
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
-    m_isMakingThumbnail(false)
+    m_isMakingThumbnail(false) ,
+    m_hotspotsLoaded(false)
 {
     computeThumbnailPath();
 }
@@ -305,12 +306,15 @@ bool Image::copy(const QString &destPath)
     }
 }
 
-void Image::loadHotspots()
+void Image::loadHotspots(bool forceReload)
 {
-    while (!m_hotspots.isEmpty()) {
-        delete m_hotspots.takeFirst();
-    }
+    if (!m_hotspotsLoaded || forceReload) {
+        while (!m_hotspots.isEmpty()) {
+            delete m_hotspots.takeFirst();
+        }
 
-    m_hotspots = LocalDatabase::instance()->queryImageHotspots(this);
+        m_hotspots = LocalDatabase::instance()->queryImageHotspots(this);
+        m_hotspotsLoaded = true;
+    }
     emit hotpotsLoaded();
 }

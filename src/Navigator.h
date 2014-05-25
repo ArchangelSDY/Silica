@@ -52,7 +52,7 @@ signals:
     void playListChange();
     void playListAppend(int start);
     void navigationChange(int index);
-    void fitInView(QRectF rect);
+    void focusOnRect(QRectF rect);
 
 public slots:
     void setPlayList(PlayList *, bool takeOwnership = false);

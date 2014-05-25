@@ -42,7 +42,7 @@ void HotspotsEditor::mousePressEvent(QMouseEvent *event)
 
 void HotspotsEditor::createHotspotsAreas()
 {
-    if (!m_navigator || !*m_navigator) {
+    if (!m_navigator || !(*m_navigator)) {
         return;
     }
 

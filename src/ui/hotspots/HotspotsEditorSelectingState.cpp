@@ -50,7 +50,7 @@ void HotspotsEditorSelectingState::onEntry()
     connect(nav->currentImage(), SIGNAL(hotpotsLoaded()),
             m_editor, SLOT(createHotspotsAreas()),
             static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
-    nav->currentImage()->loadHotspots();
+    nav->currentImage()->loadHotspots(true);
 
     setSelectingAreaSize();
 

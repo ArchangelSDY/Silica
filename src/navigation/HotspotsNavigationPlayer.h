@@ -17,6 +17,8 @@ public:
 
     Type type() const { return AbstractNavigationPlayer::HotspotsType; }
 
+private:
+    int m_curHotspotIndex;
 };
 
 #endif // HOTSPOTSNAVIGATIONPLAYER_H

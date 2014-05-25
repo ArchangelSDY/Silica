@@ -110,7 +110,7 @@ public:
     void scheduleUnload();
 
     QList<ImageHotspot *> hotspots() { return m_hotspots; }
-    void loadHotspots();
+    void loadHotspots(bool forceReload = false);
 
     bool copy(const QString &destPath);
 
@@ -147,6 +147,7 @@ private:
     bool m_isMakingThumbnail;
 
     QList<ImageHotspot *> m_hotspots;
+    bool m_hotspotsLoaded;
 };
 
 #endif // IMAGE_H

@@ -27,6 +27,8 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
 void MainGraphicsView::setNavigator(Navigator *navigator)
 {
     m_navigator = navigator;
+    connect(m_navigator, SIGNAL(focusOnRect(QRectF)),
+            this, SLOT(focusOnRect(QRectF)));
 }
 
 void MainGraphicsView::paint(Image *image)
@@ -64,6 +66,11 @@ void MainGraphicsView::paintThumbnail(Image *image)
             m_shouldRepaintThumbnailOnShown = true;
         }
     }
+}
+
+void MainGraphicsView::focusOnRect(QRectF rect)
+{
+    fitInView(rect, Qt::KeepAspectRatio);
 }
 
 void MainGraphicsView::showEvent(QShowEvent *)

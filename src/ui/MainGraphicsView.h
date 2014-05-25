@@ -34,6 +34,7 @@ signals:
 private slots:
     void paint(Image *image);
     void paintThumbnail(Image *image);
+    void focusOnRect(QRectF rect);
 
 protected:
     virtual void showEvent(QShowEvent *event);
