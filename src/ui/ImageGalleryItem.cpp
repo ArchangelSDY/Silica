@@ -5,9 +5,6 @@
 #include "ImageGalleryItem.h"
 #include "LooseImageRenderer.h"
 
-static const int PADDING = 10;
-static const int BORDER = 5;
-
 ImageGalleryItem::ImageGalleryItem(Image *image,
                                    AbstractRendererFactory *rendererFactory,
                                    QGraphicsItem *parent) :
