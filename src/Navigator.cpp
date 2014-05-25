@@ -1,5 +1,7 @@
+#include "AbstractNavigationPlayer.h"
 #include "ImageSourceManager.h"
 #include "Navigator.h"
+#include "NormalNavigationPlayer.h"
 
 static const int MAX_PRELOAD = 5;
 
@@ -13,11 +15,12 @@ Navigator::Navigator(QObject *parent) :
     m_isLooping(true) ,
     m_cachedImages(MAX_CACHE) ,
     m_playList(0) ,
-    m_ownPlayList(false)
+    m_ownPlayList(false) ,
+    m_player(new NormalNavigationPlayer(this))
 {
     m_autoNavigationTimer.setInterval(Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
     connect(&m_autoNavigationTimer, SIGNAL(timeout()),
-            this, SLOT(goFastForward()));
+            this, SLOT(goAutoNavigation()));
 }
 
 Navigator::~Navigator()
@@ -25,6 +28,7 @@ Navigator::~Navigator()
     if (m_playList) {
         delete m_playList;
     }
+    delete m_player;
 }
 
 void Navigator::reset()
@@ -168,12 +172,12 @@ void Navigator::goIndexUntilSuccess(int index, int delta)
 
 void Navigator::goPrev()
 {
-    goIndexUntilSuccess(m_currentIndex - 1, -1);
+    m_player->goPrev();
 }
 
 void Navigator::goNext()
 {
-    goIndexUntilSuccess(m_currentIndex + 1, 1);
+    m_player->goNext();
 }
 
 void Navigator::goFirst()
@@ -227,7 +231,7 @@ void Navigator::setAutoNavigationInterval(int msec)
     m_autoNavigationTimer.setInterval(msec);
 }
 
-void Navigator::goFastForward()
+void Navigator::goAutoNavigation()
 {
     if (!m_reverseNavigation) {
         if (m_currentIndex < m_playList->count() - 1 || m_isLooping) {

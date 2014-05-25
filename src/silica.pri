@@ -6,6 +6,7 @@ SOURCES += \
     $$PWD/db/*.cpp \
     $$PWD/image/*.cpp \
     $$PWD/image/sources/*.cpp \
+    $$PWD/navigation/*.cpp \
     $$PWD/ui/*.cpp \
     $$PWD/ui/hotspots/*.cpp \
     $$PWD/ui/renderers/*.cpp
@@ -15,6 +16,7 @@ HEADERS += \
     $$PWD/db/*.h \
     $$PWD/image/*.h \
     $$PWD/image/sources/*.h \
+    $$PWD/navigation/*.h \
     $$PWD/ui/*.h \
     $$PWD/ui/hotspots/*.h \
     $$PWD/ui/renderers/*.h \
@@ -25,6 +27,7 @@ INCLUDEPATH += \
     $$PWD/db \
     $$PWD/image \
     $$PWD/image/sources \
+    $$PWD/navigation \
     $$PWD/ui \
     $$PWD/ui/hotspots \
     $$PWD/ui/renderers \

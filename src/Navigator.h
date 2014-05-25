@@ -7,6 +7,8 @@
 #include "ImagesCache.h"
 #include "PlayList.h"
 
+class AbstractNavigationPlayer;
+
 class Navigator : public QObject
 {
     Q_OBJECT
@@ -29,6 +31,7 @@ public:
     void goNext();
     void goFirst();
     void goLast();
+    void goIndexUntilSuccess(int index, int delta);
 
     Image* currentImage() const { return m_currentImage; }
     int currentIndex() { return m_currentIndex; }
@@ -62,11 +65,10 @@ public slots:
 private slots:
     void playListAppended(int start);
 
-    void goFastForward();
+    void goAutoNavigation();
 
 private:
     Image* loadIndex(int index, bool shouldPaint);
-    void goIndexUntilSuccess(int index, int delta);
 
     void preload();
     void reset();
@@ -79,6 +81,8 @@ private:
     PlayList *m_playList;
     bool m_ownPlayList;
     QTimer m_autoNavigationTimer;
+
+    AbstractNavigationPlayer *m_player;
 };
 
 #endif // NAVIGATOR_H

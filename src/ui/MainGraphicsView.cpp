@@ -106,6 +106,9 @@ void MainGraphicsView::resizeEvent(QResizeEvent *)
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event)
 {
+    // Reject event by default
+    event->setAccepted(false);
+
     m_hotspotsEditor->keyPressEvent(event);
 
     if (!event->isAccepted()) {
