@@ -5,7 +5,7 @@
 
 #include "HotspotsEditorViewState.h"
 #include "Navigator.h"
-#include "ViewStateManager.h"
+#include "HotspotsEditorViewStateManager.h"
 
 class HotspotsEditor : public QObject
 {
@@ -26,6 +26,9 @@ public:
     void enterHotspotsEditing();
     void leaveHotspotsEditing();
 
+public slots:
+    void navigationChange(int);
+
 private slots:
     void createHotspotsAreas();
 
@@ -44,7 +47,7 @@ private:
     QGraphicsScene *m_scene;
     Navigator **m_navigator;
 
-    ViewStateManager m_statesMgr;
+    HotspotsEditorViewStateManager *m_statesMgr;
     QGraphicsRectItem *m_selectingArea;
     QGraphicsItemGroup *m_hotspotsAreas;
     int m_selectingAreaExpanding;

@@ -14,6 +14,7 @@ const QColor HotspotsEditor::HotspotColorMask = QColor("#AA000000");
 HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_scene(scene) ,
     m_navigator(navigator) ,
+    m_statesMgr(new HotspotsEditorViewStateManager(this)) ,
     m_selectingArea(new QGraphicsRectItem()) ,
     m_hotspotsAreas(0) ,
     m_selectingAreaExpanding(0)
@@ -22,22 +23,27 @@ HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_selectingArea->setZValue(10);     // Make it on the top
     m_scene->addItem(m_selectingArea);
 
-    m_statesMgr.moveTo(new HotspotsEditorDisabledState(&m_statesMgr, this));
+    m_statesMgr->moveTo(new HotspotsEditorDisabledState(m_statesMgr, this));
+}
+
+void HotspotsEditor::navigationChange(int index)
+{
+    m_statesMgr->navigationChange(index);
 }
 
 void HotspotsEditor::keyPressEvent(QKeyEvent *event)
 {
-    m_statesMgr.keyPressEvent(event);
+    m_statesMgr->keyPressEvent(event);
 }
 
 void HotspotsEditor::mouseMoveEvent(QMouseEvent *event)
 {
-    m_statesMgr.mouseMoveEvent(event);
+    m_statesMgr->mouseMoveEvent(event);
 }
 
 void HotspotsEditor::mousePressEvent(QMouseEvent *event)
 {
-    m_statesMgr.mousePressEvent(event);
+    m_statesMgr->mousePressEvent(event);
 }
 
 void HotspotsEditor::createHotspotsAreas()

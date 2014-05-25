@@ -13,6 +13,8 @@ public:
                                      HotspotsEditor *editor,
                                      QObject *parent = 0);
 
+    virtual void navigationChange() {}
+
 protected:
     HotspotsEditor *m_editor;
 };

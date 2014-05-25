@@ -3,6 +3,8 @@
 
 #include "HotspotsEditorViewState.h"
 
+class Image;
+
 class HotspotsEditorSelectingState : public HotspotsEditorViewState
 {
     Q_OBJECT
@@ -15,6 +17,8 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
+    void navigationChange();
+
 protected:
     void onEntry();
     void onExit();
@@ -24,6 +28,8 @@ private:
     void scaleUpSelectingArea();
     void scaleDownSelectingArea();
     int selectingAreaScaleDelta();
+
+    Image *m_curImage;
 };
 
 #endif // HOTSPOTSEDITORSELECTINGSTATE_H

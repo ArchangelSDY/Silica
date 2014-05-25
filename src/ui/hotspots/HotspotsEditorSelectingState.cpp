@@ -11,7 +11,8 @@
 
 HotspotsEditorSelectingState::HotspotsEditorSelectingState(
         ViewStateManager *mgr, HotspotsEditor *editor, QObject *parent) :
-    HotspotsEditorViewState(mgr, editor, parent)
+    HotspotsEditorViewState(mgr, editor, parent) ,
+    m_curImage(0)
 {
 }
 
@@ -44,14 +45,36 @@ void HotspotsEditorSelectingState::mousePressEvent(QMouseEvent *event)
     event->accept();
 }
 
+void HotspotsEditorSelectingState::navigationChange()
+{
+    Navigator *nav = *(m_editor->m_navigator);
+
+    if (m_curImage) {
+        disconnect(nav->currentImage(), SIGNAL(hotpotsLoaded()),
+                m_editor, SLOT(createHotspotsAreas()));
+    }
+
+    m_curImage = nav->currentImage();
+    connect(m_curImage, SIGNAL(hotpotsLoaded()),
+            m_editor, SLOT(createHotspotsAreas()),
+            static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
+    m_curImage->loadHotspots(true);
+
+    m_editor->m_selectingAreaExpanding = 0; // Reset before editing each image
+    setSelectingAreaSize();
+}
+
 void HotspotsEditorSelectingState::onEntry()
 {
     Navigator *nav = *(m_editor->m_navigator);
-    connect(nav->currentImage(), SIGNAL(hotpotsLoaded()),
+
+    m_curImage = nav->currentImage();
+    connect(m_curImage, SIGNAL(hotpotsLoaded()),
             m_editor, SLOT(createHotspotsAreas()),
             static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
-    nav->currentImage()->loadHotspots(true);
+    m_curImage->loadHotspots(true);
 
+    m_editor->m_selectingAreaExpanding = 0; // Reset before editing each image
     setSelectingAreaSize();
 
     m_editor->m_selectingArea->setBrush(
@@ -61,8 +84,8 @@ void HotspotsEditorSelectingState::onEntry()
 
 void HotspotsEditorSelectingState::onExit()
 {
+    m_curImage = 0;
     m_editor->m_selectingArea->hide();
-    m_editor->m_selectingAreaExpanding = 0; // Reset before editing next image
 }
 
 void HotspotsEditorSelectingState::setSelectingAreaSize()

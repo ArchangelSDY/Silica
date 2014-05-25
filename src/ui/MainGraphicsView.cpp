@@ -27,6 +27,8 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
 void MainGraphicsView::setNavigator(Navigator *navigator)
 {
     m_navigator = navigator;
+    connect(m_navigator, SIGNAL(navigationChange(int)),
+            m_hotspotsEditor, SLOT(navigationChange(int)));
     connect(m_navigator, SIGNAL(focusOnRect(QRectF)),
             this, SLOT(focusOnRect(QRectF)));
 }

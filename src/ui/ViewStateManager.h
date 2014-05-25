@@ -19,7 +19,7 @@ public:
 
     void moveTo(ViewState *nextState);
 
-private:
+protected:
     ViewState *m_curState;
 };
 
