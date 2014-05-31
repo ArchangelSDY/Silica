@@ -5,11 +5,13 @@
 
 #include "Image.h"
 
+class Navigator;
+
 class ImagesCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit ImagesCache(int capacity, QObject *parent = 0);
+    explicit ImagesCache(int capacity, Navigator *navigator, QObject *parent = 0);
 
     void insert(int index, Image *image);
     Image *at(int index);
@@ -20,6 +22,7 @@ private:
 
     int m_capacity;
     QMap<int, Image *> m_images;
+    Navigator *m_navigator;
 };
 
 #endif // IMAGESCACHE_H

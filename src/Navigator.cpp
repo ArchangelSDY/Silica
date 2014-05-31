@@ -13,7 +13,7 @@ Navigator::Navigator(QObject *parent) :
     m_currentIndex(-1) ,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
-    m_cachedImages(MAX_CACHE) ,
+    m_cachedImages(MAX_CACHE, this) ,
     m_playList(0) ,
     m_ownPlayList(false) ,
     m_player(new NormalNavigationPlayer(this))

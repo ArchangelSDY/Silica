@@ -1,10 +1,12 @@
 #include <QMap>
 
 #include "ImagesCache.h"
+#include "Navigator.h"
 
-ImagesCache::ImagesCache(int capacity, QObject *parent) :
+ImagesCache::ImagesCache(int capacity, Navigator *navigator, QObject *parent) :
     QObject(parent) ,
-    m_capacity(capacity)
+    m_capacity(capacity) ,
+    m_navigator(navigator)
 {
 }
 
@@ -42,18 +44,34 @@ void ImagesCache::trim(int index)
         return;
     }
 
-    // TODO: Delta may be incorrect in looping mode
-    int min = m_images.lastKey();
-    int minDelta = qAbs(index - min);
-    int max = m_images.firstKey();
-    int maxDelta = qAbs(index - max);
+    int toRemoveIndex;
 
-    Image *toRemove = 0;
-    if (minDelta > maxDelta) {
-        toRemove = m_images.take(min);
+    if (!m_navigator->isLooping()) {
+        int min = m_images.firstKey();
+        int max = m_images.lastKey();
+        int minDistance = qAbs(index - min);
+        int maxDistance = qAbs(index - max);
+        toRemoveIndex = (minDistance > maxDistance) ? min : max;
     } else {
-        toRemove = m_images.take(max);
+        int total = m_navigator->playList()->count();
+        int longestKey = 0, longestDistance = 0;
+        foreach (const int &key, m_images.keys()) {
+            int delta = qMax(key, index) - qMin(key, index);
+
+            // Handle looping
+            if (delta > total / 2) {
+                delta = total - delta;
+            }
+
+            if (delta > longestDistance) {
+                longestKey = key;
+                longestDistance = delta;
+            }
+        }
+        toRemoveIndex = longestKey;
     }
+
+    Image *toRemove = m_images.take(toRemoveIndex);
 
     if (toRemove) {
         toRemove->scheduleUnload();
