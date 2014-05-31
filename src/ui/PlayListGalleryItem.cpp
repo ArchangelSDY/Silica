@@ -8,6 +8,8 @@
 #include "LooseImageBackgroundRenderer.h"
 #include "PlayListGalleryItem.h"
 
+const QColor PlayListGalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
+
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          AbstractRendererFactory *rendererFactory,
                                          QGraphicsItem *parent) :
@@ -70,18 +72,14 @@ void PlayListGalleryItem::paint(QPainter *painter,
     painter->setBackground(scene()->palette().background());
     painter->setBrush(scene()->palette().foreground());
 
-    // Background
-    if (isSelected()) {
-        QRadialGradient gradient(boundingRect().center(),
-                                 boundingRect().width());
-        gradient.setColorAt(0, painter->brush().color());
-        gradient.setColorAt(1, Qt::transparent);
-        painter->setBrush(gradient);
+    // Clear painter first
+    painter->eraseRect(boundingRect());
 
-        painter->fillRect(boundingRect(), QBrush(gradient));
-    } else {
-        painter->eraseRect(boundingRect());
-    }
-
+    // Render
     m_renderer->paint(painter);
+
+    // Draw a mask if selected
+    if (isSelected()) {
+        painter->fillRect(boundingRect(), PlayListGalleryItem::SELECTED_COLOR);
+    }
 }

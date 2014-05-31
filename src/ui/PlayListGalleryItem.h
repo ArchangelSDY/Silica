@@ -30,6 +30,8 @@ protected:
                        const QStyleOptionGraphicsItem *, QWidget *);
 
 private:
+    static const QColor SELECTED_COLOR;
+
     PlayListRecord *m_record;
 };
 
