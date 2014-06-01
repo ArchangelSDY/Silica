@@ -76,7 +76,8 @@ void MainGraphicsView::paintThumbnail(Image *image)
 
 void MainGraphicsView::focusOnRect(QRectF rect)
 {
-    fitInView(rect, Qt::KeepAspectRatio);
+    m_focusedRect = rect;
+    fitInViewIfNecessary();
 }
 
 void MainGraphicsView::showEvent(QShowEvent *)
@@ -213,22 +214,27 @@ void MainGraphicsView::fitGridInView(int grid)
 
 void MainGraphicsView::fitInViewIfNecessary()
 {
-    if (sceneRect().width() > width() || sceneRect().height() > height()) {
-        if (m_fitInView == Fit) {
-            fitInView(sceneRect(), Qt::KeepAspectRatio);
-        } else if (m_fitInView == FitExpand) {
-            fitInView(sceneRect(), Qt::KeepAspectRatioByExpanding);
+    if (m_focusedRect.isNull()) {
+        if (sceneRect().width() > width() || sceneRect().height() > height()) {
+            if (m_fitInView == Fit) {
+                fitInView(sceneRect(), Qt::KeepAspectRatio);
+            } else if (m_fitInView == FitExpand) {
+                fitInView(sceneRect(), Qt::KeepAspectRatioByExpanding);
+            } else {
+                resetMatrix();
+            }
         } else {
+            // No need to fit in view(expanding in this case)
+            // if image is smaller than view.
             resetMatrix();
         }
     } else {
-        // No need to fit in view(expanding in this case)
-        // if image is smaller than view.
-        resetMatrix();
+        fitInView(m_focusedRect, Qt::KeepAspectRatio);
     }
 }
 
 void MainGraphicsView::toggleFitInView()
 {
+    m_focusedRect = QRectF();    // Set focused rect null
     m_fitInView = static_cast<MainGraphicsView::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
 }

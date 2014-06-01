@@ -3,6 +3,7 @@
 
 #include "AbstractNavigationPlayer.h"
 
+class ImageHotspot;
 class Navigator;
 
 class HotspotsNavigationPlayer : public AbstractNavigationPlayer
@@ -18,6 +19,8 @@ public:
     Type type() const { return AbstractNavigationPlayer::HotspotsType; }
 
 private:
+    void goToHotspot(const QList<ImageHotspot *> &hotspots, int index);
+
     int m_curHotspotIndex;
 };
 

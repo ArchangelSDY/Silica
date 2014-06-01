@@ -55,6 +55,7 @@ private:
     FitMode m_fitInView;
 
     HotspotsEditor *m_hotspotsEditor;
+    QRectF m_focusedRect;
 };
 
 #endif // MAINGRAPHICSVIEW_H
