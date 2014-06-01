@@ -77,6 +77,8 @@ private:
     void preload();
     void reset();
 
+    void setCacheStragegy();
+
     int m_currentIndex;
     Image* m_currentImage;
     bool m_reverseNavigation;

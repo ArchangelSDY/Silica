@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+#include "AbstractImagesCacheStrategy.h"
 #include "Image.h"
 
 class Navigator;
@@ -10,19 +11,25 @@ class Navigator;
 class ImagesCache : public QObject
 {
     Q_OBJECT
+
+    friend class AbstractImagesCacheStrategy;
+
 public:
-    explicit ImagesCache(int capacity, Navigator *navigator, QObject *parent = 0);
+    explicit ImagesCache(int capacity, QObject *parent = 0);
+    ~ImagesCache();
 
     void insert(int index, Image *image);
     Image *at(int index);
     void clear();
+
+    void setStrategy(AbstractImagesCacheStrategy *strategy);
 
 private:
     void trim(int index);
 
     int m_capacity;
     QMap<int, Image *> m_images;
-    Navigator *m_navigator;
+    AbstractImagesCacheStrategy *m_strategy;
 };
 
 #endif // IMAGESCACHE_H

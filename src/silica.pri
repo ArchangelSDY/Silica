@@ -5,6 +5,7 @@ SOURCES += \
     $$PWD/PlayList.cpp \
     $$PWD/db/*.cpp \
     $$PWD/image/*.cpp \
+    $$PWD/image/caches/*.cpp \
     $$PWD/image/sources/*.cpp \
     $$PWD/navigation/*.cpp \
     $$PWD/ui/*.cpp \
@@ -15,6 +16,7 @@ HEADERS += \
     $$PWD/*.h \
     $$PWD/db/*.h \
     $$PWD/image/*.h \
+    $$PWD/image/caches/*.h \
     $$PWD/image/sources/*.h \
     $$PWD/navigation/*.h \
     $$PWD/ui/*.h \
@@ -26,6 +28,7 @@ INCLUDEPATH += \
     $$PWD \
     $$PWD/db \
     $$PWD/image \
+    $$PWD/image/caches \
     $$PWD/image/sources \
     $$PWD/navigation \
     $$PWD/ui \
