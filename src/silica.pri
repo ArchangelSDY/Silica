@@ -36,7 +36,8 @@ INCLUDEPATH += \
     $$PWD/ui/renderers \
     $$PWD/util
 
-FORMS += $$PWD/*.ui
+FORMS += $$PWD/*.ui \
+    $$PWD/ui/*.ui
 
 RESOURCES += $$PWD/*.qrc
 
