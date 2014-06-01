@@ -1,4 +1,5 @@
 #include <QPainter>
+#include <QPropertyAnimation>
 
 #include "NotificationWidget.h"
 #include "ui_NotificationWidget.h"
@@ -12,11 +13,31 @@ NotificationWidget::NotificationWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    connect(this, SIGNAL(transparencyChanged(int)),
+            this, SLOT(repaint()));
 }
 
 NotificationWidget::~NotificationWidget()
 {
     delete ui;
+}
+
+void NotificationWidget::showOnce(int duration, bool autoDelete)
+{
+    show();
+
+    QPropertyAnimation *animation =
+        new QPropertyAnimation(this, "transparency");
+    animation->setDuration(duration);
+    animation->setEasingCurve(QEasingCurve::OutInCubic);
+    animation->setStartValue(0);
+    animation->setKeyValueAt(0.5, 255);
+    animation->setEndValue(0);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+
+    if (autoDelete) {
+        connect(animation, SIGNAL(finished()), this, SLOT(deleteLater()));
+    }
 }
 
 void NotificationWidget::setStickyMode(StickyMode mode)
@@ -36,10 +57,18 @@ void NotificationWidget::paintEvent(QPaintEvent *)
 
     QPainter painter(this);
 
+    // Paint background
     painter.setPen(Qt::NoPen);
-    // painter.setBrush(QColor("#F8C014"));     // Orange color
-    painter.setBrush(QColor("#58B6BF"));
+    QColor bgColor("#58B6BF");
+    bgColor.setAlpha(m_transparency);
+    painter.setBrush(bgColor);
     painter.drawRoundedRect(rect(), 5, 5);
+
+    // Set message color
+    QColor msgColor("#FFFFFF");
+    msgColor.setAlpha(m_transparency);
+    ui->lblMsg->setStyleSheet(
+        QString("Color: %1").arg(msgColor.name(QColor::HexArgb)));
 }
 
 void NotificationWidget::moveToStickyPosition()

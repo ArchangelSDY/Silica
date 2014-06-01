@@ -10,6 +10,8 @@ class NotificationWidget;
 class NotificationWidget : public QWidget
 {
     Q_OBJECT
+
+    Q_PROPERTY(int transparency READ transparency WRITE setTransparency NOTIFY transparencyChanged)
 public:
     enum StickyMode {
         StickyTopLeft,
@@ -23,8 +25,20 @@ public:
     explicit NotificationWidget(QWidget *parent = 0);
     ~NotificationWidget();
 
+    void showOnce(int duration = 2000, bool autoDelete = true);
+
     void setStickyMode(StickyMode mode);
     void setMessage(const QString &message);
+
+    int transparency() const { return m_transparency; }
+    void setTransparency(int transparency)
+    {
+        m_transparency = transparency;
+        emit transparencyChanged(transparency);
+    }
+
+signals:
+    void transparencyChanged(int transparency);
 
 protected:
     virtual void paintEvent(QPaintEvent *);
@@ -36,6 +50,7 @@ private:
 
     Ui::NotificationWidget *ui;
     StickyMode m_stickyMode;
+    int m_transparency;
 };
 
 #endif // NOTIFICATIONWIDGET_H
