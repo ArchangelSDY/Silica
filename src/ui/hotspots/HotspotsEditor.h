@@ -25,9 +25,6 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
-    void enterHotspotsEditing();
-    void leaveHotspotsEditing();
-
 public slots:
     void navigationChange(int);
 

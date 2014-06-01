@@ -50,7 +50,7 @@ void HotspotsEditorSelectingState::navigationChange()
     Navigator *nav = *(m_editor->m_navigator);
 
     if (m_curImage) {
-        disconnect(nav->currentImage(), SIGNAL(hotpotsLoaded()),
+        disconnect(m_curImage, SIGNAL(hotpotsLoaded()),
                 m_editor, SLOT(createHotspotsAreas()));
     }
 
