@@ -17,8 +17,11 @@ HotspotsEditor::HotspotsEditor(QGraphicsScene *scene, Navigator **navigator) :
     m_statesMgr(new HotspotsEditorViewStateManager(this)) ,
     m_selectingArea(new QGraphicsRectItem()) ,
     m_hotspotsAreas(0) ,
-    m_selectingAreaExpanding(0)
+    m_selectingAreaExpanding(0) ,
+    m_indicator(new NotificationWidget(scene->views()[0]))
 {
+    m_indicator->setStickyMode(NotificationWidget::StickyTopRight);
+
     m_selectingArea->hide();
     m_selectingArea->setZValue(10);     // Make it on the top
     m_scene->addItem(m_selectingArea);

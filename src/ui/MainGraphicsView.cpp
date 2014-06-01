@@ -13,7 +13,7 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_imageItem(new QGraphicsPixmapItem()) ,
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit) ,
-    m_hotspotsEditor(new HotspotsEditor(m_scene, &m_navigator))
+    m_hotspotsEditor(0)
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
@@ -22,6 +22,10 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     setMouseTracking(true);
 
     setScene(m_scene);
+
+    // Hotspots editor must be initialized after scene's added to view
+    // because its mode indicator needs a parent widget
+    m_hotspotsEditor = new HotspotsEditor(m_scene, &m_navigator);
 }
 
 void MainGraphicsView::setNavigator(Navigator *navigator)

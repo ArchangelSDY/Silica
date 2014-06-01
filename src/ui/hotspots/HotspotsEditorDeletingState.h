@@ -14,6 +14,9 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
+protected:
+    void onEntry();
+    void onExit();
 };
 
 #endif // HOTSPOTSEDITORDELETINGSTATE_H

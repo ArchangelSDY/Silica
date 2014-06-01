@@ -20,6 +20,7 @@ void HotspotsEditorDisabledState::keyPressEvent(QKeyEvent *event)
 void HotspotsEditorDisabledState::onEntry()
 {
     m_editor->destroyHotspotsAreas();
+    m_editor->m_indicator->hide();
 
     if (m_editor->m_navigator) {
         Navigator *nav = *(m_editor->m_navigator);

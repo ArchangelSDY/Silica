@@ -12,10 +12,6 @@ NotificationWidget::NotificationWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-
-    QPalette msgPal = ui->lblMsg->palette();
-    msgPal.setColor(QPalette::Foreground, Qt::white);
-    ui->lblMsg->setPalette(msgPal);
 }
 
 NotificationWidget::~NotificationWidget()

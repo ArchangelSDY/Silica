@@ -4,8 +4,10 @@
 #include <QGraphicsScene>
 
 #include "HotspotsEditorViewState.h"
-#include "Navigator.h"
 #include "HotspotsEditorViewStateManager.h"
+
+#include "Navigator.h"
+#include "NotificationWidget.h"
 
 class HotspotsEditor : public QObject
 {
@@ -51,6 +53,7 @@ private:
     QGraphicsRectItem *m_selectingArea;
     QGraphicsItemGroup *m_hotspotsAreas;
     int m_selectingAreaExpanding;
+    NotificationWidget *m_indicator;
 };
 
 #endif // HOTSPOTSEDITOR_H

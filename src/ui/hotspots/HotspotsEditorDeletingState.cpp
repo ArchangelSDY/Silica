@@ -22,3 +22,14 @@ void HotspotsEditorDeletingState::mousePressEvent(QMouseEvent *event)
     m_editor->confirmHotspotDeleting(event->pos());
     event->accept();
 }
+
+void HotspotsEditorDeletingState::onEntry()
+{
+    m_editor->m_indicator->setMessage("Hotspots Editor Deleting");
+    m_editor->m_indicator->show();
+}
+
+void HotspotsEditorDeletingState::onExit()
+{
+    m_editor->m_indicator->hide();
+}

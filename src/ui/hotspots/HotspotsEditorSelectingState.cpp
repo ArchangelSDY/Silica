@@ -80,6 +80,9 @@ void HotspotsEditorSelectingState::onEntry()
     m_editor->m_selectingArea->setBrush(
         HotspotsEditor::HotspotColorSelecting);
     m_editor->m_selectingArea->show();
+
+    m_editor->m_indicator->setMessage("Hotspots Editor Selecting");
+    m_editor->m_indicator->show();
 }
 
 void HotspotsEditorSelectingState::onExit()
@@ -90,6 +93,7 @@ void HotspotsEditorSelectingState::onExit()
         m_curImage = 0;
     }
     m_editor->m_selectingArea->hide();
+    m_editor->m_indicator->hide();
 }
 
 void HotspotsEditorSelectingState::setSelectingAreaSize()

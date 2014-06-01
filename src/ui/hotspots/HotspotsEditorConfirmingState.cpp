@@ -50,6 +50,9 @@ void HotspotsEditorConfirmingState::onEntry()
 
     // Hide existed areas
     m_editor->m_hotspotsAreas->hide();
+
+    m_editor->m_indicator->setMessage("Hotspots Editor Confirming");
+    m_editor->m_indicator->show();
 }
 
 void HotspotsEditorConfirmingState::onExit()
@@ -63,4 +66,6 @@ void HotspotsEditorConfirmingState::onExit()
 
     // Show existed areas again
     m_editor->m_hotspotsAreas->show();
+
+    m_editor->m_indicator->hide();
 }
