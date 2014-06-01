@@ -235,6 +235,8 @@ void MainGraphicsView::fitInViewIfNecessary()
 
 void MainGraphicsView::toggleFitInView()
 {
-    m_focusedRect = QRectF();    // Set focused rect null
+    // Set focused rect to null to disable focusing temporarily
+    m_focusedRect = QRectF();
+
     m_fitInView = static_cast<MainGraphicsView::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
 }

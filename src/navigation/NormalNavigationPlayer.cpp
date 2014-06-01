@@ -5,7 +5,8 @@ NormalNavigationPlayer::NormalNavigationPlayer(Navigator *navigator,
                                                QObject *parent) :
     AbstractNavigationPlayer(navigator, parent)
 {
-    m_navigator->focusOnRect(QRectF());  // Set focused rect null
+    // Set focused rect to null to disable focusing
+    m_navigator->focusOnRect(QRectF());
 }
 
 void NormalNavigationPlayer::goNext()
