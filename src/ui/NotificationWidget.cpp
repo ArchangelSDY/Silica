@@ -26,7 +26,6 @@ NotificationWidget::~NotificationWidget()
 void NotificationWidget::setStickyMode(StickyMode mode)
 {
     m_stickyMode = mode;
-    moveToStickyPosition();
 }
 
 void NotificationWidget::setMessage(const QString &message)
