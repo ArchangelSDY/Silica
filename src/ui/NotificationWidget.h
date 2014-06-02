@@ -36,11 +36,7 @@ public:
     void setMessage(const QString &message);
 
     int transparency() const { return m_transparency; }
-    void setTransparency(int transparency)
-    {
-        m_transparency = transparency;
-        emit transparencyChanged(transparency);
-    }
+    void setTransparency(int transparency);
 
 signals:
     void transparencyChanged(int transparency);

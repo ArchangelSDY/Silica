@@ -21,12 +21,25 @@ NotificationWidget::NotificationWidget(QWidget *parent) :
     setPalette(pal);
 
     connect(this, SIGNAL(transparencyChanged(int)),
-            this, SLOT(repaint()));
+            this, SLOT(update()));
 }
 
 NotificationWidget::~NotificationWidget()
 {
     delete ui;
+}
+
+void NotificationWidget::setTransparency(int transparency)
+{
+    m_transparency = transparency;
+
+    // Set message transparency
+    QColor msgColor = palette().color(QPalette::Text);
+    msgColor.setAlpha(m_transparency);
+    ui->lblMsg->setStyleSheet(
+        QString("Color: %1").arg(msgColor.name(QColor::HexArgb)));
+
+    emit transparencyChanged(m_transparency);
 }
 
 void NotificationWidget::showOnce(int duration, bool autoDelete)
@@ -40,6 +53,7 @@ void NotificationWidget::showOnce(int duration, bool autoDelete)
     animation->setStartValue(0);
     animation->setKeyValueAt(0.5, 255);
     animation->setEndValue(0);
+
     animation->start(QAbstractAnimation::DeleteWhenStopped);
 
     if (autoDelete) {
@@ -70,12 +84,6 @@ void NotificationWidget::paintEvent(QPaintEvent *)
     bgColor.setAlpha(m_transparency);
     painter.setBrush(bgColor);
     painter.drawRoundedRect(rect(), 5, 5);
-
-    // Set message color
-    QColor msgColor = palette().color(QPalette::Text);
-    msgColor.setAlpha(m_transparency);
-    ui->lblMsg->setStyleSheet(
-        QString("Color: %1").arg(msgColor.name(QColor::HexArgb)));
 }
 
 void NotificationWidget::moveToStickyPosition()
@@ -113,5 +121,7 @@ void NotificationWidget::moveToStickyPosition()
         targetPos = pos();
     }
 
-    move(targetPos);
+    if (targetPos != pos()) {
+        move(targetPos);
+    }
 }
