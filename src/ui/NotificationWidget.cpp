@@ -13,6 +13,12 @@ NotificationWidget::NotificationWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+    QPalette pal = palette();
+    pal.setColor(QPalette::Background, QColor("#58B6BF"));
+    pal.setColor(QPalette::Text, QColor("#FFFFFF"));
+    setPalette(pal);
+
     connect(this, SIGNAL(transparencyChanged(int)),
             this, SLOT(repaint()));
 }
@@ -59,13 +65,13 @@ void NotificationWidget::paintEvent(QPaintEvent *)
 
     // Paint background
     painter.setPen(Qt::NoPen);
-    QColor bgColor("#58B6BF");
+    QColor bgColor = palette().color(QPalette::Background);
     bgColor.setAlpha(m_transparency);
     painter.setBrush(bgColor);
     painter.drawRoundedRect(rect(), 5, 5);
 
     // Set message color
-    QColor msgColor("#FFFFFF");
+    QColor msgColor = palette().color(QPalette::Text);
     msgColor.setAlpha(m_transparency);
     ui->lblMsg->setStyleSheet(
         QString("Color: %1").arg(msgColor.name(QColor::HexArgb)));
