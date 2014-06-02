@@ -8,6 +8,8 @@
 #include "Image.h"
 #include "Navigator.h"
 
+class RankVoteView;
+
 class MainGraphicsView : public QGraphicsView
 {
     Q_OBJECT
@@ -56,6 +58,8 @@ private:
 
     HotspotsEditor *m_hotspotsEditor;
     QRectF m_focusedRect;
+
+    RankVoteView *m_rankVoteView;
 };
 
 #endif // MAINGRAPHICSVIEW_H

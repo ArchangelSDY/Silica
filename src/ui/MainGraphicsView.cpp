@@ -3,6 +3,7 @@
 #include <QSignalMapper>
 
 #include "MainGraphicsView.h"
+#include "RankVoteView.h"
 
 static const double SCALE_FACTOR = 0.05;
 
@@ -13,7 +14,8 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_imageItem(new QGraphicsPixmapItem()) ,
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit) ,
-    m_hotspotsEditor(0)
+    m_hotspotsEditor(0) ,
+    m_rankVoteView(new RankVoteView(&m_navigator, this))
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
@@ -124,10 +126,16 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *event)
     event->setAccepted(false);
 
     m_hotspotsEditor->keyPressEvent(event);
-
-    if (!event->isAccepted()) {
-        QGraphicsView::keyPressEvent(event);
+    if (event->isAccepted()) {
+        return;
     }
+
+    m_rankVoteView->keyPressEvent(event);
+    if (event->isAccepted()) {
+        return;
+    }
+
+    QGraphicsView::keyPressEvent(event);
 }
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
