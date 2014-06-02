@@ -34,6 +34,16 @@
             "version": 6,
             "applySql": "alter table playlists add column type integer not null default 0",
             "revertSql": ""
+        },
+        {
+            "version": 7,
+            "applySql": "create table image_ranks (id integer primary key autoincrement, image_hash text, rank integer)",
+            "revertSql": "drop table image_ranks"
+        },
+        {
+            "version": 8,
+            "applySql": "create index image_ranks_image_hash on image_ranks (image_hash)",
+            "revertSql": "drop index image_ranks_image_hash"
         }
     ]
 }
