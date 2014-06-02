@@ -9,7 +9,8 @@ const int NotificationWidget::STICKY_MARGIN = 15;
 NotificationWidget::NotificationWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::NotificationWidget) ,
-    m_stickyMode(NotificationWidget::StickyCenter)
+    m_stickyMode(NotificationWidget::StickyCenter) ,
+    m_transparency(255)
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
