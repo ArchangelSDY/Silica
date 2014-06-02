@@ -26,6 +26,9 @@ public:
     bool removeImageHotspot(ImageHotspot *hotspot);
     QList<ImageHotspot *> queryImageHotspots(Image *image);
 
+    int queryImageRankValue(Image *image);
+    bool updateImageRank(Image *image, int rank);
+
 private:
     QSqlDatabase m_db;
 };

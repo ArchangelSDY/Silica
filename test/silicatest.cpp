@@ -4,6 +4,7 @@
 
 #include "TestLocalDatabase.h"
 #include "TestImage.h"
+#include "TestImageRank.h"
 #include "TestImageSource.h"
 #include "TestPlayList.h"
 
@@ -16,12 +17,16 @@ int main(int argc, char **argv)
 
     int err = 0;
     {
-        TestImageSource testImageSource;
-        err = qMax(err, QTest::qExec(&testImageSource, app.arguments()));
-    }
-    {
         TestImage testImage;
         err = qMax(err, QTest::qExec(&testImage, app.arguments()));
+    }
+    {
+        TestImageRank testImageRank;
+        err = qMax(err, QTest::qExec(&testImageRank, app.arguments()));
+    }
+    {
+        TestImageSource testImageSource;
+        err = qMax(err, QTest::qExec(&testImageSource, app.arguments()));
     }
     {
         TestPlayList testPlayList;

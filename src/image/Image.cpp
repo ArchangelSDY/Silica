@@ -10,6 +10,7 @@
 
 #include "LocalDatabase.h"
 #include "Image.h"
+#include "ImageRank.h"
 #include "ImageSourceManager.h"
 
 static const QString THUMBNAIL_FOLDER = "thumbnails";
@@ -81,7 +82,8 @@ Image::Image(QUrl url, QObject *parent) :
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
-    m_hotspotsLoaded(false)
+    m_hotspotsLoaded(false) ,
+    m_rank(new ImageRank(this, this))
 {
     computeThumbnailPath();
 }
@@ -95,7 +97,9 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
-    m_isMakingThumbnail(false)
+    m_isMakingThumbnail(false) ,
+    m_hotspotsLoaded(false) ,
+    m_rank(new ImageRank(this, this))
 {
     computeThumbnailPath();
 }

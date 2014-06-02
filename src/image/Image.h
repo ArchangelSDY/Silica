@@ -7,6 +7,8 @@
 #include "ImageHotspot.h"
 #include "ImageSource.h"
 
+class ImageRank;
+
 class LoadImageTask : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -112,6 +114,8 @@ public:
     QList<ImageHotspot *> hotspots() { return m_hotspots; }
     void loadHotspots(bool forceReload = false);
 
+    ImageRank *rank() { return m_rank; }
+
     bool copy(const QString &destPath);
 
     inline bool operator ==(const Image &other)
@@ -148,6 +152,8 @@ private:
 
     QList<ImageHotspot *> m_hotspots;
     bool m_hotspotsLoaded;
+
+    ImageRank *m_rank;
 };
 
 #endif // IMAGE_H

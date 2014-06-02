@@ -1,5 +1,6 @@
 #include "QtDBMigration.h"
 
+#include "ImageRank.h"
 #include "GlobalConfig.h"
 #include "PlayList.h"
 #include "SQLiteLocalDatabase.h"
@@ -40,6 +41,10 @@ const char *SQL_INSERT_IMAGE_HOTSPOT = "insert into image_hotspots(image_hash, l
 const char *SQL_REMOVE_IMAGE_HOTSPOT_BY_ID = "delete from image_hotspots where id = ?";
 
 const char *SQL_QUERY_IMAGE_HOTSPOTS = "select id, left, top, width, height from image_hotspots where image_hash = ?";
+
+const char *SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH = "select rank from image_ranks where image_hash = ?";
+
+const char *SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH = "insert or replace into image_ranks (rank, image_hash) values (?, ?)";
 
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
@@ -307,4 +312,45 @@ QList<ImageHotspot *> SQLiteLocalDatabase::queryImageHotspots(Image *image)
     }
 
     return hotspots;
+}
+
+int SQLiteLocalDatabase::queryImageRankValue(Image *image)
+{
+    if (!m_db.isOpen()) {
+        return ImageRank::DEFAULT_VALUE;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH);
+    q.addBindValue(image->source()->hashStr());
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return ImageRank::DEFAULT_VALUE;
+    }
+
+    while (q.next()) {
+        return q.value("rank").toInt();
+    }
+
+    return ImageRank::DEFAULT_VALUE;
+}
+
+bool SQLiteLocalDatabase::updateImageRank(Image *image, int rank)
+{
+    if (!m_db.isOpen() || image == 0) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH);
+    q.addBindValue(rank);
+    q.addBindValue(image->source()->hashStr());
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
 }
