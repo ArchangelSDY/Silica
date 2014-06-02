@@ -2,6 +2,8 @@
 #include "LocalDatabase.h"
 
 const int ImageRank::DEFAULT_VALUE = 3;
+const int ImageRank::MIN_VALUE = 1;
+const int ImageRank::MAX_VALUE = 5;
 
 ImageRank::ImageRank(Image *image, QObject *parent) :
     QObject(parent) ,
@@ -22,7 +24,7 @@ int ImageRank::value()
 
 void ImageRank::setValue(int rank)
 {
-    m_value = rank;
+    m_value = adjustNewRank(rank);
     save();
     emit imageRankChanged(rank);
 }
@@ -36,4 +38,11 @@ void ImageRank::load()
 void ImageRank::save()
 {
     LocalDatabase::instance()->updateImageRank(m_image, m_value);
+}
+
+int ImageRank::adjustNewRank(int newRank)
+{
+    newRank = qMin(MAX_VALUE, newRank);
+    newRank = qMax(MIN_VALUE, newRank);
+    return newRank;
 }

@@ -12,6 +12,8 @@ public:
     explicit ImageRank(Image *image, QObject *parent = 0);
 
     static const int DEFAULT_VALUE;
+    static const int MIN_VALUE;
+    static const int MAX_VALUE;
 
     int value();
     void setValue(int rank);
@@ -24,6 +26,7 @@ signals:
 private:
     void load();
     void save();
+    int adjustNewRank(int newRank);
 
     Image *m_image;
     bool m_inited;
