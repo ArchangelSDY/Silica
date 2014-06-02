@@ -20,7 +20,7 @@ NotificationWidget::NotificationWidget(QWidget *parent) :
     setPalette(pal);
 
     connect(this, SIGNAL(transparencyChanged(int)),
-            this, SLOT(repaint()));
+            this, SLOT(update()));
 }
 
 NotificationWidget::~NotificationWidget()
