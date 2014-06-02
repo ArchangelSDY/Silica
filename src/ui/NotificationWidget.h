@@ -25,6 +25,11 @@ public:
     explicit NotificationWidget(QWidget *parent = 0);
     ~NotificationWidget();
 
+    /**
+     * @brief Show notification once with some animation.
+     * @param duration Animation duration.
+     * @param autoDelete Delete self after finished if true.
+     */
     void showOnce(int duration = 2000, bool autoDelete = true);
 
     void setStickyMode(StickyMode mode);
