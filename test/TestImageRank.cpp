@@ -48,3 +48,53 @@ void TestImageRank::saveAndLoad_data()
     QTest::newRow("Too large rank") << imageUrl << 10 << ImageRank::MAX_VALUE;
     QTest::newRow("Too small rank") << imageUrl << 0 << ImageRank::MIN_VALUE;
 }
+
+void TestImageRank::upDownVote()
+{
+    QFETCH(QUrl, imageUrl);
+    QFETCH(int, oldRank);
+    QFETCH(int, newRankAfterUpVote);
+    QFETCH(int, newRankAfterDownVote);
+
+    Image image(imageUrl);
+    image.rank()->setValue(oldRank);
+
+    // Test up vote
+    image.rank()->upVote();
+    QCOMPARE(image.rank()->value(), newRankAfterUpVote);
+    QCOMPARE(
+        LocalDatabase::instance()->queryImageRankValue(&image),
+        newRankAfterUpVote);
+
+    // Reset rank
+    image.rank()->setValue(oldRank);
+
+    // Test down vote
+    image.rank()->downVote();
+    QCOMPARE(image.rank()->value(), newRankAfterDownVote);
+    QCOMPARE(
+        LocalDatabase::instance()->queryImageRankValue(&image),
+        newRankAfterDownVote);
+}
+
+void TestImageRank::upDownVote_data()
+{
+    QTest::addColumn<QUrl>("imageUrl");
+    QTest::addColumn<int>("oldRank");
+    QTest::addColumn<int>("newRankAfterUpVote");
+    QTest::addColumn<int>("newRankAfterDownVote");
+    const QString &currentDir = qApp->applicationDirPath();
+    QUrl imageUrl("file://" + currentDir + "/assets/me.jpg");
+
+    QTest::newRow("Basic") << imageUrl << 3 << 4 << 2;
+    QTest::newRow("Max rank")
+        << imageUrl
+        << ImageRank::MAX_VALUE
+        << ImageRank::MAX_VALUE
+        << ImageRank::MAX_VALUE - 1;
+    QTest::newRow("Min rank")
+        << imageUrl
+        << ImageRank::MIN_VALUE
+        << ImageRank::MIN_VALUE + 1
+        << ImageRank::MIN_VALUE;
+}

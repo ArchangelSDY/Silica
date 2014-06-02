@@ -10,6 +10,8 @@ private slots:
     void cleanup();
     void saveAndLoad();
     void saveAndLoad_data();
+    void upDownVote();
+    void upDownVote_data();
 };
 
 #endif // TESTIMAGERANK_H

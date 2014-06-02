@@ -24,9 +24,22 @@ int ImageRank::value()
 
 void ImageRank::setValue(int rank)
 {
-    m_value = adjustNewRank(rank);
-    save();
-    emit imageRankChanged(rank);
+    rank = adjustNewRank(rank);
+    if (m_value != rank) {
+        m_value = rank;
+        save();
+        emit imageRankChanged(rank);
+    }
+}
+
+void ImageRank::upVote()
+{
+    setValue(value() + 1);
+}
+
+void ImageRank::downVote()
+{
+    setValue(value() - 1);
 }
 
 void ImageRank::load()

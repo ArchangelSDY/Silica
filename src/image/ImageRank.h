@@ -18,6 +18,9 @@ public:
     int value();
     void setValue(int rank);
 
+    void upVote();
+    void downVote();
+
     Image *image() { return m_image; }
 
 signals:

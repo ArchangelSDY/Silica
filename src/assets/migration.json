@@ -37,7 +37,7 @@
         },
         {
             "version": 7,
-            "applySql": "create table image_ranks (id integer primary key autoincrement, image_hash text, rank integer)",
+            "applySql": "create table image_ranks (id integer primary key autoincrement, image_hash text unique, rank integer)",
             "revertSql": "drop table image_ranks"
         },
         {
