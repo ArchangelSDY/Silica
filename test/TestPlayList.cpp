@@ -117,8 +117,11 @@ void TestPlayList::setFilter()
     QCOMPARE(pl.count(), initialCount);
     QCOMPARE(pl.size(), initialCount);
 
+    QSignalSpy spyItemsChanged(&pl, SIGNAL(itemsChanged()));
+
     pl.setFilter(filter);
 
+    QCOMPARE(spyItemsChanged.count(), 1);
     QCOMPARE(pl.count(), filteredCount);
     QCOMPARE(pl.size(), filteredCount);
 

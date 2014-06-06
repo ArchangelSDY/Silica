@@ -89,4 +89,5 @@ void PlayList::setFilter(AbstractPlayListFilter *filter)
 {
     m_filter = filter ? filter : new DoNothingFilter();
     m_filteredImages = m_filter->filtered(m_allImages);
+    emit itemsChanged();
 }
