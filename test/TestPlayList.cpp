@@ -6,6 +6,8 @@
 
 #include "TestPlayList.h"
 
+Q_DECLARE_METATYPE(AbstractPlayListFilter *)
+
 void TestPlayList::initTestCase()
 {
     const QString &tmpDirPath = m_tmpDir.path();
@@ -98,4 +100,59 @@ void TestPlayList::sortByAspectRatio_data()
         << (QList<QUrl>() << asunaUrl << silicaUrl)
         << "silica.png"
         << "asuna.png";
+}
+
+void TestPlayList::setFilter()
+{
+    QFETCH(ImageList, images);
+    QFETCH(AbstractPlayListFilter *, filter);
+    QFETCH(int, initialCount);
+    QFETCH(int, filteredCount);
+
+    PlayList pl;
+    pl << images;
+
+    QCOMPARE(pl.count(), initialCount);
+    QCOMPARE(pl.size(), initialCount);
+
+    pl.setFilter(filter);
+
+    QCOMPARE(pl.count(), filteredCount);
+    QCOMPARE(pl.size(), filteredCount);
+
+    // Sorting has no effect on filter
+    pl.sortByAspectRatio();
+
+    QCOMPARE(pl.count(), filteredCount);
+    QCOMPARE(pl.size(), filteredCount);
+
+    pl.sortByName();
+
+    QCOMPARE(pl.count(), filteredCount);
+    QCOMPARE(pl.size(), filteredCount);
+}
+
+void TestPlayList::setFilter_data()
+{
+    QTest::addColumn<ImageList>("images");
+    QTest::addColumn<AbstractPlayListFilter *>("filter");
+    QTest::addColumn<int>("initialCount");
+    QTest::addColumn<int>("filteredCount");
+
+    const QString &tmpDirPath = m_tmpDir.path();
+    QUrl silicaUrl = QUrl::fromLocalFile(
+        tmpDirPath + QDir::separator() + "silica.png");
+
+    QSharedPointer<Image> imgSilica(new Image(silicaUrl));
+
+    QTest::newRow("Empty image list with no filter")
+        << (ImageList())
+        << static_cast<AbstractPlayListFilter *>(0)
+        << 0
+        << 0;
+    QTest::newRow("Not empty image list with no filter")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(0)
+        << 1
+        << 1;
 }
