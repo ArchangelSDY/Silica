@@ -1,17 +1,26 @@
 #include "ImageSourceManager.h"
 #include "PlayList.h"
 
+#include "DoNothingFilter.h"
+
 PlayList::PlayList() :
-    m_record(0)
+    m_record(0) ,
+    m_filter(new DoNothingFilter())
 {
 }
 
 PlayList::PlayList(const QList<QUrl> &imageUrls) :
-    m_record(0)
+    m_record(0) ,
+    m_filter(new DoNothingFilter())
 {
     foreach(const QUrl &imageUrl, imageUrls) {
         addPath(imageUrl);
     }
+}
+
+PlayList::~PlayList()
+{
+    delete m_filter;
 }
 
 void PlayList::addPath(const QString &path)
@@ -41,7 +50,13 @@ void PlayList::watchedPlayListAppended(int start)
     int oldCount = count();
     PlayList *watched = static_cast<PlayList *>(sender());
     for (int i = start; i < watched->count(); ++i) {
-        m_images << watched->at(i);
+        const ImagePtr &image = watched->at(i);
+
+        ImageList l;
+        l << image;
+
+        m_allImages << l;
+        m_filteredImages << m_filter->filtered(l);
     }
     emit itemsAppended(oldCount);
 }
@@ -54,7 +69,7 @@ static bool imageNameLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByName()
 {
-    qSort(m_images.begin(), m_images.end(), imageNameLessThan);
+    qSort(m_filteredImages.begin(), m_filteredImages.end(), imageNameLessThan);
     emit itemsChanged();
 }
 
@@ -66,6 +81,12 @@ static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByAspectRatio()
 {
-    qSort(m_images.begin(), m_images.end(), imageAspectRatioLessThan);
+    qSort(m_filteredImages.begin(), m_filteredImages.end(), imageAspectRatioLessThan);
     emit itemsChanged();
+}
+
+void PlayList::setFilter(AbstractPlayListFilter *filter)
+{
+    m_filter = filter ? filter : new DoNothingFilter();
+    m_filteredImages = m_filter->filtered(m_allImages);
 }

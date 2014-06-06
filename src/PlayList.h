@@ -3,6 +3,7 @@
 
 #include <QUrl>
 
+#include "AbstractPlayListFilter.h"
 #include "Image.h"
 #include "PlayListRecord.h"
 
@@ -12,6 +13,7 @@ class PlayList : public QObject
 public:
     PlayList();
     PlayList(const QList<QUrl> &imageUrls);
+    ~PlayList();
 
     PlayListRecord *record() { return m_record; }
     void setRecord(PlayListRecord *record) { m_record = record; }
@@ -22,33 +24,37 @@ public:
     void sortByName();
     void sortByAspectRatio();
 
+    void setFilter(AbstractPlayListFilter *filter);
+
     // Delegate to inner QList
     typedef QList<QSharedPointer<Image> >::const_iterator const_iterator;
     inline const_iterator begin() const
     {
-        return m_images.begin();
+        return m_filteredImages.begin();
     }
     inline const_iterator end() const
     {
-        return m_images.end();
+        return m_filteredImages.end();
     }
 
     inline void append(const QSharedPointer<Image> &image)
     {
-        int start = count();
-        m_images.append(image);
-        emit itemsAppended(start);
+        ImageList l;
+        l << image;
+        append(l);
     }
-    inline void append(const QList<QSharedPointer<Image> > &images)
+    inline void append(const ImageList &images)
     {
         int start = count();
-        m_images.append(images);
+        m_allImages.append(images);
+        m_filteredImages.append(m_filter->filtered(images));
         emit itemsAppended(start);
     }
     inline void append(PlayList *playList, bool watching = false)
     {
         int start = count();
-        m_images.append(playList->m_images);
+        m_allImages.append(playList->m_filteredImages);
+        m_filteredImages.append(playList->m_filteredImages);
         emit itemsAppended(start);
 
         if (watching) {
@@ -60,50 +66,52 @@ public:
     inline QList<QSharedPointer<Image> > &operator<<(
             const QSharedPointer<Image> &image)
     {
-        int start = count();
-        QList<QSharedPointer<Image> > &ret =  m_images << image;
-        emit itemsAppended(start);
-        return ret;
+        ImageList l;
+        l << image;
+        return (*this << l);
     }
     inline QList<QSharedPointer<Image> > &operator<<(
-            const QList<QSharedPointer<Image> > &images)
+            const ImageList &images)
     {
         int start = count();
-        QList<QSharedPointer<Image> > &ret = m_images << images;
+        m_allImages << images;
+        QList<QSharedPointer<Image> > &ret =
+            m_filteredImages << m_filter->filtered(images);
         emit itemsAppended(start);
         return ret;
     }
 
     inline void clear()
     {
-        m_images.clear();
+        m_allImages.clear();
+        m_filteredImages.clear();
         emit itemsChanged();
     }
 
     inline QSharedPointer<Image> &operator[](int i)
     {
-        return m_images[i];
+        return m_filteredImages[i];
     }
     inline const QSharedPointer<Image> &operator[](int i) const
     {
-        return m_images[i];
+        return m_filteredImages[i];
     }
     inline const QSharedPointer<Image> &at(int i) const
     {
-        return m_images.at(i);
+        return m_filteredImages.at(i);
     }
 
     inline int count() const
     {
-        return m_images.count();
+        return m_filteredImages.count();
     }
     inline int size() const
     {
-        return m_images.size();
+        return m_filteredImages.size();
     }
     inline bool isEmpty() const
     {
-        return m_images.isEmpty();
+        return m_filteredImages.isEmpty();
     }
 
 signals:
@@ -114,8 +122,10 @@ private slots:
     void watchedPlayListAppended(int start);
 
 private:
-    QList<QSharedPointer<Image> > m_images;
+    ImageList m_allImages;
+    ImageList m_filteredImages;
     PlayListRecord *m_record;
+    AbstractPlayListFilter *m_filter;   // Should never be 0
 };
 
 #endif // PLAYLIST_H

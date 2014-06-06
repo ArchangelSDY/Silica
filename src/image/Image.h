@@ -7,6 +7,9 @@
 #include "ImageHotspot.h"
 #include "ImageSource.h"
 
+typedef QList<QSharedPointer<Image> > ImageList;
+typedef QSharedPointer<Image> ImagePtr;
+
 class ImageRank;
 
 class LoadImageTask : public QObject, public QRunnable

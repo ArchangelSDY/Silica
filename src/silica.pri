@@ -8,6 +8,7 @@ SOURCES += \
     $$PWD/image/caches/*.cpp \
     $$PWD/image/sources/*.cpp \
     $$PWD/navigation/*.cpp \
+    $$PWD/playlist/*.cpp \
     $$PWD/ui/*.cpp \
     $$PWD/ui/hotspots/*.cpp \
     $$PWD/ui/renderers/*.cpp
@@ -19,6 +20,7 @@ HEADERS += \
     $$PWD/image/caches/*.h \
     $$PWD/image/sources/*.h \
     $$PWD/navigation/*.h \
+    $$PWD/playlist/*.h \
     $$PWD/ui/*.h \
     $$PWD/ui/hotspots/*.h \
     $$PWD/ui/renderers/*.h \
@@ -31,6 +33,7 @@ INCLUDEPATH += \
     $$PWD/image/caches \
     $$PWD/image/sources \
     $$PWD/navigation \
+    $$PWD/playlist \
     $$PWD/ui \
     $$PWD/ui/hotspots \
     $$PWD/ui/renderers \
