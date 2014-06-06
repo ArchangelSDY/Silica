@@ -2,7 +2,9 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include "../src/image/ImageRank.h"
 #include "../src/PlayList.h"
+#include "../src/playlist/MinRankFilter.h"
 
 #include "TestPlayList.h"
 
@@ -144,6 +146,7 @@ void TestPlayList::setFilter_data()
         tmpDirPath + QDir::separator() + "silica.png");
 
     QSharedPointer<Image> imgSilica(new Image(silicaUrl));
+    imgSilica->rank()->setValue(3);
 
     QTest::newRow("Empty image list with no filter")
         << (ImageList())
@@ -155,4 +158,20 @@ void TestPlayList::setFilter_data()
         << static_cast<AbstractPlayListFilter *>(0)
         << 1
         << 1;
+
+    QTest::newRow("MinRankFilter above")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(new MinRankFilter(2))
+        << 1
+        << 1;
+    QTest::newRow("MinRankFilter equal")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(new MinRankFilter(3))
+        << 1
+        << 1;
+    QTest::newRow("MinRankFilter below")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(new MinRankFilter(4))
+        << 1
+        << 0;
 }
