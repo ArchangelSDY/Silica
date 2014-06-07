@@ -4,6 +4,7 @@
 
 #include "../src/image/ImageRank.h"
 #include "../src/PlayList.h"
+#include "../src/playlist/EqualRankFilter.h"
 #include "../src/playlist/MinRankFilter.h"
 
 #include "TestPlayList.h"
@@ -175,6 +176,19 @@ void TestPlayList::setFilter_data()
     QTest::newRow("MinRankFilter below")
         << (ImageList() << imgSilica)
         << static_cast<AbstractPlayListFilter *>(new MinRankFilter(4))
+        << 1
+        << 0;
+
+    QTest::newRow("EqualRankFilter equal")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(
+            new EqualRankFilter(imgSilica->rank()->value()))
+        << 1
+        << 1;
+    QTest::newRow("EqualRankFilter not equal")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(
+            new EqualRankFilter(imgSilica->rank()->value() - 1))
         << 1
         << 0;
 }
