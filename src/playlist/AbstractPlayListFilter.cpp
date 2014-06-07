@@ -12,9 +12,12 @@ ImageList AbstractPlayListFilter::filtered(const ImageList &images)
         m_parentFilter ? m_parentFilter->filtered(images) : images;
 
     ImageList::iterator it = filtered.begin();
-    while (it != filtered.end()) {
+    ImageList::iterator end = filtered.end();
+    while (it != end) {
         if (!filter(*it)) {
-            it = filtered.erase(it);
+            --end;
+            *it = qMove(*end);
+            filtered.erase(end);
         } else {
             ++it;
         }
