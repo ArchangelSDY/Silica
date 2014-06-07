@@ -12,9 +12,11 @@ ImageList AbstractPlayListFilter::filtered(const ImageList &images)
         m_parentFilter ? m_parentFilter->filtered(images) : images;
 
     ImageList::iterator it = filtered.begin();
-    for (; it != filtered.end(); ++it) {
+    while (it != filtered.end()) {
         if (!filter(*it)) {
-            filtered.erase(it);
+            it = filtered.erase(it);
+        } else {
+            ++it;
         }
     }
 

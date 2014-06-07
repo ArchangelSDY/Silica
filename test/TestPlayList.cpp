@@ -6,6 +6,7 @@
 #include "../src/PlayList.h"
 #include "../src/playlist/EqualRankFilter.h"
 #include "../src/playlist/MinRankFilter.h"
+#include "../src/playlist/NotEqualRankFilter.h"
 
 #include "TestPlayList.h"
 
@@ -14,6 +15,10 @@ Q_DECLARE_METATYPE(AbstractPlayListFilter *)
 void TestPlayList::initTestCase()
 {
     const QString &tmpDirPath = m_tmpDir.path();
+
+    QImage imgLisbeth(100, 100, QImage::Format_ARGB32);
+    imgLisbeth.fill(Qt::white);
+    imgLisbeth.save(tmpDirPath + QDir::separator() + "lisbeth.png");
 
     QImage imgSilica(100, 200, QImage::Format_ARGB32);
     imgSilica.fill(Qt::blue);
@@ -146,11 +151,21 @@ void TestPlayList::setFilter_data()
     QTest::addColumn<int>("filteredCount");
 
     const QString &tmpDirPath = m_tmpDir.path();
+
     QUrl silicaUrl = QUrl::fromLocalFile(
         tmpDirPath + QDir::separator() + "silica.png");
-
-    QSharedPointer<Image> imgSilica(new Image(silicaUrl));
+    ImagePtr imgSilica(new Image(silicaUrl));
     imgSilica->rank()->setValue(3);
+
+    QUrl lisbethUrl = QUrl::fromLocalFile(
+        tmpDirPath + QDir::separator() + "lisbeth.png");
+    ImagePtr imgLisbeth(new Image(lisbethUrl));
+    imgLisbeth->rank()->setValue(2);
+
+    QUrl asunaUrl = QUrl::fromLocalFile(
+        tmpDirPath + QDir::separator() + "asuna.png");
+    ImagePtr imgAsuna(new Image(asunaUrl));
+    imgAsuna->rank()->setValue(5);
 
     QTest::newRow("Empty image list with no filter")
         << (ImageList())
@@ -190,5 +205,34 @@ void TestPlayList::setFilter_data()
         << static_cast<AbstractPlayListFilter *>(
             new EqualRankFilter(imgSilica->rank()->value() - 1))
         << 1
+        << 0;
+
+    QTest::newRow("NotEqualRankFilter not equal")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(
+            new NotEqualRankFilter(imgSilica->rank()->value() - 1))
+        << 1
+        << 1;
+    QTest::newRow("NotEqualRankFilter equal")
+        << (ImageList() << imgSilica)
+        << static_cast<AbstractPlayListFilter *>(
+            new NotEqualRankFilter(imgSilica->rank()->value()))
+        << 1
+        << 0;
+
+    QTest::newRow("Multiple NotEqualRankFilter only rank 3,4,5 pass")
+        << (ImageList() << imgLisbeth << imgSilica << imgAsuna)
+        << static_cast<AbstractPlayListFilter *>(
+            new NotEqualRankFilter(1,
+            new NotEqualRankFilter(2)))
+        << 3
+        << 2;
+    QTest::newRow("Multiple NotEqualRankFilter only rank 1,4 pass")
+        << (ImageList() << imgLisbeth << imgSilica << imgAsuna)
+        << static_cast<AbstractPlayListFilter *>(
+            new NotEqualRankFilter(2,
+            new NotEqualRankFilter(3,
+            new NotEqualRankFilter(5))))
+        << 3
         << 0;
 }
