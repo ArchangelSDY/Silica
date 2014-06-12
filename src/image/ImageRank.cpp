@@ -4,6 +4,7 @@
 const int ImageRank::DEFAULT_VALUE = 3;
 const int ImageRank::MIN_VALUE = 1;
 const int ImageRank::MAX_VALUE = 5;
+const int ImageRank::MIN_SHOWN_VALUE = 3;
 
 ImageRank::ImageRank(Image *image, QObject *parent) :
     QObject(parent) ,

@@ -53,7 +53,7 @@ public:
     inline void append(PlayList *playList, bool watching = false)
     {
         int start = count();
-        m_allImages.append(playList->m_filteredImages);
+        m_allImages.append(playList->m_allImages);
         m_filteredImages.append(playList->m_filteredImages);
         emit itemsAppended(start);
 

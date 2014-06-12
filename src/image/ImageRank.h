@@ -14,6 +14,7 @@ public:
     static const int DEFAULT_VALUE;
     static const int MIN_VALUE;
     static const int MAX_VALUE;
+    static const int MIN_SHOWN_VALUE;
 
     int value();
     void setValue(int rank);

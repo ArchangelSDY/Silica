@@ -5,13 +5,13 @@
 
 PlayList::PlayList() :
     m_record(0) ,
-    m_filter(new DoNothingFilter())
+    m_filter(AbstractPlayListFilter::defaultFilter())
 {
 }
 
 PlayList::PlayList(const QList<QUrl> &imageUrls) :
     m_record(0) ,
-    m_filter(new DoNothingFilter())
+    m_filter(AbstractPlayListFilter::defaultFilter())
 {
     foreach(const QUrl &imageUrl, imageUrls) {
         addPath(imageUrl);
@@ -87,7 +87,12 @@ void PlayList::sortByAspectRatio()
 
 void PlayList::setFilter(AbstractPlayListFilter *filter)
 {
+    if (m_filter) {
+        delete m_filter;
+    }
+
     m_filter = filter ? filter : new DoNothingFilter();
     m_filteredImages = m_filter->filtered(m_allImages);
+
     emit itemsChanged();
 }

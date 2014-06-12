@@ -8,7 +8,8 @@
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_navigator(0) ,
-    m_playList(0)
+    m_playList(0) ,
+    m_rankFilterMenuManager(new RankFilterMenuManager(&m_navigator, this))
 {
     m_rendererFactory = new LooseRendererFactory();
 }
@@ -51,6 +52,8 @@ void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
     QMenu *sorts = menu.addMenu(tr("Sort By"));
     sorts->addAction(tr("Name"), this, SLOT(sortByName()));
     sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
+
+    menu.addMenu(m_rankFilterMenuManager->menu());
 
     QMenu *renderers = menu.addMenu(tr("Layout"));
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));

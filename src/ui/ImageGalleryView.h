@@ -3,6 +3,7 @@
 
 #include "AbstractRendererFactory.h"
 #include "GalleryView.h"
+#include "RankFilterMenuManager.h"
 
 class ImageGalleryView : public GalleryView
 {
@@ -30,6 +31,8 @@ protected:
 private:
     Navigator *m_navigator;
     PlayList *m_playList;
+
+    RankFilterMenuManager *m_rankFilterMenuManager;
 };
 
 #endif // IMAGEGALLERYVIEW_H
