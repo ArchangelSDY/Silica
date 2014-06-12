@@ -95,6 +95,13 @@ void Navigator::playListAppended(int start)
 void Navigator::reloadPlayList()
 {
     emit playListChange();
+
+    // Cached index may be incorrect after filtering, clear cache.
+    m_cachedImages.clear();
+
+    // Current index may be incorrect after filtering, reset to first image and
+    // force to reload it.
+    goIndex(0, true);
 }
 
 Image* Navigator::loadIndex(int index, bool shouldPaint)
@@ -128,9 +135,13 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     return image;
 }
 
-bool Navigator::goIndex(int index)
+bool Navigator::goIndex(int index, bool forceReloadCurrent)
 {
-    if (index < 0 || index >= m_playList->count() || index == m_currentIndex) {
+    if (index < 0 || index >= m_playList->count()) {
+        return false;
+    }
+
+    if (!forceReloadCurrent && index == m_currentIndex) {
         return false;
     }
 

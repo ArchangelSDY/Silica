@@ -58,7 +58,13 @@ public slots:
     void setPlayList(PlayList *, bool takeOwnership = false);
     void reloadPlayList();
 
-    bool goIndex(int index);
+    /**
+     * @brief Go to specific image of `index`.
+     * @param index Image index.
+     * @param forceReloadCurrent If true, load even if current index not changed.
+     * @return true if loaded successfully.
+     */
+    bool goIndex(int index, bool forceReloadCurrent = false);
 
     void imageLoaded();
     void thumbnailLoaded();
