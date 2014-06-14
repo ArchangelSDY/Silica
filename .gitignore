@@ -1,6 +1,7 @@
 .moc/
 .obj/
 .qmake.stash
+.DS_Store
 *.swp
 *.swo
 *.a
