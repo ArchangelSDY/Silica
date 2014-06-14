@@ -72,6 +72,10 @@ void MakeThumbnailTask::run()
     emit thumbnailMade(thumbnail);
 }
 
+/* Image */
+
+const QSize Image::UNKNOWN_SIZE = QSize(-1, -1);
+
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
     m_status(Image::NotLoad) ,
@@ -83,9 +87,11 @@ Image::Image(QUrl url, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_hotspotsLoaded(false) ,
-    m_rank(new ImageRank(this, this))
+    m_rank(new ImageRank(this, this)) ,
+    m_size(Image::UNKNOWN_SIZE)
 {
     computeThumbnailPath();
+    loadMetaFromDatabase();
 }
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
@@ -99,9 +105,11 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_hotspotsLoaded(false) ,
-    m_rank(new ImageRank(this, this))
+    m_rank(new ImageRank(this, this)) ,
+    m_size(Image::UNKNOWN_SIZE)
 {
     computeThumbnailPath();
+    loadMetaFromDatabase();
 }
 
 Image::~Image()
@@ -171,6 +179,15 @@ void Image::imageReaderFinished(QImage *image)
     }
 
     if (!m_image->isNull()) {
+        bool shouldWriteSizeIntoDatabase = (m_size == Image::UNKNOWN_SIZE);
+
+        m_size = m_image->size();
+
+        // Write image size into database
+        if (shouldWriteSizeIntoDatabase) {
+            LocalDatabase::instance()->updateImageSize(this);
+        }
+
         m_status = Image::LoadComplete;
     } else {
         m_status = Image::LoadError;
@@ -275,6 +292,10 @@ void Image::computeThumbnailPath()
     }
 }
 
+void Image::loadMetaFromDatabase()
+{
+    m_size = LocalDatabase::instance()->queryImageSize(this);
+}
 
 QString Image::name() const
 {

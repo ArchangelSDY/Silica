@@ -23,6 +23,8 @@ public:
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
+    virtual bool updateImageSize(Image *image) = 0;
+    virtual QSize queryImageSize(Image *image) = 0;
 
     virtual bool insertImageHotspot(ImageHotspot *hotspot) = 0;
     virtual bool removeImageHotspot(ImageHotspot *hotspot) = 0;

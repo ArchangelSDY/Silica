@@ -44,6 +44,16 @@
             "version": 8,
             "applySql": "create index image_ranks_image_hash on image_ranks (image_hash)",
             "revertSql": "drop index image_ranks_image_hash"
+        },
+        {
+            "version": 9,
+            "applySql": "alter table images add column width integer not null default -1",
+            "revertSql": ""
+        },
+        {
+            "version": 10,
+            "applySql": "alter table images add column height integer not null default -1",
+            "revertSql": ""
         }
     ]
 }

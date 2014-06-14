@@ -72,6 +72,7 @@ private:
       QString m_path;
 };
 
+
 class Image : public QObject
 {
     Q_OBJECT
@@ -126,6 +127,12 @@ public:
         return m_imageSource == other.m_imageSource;
     }
 
+    static const QSize UNKNOWN_SIZE;
+
+    int width() const { return m_size.width(); }
+    int height() const { return m_size.height(); }
+    QSize size() const { return m_size; }
+
 signals:
     void loaded();
     void thumbnailLoaded();
@@ -141,6 +148,7 @@ private:
     void unloadIfNeeded();
     void makeThumbnail();
     void computeThumbnailPath();
+    void loadMetaFromDatabase();
 
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
@@ -157,6 +165,8 @@ private:
     bool m_hotspotsLoaded;
 
     ImageRank *m_rank;
+
+    QSize m_size;
 };
 
 #endif // IMAGE_H
