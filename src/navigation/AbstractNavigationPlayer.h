@@ -17,6 +17,7 @@ public:
     enum Type {
         NormalType,
         HotspotsType,
+        ExpandingType,
     };
 
     virtual Type type() const = 0;

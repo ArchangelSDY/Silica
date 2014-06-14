@@ -1,3 +1,4 @@
+#include "ExpandingNavigationPlayer.h"
 #include "HotspotsNavigationPlayer.h"
 #include "MainMenuBarManager.h"
 #include "Navigator.h"
@@ -6,7 +7,8 @@
 MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     QObject(parent) ,
     m_menuBar(context.menuBar) ,
-    m_navigator(context.navigator)
+    m_navigator(context.navigator) ,
+    m_imageView(context.imageView)
 {
     init();
 }
@@ -31,6 +33,13 @@ void MainMenuBarManager::init()
     actSetHotspotsPlayer->setCheckable(true);
     actSetHotspotsPlayer->setChecked(
         m_navigator->player()->type() == AbstractNavigationPlayer::HotspotsType);
+
+    QAction *actSetExpandingPlayer = playersMenu->addAction(
+        tr("Expanding Player"), this, SLOT(setExpandingPlayer()));
+    playersGrp->addAction(actSetExpandingPlayer);
+    actSetExpandingPlayer->setCheckable(true);
+    actSetExpandingPlayer->setChecked(
+        m_navigator->player()->type() == AbstractNavigationPlayer::ExpandingType);
 }
 
 void MainMenuBarManager::setNormalPlayer()
@@ -41,4 +50,10 @@ void MainMenuBarManager::setNormalPlayer()
 void MainMenuBarManager::setHotspotsPlayer()
 {
     m_navigator->setPlayer(new HotspotsNavigationPlayer(m_navigator));
+}
+
+void MainMenuBarManager::setExpandingPlayer()
+{
+    m_navigator->setPlayer(
+        new ExpandingNavigationPlayer(m_navigator, m_imageView));
 }

@@ -104,6 +104,7 @@ void MainWindow::setupExtraUi()
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
     menuBarCtx.navigator = &m_navigator;
+    menuBarCtx.imageView = ui->graphicsView;
     new MainMenuBarManager(menuBarCtx, this);
 
     // Main toolbar

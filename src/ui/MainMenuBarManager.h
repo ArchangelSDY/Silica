@@ -13,6 +13,7 @@ public:
     struct Context {
         Navigator *navigator;
         QMenuBar *menuBar;
+        QWidget *imageView;
     };
 
     explicit MainMenuBarManager(Context context, QObject *parent = 0);
@@ -20,6 +21,7 @@ public:
 private slots:
     void setNormalPlayer();
     void setHotspotsPlayer();
+    void setExpandingPlayer();
 
 private:
     void init();
@@ -27,6 +29,7 @@ private:
 
     QMenuBar *m_menuBar;
     Navigator *m_navigator;
+    QWidget *m_imageView;
 };
 
 #endif // MAINMENUBARMANAGER_H
