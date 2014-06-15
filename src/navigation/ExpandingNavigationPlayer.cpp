@@ -7,31 +7,38 @@ ExpandingNavigationPlayer::ExpandingNavigationPlayer(Navigator *navigator,
                                                      QWidget *view,
                                                      QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
-    m_view(view)
+    m_view(view) ,
+    m_curIndex(0)
 {
 }
 
 void ExpandingNavigationPlayer::goNext()
 {
-    if (m_toBeFocused.empty()) {
+    if (m_curIndex >= m_toBeFocused.count() - 1) {
         m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() + 1, 1);
 
         calcFocused();
+        m_curIndex = 0;
+    } else {
+        m_curIndex ++;
     }
 
-    QRectF focused = m_toBeFocused.takeFirst();
+    QRectF focused = m_toBeFocused.at(m_curIndex);
     m_navigator->focusOnRect(focused);
 }
 
 void ExpandingNavigationPlayer::goPrev()
 {
-    if (m_toBeFocused.empty()) {
+    if (m_curIndex <= 0) {
         m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() - 1, -1);
 
         calcFocused();
+        m_curIndex = m_toBeFocused.count() - 1;
+    } else {
+        m_curIndex --;
     }
 
-    QRectF focused = m_toBeFocused.takeLast();
+    QRectF focused = m_toBeFocused.at(m_curIndex);
     m_navigator->focusOnRect(focused);
 }
 
@@ -39,6 +46,8 @@ void ExpandingNavigationPlayer::calcFocused()
 {
     Image *curImage = m_navigator->currentImage();
     if (curImage) {
+        m_toBeFocused.clear();
+
         QSize imageSize = curImage->size();
         QSize viewSize = m_view->size();
         QSize scaled = imageSize.scaled(viewSize,

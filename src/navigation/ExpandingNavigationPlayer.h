@@ -23,6 +23,7 @@ private:
 
     QWidget *m_view;
     QList<QRectF> m_toBeFocused;
+    int m_curIndex;
 };
 
 #endif // EXPANDINGNAVIGATIONPLAYER_H
