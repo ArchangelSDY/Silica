@@ -264,7 +264,7 @@ bool SQLiteLocalDatabase::updateImageSize(Image *image)
 
 QSize SQLiteLocalDatabase::queryImageSize(Image *image)
 {
-    if (!m_db.isOpen() || !image) {
+    if (!m_db.isOpen() || !image || !image->source()) {
         return Image::UNKNOWN_SIZE;
     }
 
@@ -360,7 +360,7 @@ QList<ImageHotspot *> SQLiteLocalDatabase::queryImageHotspots(Image *image)
 
 int SQLiteLocalDatabase::queryImageRankValue(Image *image)
 {
-    if (!m_db.isOpen()) {
+    if (!m_db.isOpen() || !image || !image->source()) {
         return ImageRank::DEFAULT_VALUE;
     }
 
