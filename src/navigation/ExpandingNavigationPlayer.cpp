@@ -3,6 +3,8 @@
 #include "ExpandingNavigationPlayer.h"
 #include "Navigator.h"
 
+const float ExpandingNavigationPlayer::MOVE_COUNT_FACTOR = 1.5;
+
 ExpandingNavigationPlayer::ExpandingNavigationPlayer(Navigator *navigator,
                                                      QWidget *view,
                                                      QObject *parent) :
@@ -57,7 +59,8 @@ void ExpandingNavigationPlayer::calcFocused()
             // Split height
             qreal ratio = scaled.height() / qreal(imageSize.height());
 
-            int moveCount = scaled.height() / viewSize.height();
+            int moveCount = scaled.height() / viewSize.height()
+                * ExpandingNavigationPlayer::MOVE_COUNT_FACTOR;
             qreal offsetDelta =
                 (scaled.height() - viewSize.height()) / moveCount;
 
@@ -76,7 +79,8 @@ void ExpandingNavigationPlayer::calcFocused()
             // Split width
             qreal ratio = scaled.width() / qreal(imageSize.width());
 
-            int moveCount = scaled.width() / viewSize.width();
+            int moveCount = scaled.width() / viewSize.width() * 2
+                * ExpandingNavigationPlayer::MOVE_COUNT_FACTOR;
             qreal offsetDelta =
                 (scaled.width() - viewSize.width()) / moveCount;
 

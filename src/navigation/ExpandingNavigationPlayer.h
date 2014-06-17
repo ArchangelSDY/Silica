@@ -19,6 +19,8 @@ public:
     Type type() const { return AbstractNavigationPlayer::ExpandingType; }
 
 private:
+    static const float MOVE_COUNT_FACTOR;
+
     void calcFocused();
 
     QWidget *m_view;
