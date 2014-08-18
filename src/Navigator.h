@@ -49,7 +49,7 @@ public:
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-    void playListChange();
+    void playListChange(PlayList *);
     void playListAppend(int start);
     void navigationChange(int index);
     void focusOnRect(QRectF rect);

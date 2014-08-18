@@ -7,9 +7,8 @@
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
-    m_navigator(0) ,
     m_playList(0) ,
-    m_rankFilterMenuManager(new RankFilterMenuManager(&m_navigator, this))
+    m_rankFilterMenuManager(0)
 {
     m_rendererFactory = new LooseRendererFactory();
 }
@@ -19,13 +18,22 @@ ImageGalleryView::~ImageGalleryView()
     delete m_rendererFactory;
 }
 
-void ImageGalleryView::setNavigator(Navigator *navigator)
+void ImageGalleryView::setPlayList(PlayList *playList)
 {
-    m_navigator = navigator;
+    m_playList = playList;
+
+    if (m_rankFilterMenuManager) {
+        delete m_rankFilterMenuManager;
+    }
+    m_rankFilterMenuManager = new RankFilterMenuManager(&m_playList, this);
 }
 
-void ImageGalleryView::playListChange()
+void ImageGalleryView::playListChange(PlayList *playList)
 {
+    if (playList != m_playList) {
+        setPlayList(playList);
+    }
+
     clear();
 
     playListAppend(0);
@@ -33,9 +41,8 @@ void ImageGalleryView::playListChange()
 
 void ImageGalleryView::playListAppend(int start)
 {
-    PlayList *pl = m_navigator->playList();
-    for (int i = start; i < pl->count(); ++i) {
-        Image *image = pl->at(i).data();
+    for (int i = start; i < m_playList->count(); ++i) {
+        Image *image = m_playList->at(i).data();
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
@@ -59,7 +66,7 @@ void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
-    if (m_navigator->playList()->record() != 0) {
+    if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =
             menu.addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
         if (scene()->selectedItems().count() == 0) {
@@ -82,28 +89,28 @@ void ImageGalleryView::mousePressEvent(QMouseEvent *ev)
 
 void ImageGalleryView::sortByName()
 {
-    if (!m_navigator || !m_navigator->playList()) {
+    if (!m_playList) {
         return;
     }
 
-    m_navigator->playList()->sortByName();
+    m_playList->sortByName();
 }
 
 void ImageGalleryView::sortByAspectRatio()
 {
-    if (!m_navigator || !m_navigator->playList()) {
+    if (!m_playList) {
         return;
     }
 
-    m_navigator->playList()->sortByAspectRatio();
+    m_playList->sortByAspectRatio();
 }
 
 void ImageGalleryView::setAsCover()
 {
-    if (scene()->selectedItems().count() > 0) {
+    if (m_playList && scene()->selectedItems().count() > 0) {
         ImageGalleryItem *item =
             static_cast<ImageGalleryItem *>(scene()->selectedItems()[0]);
-        PlayListRecord *record = m_navigator->playList()->record();
+        PlayListRecord *record = m_playList->record();
 
         if (record) {
              record->setCoverPath(item->image()->thumbnailPath());

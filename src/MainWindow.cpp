@@ -35,8 +35,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setupExtraUi();
 
-    ui->gallery->setNavigator(&m_navigator);
+    ui->gallery->setPlayList(m_navigator.playList());
     ui->graphicsView->setNavigator(&m_navigator);
+    ui->basketView->hide();
     ui->sidebar->hide();
     statusBar()->hide();
 
@@ -59,14 +60,14 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
-    connect(&m_navigator, SIGNAL(playListChange()),
+    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
             this, SLOT(playListChange()));
     connect(&m_navigator, SIGNAL(playListAppend(int)),
             this, SLOT(playListAppend(int)));
 
     // Update gallery
-    connect(&m_navigator, SIGNAL(playListChange()),
-            ui->gallery, SLOT(playListChange()));
+    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+            ui->gallery, SLOT(playListChange(PlayList *)));
     connect(&m_navigator, SIGNAL(playListAppend(int)),
             ui->gallery, SLOT(playListAppend(int)));
 
@@ -436,12 +437,14 @@ void MainWindow::navigationChange(int index)
     ui->playListWidget->setCurrentRow(index);
 
     // Gallery widget
-    QGraphicsItem *selectedItem =
-        ui->gallery->scene()->items(Qt::AscendingOrder).at(index);
-    if (selectedItem) {
-        ui->gallery->scene()->clearSelection();
-        selectedItem->setSelected(true);
-        selectedItem->ensureVisible();
+    if (index >= 0 && index < ui->gallery->scene()->items().count()) {
+        QGraphicsItem *selectedItem =
+            ui->gallery->scene()->items(Qt::AscendingOrder).at(index);
+        if (selectedItem) {
+            ui->gallery->scene()->clearSelection();
+            selectedItem->setSelected(true);
+            selectedItem->ensureVisible();
+        }
     }
 
     // Sidebar

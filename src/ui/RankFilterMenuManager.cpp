@@ -1,12 +1,12 @@
 #include "ImageRank.h"
-#include "Navigator.h"
 #include "NotEqualRankFilter.h"
+#include "PlayList.h"
 #include "RankFilterMenuManager.h"
 
-RankFilterMenuManager::RankFilterMenuManager(Navigator **navigator,
+RankFilterMenuManager::RankFilterMenuManager(PlayList **playList,
                                              QObject *parent) :
     QObject(parent) ,
-    m_navigator(navigator) ,
+    m_playList(playList) ,
     m_menu(0)
 {
     m_menu = new QMenu(tr("Rank"));
@@ -45,12 +45,11 @@ void RankFilterMenuManager::selectionChanged(bool selected)
         m_unselectedRanks.remove(rank);
     }
 
-    if (*m_navigator && (*m_navigator)->playList()) {
+    if (m_playList && *m_playList) {
         AbstractPlayListFilter *filter = 0;
         foreach (const int &rank, m_unselectedRanks) {
             filter = new NotEqualRankFilter(rank, filter);
         }
-        PlayList *pl = (*m_navigator)->playList();
-        pl->setFilter(filter);
+        (*m_playList)->setFilter(filter);
     }
 }

@@ -75,7 +75,7 @@ void Navigator::setPlayList(PlayList *playList, bool takeOwnership)
     connect(m_playList, SIGNAL(itemsChanged()), this, SLOT(reloadPlayList()));
     connect(m_playList, SIGNAL(itemsAppended(int)),
             this, SLOT(playListAppended(int)));
-    emit playListChange();
+    emit playListChange(m_playList);
 
     goIndex(0);
 }
@@ -94,7 +94,7 @@ void Navigator::playListAppended(int start)
 
 void Navigator::reloadPlayList()
 {
-    emit playListChange();
+    emit playListChange(m_playList);
 
     // Cached index may be incorrect after filtering, clear cache.
     m_cachedImages.clear();

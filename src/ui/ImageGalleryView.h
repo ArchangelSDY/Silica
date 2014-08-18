@@ -12,10 +12,10 @@ public:
     explicit ImageGalleryView(QWidget *parent = 0);
     ~ImageGalleryView();
 
-    void setNavigator(Navigator *navigator);
-
 public slots:
-    void playListChange();
+    void setPlayList(PlayList *playList);
+
+    void playListChange(PlayList *playList);
     void playListAppend(int start);
 
 private slots:
@@ -29,7 +29,6 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
 
 private:
-    Navigator *m_navigator;
     PlayList *m_playList;
 
     RankFilterMenuManager *m_rankFilterMenuManager;

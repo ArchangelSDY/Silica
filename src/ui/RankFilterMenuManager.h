@@ -6,13 +6,13 @@
 #include <QSet>
 
 class AbstractPlayListFilter;
-class Navigator;
+class PlayList;
 
 class RankFilterMenuManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit RankFilterMenuManager(Navigator **navigator, QObject *parent = 0);
+    explicit RankFilterMenuManager(PlayList **playList, QObject *parent = 0);
     ~RankFilterMenuManager();
 
     QMenu *menu();
@@ -21,7 +21,7 @@ private slots:
     void selectionChanged(bool selected);
 
 private:
-    Navigator **m_navigator;
+    PlayList **m_playList;
     QSet<int> m_unselectedRanks;
     QMenu *m_menu;
 };
