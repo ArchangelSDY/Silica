@@ -26,6 +26,7 @@ static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
+    m_navigator(Navigator::instance()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
     m_actToolBarFav(0) ,
@@ -35,9 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setupExtraUi();
 
-    ui->gallery->setPlayList(m_navigator.playList());
-    ui->graphicsView->setNavigator(&m_navigator);
-    ui->basketView->hide();
+    ui->gallery->setPlayList(m_navigator->playList());
+    ui->graphicsView->setNavigator(m_navigator);
     ui->sidebar->hide();
     statusBar()->hide();
 
@@ -48,11 +48,11 @@ MainWindow::MainWindow(QWidget *parent) :
     // Maximize on start
     showMaximized();
 
-    connect(&m_navigator, SIGNAL(paint(Image *)),
+    connect(m_navigator, SIGNAL(paint(Image *)),
             this, SLOT(imageLoaded(Image *)));
-    connect(&m_navigator, SIGNAL(paint(Image *)),
+    connect(m_navigator, SIGNAL(paint(Image *)),
             ui->graphicsView, SLOT(paint(Image *)));
-    connect(&m_navigator, SIGNAL(paintThumbnail(Image *)),
+    connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
             ui->graphicsView, SLOT(paintThumbnail(Image *)));
 
     // StatusBar
@@ -60,23 +60,23 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
-    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+    connect(m_navigator, SIGNAL(playListChange(PlayList *)),
             this, SLOT(playListChange()));
-    connect(&m_navigator, SIGNAL(playListAppend(int)),
+    connect(m_navigator, SIGNAL(playListAppend(int)),
             this, SLOT(playListAppend(int)));
 
     // Update gallery
-    connect(&m_navigator, SIGNAL(playListChange(PlayList *)),
+    connect(m_navigator, SIGNAL(playListChange(PlayList *)),
             ui->gallery, SLOT(playListChange(PlayList *)));
-    connect(&m_navigator, SIGNAL(playListAppend(int)),
+    connect(m_navigator, SIGNAL(playListAppend(int)),
             ui->gallery, SLOT(playListAppend(int)));
 
-    connect(&m_navigator, SIGNAL(navigationChange(int)),
+    connect(m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
 
     // Navigation binding for playListWidget
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
-            &m_navigator, SLOT(goIndex(int)));
+            m_navigator, SLOT(goIndex(int)));
 
     // Navigation binding for gallery
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
@@ -104,7 +104,7 @@ void MainWindow::setupExtraUi()
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
-    menuBarCtx.navigator = &m_navigator;
+    menuBarCtx.navigator = m_navigator;
     menuBarCtx.imageView = ui->graphicsView;
     new MainMenuBarManager(menuBarCtx, this);
 
@@ -188,6 +188,14 @@ void MainWindow::setupExtraUi()
     // PlayList gallery
     connect(ui->playListGallery, SIGNAL(promptToSaveRemotePlayList()),
             this, SLOT(promptToSaveRemotePlayList()));
+
+    // Init Basket
+    ui->basketView->setPlayList(m_navigator->basket());
+    connect(m_navigator->basket(), SIGNAL(itemsAppended(int)),
+            ui->basketView, SLOT(playListAppend(int)));
+    connect(m_navigator->basket(), SIGNAL(itemsChanged()),
+            ui->basketView, SLOT(playListChange()));
+
     // TODO: Lazy load here
     loadSavedPlayLists();
 }
@@ -221,7 +229,7 @@ void MainWindow::loadSelectedPlayList()
         }
 
         // Navigator should take ownership of PlayList in this case
-        m_navigator.setPlayList(pl);
+        m_navigator->setPlayList(pl);
 
         // Make cover image of first playlist item selected
         PlayListGalleryItem *firstItem =
@@ -257,7 +265,7 @@ void MainWindow::processCommandLineOptions()
         }
     }
 
-    m_navigator.setPlayList(playList);
+    m_navigator->setPlayList(playList);
 }
 
 void MainWindow::promptToOpenImage()
@@ -288,7 +296,7 @@ void MainWindow::promptToOpenImage()
 
     PlayList *playList = new PlayList(images);
     // Navigator takes ownership of PlayList in this case
-    m_navigator.setPlayList(playList, true);
+    m_navigator->setPlayList(playList, true);
 }
 
 void MainWindow::promptToSaveImage()
@@ -325,7 +333,7 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSaveLocalPlayList()
 {
-    Image *image = m_navigator.currentImage();
+    Image *image = m_navigator->currentImage();
     if (!image) {
         return;
     }
@@ -348,7 +356,7 @@ void MainWindow::promptToSaveLocalPlayList()
     QString name = dialog.textValue();
     if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
         LocalPlayListRecord record(name, image->thumbnailPath(),
-                              m_navigator.playList());
+                              m_navigator->playList());
         if (record.save()) {
             statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
                                      2000);
@@ -394,8 +402,8 @@ void MainWindow::imageLoaded(Image *image)
 
     QString progress;
     QTextStream(&progress) << "["
-        << (m_navigator.currentIndex() + 1) << "/"
-        << m_navigator.playList()->count() << "] ";
+        << (m_navigator->currentIndex() + 1) << "/"
+        << m_navigator->playList()->count() << "] ";
 
     QString title;
     QTextStream(&title) << status << progress << image->name();
@@ -410,7 +418,7 @@ void MainWindow::imageLoaded(Image *image)
 void MainWindow::playListChange()
 {
     // Switch to gallery view if playlist is not empty
-    if (!m_navigator.playList()->isEmpty()) {
+    if (!m_navigator->playList()->isEmpty()) {
         m_actToolBarGallery->trigger();
     }
 
@@ -421,7 +429,7 @@ void MainWindow::playListChange()
 
 void MainWindow::playListAppend(int start)
 {
-    PlayList *pl = m_navigator.playList();
+    PlayList *pl = m_navigator->playList();
 
     QListWidget *list = ui->playListWidget;
     for (int i = start; i < pl->count(); ++i) {
@@ -453,10 +461,10 @@ void MainWindow::navigationChange(int index)
 
 void MainWindow::updateSidebarTitle()
 {
-    int index = m_navigator.currentIndex();
+    int index = m_navigator->currentIndex();
     QString title;
     QTextStream(&title) << PLAYLIST_TITLE_PREFIX << " - "
-        << (index + 1) << "/" << m_navigator.playList()->count();
+        << (index + 1) << "/" << m_navigator->playList()->count();
     ui->sidebar->setWindowTitle(title);
 }
 
@@ -477,7 +485,7 @@ void MainWindow::gallerySelectionChanged()
         const QList<QGraphicsItem *> &allItems =
             scene->items(Qt::AscendingOrder);
         int index = allItems.indexOf(item);
-        m_navigator.goIndex(index);
+        m_navigator->goIndex(index);
     }
 }
 
@@ -487,17 +495,17 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         switch (ev->key()) {
             case Qt::Key_J:
             case Qt::Key_Space:
-                if (m_navigator.isAutoNavigating()) {
-                    m_navigator.stopAutoNavigation();
+                if (m_navigator->isAutoNavigating()) {
+                    m_navigator->stopAutoNavigation();
                 } else {
-                    m_navigator.goNext();
+                    m_navigator->goNext();
                 }
                 break;
             case Qt::Key_K:
-                if (m_navigator.isAutoNavigating()) {
-                    m_navigator.stopAutoNavigation();
+                if (m_navigator->isAutoNavigating()) {
+                    m_navigator->stopAutoNavigation();
                 } else {
-                    m_navigator.goPrev();
+                    m_navigator->goPrev();
                 }
                 break;
             case Qt::Key_F:
@@ -540,16 +548,16 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             }
             case Qt::Key_Home:
-                m_navigator.goFirst();
+                m_navigator->goFirst();
                 break;
             case Qt::Key_End:
-                m_navigator.goLast();
+                m_navigator->goLast();
                 break;
             case Qt::Key_Period:
-                m_navigator.startAutoNavigation(Navigator::NormalDirection);
+                m_navigator->startAutoNavigation(Navigator::NormalDirection);
                 break;
             case Qt::Key_Comma:
-                m_navigator.startAutoNavigation(Navigator::ReverseDirection);
+                m_navigator->startAutoNavigation(Navigator::ReverseDirection);
                 break;
             case Qt::Key_1:
             case Qt::Key_2:

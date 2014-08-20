@@ -4,6 +4,7 @@
 #include "ImageGalleryItem.h"
 #include "ImageGalleryView.h"
 #include "LooseRendererFactory.h"
+#include "Navigator.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
@@ -30,12 +31,15 @@ void ImageGalleryView::setPlayList(PlayList *playList)
 
 void ImageGalleryView::playListChange(PlayList *playList)
 {
+    if (!playList) {
+         return;
+    }
+
     if (playList != m_playList) {
         setPlayList(playList);
     }
 
     clear();
-
     playListAppend(0);
 }
 
@@ -54,27 +58,33 @@ void ImageGalleryView::playListAppend(int start)
 
 void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
-    QMenu menu(this);
+    QMenu *menu = createContextMenu();
+    menu->exec(event->globalPos());
+}
 
-    QMenu *sorts = menu.addMenu(tr("Sort By"));
+QMenu *ImageGalleryView::createContextMenu()
+{
+    QMenu *menu = new QMenu(this);
+
+    QMenu *sorts = menu->addMenu(tr("Sort By"));
     sorts->addAction(tr("Name"), this, SLOT(sortByName()));
     sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
 
-    menu.addMenu(m_rankFilterMenuManager->menu());
+    menu->addMenu(m_rankFilterMenuManager->menu());
 
-    QMenu *renderers = menu.addMenu(tr("Layout"));
+    QMenu *renderers = menu->addMenu(tr("Layout"));
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
 
     if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =
-            menu.addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
+            menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
         if (scene()->selectedItems().count() == 0) {
             actSetAsCover->setEnabled(false);
         }
     }
 
-    menu.exec(event->globalPos());
+    return menu;
 }
 
 void ImageGalleryView::mousePressEvent(QMouseEvent *ev)
@@ -116,5 +126,17 @@ void ImageGalleryView::setAsCover()
              record->setCoverPath(item->image()->thumbnailPath());
              record->save();
         }
+    }
+}
+
+void ImageGalleryView::addToBasket()
+{
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    for (int i = 0; i < selectedItems.count(); ++i) {
+        ImageGalleryItem *item =
+            static_cast<ImageGalleryItem *>(selectedItems[i]);
+
+        Image *image = item->image();
+        *(Navigator::instance()->basket()) << ImagePtr(image);
     }
 }

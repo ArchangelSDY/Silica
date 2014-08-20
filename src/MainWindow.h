@@ -52,13 +52,13 @@ private:
     void switchViews();
 
     Ui::MainWindow *ui;
+    Navigator *m_navigator;
     QToolBar *m_toolBar;
     QActionGroup *m_toolBarActs;
     QAction *m_actToolBarFav;
     QAction *m_actToolBarGallery;
     QAction *m_actToolBarImage;
 
-    Navigator m_navigator;
 };
 
 #endif // MAINWINDOW_H

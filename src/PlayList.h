@@ -114,6 +114,21 @@ public:
         return m_filteredImages.isEmpty();
     }
 
+    inline bool removeOne(const ImagePtr &val)
+    {
+        bool ret = m_allImages.removeOne(val);
+        m_filteredImages.removeOne(val);
+        emit itemsChanged();
+        return ret;
+    }
+
+    inline void removeAt(int index)
+    {
+        ImagePtr removed = m_allImages.takeAt(index);
+        m_filteredImages.removeOne(removed);
+        emit itemsChanged();
+    }
+
 signals:
     void itemsChanged();
     void itemsAppended(int start);

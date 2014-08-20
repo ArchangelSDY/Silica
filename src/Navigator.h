@@ -22,7 +22,7 @@ public:
     static const int MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
     static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
-    explicit Navigator(QObject *parent = 0);
+    static Navigator *instance();
     ~Navigator();
 
     PlayList *playList() { return m_playList; }
@@ -45,6 +45,8 @@ public:
 
     void setPlayer(AbstractNavigationPlayer *player);
     AbstractNavigationPlayer *player() { return m_player; }
+
+    PlayList *basket() { return m_basket; }
 
 signals:
     void paint(Image *image);
@@ -78,6 +80,9 @@ private slots:
     void goAutoNavigation();
 
 private:
+    explicit Navigator(QObject *parent = 0);
+    static Navigator *s_instance;
+
     Image* loadIndex(int index, bool shouldPaint);
 
     void preload();
@@ -95,6 +100,8 @@ private:
     QTimer m_autoNavigationTimer;
 
     AbstractNavigationPlayer *m_player;
+
+    PlayList *m_basket;
 };
 
 #endif // NAVIGATOR_H

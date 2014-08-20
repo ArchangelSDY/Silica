@@ -11,6 +11,17 @@ static const int MAX_PRELOAD = 5;
 // Cache both backward/forward preloaded images and the current one
 static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
 
+Navigator *Navigator::s_instance = 0;
+
+Navigator *Navigator::instance()
+{
+    if (!s_instance) {
+        s_instance = new Navigator();
+    }
+
+    return s_instance;
+}
+
 Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
@@ -19,7 +30,8 @@ Navigator::Navigator(QObject *parent) :
     m_cachedImages(MAX_CACHE) ,
     m_playList(0) ,
     m_ownPlayList(false) ,
-    m_player(new NormalNavigationPlayer(this))
+    m_player(new NormalNavigationPlayer(this)) ,
+    m_basket(new PlayList())
 {
     setCacheStragegy();   // To set corresponding cache strategy
 
@@ -34,6 +46,7 @@ Navigator::~Navigator()
         delete m_playList;
     }
     delete m_player;
+    delete m_basket;
 }
 
 void Navigator::reset()

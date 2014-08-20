@@ -30,7 +30,7 @@
       <widget class="QWidget" name="pageGallery">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="ImageGalleryView" name="gallery"/>
+         <widget class="MainImageGalleryView" name="gallery"/>
         </item>
        </layout>
       </widget>
@@ -171,11 +171,6 @@
    <header>ui/MainGraphicsView.h</header>
   </customwidget>
   <customwidget>
-   <class>ImageGalleryView</class>
-   <extends>QGraphicsView</extends>
-   <header>ui/ImageGalleryView.h</header>
-  </customwidget>
-  <customwidget>
    <class>PlayListGalleryView</class>
    <extends>QGraphicsView</extends>
    <header>ui/PlayListGalleryView.h</header>
@@ -184,6 +179,11 @@
    <class>BasketView</class>
    <extends>QGraphicsView</extends>
    <header>ui/BasketView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MainImageGalleryView</class>
+   <extends>QGraphicsView</extends>
+   <header>ui/MainImageGalleryView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
