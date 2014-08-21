@@ -5,7 +5,7 @@
 #include "ImageGalleryItem.h"
 #include "LooseImageRenderer.h"
 
-ImageGalleryItem::ImageGalleryItem(Image *image,
+ImageGalleryItem::ImageGalleryItem(ImagePtr image,
                                    AbstractRendererFactory *rendererFactory,
                                    QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
@@ -14,7 +14,7 @@ ImageGalleryItem::ImageGalleryItem(Image *image,
     setFlag(QGraphicsItem::ItemIsSelectable);
     setRenderer(m_rendererFactory->createForImageGallery());
 
-    connect(m_image, SIGNAL(thumbnailLoaded()),
+    connect(m_image.data(), SIGNAL(thumbnailLoaded()),
             this, SLOT(thumbnailLoaded()));
     m_image->loadThumbnail(true);
 }

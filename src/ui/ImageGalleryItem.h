@@ -12,12 +12,12 @@ class ImageGalleryItem : public QObject, public GalleryItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    explicit ImageGalleryItem(Image *image,
+    explicit ImageGalleryItem(ImagePtr image,
                               AbstractRendererFactory *rendererFactory,
                               QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
-    Image *image() { return m_image; }
+    ImagePtr image() { return m_image; }
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
@@ -29,7 +29,7 @@ protected:
                QWidget *widget);
 
 private:
-    Image *m_image;
+    ImagePtr m_image;
 };
 
 #endif // IMAGEGALLERYITEM_H

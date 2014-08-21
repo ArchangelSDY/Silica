@@ -1,4 +1,5 @@
 #include <QMenu>
+#include <QMessageBox>
 
 #include "CompactRendererFactory.h"
 #include "ImageGalleryItem.h"
@@ -31,11 +32,7 @@ void ImageGalleryView::setPlayList(PlayList *playList)
 
 void ImageGalleryView::playListChange(PlayList *playList)
 {
-    if (!playList) {
-         return;
-    }
-
-    if (playList != m_playList) {
+    if (playList && playList != m_playList) {
         setPlayList(playList);
     }
 
@@ -46,7 +43,7 @@ void ImageGalleryView::playListChange(PlayList *playList)
 void ImageGalleryView::playListAppend(int start)
 {
     for (int i = start; i < m_playList->count(); ++i) {
-        Image *image = m_playList->at(i).data();
+        ImagePtr image = m_playList->at(i);
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
@@ -82,6 +79,10 @@ QMenu *ImageGalleryView::createContextMenu()
         if (scene()->selectedItems().count() == 0) {
             actSetAsCover->setEnabled(false);
         }
+    }
+
+    if (!scene()->selectedItems().isEmpty()) {
+        menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
     }
 
     return menu;
@@ -136,7 +137,22 @@ void ImageGalleryView::addToBasket()
         ImageGalleryItem *item =
             static_cast<ImageGalleryItem *>(selectedItems[i]);
 
-        Image *image = item->image();
-        *(Navigator::instance()->basket()) << ImagePtr(image);
+        ImagePtr image = item->image();
+        *(Navigator::instance()->basket()) << image;
+    }
+}
+
+void ImageGalleryView::removeSelected()
+{
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+
+    QString msg = tr("Remove %1 images?").arg(selectedItems.count());
+    if (QMessageBox::question(
+            this, tr("Images Remove"), msg) == QMessageBox::Yes) {
+        foreach (QGraphicsItem *item, selectedItems) {
+            ImageGalleryItem *galleryItem =
+                static_cast<ImageGalleryItem *>(item);
+            m_playList->removeOne(galleryItem->image());
+        }
     }
 }

@@ -312,8 +312,8 @@ void MainWindow::promptToSaveImage()
         foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
             ImageGalleryItem *imageGalleryItem =
                 static_cast<ImageGalleryItem *>(item);
-            Image *image = imageGalleryItem->image();
-            if (image) {
+            ImagePtr image = imageGalleryItem->image();
+            if (!image.isNull()) {
                 QFileInfo imageFile(image->name()); // Remove dir in image name
                 QString destPath = destDir + QDir::separator() +
                     imageFile.fileName();

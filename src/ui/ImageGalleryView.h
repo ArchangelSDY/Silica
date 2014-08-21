@@ -24,6 +24,7 @@ protected slots:
 
     void setAsCover();
     void addToBasket();
+    void removeSelected();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
