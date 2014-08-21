@@ -61,6 +61,20 @@ bool PlayListRecord::remove()
     return LocalDatabase::instance()->removePlayListRecord(this);
 }
 
+bool PlayListRecord::removeImage(Image *image)
+{
+    bool ret = LocalDatabase::instance()->removeImageFromPlayListRecord(
+        this, image);
+
+    // Remove cached playlist. It will be re-generated in the future
+    if (m_playList) {
+        delete m_playList;
+        m_playList = 0;
+    }
+
+    return ret;
+}
+
 QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();

@@ -17,6 +17,8 @@ public:
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);
+    bool removeImageFromPlayListRecord(
+        PlayListRecord *playListRecord, Image *image);
 
     int queryImagesCount();
     bool insertImage(Image *image);

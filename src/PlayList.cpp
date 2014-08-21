@@ -45,6 +45,34 @@ void PlayList::addPath(const QUrl &url)
     }
 }
 
+bool PlayList::removeOne(const ImagePtr &val)
+{
+    // Do this first to ensure image ptr not deleted
+    if (m_record) {
+        m_record->removeImage(val.data());
+    }
+
+    bool ret = m_allImages.removeOne(val);
+    m_filteredImages.removeOne(val);
+
+    emit itemsChanged();
+    return ret;
+}
+
+void PlayList::removeAt(int index)
+{
+    ImagePtr removed = m_allImages.takeAt(index);
+
+    // Do this first to ensure image ptr not deleted
+    if (m_record) {
+        m_record->removeImage(removed.data());
+    }
+
+    m_filteredImages.removeOne(removed);
+
+    emit itemsChanged();
+}
+
 void PlayList::watchedPlayListAppended(int start)
 {
     int oldCount = count();

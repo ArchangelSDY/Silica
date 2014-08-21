@@ -12,6 +12,10 @@ const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path, type)
 const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
         "?, (select id from images where hash = ?))";
 
+const char *SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH = "delete from playlist_images "
+        "where playlist_id=? and image_id in "
+        "(select id from images where hash = ?)";
+
 const char *SQL_QUERY_PLAYLISTS =
     "select playlists.id, playlists.name, playlists.cover_path, playlists.type, "
     "count(playlists.id) from playlists left outer join playlist_images "
@@ -186,6 +190,20 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
     q.addBindValue(playListRecord->name());
     q.addBindValue(playListRecord->coverPath());
     q.addBindValue(playListRecord->id());
+    return q.exec();
+}
+
+bool SQLiteLocalDatabase::removeImageFromPlayListRecord(
+        PlayListRecord *playListRecord, Image *image)
+{
+    if (!m_db.isOpen() || !playListRecord || !image) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH);
+    q.addBindValue(playListRecord->id());
+    q.addBindValue(image->source()->hashStr());
     return q.exec();
 }
 

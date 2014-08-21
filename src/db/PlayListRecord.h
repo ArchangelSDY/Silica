@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QString>
 
+class Image;
 class PlayList;
 
 class PlayListRecord : public QObject
@@ -37,6 +38,7 @@ public:
     virtual PlayList *playList() = 0;
     virtual bool save();
     virtual bool remove();
+    virtual bool removeImage(Image *);
 
     static QList<PlayListRecord *> all();
     static PlayListRecord *create(PlayListType type,
