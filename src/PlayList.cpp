@@ -18,6 +18,14 @@ PlayList::PlayList(const QList<QUrl> &imageUrls) :
     }
 }
 
+PlayList::PlayList(const PlayList &playList) :
+    m_allImages(playList.m_allImages) ,
+    m_filteredImages(playList.m_filteredImages) ,
+    m_record(playList.m_record) ,
+    m_filter(playList.m_filter)
+{
+}
+
 PlayList::~PlayList()
 {
     delete m_filter;

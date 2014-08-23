@@ -9,6 +9,9 @@ class BasketView : public ImageGalleryView
 public:
     explicit BasketView(QWidget *parent = 0);
 
+protected slots:
+    virtual void exportToNavigator();
+
 protected:
     virtual QMenu *createContextMenu();
 

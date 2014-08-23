@@ -13,6 +13,7 @@ class PlayList : public QObject
 public:
     PlayList();
     PlayList(const QList<QUrl> &imageUrls);
+    PlayList(const PlayList &playList);
     ~PlayList();
 
     PlayListRecord *record() { return m_record; }
