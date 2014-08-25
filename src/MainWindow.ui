@@ -13,8 +13,68 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="0">
+     <widget class="QWidget" name="basketPane" native="true">
+      <property name="styleSheet">
+       <string notr="true">background-color: #323A44</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="basketTitle">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="styleSheet">
+           <string notr="true">
+             color: #FFFFFF;
+             background-color: #47505A;
+             padding: 0.3em 1em;
+             border-top: 1px solid #333333;
+             border-bottom: 1px solid #000000;
+             max-height: 1em;
+          </string>
+         </property>
+         <property name="text">
+          <string>Basket</string>
+         </property>
+         <property name="indent">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="BasketView" name="basketView">
+         <property name="styleSheet">
+          <string notr="true">border: none</string>
+         </property>
+         <property name="lineWidth">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedViews">
       <property name="currentIndex">
@@ -52,9 +112,6 @@
        </layout>
       </widget>
      </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="BasketView" name="basketView"/>
     </item>
    </layout>
   </widget>

@@ -190,7 +190,8 @@ void MainWindow::setupExtraUi()
             this, SLOT(promptToSaveRemotePlayList()));
 
     // Init Basket
-    ui->basketView->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
+    ui->basketPane->layout()->setSpacing(0);
+    ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
     ui->basketView->setPlayList(m_navigator->basket());
     connect(m_navigator->basket(), SIGNAL(itemsAppended(int)),
             ui->basketView, SLOT(playListAppend(int)));
@@ -535,7 +536,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 ui->graphicsView->rotate(90);
                 break;
             case Qt::Key_B:
-                ui->basketView->setVisible(!ui->basketView->isVisible());
+                ui->basketPane->setVisible(!ui->basketPane->isVisible());
                 break;
             case Qt::Key_F10:
                 if (!isFullScreen()) {
