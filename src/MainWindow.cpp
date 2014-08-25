@@ -190,6 +190,7 @@ void MainWindow::setupExtraUi()
             this, SLOT(promptToSaveRemotePlayList()));
 
     // Init Basket
+    ui->basketPane->hide();
     ui->basketPane->layout()->setSpacing(0);
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
     ui->basketView->setPlayList(m_navigator->basket());

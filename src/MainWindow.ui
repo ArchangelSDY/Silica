@@ -20,8 +20,11 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="3" column="0">
      <widget class="QWidget" name="basketPane" native="true">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #323A44</string>
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="leftMargin">
@@ -45,7 +48,7 @@
           </sizepolicy>
          </property>
          <property name="styleSheet">
-           <string notr="true">
+          <string notr="true">
              color: #FFFFFF;
              background-color: #47505A;
              padding: 0.3em 1em;
