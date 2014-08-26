@@ -15,7 +15,11 @@ QMenu *BasketView::createContextMenu()
 {
     QMenu *menu = ImageGalleryView::createContextMenu();
 
-    menu->addAction(tr("Export To Navigator"), this, SLOT(exportToNavigator()));
+    QAction *actExport = menu->addAction(
+        tr("Export To Navigator"), this, SLOT(exportToNavigator()));
+    if (!m_playList || m_playList->count() == 0) {
+        actExport->setDisabled(true);
+    }
 
     return menu;
 }
