@@ -67,9 +67,6 @@
        </item>
        <item>
         <widget class="BasketView" name="basketView">
-         <property name="styleSheet">
-          <string notr="true">border: none</string>
-         </property>
          <property name="lineWidth">
           <number>0</number>
          </property>
