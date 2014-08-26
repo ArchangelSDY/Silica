@@ -5,6 +5,16 @@ MainImageGalleryView::MainImageGalleryView(QWidget *parent) :
 {
 }
 
+void MainImageGalleryView::keyPressEvent(QKeyEvent *event)
+{
+    // Press 'Shift + B' to add images to basket
+    if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_B) {
+        addToBasket();
+    } else {
+        ImageGalleryView::keyPressEvent(event);
+    }
+}
+
 QMenu *MainImageGalleryView::createContextMenu()
 {
     QMenu *menu = ImageGalleryView::createContextMenu();

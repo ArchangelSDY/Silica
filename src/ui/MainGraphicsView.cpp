@@ -2,6 +2,7 @@
 #include <QMenu>
 #include <QSignalMapper>
 
+#include "Navigator.h"
 #include "MainGraphicsView.h"
 #include "RankVoteView.h"
 
@@ -132,6 +133,14 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *event)
 
     m_rankVoteView->keyPressEvent(event);
     if (event->isAccepted()) {
+        return;
+    }
+
+    // Press 'Shift + B' to add current image to basket
+    if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_B) {
+        Navigator::instance()->basket()->append(
+            Navigator::instance()->currentImagePtr());
+        event->accept();
         return;
     }
 

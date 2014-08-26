@@ -88,14 +88,14 @@ QMenu *ImageGalleryView::createContextMenu()
     return menu;
 }
 
-void ImageGalleryView::mousePressEvent(QMouseEvent *ev)
+void ImageGalleryView::mousePressEvent(QMouseEvent *event)
 {
-    if (ev->button() == Qt::RightButton) {
-        ev->accept();
+    if (event->button() == Qt::RightButton) {
+        event->accept();
         return;
     }
 
-    QGraphicsView::mousePressEvent(ev);
+    QGraphicsView::mousePressEvent(event);
 }
 
 void ImageGalleryView::sortByName()

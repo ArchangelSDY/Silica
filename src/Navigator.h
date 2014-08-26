@@ -34,6 +34,7 @@ public:
     void goIndexUntilSuccess(int index, int delta);
 
     Image* currentImage() const { return m_currentImage; }
+    ImagePtr currentImagePtr();
     int currentIndex() { return m_currentIndex; }
 
     bool isAutoNavigating() const { return m_autoNavigationTimer.isActive(); }

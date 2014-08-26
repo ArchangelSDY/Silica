@@ -244,6 +244,16 @@ void Navigator::thumbnailLoaded()
     }
 }
 
+ImagePtr Navigator::currentImagePtr()
+{
+    if (m_playList &&
+        m_currentIndex >= 0 && m_currentIndex < m_playList->count()) {
+        return m_playList->at(m_currentIndex);
+    } else {
+        return ImagePtr();
+    }
+}
+
 void Navigator::startAutoNavigation(Direction direction)
 {
     m_reverseNavigation = (direction == ReverseDirection);
