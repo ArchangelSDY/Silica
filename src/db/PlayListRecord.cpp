@@ -16,6 +16,9 @@ PlayListRecord::PlayListRecord(const QString &name,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_playList(playList)
 {
+    // If playList is given, then we do not own this playList and will not try
+    // to delete it.
+    m_ownPlayList = (playList == 0);
 }
 
 void PlayListRecord::setCount(int count)
@@ -63,7 +66,7 @@ bool PlayListRecord::remove()
 
 void PlayListRecord::flushPlayList()
 {
-    if (m_playList) {
+    if (m_playList && m_ownPlayList) {
         delete m_playList;
         m_playList = 0;
     }

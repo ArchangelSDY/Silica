@@ -124,6 +124,66 @@ void TestLocalDatabase::playListUpdate()
     QCOMPARE((*it)->coverPath(), QString("new_cover.jpg"));
 }
 
+void TestLocalDatabase::insertImagesToPlayList()
+{
+    const QString &currentDir = qApp->applicationDirPath();
+    ImagePtr imageA(
+        new Image(QUrl("file://" + currentDir + "/assets/me.jpg")));
+    ImagePtr imageB(
+        new Image(QUrl("file://" + currentDir + "/assets/silica.png")));
+
+    PlayList pl;
+    pl << imageA;
+
+    LocalPlayListRecord record("test", "", &pl);
+    record.save();
+    int rid = record.id();
+
+    QVERIFY2(record.isSaved(), "PlayListRecord should be saved.");
+    QCOMPARE(record.playList()->count(), 1);
+
+    ImageList images;
+    images << imageB;
+    record.insertImages(images);
+
+    LocalPlayListRecord dupRecord("test", "");
+    qDebug() << "rid" << rid;
+    dupRecord.setId(rid);
+
+    PlayList *spl = dupRecord.playList();
+    QCOMPARE(spl->count(), 2);
+}
+
+void TestLocalDatabase::removeImagesFromPlayList()
+{
+    const QString &currentDir = qApp->applicationDirPath();
+    ImagePtr imageA(
+        new Image(QUrl("file://" + currentDir + "/assets/me.jpg")));
+    ImagePtr imageB(
+        new Image(QUrl("file://" + currentDir + "/assets/silica.png")));
+
+    PlayList pl;
+    pl << imageA;
+    pl << imageB;
+
+    LocalPlayListRecord record("test", "", &pl);
+    record.save();
+    int rid = record.id();
+
+    QVERIFY2(record.isSaved(), "PlayListRecord should be saved.");
+    QCOMPARE(record.playList()->count(), 2);
+
+    record.removeImage(imageB);
+
+    LocalPlayListRecord dupRecord("test", "");
+    qDebug() << "rid" << rid;
+    dupRecord.setId(rid);
+
+    PlayList *spl = dupRecord.playList();
+    QCOMPARE(spl->count(), 1);
+    QCOMPARE(spl->at(0)->source()->hashStr(), imageA->source()->hashStr());
+}
+
 void TestLocalDatabase::insertImage()
 {
     QFETCH(QUrl, imageUrl);

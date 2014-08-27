@@ -65,6 +65,7 @@ protected:
     int m_count;
     int m_coverIndex;
     PlayList *m_playList;
+    bool m_ownPlayList;
 };
 
 #endif // PLAYLISTRECORD_H
