@@ -69,7 +69,7 @@ void PlayListRecord::flushPlayList()
     }
 }
 
-bool PlayListRecord::removeImage(Image *image)
+bool PlayListRecord::removeImage(ImagePtr image)
 {
     bool ret = LocalDatabase::instance()->removeImageFromPlayListRecord(
         this, image);

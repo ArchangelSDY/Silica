@@ -209,9 +209,9 @@ bool SQLiteLocalDatabase::insertImagesForPlayListRecord(
 }
 
 bool SQLiteLocalDatabase::removeImageFromPlayListRecord(
-        PlayListRecord *playListRecord, Image *image)
+        PlayListRecord *playListRecord, ImagePtr image)
 {
-    if (!m_db.isOpen() || !playListRecord || !image) {
+    if (!m_db.isOpen() || !playListRecord || image.isNull()) {
         return false;
     }
 

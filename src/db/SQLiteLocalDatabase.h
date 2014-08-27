@@ -20,7 +20,7 @@ public:
     bool insertImagesForPlayListRecord(
         PlayListRecord *playListRecord, const QList<ImagePtr> &images);
     bool removeImageFromPlayListRecord(
-        PlayListRecord *playListRecord, Image *image);
+        PlayListRecord *playListRecord, ImagePtr image);
 
     int queryImagesCount();
     bool insertImage(Image *image);

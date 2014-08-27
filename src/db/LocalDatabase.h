@@ -22,7 +22,7 @@ public:
     virtual bool insertImagesForPlayListRecord(
         PlayListRecord *playListRecord, const QList<ImagePtr> &images) = 0;
     virtual bool removeImageFromPlayListRecord(
-        PlayListRecord *playListRecord, Image *image) = 0;
+        PlayListRecord *playListRecord, ImagePtr image) = 0;
 
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;

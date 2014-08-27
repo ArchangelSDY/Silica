@@ -40,7 +40,7 @@ public:
     virtual PlayList *playList() = 0;
     virtual bool save();
     virtual bool remove();
-    virtual bool removeImage(Image *);
+    virtual bool removeImage(ImagePtr image);
     virtual bool insertImages(const ImageList &images);
 
     static QList<PlayListRecord *> all();

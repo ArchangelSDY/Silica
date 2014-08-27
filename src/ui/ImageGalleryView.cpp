@@ -6,6 +6,7 @@
 #include "ImageGalleryView.h"
 #include "LooseRendererFactory.h"
 #include "Navigator.h"
+#include "PlayListRecord.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
@@ -152,7 +153,15 @@ void ImageGalleryView::removeSelected()
         foreach (QGraphicsItem *item, selectedItems) {
             ImageGalleryItem *galleryItem =
                 static_cast<ImageGalleryItem *>(item);
-            m_playList->removeOne(galleryItem->image());
+            ImagePtr toRemove = galleryItem->image();
+
+            m_playList->removeOne(toRemove);
+
+            // Sync to record if any
+            PlayListRecord *record = m_playList->record();
+            if (record) {
+                record->removeImage(toRemove);
+            }
         }
     }
 }
