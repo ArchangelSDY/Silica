@@ -120,11 +120,15 @@ void TestPlayList::setFilter()
     PlayList pl;
     pl << images;
 
+    // Disable filters first
+    pl.setFilter(0);
+
     QCOMPARE(pl.count(), initialCount);
     QCOMPARE(pl.size(), initialCount);
 
     QSignalSpy spyItemsChanged(&pl, SIGNAL(itemsChanged()));
 
+    // Apply filters
     pl.setFilter(filter);
 
     QCOMPARE(spyItemsChanged.count(), 1);
