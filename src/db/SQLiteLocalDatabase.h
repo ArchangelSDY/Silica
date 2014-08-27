@@ -17,6 +17,8 @@ public:
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);
+    bool insertImagesForPlayListRecord(
+        PlayListRecord *playListRecord, const QList<ImagePtr> &images);
     bool removeImageFromPlayListRecord(
         PlayListRecord *playListRecord, Image *image);
 

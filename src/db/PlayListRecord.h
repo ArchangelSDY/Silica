@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QString>
 
-class Image;
+#include "Image.h"
+
 class PlayList;
 
 class PlayListRecord : public QObject
@@ -32,6 +33,7 @@ public:
     };
 
     PlayListType type() const { return m_type; }
+    bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
     int coverIndex();
 
@@ -39,6 +41,7 @@ public:
     virtual bool save();
     virtual bool remove();
     virtual bool removeImage(Image *);
+    virtual bool insertImages(const ImageList &images);
 
     static QList<PlayListRecord *> all();
     static PlayListRecord *create(PlayListType type,
@@ -52,6 +55,8 @@ protected:
     static const int EMPTY_ID = -1;
     static const int EMPTY_COVER_INDEX = -1;
     static const int EMPTY_COUNT = -1;
+
+    virtual void flushPlayList();
 
     int m_id;
     QString m_name;

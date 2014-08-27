@@ -21,6 +21,12 @@ QMenu *BasketView::createContextMenu()
         actExport->setDisabled(true);
     }
 
+    QAction *actAppend = menu->addAction(
+        tr("Append To Navigator"), this, SLOT(appendToNavigator()));
+    if (!m_playList || m_playList->count() == 0) {
+        actAppend->setDisabled(true);
+    }
+
     return menu;
 }
 
@@ -28,5 +34,20 @@ void BasketView::exportToNavigator()
 {
     PlayList *dupPl = new PlayList(*m_playList);
     Navigator::instance()->setPlayList(dupPl, true);
+    m_playList->clear();
+}
+
+void BasketView::appendToNavigator()
+{
+    PlayList *navPl = Navigator::instance()->playList();
+    if (navPl && m_playList) {
+        navPl->append(m_playList);
+
+        // Sync with record if any
+        PlayListRecord *record = navPl->record();
+        if (record) {
+            record->insertImages(m_playList->toImageList());
+        }
+    }
     m_playList->clear();
 }

@@ -11,6 +11,7 @@ public:
 
 protected slots:
     virtual void exportToNavigator();
+    virtual void appendToNavigator();
 
 protected:
     virtual QMenu *createContextMenu();

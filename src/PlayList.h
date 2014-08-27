@@ -114,6 +114,10 @@ public:
     {
         return m_filteredImages.isEmpty();
     }
+    inline ImageList toImageList()
+    {
+        return m_filteredImages;
+    }
 
     bool removeOne(const ImagePtr &val);
     void removeAt(int index);

@@ -61,16 +61,32 @@ bool PlayListRecord::remove()
     return LocalDatabase::instance()->removePlayListRecord(this);
 }
 
+void PlayListRecord::flushPlayList()
+{
+    if (m_playList) {
+        delete m_playList;
+        m_playList = 0;
+    }
+}
+
 bool PlayListRecord::removeImage(Image *image)
 {
     bool ret = LocalDatabase::instance()->removeImageFromPlayListRecord(
         this, image);
 
     // Remove cached playlist. It will be re-generated in the future
-    if (m_playList) {
-        delete m_playList;
-        m_playList = 0;
-    }
+    flushPlayList();
+
+    return ret;
+}
+
+bool PlayListRecord::insertImages(const ImageList &images)
+{
+    bool ret = LocalDatabase::instance()->insertImagesForPlayListRecord(
+        this, images);
+
+    // Remove cached playlist. It will be re-generated in the future
+    flushPlayList();
 
     return ret;
 }

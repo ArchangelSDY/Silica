@@ -19,6 +19,8 @@ public:
     virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool removePlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool updatePlayListRecord(PlayListRecord *playListRecord) = 0;
+    virtual bool insertImagesForPlayListRecord(
+        PlayListRecord *playListRecord, const QList<ImagePtr> &images) = 0;
     virtual bool removeImageFromPlayListRecord(
         PlayListRecord *playListRecord, Image *image) = 0;
 

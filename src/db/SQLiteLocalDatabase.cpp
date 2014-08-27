@@ -142,37 +142,12 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
                    << qInsertPlayList.lastQuery();
         return false;
     }
-    QVariant playListId = qInsertPlayList.lastInsertId();
+    int playListId = qInsertPlayList.lastInsertId().toInt();
+    playListRecord->setId(playListId);
 
-    // Only Local PlayList Record needs inserting related images
-    if (playListRecord->type() == PlayListRecord::LocalPlayList) {
-        // Insert images
-        PlayList *pl = playListRecord->playList();
-        PlayList::const_iterator it;
-        for (it = pl->begin(); it != pl->end(); ++it) {
-            insertImage(it->data());
-        }
-
-        // Insert relationship records
-        QSqlQuery qInsertPlayListImages;
-        qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
-        QVariantList playListIds;
-        QVariantList imageHashes;
-        for (it = pl->begin(); it != pl->end(); ++it) {
-            playListIds << playListId;
-            imageHashes << it->data()->source()->hashStr();
-        }
-        qInsertPlayListImages.addBindValue(playListIds);
-        qInsertPlayListImages.addBindValue(imageHashes);
-
-        if (!qInsertPlayListImages.execBatch()) {
-            qWarning() << qInsertPlayListImages.lastError()
-                       << qInsertPlayListImages.lastQuery();
-            return false;
-        }
-    }
-
-    return true;
+    // Bind images to playlist
+    return insertImagesForPlayListRecord(
+        playListRecord, playListRecord->playList()->toImageList());
 }
 
 bool SQLiteLocalDatabase::removePlayListRecord(PlayListRecord *playListRecord)
@@ -191,6 +166,46 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
     q.addBindValue(playListRecord->coverPath());
     q.addBindValue(playListRecord->id());
     return q.exec();
+}
+
+bool SQLiteLocalDatabase::insertImagesForPlayListRecord(
+        PlayListRecord *playListRecord, const QList<ImagePtr> &images)
+{
+    // PlayListRecord should be saved already.
+    if (!playListRecord->isSaved()) {
+        return false;
+    }
+
+    // Only Local PlayList Record needs inserting related images
+    if (playListRecord->type() != PlayListRecord::LocalPlayList) {
+        return false;
+    }
+
+    // Insert images
+    foreach (const ImagePtr &image, images) {
+        insertImage(image.data());
+    }
+
+    // Insert relationship records
+    int playListId = playListRecord->id();
+    QSqlQuery qInsertPlayListImages;
+    qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+    QVariantList playListIds;
+    QVariantList imageHashes;
+    foreach (const ImagePtr &image, images) {
+        playListIds << playListId;
+        imageHashes << image->source()->hashStr();
+    }
+    qInsertPlayListImages.addBindValue(playListIds);
+    qInsertPlayListImages.addBindValue(imageHashes);
+
+    if (!qInsertPlayListImages.execBatch()) {
+        qWarning() << qInsertPlayListImages.lastError()
+                   << qInsertPlayListImages.lastQuery();
+        return false;
+    }
+
+    return true;
 }
 
 bool SQLiteLocalDatabase::removeImageFromPlayListRecord(
