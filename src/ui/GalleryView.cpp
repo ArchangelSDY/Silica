@@ -9,12 +9,16 @@
 #include "GalleryItem.h"
 #include "GalleryView.h"
 #include "GlobalConfig.h"
+
+#include "CompactRendererFactory.h"
 #include "LooseRendererFactory.h"
+#include "WaterfallRendererFactory.h"
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
-    m_enableGrouping(false)
+    m_enableGrouping(false) ,
+    m_layoutNeeded(true)
 {
 #ifdef ENABLE_OPENGL
     setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
@@ -29,6 +33,10 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene->setBackgroundBrush(palette.background());
 
     setScene(m_scene);
+
+    m_layoutTimer.setSingleShot(false);
+    connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
+    m_layoutTimer.start(100);
 }
 
 GalleryView::~GalleryView()
@@ -47,6 +55,10 @@ void GalleryView::clear()
 
 void GalleryView::layout()
 {
+    if (!m_layoutNeeded) {
+        return;
+    }
+
     if (!isVisible() || m_scene->items().length() == 0) {
         return;
     }
@@ -66,16 +78,23 @@ void GalleryView::layout()
         m_rendererFactory->createViewRenderer(m_scene);
     renderer->layout(items, itemGroups, geometry());
     delete renderer;
+
+    m_layoutNeeded = false;
+}
+
+void GalleryView::scheduleLayout()
+{
+    m_layoutNeeded = true;
 }
 
 void GalleryView::resizeEvent(QResizeEvent *)
 {
-    layout();
+    scheduleLayout();
 }
 
 void GalleryView::showEvent(QShowEvent *)
 {
-    layout();
+    scheduleLayout();
 }
 
 void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
@@ -117,6 +136,7 @@ void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
         galleryItem->setRendererFactory(m_rendererFactory);
     }
 
+    scheduleLayout();
     viewport()->update();
 }
 
@@ -130,14 +150,19 @@ void GalleryView::setCompactRenderer()
     setRendererFactory(new CompactRendererFactory());
 }
 
+void GalleryView::setWaterfallRenderer()
+{
+    setRendererFactory(new WaterfallRendererFactory());
+}
+
 void GalleryView::enableGrouping()
 {
     m_enableGrouping = true;
-    layout();
+    scheduleLayout();
 }
 
 void GalleryView::disableGrouping()
 {
     m_enableGrouping = false;
-    layout();
+    scheduleLayout();
 }

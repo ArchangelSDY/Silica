@@ -51,7 +51,7 @@ void ImageGalleryView::playListAppend(int start)
         m_scene->addItem(item);
     }
 
-    layout();
+    scheduleLayout();
 }
 
 void ImageGalleryView::contextMenuEvent(QContextMenuEvent *event)
@@ -73,6 +73,7 @@ QMenu *ImageGalleryView::createContextMenu()
     QMenu *renderers = menu->addMenu(tr("Layout"));
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
+    renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
 
     if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =

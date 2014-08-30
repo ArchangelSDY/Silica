@@ -24,5 +24,7 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
     delete m_renderer;
     m_renderer = renderer;
     m_renderer->setImage(m_thumbnail);
+
+    prepareGeometryChange();
     m_renderer->layout();
 }

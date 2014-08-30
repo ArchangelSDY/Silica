@@ -1,6 +1,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 
+#include "GalleryView.h"
 #include "GlobalConfig.h"
 #include "ImageGalleryItem.h"
 #include "LooseImageRenderer.h"
@@ -27,7 +28,7 @@ void ImageGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 
 QRectF ImageGalleryItem::boundingRect() const
 {
-    return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());
+    return m_renderer->boundingRect();
 }
 
 void ImageGalleryItem::thumbnailLoaded()
@@ -36,8 +37,19 @@ void ImageGalleryItem::thumbnailLoaded()
     if (!thumbnailImage.isNull()) {
         m_thumbnail = new QImage(thumbnailImage);
         m_renderer->setImage(const_cast<QImage *>(m_thumbnail));
+
+        prepareGeometryChange();
         m_renderer->layout();
+
         update(boundingRect());
+
+        if (scene()) {
+            QList<QGraphicsView *> views = scene()->views();
+            if (!views.isEmpty()) {
+                GalleryView *view = static_cast<GalleryView *>(views[0]);
+                view->scheduleLayout();
+            }
+        }
     }
 }
 

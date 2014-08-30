@@ -59,7 +59,7 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
         m_scene->addItem(item);
     }
 
-    layout();
+    scheduleLayout();
 }
 
 void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
@@ -160,7 +160,7 @@ void PlayListGalleryView::removeSelectedItems()
                 scene()->removeItem(item);
             }
 
-            layout();
+            scheduleLayout();
         }
     }
 }

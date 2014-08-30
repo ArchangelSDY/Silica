@@ -17,12 +17,19 @@ public:
 signals:
     void enterItem();
 
+public slots:
+    virtual void scheduleLayout();
+
 protected slots:
     void setLooseRenderer();
     void setCompactRenderer();
+    void setWaterfallRenderer();
 
     void enableGrouping();
     void disableGrouping();
+
+private slots:
+    virtual void layout();
 
 protected:
     virtual void resizeEvent(QResizeEvent *);
@@ -31,7 +38,6 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void clear();
-    virtual void layout();
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
@@ -41,6 +47,8 @@ protected:
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;
     bool m_enableGrouping;
+    bool m_layoutNeeded;
+    QTimer m_layoutTimer;
 };
 
 #endif // GALLERYVIEW_H
