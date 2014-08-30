@@ -33,7 +33,7 @@ void LooseImageRenderer::layout()
     m_borderRect.moveTo(m_imageRect.topLeft() -
         QPoint(LooseImageRenderer::BORDER, LooseImageRenderer::BORDER));
 
-    m_boundingRect = m_borderRect;
+    m_boundingRect = QRect(QPoint(0, 0), itemSize);
 }
 
 void LooseImageRenderer::paint(QPainter *painter)
