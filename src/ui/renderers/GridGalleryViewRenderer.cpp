@@ -57,6 +57,10 @@ void GridGalleryViewRenderer::layout(QList<QGraphicsItem *> &items,
         qreal x = curColumn * galleryItemSize.width();
         qreal y = curRow * galleryItemSize.height();
         item->setPos(x, y);
+
+        if (item->isReadyToShow()) {
+            item->show();
+        }
     }
 
     QRectF newSceneRect(0, 0,

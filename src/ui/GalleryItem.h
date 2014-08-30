@@ -15,12 +15,19 @@ public:
 
     virtual void setRendererFactory(AbstractRendererFactory *factory) = 0;
 
+    /**
+     * @brief Call by GalleryView during layout to check if thumbnail is ready.
+     * @return True if this item has thumbnail loaded and ready to show.
+     */
+    virtual bool isReadyToShow();
+
 protected:
     void setRenderer(AbstractGalleryItemRenderer *renderer);
 
     AbstractRendererFactory *m_rendererFactory;
     AbstractGalleryItemRenderer *m_renderer;
     QImage *m_thumbnail;
+    bool m_isReadyToShow;
 };
 
 #endif // GALLERYITEM_H

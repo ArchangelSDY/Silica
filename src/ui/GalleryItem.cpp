@@ -7,6 +7,12 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     m_renderer(0) ,
     m_thumbnail(0)
 {
+    // Hide until thumbnail is ready.
+    // It will show during next view layout after thumbnail is loaded
+    //
+    // This strategy is to hide the crazy rapid layout procedure when loading
+    // remote gallery in waterfall mode.
+    hide();
 }
 
 GalleryItem::~GalleryItem()
@@ -27,4 +33,9 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 
     prepareGeometryChange();
     m_renderer->layout();
+}
+
+bool GalleryItem::isReadyToShow()
+{
+    return m_thumbnail && !m_thumbnail->isNull();
 }

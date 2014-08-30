@@ -1,4 +1,4 @@
-#include "GalleryItem.h"
+﻿#include "GalleryItem.h"
 #include "GlobalConfig.h"
 #include "WaterfallGalleryViewRenderer.h"
 
@@ -65,6 +65,10 @@ void WaterfallGalleryViewRenderer::layout(
         qreal y = columnHeights[columnIndex];
 
         item->setPos(x, y);
+
+        if (item->isReadyToShow()) {
+            item->show();
+        }
 
         columnHeights[columnIndex] += item->boundingRect().height();
     }
