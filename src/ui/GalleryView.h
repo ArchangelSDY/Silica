@@ -49,6 +49,9 @@ protected:
     bool m_enableGrouping;
     bool m_layoutNeeded;
     QTimer m_layoutTimer;
+
+private:
+    static const int LAYOUT_INTERVAL = 10;
 };
 
 #endif // GALLERYVIEW_H

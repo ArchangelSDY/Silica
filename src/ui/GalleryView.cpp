@@ -36,7 +36,7 @@ GalleryView::GalleryView(QWidget *parent) :
 
     m_layoutTimer.setSingleShot(false);
     connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
-    m_layoutTimer.start(100);
+    m_layoutTimer.start(GalleryView::LAYOUT_INTERVAL);
 }
 
 GalleryView::~GalleryView()
