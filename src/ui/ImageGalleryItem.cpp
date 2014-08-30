@@ -12,7 +12,7 @@ ImageGalleryItem::ImageGalleryItem(ImagePtr image,
     m_image(image)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setRenderer(m_rendererFactory->createForImageGallery());
+    setRenderer(m_rendererFactory->createItemRendererForImageGallery());
 
     connect(m_image.data(), SIGNAL(thumbnailLoaded()),
             this, SLOT(thumbnailLoaded()));
@@ -22,7 +22,7 @@ ImageGalleryItem::ImageGalleryItem(ImagePtr image,
 void ImageGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 {
     m_rendererFactory = factory;
-    setRenderer(m_rendererFactory->createForImageGallery());
+    setRenderer(m_rendererFactory->createItemRendererForImageGallery());
 }
 
 QRectF ImageGalleryItem::boundingRect() const

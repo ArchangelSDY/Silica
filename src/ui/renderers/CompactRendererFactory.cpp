@@ -3,12 +3,12 @@
 #include "CompactRendererFactory.h"
 #include "CompactTitleRenderer.h"
 
-AbstractGalleryItemRenderer *CompactRendererFactory::createForImageGallery()
+AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForImageGallery()
 {
     return new CompactImageRenderer();
 }
 
-AbstractGalleryItemRenderer *CompactRendererFactory::createForPlayListGallery(
+AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForPlayListGallery(
     const QString &title, const int count)
 {
     return new CompactCountRenderer(count,

@@ -18,7 +18,7 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setToolTip(m_record->name());
-    setRenderer(m_rendererFactory->createForPlayListGallery(
+    setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
         m_record->name(), m_record->count()));
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
@@ -46,14 +46,14 @@ void PlayListGalleryItem::loadThumbnail()
     }
 
     // Replace with new render since cover image has changed
-    setRenderer(m_rendererFactory->createForPlayListGallery(
+    setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
         m_record->name(), m_record->count()));
 }
 
 void PlayListGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 {
     m_rendererFactory = factory;
-    setRenderer(m_rendererFactory->createForPlayListGallery(
+    setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
         m_record->name(), m_record->count()));
 }
 

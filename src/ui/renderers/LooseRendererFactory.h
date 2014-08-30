@@ -6,8 +6,8 @@
 class LooseRendererFactory : public AbstractRendererFactory
 {
 public:
-    AbstractGalleryItemRenderer *createForImageGallery();
-    AbstractGalleryItemRenderer *createForPlayListGallery(
+    AbstractGalleryItemRenderer *createItemRendererForImageGallery();
+    AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &, const int);
 };
 

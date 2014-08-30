@@ -4,13 +4,12 @@
 
 #include <QGraphicsItem>
 
+#include "AbstractGalleryViewRenderer.h"
 #include "CompactRendererFactory.h"
 #include "GalleryItem.h"
 #include "GalleryView.h"
 #include "GlobalConfig.h"
 #include "LooseRendererFactory.h"
-
-static const qreal GROUP_PADDING_ROW = 0.1;
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
@@ -52,52 +51,21 @@ void GalleryView::layout()
         return;
     }
 
-    const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
-    int maxColumns = width() / galleryItemSize.width();
-    if (maxColumns == 0) {
-        return;
-    }
-
     QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
+
+    QStringList itemGroups;
     if (m_enableGrouping) {
         sortByGroup(&items);
+
+        foreach (QGraphicsItem *item, items) {
+            itemGroups << groupForItem(item);
+        }
     }
 
-    qreal curRow = 0, curColumn = -1;
-    QString curGroup = groupForItem(static_cast<GalleryItem *>(items[0]));
-    for (int i = 0; i < items.length(); ++i) {
-        GalleryItem *item = static_cast<GalleryItem *>(items[i]);
-
-        bool shouldBreakLine = false;
-        // Break line if exceeds columns limit
-        if (curColumn == maxColumns - 1) {
-            shouldBreakLine = true;
-        }
-
-        // Break line if group changs
-        if (m_enableGrouping && groupForItem(item) != curGroup) {
-            curRow += GROUP_PADDING_ROW;    // Add additional padding row
-
-            shouldBreakLine = true;
-        }
-        curGroup = groupForItem(item);
-
-        if (shouldBreakLine) {
-            curRow += 1;
-            curColumn = 0;
-        } else {
-            curColumn += 1;
-        }
-
-        qreal x = curColumn * galleryItemSize.width();
-        qreal y = curRow * galleryItemSize.height();
-        item->setPos(x, y);
-    }
-
-    QRectF newSceneRect(0, 0,
-        maxColumns * galleryItemSize.width(),
-        (curRow + 1) * galleryItemSize.height());
-    setSceneRect(newSceneRect);
+    AbstractGalleryViewRenderer *renderer =
+        m_rendererFactory->createViewRenderer(m_scene);
+    renderer->layout(items, itemGroups, geometry());
+    delete renderer;
 }
 
 void GalleryView::resizeEvent(QResizeEvent *)
