@@ -50,7 +50,17 @@ void WaterfallGalleryViewRenderer::layout(
             curGroup = itemGroups[i];
         }
 
-        int columnIndex = i % maxColumns;
+        // Put image in column with lowest height
+        qreal minHeight = columnHeights[0];
+        int columnIndex = 0;
+        for (int i = 1; i < columnHeights.length(); ++ i) {
+            qreal y = columnHeights[i];
+            if (qMin(minHeight, y) == y) {
+                columnIndex = i;
+                minHeight = y;
+            }
+        }
+
         qreal x = columnIndex * galleryItemSize.width();
         qreal y = columnHeights[columnIndex];
 
