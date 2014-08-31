@@ -176,9 +176,10 @@ bool SQLiteLocalDatabase::insertImagesForPlayListRecord(
         return false;
     }
 
-    // Only Local PlayList Record needs inserting related images
+    // Only Local PlayList Record needs inserting related images.
+    // For Remote PlayList, return with true directly.
     if (playListRecord->type() != PlayListRecord::LocalPlayList) {
-        return false;
+        return true;
     }
 
     // Insert images
