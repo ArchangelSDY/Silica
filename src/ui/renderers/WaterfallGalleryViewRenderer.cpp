@@ -55,7 +55,7 @@ void WaterfallGalleryViewRenderer::layout(
         int columnIndex = 0;
         for (int i = 1; i < columnHeights.length(); ++ i) {
             qreal y = columnHeights[i];
-            if (qMin(minHeight, y) == y) {
+            if (y < minHeight) {
                 columnIndex = i;
                 minHeight = y;
             }
