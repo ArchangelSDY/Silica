@@ -127,6 +127,11 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
         }
     }
 
+    // Double check here in case playlist has no images, eg.
+    if (index < 0 || index >= m_playList->count()) {
+        return 0;
+    }
+
     Image *image = m_cachedImages.at(index);
 
     if (!image) {
