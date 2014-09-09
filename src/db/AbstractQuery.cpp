@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QNetworkConfiguration>
 #include <QNetworkReply>
 #include <QUrlQuery>
 
@@ -37,6 +38,16 @@ void AbstractQuery::start()
     query.addQueryItem("page", QString::number(m_page));
     url.setQuery(query);
     m_request.setUrl(url);
+
+    // If offline, use cache.
+    if (m_manager.configuration().state().testFlag(
+            QNetworkConfiguration::Active)) {
+        m_request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+            QNetworkRequest::PreferNetwork);
+    } else {
+        m_request.setAttribute(QNetworkRequest::CacheLoadControlAttribute,
+            QNetworkRequest::AlwaysCache);
+    }
 
     m_manager.get(m_request);
 }
