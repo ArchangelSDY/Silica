@@ -6,17 +6,12 @@
 
 #include "ImagesQuery.h"
 #include "PlayList.h"
+#include "RemoteDatabase.h"
 
 ImagesQuery::ImagesQuery(QString tag, QObject *parent) :
     AbstractQuery(parent)
 {
-    QString urlString;
-    QTextStream urlBuilder(&urlString);
-    urlBuilder << m_settings.value("ASUNA_BASE").toString()
-               << "/api/images/by-tag/" << tag
-               << "/";
-    QUrl url(urlString);
-    m_request.setUrl(url);
+    m_request.setUrl(RemoteDatabase::instance()->getUrlToQueryByTag(tag));
 }
 
 void ImagesQuery::parseReply(QNetworkReply *reply)
@@ -26,8 +21,8 @@ void ImagesQuery::parseReply(QNetworkReply *reply)
     QJsonArray images = doc.array();
     for (QJsonArray::const_iterator i = images.constBegin();
          i != images.constEnd(); ++i) {
-        QJsonObject image = (*i).toObject();
-        QJsonObject imageFields = image["fields"].toObject();
+        QJsonObject imageInfo = (*i).toObject();
+        QJsonObject imageFields = imageInfo["fields"].toObject();
         QString fileName = imageFields["name"].toString();
         QString zipPackage = imageFields["zip_package"].toString();
 
@@ -36,7 +31,8 @@ void ImagesQuery::parseReply(QNetworkReply *reply)
         imageUrlBuilder << "zip:///"
                         << zipPackage << "#" << fileName;
 
-        m_queuedImages.enqueue(QSharedPointer<Image>(new Image(imageUrl)));
+        ImagePtr image(new Image(imageUrl));
+        m_queuedImages.enqueue(image);
     }
 
     emit gotContent();

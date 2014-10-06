@@ -132,6 +132,7 @@ public:
     int width() const { return m_size.width(); }
     int height() const { return m_size.height(); }
     QSize size() const { return m_size; }
+    QVariantHash &extraInfo() { return m_extraInfo; }
 
 signals:
     void loaded();
@@ -167,6 +168,7 @@ private:
     ImageRank *m_rank;
 
     QSize m_size;
+    QVariantHash m_extraInfo;
 };
 
 #endif // IMAGE_H
