@@ -8,7 +8,7 @@
 class AsunaDatabase : public RemoteDatabase
 {
 public:
-    virtual QUrl getUrlToQueryByTag(const QString &tag);
+    virtual MultiPageReplyIterator *queryImagesByTag(const QString &tag);
 
 private:
     QSettings m_settings;

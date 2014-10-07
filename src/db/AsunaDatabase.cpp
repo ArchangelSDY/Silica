@@ -2,13 +2,12 @@
 
 #include "AsunaDatabase.h"
 
-QUrl AsunaDatabase::getUrlToQueryByTag(const QString &tag)
+MultiPageReplyIterator *AsunaDatabase::queryImagesByTag(const QString &tag)
 {
-    QString urlString;
-    QTextStream urlBuilder(&urlString);
-    urlBuilder << m_settings.value("ASUNA_BASE").toString()
-               << "/api/images/by-tag/" << tag
-               << "/";
-    QUrl url(urlString);
-    return url;
+    QString urlStr = QString("%1/api/images/by-tag/%2/?page=1")
+            .arg(m_settings.value("ASUNA_BASE").toString())
+            .arg(tag);
+    QUrl url(urlStr);
+
+    return getMultiPage(url);
 }

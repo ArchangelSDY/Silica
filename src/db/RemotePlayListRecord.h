@@ -1,7 +1,7 @@
 #ifndef REMOTEPLAYLISTRECORD_H
 #define REMOTEPLAYLISTRECORD_H
 
-#include "ImagesQuery.h"
+#include "MultiPageReplyIterator.h"
 #include "PlayListRecord.h"
 
 class RemotePlayListRecord : public PlayListRecord
@@ -11,14 +11,15 @@ public:
     explicit RemotePlayListRecord(const QString &name,
                                   const QString &coverPath = QString(),
                                   QObject *parent = 0);
+    ~RemotePlayListRecord();
 
     PlayList *playList();
 
 private slots:
-    void gotPlayList();
+    void gotReplyPage(QNetworkReply *reply);
 
 private:
-    ImagesQuery *m_query;
+    MultiPageReplyIterator *m_replyIter;
 };
 
 #endif // REMOTEPLAYLISTRECORD_H
