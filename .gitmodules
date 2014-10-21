@@ -4,3 +4,6 @@
 [submodule "src/deps/QtDBMigration"]
 	path = src/deps/QtDBMigration
 	url = ssh://git@archangelsdy.com:9687/QtDBMigration
+[submodule "test/deps/QtMockWebServer"]
+	path = test/deps/QtMockWebServer
+	url = git@github.com:ArchangelSDY/QtMockWebServer.git
