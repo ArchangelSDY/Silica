@@ -7,6 +7,7 @@
 #include "TestImage.h"
 #include "TestImageRank.h"
 #include "TestImageSource.h"
+#include "TestMultiPageReplyIterator.h"
 #include "TestPlayList.h"
 
 int main(int argc, char **argv)
@@ -40,6 +41,11 @@ int main(int argc, char **argv)
     {
         TestAsunaDatabase testAsunaDatabase;
         err = qMax(err, QTest::qExec(&testAsunaDatabase, app.arguments()));
+    }
+    {
+        TestMultiPageReplyIterator testMultiPageReplyIterator;
+        err = qMax(err, QTest::qExec(&testMultiPageReplyIterator,
+                                     app.arguments()));
     }
 
     if (err != 0) {

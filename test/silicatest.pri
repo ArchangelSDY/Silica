@@ -5,6 +5,7 @@ SOURCES += \
     $$PWD/TestImageRank.cpp \
     $$PWD/TestImageSource.cpp \
     $$PWD/TestLocalDatabase.cpp \
+    $$PWD/TestMultiPageReplyIterator.cpp \
     $$PWD/TestPlayList.cpp
 
 HEADERS += \
@@ -13,6 +14,7 @@ HEADERS += \
     $$PWD/TestImageRank.h \
     $$PWD/TestImageSource.h \
     $$PWD/TestLocalDatabase.h \
+    $$PWD/TestMultiPageReplyIterator.h \
     $$PWD/TestPlayList.h
 
 assets.files = $$PWD/assets/*

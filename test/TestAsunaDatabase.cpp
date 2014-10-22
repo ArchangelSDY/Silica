@@ -23,6 +23,16 @@ void TestAsunaDatabase::cleanup()
     delete m_database;
 }
 
+void TestAsunaDatabase::queryImagesByTag()
+{
+
+}
+
+void TestAsunaDatabase::queryImagesByTag_data()
+{
+
+}
+
 void TestAsunaDatabase::addImageToAlbum()
 {
     QFETCH(ImagePtr, image);

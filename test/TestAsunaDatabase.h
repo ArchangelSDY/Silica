@@ -12,6 +12,8 @@ class TestAsunaDatabase : public QObject
 private slots:
     void init();
     void cleanup();
+    void queryImagesByTag();
+    void queryImagesByTag_data();
     void addImageToAlbum();
     void addImageToAlbum_data();
 
