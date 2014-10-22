@@ -1,17 +1,19 @@
 SOURCES += \
-    silicatest.cpp \
-    TestImage.cpp \
-    TestImageRank.cpp \
-    TestImageSource.cpp \
-    TestLocalDatabase.cpp \
-    TestPlayList.cpp
+    $$PWD/silicatest.cpp \
+    $$PWD/TestAsunaDatabase.cpp \
+    $$PWD/TestImage.cpp \
+    $$PWD/TestImageRank.cpp \
+    $$PWD/TestImageSource.cpp \
+    $$PWD/TestLocalDatabase.cpp \
+    $$PWD/TestPlayList.cpp
 
 HEADERS += \
-    TestImage.h \
-    TestImageRank.h \
-    TestImageSource.h \
-    TestLocalDatabase.h \
-    TestPlayList.h
+    $$PWD/TestAsunaDatabase.h \
+    $$PWD/TestImage.h \
+    $$PWD/TestImageRank.h \
+    $$PWD/TestImageSource.h \
+    $$PWD/TestLocalDatabase.h \
+    $$PWD/TestPlayList.h
 
 assets.files = $$PWD/assets/*
 assets.path = $$OUT_PWD/assets

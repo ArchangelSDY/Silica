@@ -5,14 +5,19 @@
 #include <QNetworkReply>
 #include <QUrl>
 
+#include "Image.h"
 #include "MultiPageReplyIterator.h"
 
 class RemoteDatabase
 {
 public:
+    virtual ~RemoteDatabase() {}
+
     static RemoteDatabase *instance();
 
     virtual MultiPageReplyIterator *queryImagesByTag(const QString &tag) = 0;
+    virtual QNetworkReply *addImageToAlbum(ImagePtr image,
+                                           const QString &album) = 0;
 
 protected:
     RemoteDatabase();
@@ -20,10 +25,11 @@ protected:
     virtual QNetworkRequest *prepareRequest(QNetworkRequest *req);
     virtual MultiPageReplyIterator *getMultiPage(QUrl url);
 
+    QNetworkAccessManager m_manager;
+
 private:
     static RemoteDatabase *s_instance;
 
-    QNetworkAccessManager m_manager;
     QNetworkDiskCache m_cache;
 };
 

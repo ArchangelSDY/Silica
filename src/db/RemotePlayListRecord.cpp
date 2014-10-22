@@ -57,6 +57,7 @@ void RemotePlayListRecord::gotReplyPage(QNetworkReply *reply)
                         << zipPackage << "#" << fileName;
 
         ImagePtr image(new Image(imageUrl));
+        image->extraInfo().insert("pk", imageInfo["pk"].toInt());
         toBeAppended.append(image);
     }
 

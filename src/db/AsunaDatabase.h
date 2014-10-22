@@ -8,10 +8,15 @@
 class AsunaDatabase : public RemoteDatabase
 {
 public:
+    AsunaDatabase();
+    AsunaDatabase(const QUrl &baseUrl);
+
     virtual MultiPageReplyIterator *queryImagesByTag(const QString &tag);
+    virtual QNetworkReply *addImageToAlbum(ImagePtr image,
+                                           const QString &album);
 
 private:
-    QSettings m_settings;
+    QString m_baseUrl;
 };
 
 #endif // ASUNADATABASE_H

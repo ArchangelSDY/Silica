@@ -3,6 +3,7 @@
 #include <QTextCodec>
 
 #include "TestLocalDatabase.h"
+#include "TestAsunaDatabase.h"
 #include "TestImage.h"
 #include "TestImageRank.h"
 #include "TestImageSource.h"
@@ -35,6 +36,10 @@ int main(int argc, char **argv)
     {
         TestLocalDatabase testLocalDatabase;
         err = qMax(err, QTest::qExec(&testLocalDatabase, app.arguments()));
+    }
+    {
+        TestAsunaDatabase testAsunaDatabase;
+        err = qMax(err, QTest::qExec(&testAsunaDatabase, app.arguments()));
     }
 
     if (err != 0) {

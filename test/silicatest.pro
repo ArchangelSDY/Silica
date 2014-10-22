@@ -13,8 +13,10 @@ CONFIG   -= app_bundle
 
 TARGET = silicatest
 TEMPLATE = app
+QMAKE_MAC_SDK = macosx10.9
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
+include(deps/QtMockWebServer/src/QtMockWebServer.pri)
 include(silicatest.pri)
 include(../src/silica.pri)
