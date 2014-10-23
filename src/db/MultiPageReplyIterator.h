@@ -12,6 +12,7 @@ public:
 
 signals:
     void gotPage(QNetworkReply *reply);
+    void finished();
 
 private slots:
     void replyFinished();

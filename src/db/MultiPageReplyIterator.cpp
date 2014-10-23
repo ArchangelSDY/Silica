@@ -38,5 +38,6 @@ void MultiPageReplyIterator::replyFinished()
         setReply(mgr->get(nextReq));
     } else {
         m_reply->deleteLater();
+        emit finished();
     }
 }

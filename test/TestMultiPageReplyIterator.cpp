@@ -40,14 +40,15 @@ void TestMultiPageReplyIterator::gotPage()
         m_mockServer->getUrl(QString("/?page=%1").arg(pageStart)));
     QNetworkReply *reply = m_mgr.get(req);
     MultiPageReplyIterator iter(reply);
-    QSignalSpy spy(&iter, SIGNAL(gotPage(QNetworkReply *)));
+    QSignalSpy gotPageSpy(&iter, SIGNAL(gotPage(QNetworkReply *)));
+    QSignalSpy finishedSpy(&iter, SIGNAL(finished()));
 
     int waitTimes = 0;
     while (waitTimes < pagesCount + 1) {
-        spy.wait(50);
+        gotPageSpy.wait(50);
         waitTimes++;
     }
-    QCOMPARE(spy.count(), pagesCount);
+    QCOMPARE(gotPageSpy.count(), pagesCount);
     QVERIFY2(m_mockServer->requestCount() >= pagesCount + 1,
              "Not enough requests");
 
@@ -57,6 +58,11 @@ void TestMultiPageReplyIterator::gotPage()
             req.path().contains(QString("page=%1").arg(i + pageStart));
         QVERIFY2(correctPageQueryExists, "Wrong request path");
     }
+
+    if (finishedSpy.count() < 1) {
+        finishedSpy.wait();
+    }
+    QCOMPARE(finishedSpy.count(), 1);
 }
 
 void TestMultiPageReplyIterator::gotPage_data()
