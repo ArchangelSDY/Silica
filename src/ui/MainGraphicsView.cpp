@@ -5,6 +5,7 @@
 #include "Navigator.h"
 #include "MainGraphicsView.h"
 #include "RankVoteView.h"
+#include "RemoteWallpapersManager.h"
 
 static const double SCALE_FACTOR = 0.05;
 
@@ -16,7 +17,8 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit) ,
     m_hotspotsEditor(0) ,
-    m_rankVoteView(new RankVoteView(&m_navigator, this))
+    m_rankVoteView(new RankVoteView(&m_navigator, this)) ,
+    m_remoteWallpapersMgr(new RemoteWallpapersManager(this))
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
@@ -142,6 +144,12 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *event)
             Navigator::instance()->currentImagePtr());
         event->accept();
         return;
+    }
+
+    // Press 'Shift + W' to add as remote wallpaper
+    if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_W) {
+        m_remoteWallpapersMgr->addImageToWallpapers(
+            Navigator::instance()->currentImagePtr());
     }
 
     QGraphicsView::keyPressEvent(event);

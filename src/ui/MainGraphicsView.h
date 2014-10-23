@@ -9,6 +9,7 @@
 #include "Navigator.h"
 
 class RankVoteView;
+class RemoteWallpapersManager;
 
 class MainGraphicsView : public QGraphicsView
 {
@@ -60,6 +61,7 @@ private:
     QRectF m_focusedRect;
 
     RankVoteView *m_rankVoteView;
+    RemoteWallpapersManager *m_remoteWallpapersMgr;
 };
 
 #endif // MAINGRAPHICSVIEW_H
