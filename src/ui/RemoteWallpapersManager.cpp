@@ -36,10 +36,7 @@ void RemoteWallpapersManager::showSuccess()
 {
     NotificationWidget *w = new NotificationWidget(m_parentWidget);
 
-    QPalette pal = w->palette();
-    pal.setColor(QPalette::Background, QColor("#71C341"));
-    w->setPalette(pal);
-
+    w->setTheme(NotificationWidget::ThemeSuccess);
     w->setMessage(tr("Added as Wallpapers!"));
 
     w->showOnce();
@@ -49,10 +46,7 @@ void RemoteWallpapersManager::showError()
 {
     NotificationWidget *w = new NotificationWidget(m_parentWidget);
 
-    QPalette pal = w->palette();
-    pal.setColor(QPalette::Background, QColor("#F83"));
-    w->setPalette(pal);
-
+    w->setTheme(NotificationWidget::ThemeWarning);
     w->setMessage("Oops! Fail to Add as Wallpapers!");
 
     w->showOnce();

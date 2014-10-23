@@ -22,6 +22,13 @@ public:
         NoSticky,
     };
 
+    enum Theme {
+        ThemeInfo,
+        ThemeSuccess,
+        ThemeWarning,
+        ThemeMessage,
+    };
+
     explicit NotificationWidget(QWidget *parent = 0);
     ~NotificationWidget();
 
@@ -32,6 +39,7 @@ public:
      */
     void showOnce(int duration = 2000, bool autoDelete = true);
 
+    void setTheme(Theme theme);
     void setStickyMode(StickyMode mode);
     void setMessage(const QString &message);
 

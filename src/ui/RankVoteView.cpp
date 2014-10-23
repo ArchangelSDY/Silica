@@ -48,10 +48,7 @@ void RankVoteView::showNotification()
     if (navigator && navigator->currentImage()) {
         NotificationWidget *w = new NotificationWidget(m_parentWidget);
 
-        QPalette pal = w->palette();
-        pal.setColor(QPalette::Background, QColor("#F83"));
-        w->setPalette(pal);
-
+        w->setTheme(NotificationWidget::ThemeMessage);
         int rank = navigator->currentImage()->rank()->value();
         w->setMessage(QString("Rank %1").arg(rank));
 

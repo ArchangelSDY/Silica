@@ -61,6 +61,30 @@ void NotificationWidget::showOnce(int duration, bool autoDelete)
     }
 }
 
+void NotificationWidget::setTheme(Theme theme) {
+    QPalette pal = palette();
+
+    switch (theme) {
+    case ThemeSuccess:
+        pal.setColor(QPalette::Background, QColor("#71C341"));
+        break;
+    case ThemeWarning:
+        pal.setColor(QPalette::Background, QColor("#F83"));
+        break;
+    case ThemeInfo:
+        pal.setColor(QPalette::Background, QColor("#58B6BF"));
+        break;
+    case ThemeMessage:
+        pal.setColor(QPalette::Background, QColor("#05B2D2"));
+        break;
+    default:
+        pal.setColor(QPalette::Background, QColor("#58B6BF"));
+        break;
+    }
+
+    setPalette(pal);
+}
+
 void NotificationWidget::setStickyMode(StickyMode mode)
 {
     m_stickyMode = mode;
