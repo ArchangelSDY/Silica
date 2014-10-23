@@ -6,8 +6,11 @@
 
 #include "Image.h"
 #include "TestAsunaDatabase.h"
+#include "utils/MultiSignalSpy.h"
 #include "deps/QtMockWebServer/src/MockResponse.h"
 #include "deps/QtMockWebServer/src/RecordedRequest.h"
+
+Q_DECLARE_METATYPE(MockResponse)
 
 void TestAsunaDatabase::init()
 {
@@ -25,12 +28,45 @@ void TestAsunaDatabase::cleanup()
 
 void TestAsunaDatabase::queryImagesByTag()
 {
+    QFETCH(QString, tag);
+    QFETCH(QList<MockResponse>, responses);
+    QFETCH(int, pagesCount);
 
+    foreach (const MockResponse &response, responses) {
+        m_mockServer->enqueue(response);
+    }
+
+    MultiPageReplyIterator *iter = m_database->queryImagesByTag(tag);
+    connect(iter, SIGNAL(finished()), iter, SLOT(deleteLater()));
+
+    MultiSignalSpy gotPageSpy(iter, SIGNAL(gotPage(QNetworkReply*)));
+    QVERIFY2(gotPageSpy.wait(pagesCount), "Did not get enough pages.");
+
+    for (int i = 0; i < pagesCount; ++i) {
+        RecordedRequest req = m_mockServer->takeRequest();
+        QString expectedPath = QString("/api/images/by-tag/pants/?page=%1")
+            .arg(i + 1);
+        QCOMPARE(req.path(), expectedPath);
+    }
 }
 
 void TestAsunaDatabase::queryImagesByTag_data()
 {
+    QTest::addColumn<QString>("tag");
+    QTest::addColumn<QList<MockResponse> >("responses");
+    QTest::addColumn<int>("pagesCount");
 
+    QTest::newRow("1 page")
+        << "pants"
+        << (QList<MockResponse>()
+                << MockResponse() << MockResponse().setResponseCode(404))
+        << 1;
+    QTest::newRow("3 page")
+        << "pants"
+        << (QList<MockResponse>()
+                << MockResponse() << MockResponse() << MockResponse()
+                << MockResponse().setResponseCode(404))
+        << 3;
 }
 
 void TestAsunaDatabase::addImageToAlbum()

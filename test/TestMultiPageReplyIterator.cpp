@@ -4,6 +4,7 @@
 
 #include "MultiPageReplyIterator.h"
 #include "TestMultiPageReplyIterator.h"
+#include "utils/MultiSignalSpy.h"
 #include "deps/QtMockWebServer/src/MockResponse.h"
 #include "deps/QtMockWebServer/src/QueueDispatcher.h"
 #include "deps/QtMockWebServer/src/RecordedRequest.h"
@@ -40,17 +41,10 @@ void TestMultiPageReplyIterator::gotPage()
         m_mockServer->getUrl(QString("/?page=%1").arg(pageStart)));
     QNetworkReply *reply = m_mgr.get(req);
     MultiPageReplyIterator iter(reply);
-    QSignalSpy gotPageSpy(&iter, SIGNAL(gotPage(QNetworkReply *)));
     QSignalSpy finishedSpy(&iter, SIGNAL(finished()));
 
-    int waitTimes = 0;
-    while (waitTimes < pagesCount + 1) {
-        gotPageSpy.wait(50);
-        waitTimes++;
-    }
-    QCOMPARE(gotPageSpy.count(), pagesCount);
-    QVERIFY2(m_mockServer->requestCount() >= pagesCount + 1,
-             "Not enough requests");
+    MultiSignalSpy gotPageSpy(&iter, SIGNAL(gotPage(QNetworkReply *)));
+    QVERIFY2(gotPageSpy.wait(pagesCount), "Did not get enough pages.");
 
     for (int i = 0; i < pagesCount; ++i) {
         RecordedRequest req = m_mockServer->takeRequest();

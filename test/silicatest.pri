@@ -6,7 +6,8 @@ SOURCES += \
     $$PWD/TestImageSource.cpp \
     $$PWD/TestLocalDatabase.cpp \
     $$PWD/TestMultiPageReplyIterator.cpp \
-    $$PWD/TestPlayList.cpp
+    $$PWD/TestPlayList.cpp \
+    $$PWD/utils/MultiSignalSpy.cpp
 
 HEADERS += \
     $$PWD/TestAsunaDatabase.h \
@@ -15,7 +16,8 @@ HEADERS += \
     $$PWD/TestImageSource.h \
     $$PWD/TestLocalDatabase.h \
     $$PWD/TestMultiPageReplyIterator.h \
-    $$PWD/TestPlayList.h
+    $$PWD/TestPlayList.h \
+    $$PWD/utils/MultiSignalSpy.h
 
 assets.files = $$PWD/assets/*
 assets.path = $$OUT_PWD/assets
