@@ -308,7 +308,6 @@ QSize SQLiteLocalDatabase::queryImageSize(Image *image)
     q.addBindValue(image->source()->hashStr());
 
     if (!q.exec() || !q.first()) {
-        qWarning() << q.lastError() << q.lastQuery();
         return Image::UNKNOWN_SIZE;
     } else {
         int width = q.value("width").toInt();
