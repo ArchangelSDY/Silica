@@ -1,2 +1,3 @@
 TEMPLATE=subdirs
-SUBDIRS=quazip
+SUBDIRS=quazip qztest
+qztest.depends = quazip
