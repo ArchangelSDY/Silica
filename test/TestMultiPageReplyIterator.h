@@ -4,7 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QObject>
 
-#include "deps/QtMockWebServer/src/QtMockWebServer.h"
+class QtMockWebServer;
 
 class TestMultiPageReplyIterator : public QObject
 {

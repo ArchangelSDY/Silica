@@ -2,8 +2,8 @@
 #include <QtSql>
 #include <QTest>
 
-#include "LocalDatabase.h"
-#include "Image.h"
+#include "../src/db/LocalDatabase.h"
+#include "../src/image/Image.h"
 
 #include "TestImage.h"
 

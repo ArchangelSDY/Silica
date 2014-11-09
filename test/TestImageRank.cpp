@@ -1,9 +1,9 @@
 #include <QtSql>
 #include <QTest>
 
-#include "Image.h"
-#include "ImageRank.h"
-#include "LocalDatabase.h"
+#include "../src/db/LocalDatabase.h"
+#include "../src/image/Image.h"
+#include "../src/image/ImageRank.h"
 
 #include "TestImageRank.h"
 

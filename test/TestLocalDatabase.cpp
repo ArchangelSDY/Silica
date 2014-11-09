@@ -1,11 +1,11 @@
 #include <QtSql>
 #include <QTest>
 
-#include "LocalDatabase.h"
-#include "LocalPlayListRecord.h"
-#include "PlayList.h"
-#include "PlayListRecord.h"
-#include "RemotePlayListRecord.h"
+#include "../src/db/LocalDatabase.h"
+#include "../src/db/LocalPlayListRecord.h"
+#include "../src/db/PlayListRecord.h"
+#include "../src/db/RemotePlayListRecord.h"
+#include "../src/PlayList.h"
 
 #include "TestLocalDatabase.h"
 

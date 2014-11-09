@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "AsunaDatabase.h"
-#include "deps/QtMockWebServer/src/QtMockWebServer.h"
+class AsunaDatabase;
+class QtMockWebServer;
 
 class TestAsunaDatabase : public QObject
 {

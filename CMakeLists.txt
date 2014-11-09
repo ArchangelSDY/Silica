@@ -5,6 +5,7 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Test REQUIRED)
 
 set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 # if there is no QT_ROOT, try to deduce it from Qt QtCore include
@@ -14,6 +15,7 @@ endif()
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 include_directories(${Qt5Sql_INCLUDE_DIRS})
+include_directories(${Qt5Test_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
 # All build libraries are moved to this directory
@@ -27,4 +29,6 @@ set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 add_subdirectory(src)
 
-# install(FILES DESTINATION ${CMAKE_ROOT}/Modules)
+enable_testing()
+add_subdirectory(test)
+add_test(silicatest test/silicatest)

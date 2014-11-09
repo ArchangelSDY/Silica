@@ -4,10 +4,12 @@
 #include <QSignalSpy>
 #include <QTest>
 
-#include "Image.h"
+#include "../src/image/Image.h"
+#include "../src/db/AsunaDatabase.h"
 #include "TestAsunaDatabase.h"
 #include "utils/MultiSignalSpy.h"
 #include "deps/QtMockWebServer/src/MockResponse.h"
+#include "deps/QtMockWebServer/src/QtMockWebServer.h"
 #include "deps/QtMockWebServer/src/RecordedRequest.h"
 
 Q_DECLARE_METATYPE(MockResponse)

@@ -2,12 +2,14 @@
 #include <QSignalSpy>
 #include <QTest>
 
-#include "MultiPageReplyIterator.h"
-#include "TestMultiPageReplyIterator.h"
-#include "utils/MultiSignalSpy.h"
+#include "../src/db/MultiPageReplyIterator.h"
 #include "deps/QtMockWebServer/src/MockResponse.h"
+#include "deps/QtMockWebServer/src/QtMockWebServer.h"
 #include "deps/QtMockWebServer/src/QueueDispatcher.h"
 #include "deps/QtMockWebServer/src/RecordedRequest.h"
+
+#include "TestMultiPageReplyIterator.h"
+#include "utils/MultiSignalSpy.h"
 
 Q_DECLARE_METATYPE(MockResponse)
 
