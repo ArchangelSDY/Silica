@@ -56,7 +56,7 @@ target_link_libraries(silica
 # We have to use our own Info.plist template to support Retina display.
 set_target_properties(silica
     PROPERTIES MACOSX_BUNDLE_INFO_PLIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.install
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.in
 )
 
 set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
