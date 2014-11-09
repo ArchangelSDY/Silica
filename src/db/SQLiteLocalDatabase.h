@@ -11,6 +11,7 @@ class SQLiteLocalDatabase : public LocalDatabase
     Q_OBJECT
 public:
     SQLiteLocalDatabase();
+    bool migrate();
 
     QList<PlayListRecord *> queryPlayListRecords();
     QStringList queryImageUrlsForLocalPlayListRecord(int playListId);

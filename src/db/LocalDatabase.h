@@ -14,6 +14,8 @@ class LocalDatabase : public QObject
 {
     Q_OBJECT
 public:
+    virtual bool migrate() = 0;
+
     virtual QList<PlayListRecord *> queryPlayListRecords() = 0;
     virtual QStringList queryImageUrlsForLocalPlayListRecord(int playListId) = 0;
     virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;

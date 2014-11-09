@@ -63,12 +63,13 @@ SQLiteLocalDatabase::SQLiteLocalDatabase()
         return;
     }
 
-    QtDBMigration migration(GlobalConfig::instance()->migrationConfigPath());
-    if (!migration.migrate()) {
-        qCritical() << "Fail to migrate local database!";
-    }
-
     m_db.exec(SQL_ENABLE_FOREIGN_KEYS);
+}
+
+bool SQLiteLocalDatabase::migrate()
+{
+    QtDBMigration migration(GlobalConfig::instance()->migrationConfigPath());
+    return migration.migrate();
 }
 
 QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()

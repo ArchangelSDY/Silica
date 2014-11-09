@@ -1,5 +1,8 @@
-#include "MainWindow.h"
 #include <QApplication>
+#include <QtGlobal>
+
+#include "LocalDatabase.h"
+#include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,6 +14,11 @@ int main(int argc, char *argv[])
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
                        QCoreApplication::applicationDirPath() + "/config");
+
+    if (!LocalDatabase::instance()->migrate()) {
+        qCritical("Fail to migrate database! Will exit now.");
+        return 1;
+    }
 
     QTextCodec *codec = QTextCodec::codecForName("utf8");
     QTextCodec::setCodecForLocale(codec);
