@@ -294,6 +294,8 @@ void MainWindow::promptToOpenImage()
             (*i).setScheme("zip");
         } else if ((*i).path().endsWith(".7z")) {
             (*i).setScheme("sevenz");
+        } else if ((*i).path().endsWith(".rar")) {
+            (*i).setScheme("rar");
         }
     }
 

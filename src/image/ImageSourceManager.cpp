@@ -4,6 +4,7 @@
 
 #include "ImageSourceManager.h"
 #include "LocalImageSourceFactory.h"
+#include "RARImageSourceFactory.h"
 #include "SevenzImageSourceFactory.h"
 #include "ZipImageSourceFactory.h"
 
@@ -13,8 +14,9 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
     QObject(parent)
 {
     registerFactory(new LocalImageSourceFactory());
-    registerFactory(new ZipImageSourceFactory());
+    registerFactory(new RARImageSourceFactory());
     registerFactory(new SevenzImageSourceFactory());
+    registerFactory(new ZipImageSourceFactory());
 }
 
 ImageSourceManager *ImageSourceManager::instance()

@@ -55,10 +55,11 @@ add_subdirectory(deps/QtMockWebServer)
 add_executable(silicatest ${SRCS})
 set_target_properties(silicatest PROPERTIES MACOSX_BUNDLE FALSE)
 target_link_libraries(silicatest
-    quazip
     qt7z
     qtdbmigration
     qtmockwebserver
+    qtrar
+    quazip
     Qt5::Core
     Qt5::Network
     Qt5::Sql

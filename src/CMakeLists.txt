@@ -11,9 +11,10 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/ui/hotspots
     ${CMAKE_CURRENT_SOURCE_DIR}/ui/renderers
     ${CMAKE_CURRENT_SOURCE_DIR}/util
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/quazip/quazip
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/Qt7z/Qt7z
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/QtDBMigration/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/quazip/quazip
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/QtRAR/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -38,15 +39,17 @@ qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
-add_subdirectory(deps/Qt7z)
 add_subdirectory(deps/quazip)
+add_subdirectory(deps/Qt7z)
+add_subdirectory(deps/QtRAR)
 add_subdirectory(deps/QtDBMigration)
 
 add_executable(silica ${SRCS})
 target_link_libraries(silica
-    quazip
     qt7z
+    qtrar
     qtdbmigration
+    quazip
     Qt5::Core
     Qt5::Network
     Qt5::Sql
