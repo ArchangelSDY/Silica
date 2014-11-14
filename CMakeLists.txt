@@ -31,4 +31,4 @@ add_subdirectory(src)
 
 enable_testing()
 add_subdirectory(test)
-add_test(silicatest test/silicatest)
+add_test(NAME silicatest COMMAND silicatest WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test)

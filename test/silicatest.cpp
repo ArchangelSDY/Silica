@@ -2,6 +2,7 @@
 #include <QTest>
 #include <QTextCodec>
 
+#include "LocalDatabase.h"
 #include "TestLocalDatabase.h"
 #include "TestAsunaDatabase.h"
 #include "TestImage.h"
@@ -16,6 +17,11 @@ int main(int argc, char **argv)
 
     QTextCodec *codec = QTextCodec::codecForName("utf8");
     QTextCodec::setCodecForLocale(codec);
+
+    if (!LocalDatabase::instance()->migrate()) {
+        qCritical("Fail to migrate database! Will exit now.");
+        return 1;
+    }
 
     int err = 0;
     {

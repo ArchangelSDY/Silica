@@ -23,7 +23,7 @@ void TestImage::cleanup()
     db.exec("delete from images");
     db.exec("delete from image_hotspots");
     db.close();
-    QSqlDatabase::removeDatabase("test");
+    QSqlDatabase::removeDatabase("TestImage");
 }
 
 void TestImage::loadThumbnail()
