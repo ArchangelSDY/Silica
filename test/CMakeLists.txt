@@ -49,6 +49,8 @@ qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
+add_library(silicafortest STATIC ${EXTERNAL_SRCS})
+
 add_subdirectory(deps/QtMockWebServer)
 
 file(
@@ -86,8 +88,8 @@ foreach(TEST_FILE ${TEST_FILES})
 
     get_filename_component(TEST_TARGET ${TEST_FILE} NAME_WE)
 
-    add_executable(${TEST_TARGET} ${TEST_FILE} ${EXTERNAL_SRCS})
+    add_executable(${TEST_TARGET} ${TEST_FILE})
     set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
-    target_link_libraries(${TEST_TARGET} ${TEST_LINK_LIBRARIES})
+    target_link_libraries(${TEST_TARGET} ${TEST_LINK_LIBRARIES} silicafortest)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endforeach(TEST_FILE)
