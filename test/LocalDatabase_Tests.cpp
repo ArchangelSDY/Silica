@@ -7,10 +7,28 @@
 #include "../src/db/RemotePlayListRecord.h"
 #include "../src/PlayList.h"
 
-#include "TestLocalDatabase.h"
+class TestLocalDatabase : public QObject
+{
+    Q_OBJECT
+private slots:
+    void initTestCase();
+
+    void localPlayListsSaveAndLoad();
+    void localPlayListsSaveAndLoad_data();
+    void playListRemove();
+    void playListUpdate();
+    void insertImagesToPlayList();
+    void removeImagesFromPlayList();
+
+    void insertImage();
+    void insertImage_data();
+};
 
 void TestLocalDatabase::initTestCase()
 {
+    QVERIFY2(LocalDatabase::instance()->migrate(),
+             "Fail to migrate database");
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
     db.setDatabaseName("local.db");
     db.open();
@@ -209,3 +227,6 @@ void TestLocalDatabase::insertImage_data()
     QTest::newRow("Basic")
         << QUrl("file://" + currentDir + "/assets/insert_image.jpg");
 }
+
+QTEST_MAIN(TestLocalDatabase)
+ #include "LocalDatabase_Tests.moc"

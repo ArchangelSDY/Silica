@@ -5,7 +5,23 @@
 #include "../src/image/Image.h"
 #include "../src/image/ImageRank.h"
 
-#include "TestImageRank.h"
+class TestImageRank : public QObject
+{
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void cleanup();
+    void saveAndLoad();
+    void saveAndLoad_data();
+    void upDownVote();
+    void upDownVote_data();
+};
+
+void TestImageRank::initTestCase()
+{
+    QVERIFY2(LocalDatabase::instance()->migrate(),
+             "Fail to migrate database");
+}
 
 void TestImageRank::cleanup()
 {
@@ -98,3 +114,6 @@ void TestImageRank::upDownVote_data()
         << ImageRank::MIN_VALUE + 1
         << ImageRank::MIN_VALUE;
 }
+
+QTEST_MAIN(TestImageRank)
+ #include "ImageRank_Tests.moc"

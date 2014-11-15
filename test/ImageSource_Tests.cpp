@@ -5,7 +5,17 @@
 #include "../src/image/ImageSource.h"
 #include "../src/image/ImageSourceManager.h"
 
-#include "TestImageSource.h"
+class TestImageSource : public QObject
+{
+    Q_OBJECT
+private slots:
+    void openAndClose();
+    void openAndClose_data();
+    void properties();
+    void properties_data();
+    void copy();
+    void copy_data();
+};
 
 void TestImageSource::openAndClose()
 {
@@ -91,3 +101,6 @@ void TestImageSource::copy_data()
     QTest::newRow("Local Source")
         << QUrl("file:///" + currentDir + "/assets/me.jpg");
 }
+
+QTEST_MAIN(TestImageSource)
+ #include "ImageSource_Tests.moc"

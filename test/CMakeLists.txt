@@ -25,7 +25,7 @@ include_directories(
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB SRCS
+file(GLOB EXTERNAL_SRCS
     "../src/GlobalConfig.cpp"
     "../src/MainWindow.cpp"
     "../src/Navigator.cpp"
@@ -39,7 +39,6 @@ file(GLOB SRCS
     "../src/ui/*.cpp"
     "../src/ui/hotspots/*.cpp"
     "../src/ui/renderers/*.cpp"
-    "*.cpp"
     "utils/*.cpp"
 )
 
@@ -48,13 +47,20 @@ file(GLOB RESOURCES "../src/*.qrc")
 
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
-set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
+set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
 add_subdirectory(deps/QtMockWebServer)
 
-add_executable(silicatest ${SRCS})
-set_target_properties(silicatest PROPERTIES MACOSX_BUNDLE FALSE)
-target_link_libraries(silicatest
+file(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+)
+file(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/../src/assets/migration.json
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+)
+
+set(TEST_LINK_LIBRARIES
     qt7z
     qtdbmigration
     qtmockwebserver
@@ -67,33 +73,21 @@ target_link_libraries(silicatest
     Qt5::Widgets
 )
 
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
-)
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/../src/assets/migration.json
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
-)
+set(TEST_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+string(LENGTH ${TEST_ROOT_DIRECTORY} TEST_ROOT_DIRECTORY_LENGTH)
+math(EXPR TEST_ROOT_DIRECTORY_LENGTH "${TEST_ROOT_DIRECTORY_LENGTH} + 1")
 
-# set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-# install(TARGETS silica BUNDLE DESTINATION ${RUNTIME_DESTINATION} RUNTIME DESTINATION ${RUNTIME_DESTINATION})
-# 
-# # Default config file
-# set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini)
-# if (APPLE)
-#     install(FILES ${SILICA_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/silica.app/Contents/MacOS/config/Asuna)
-# else ()
-#     install(FILES ${SILICA_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/config/Asuna)
-# endif()
-# 
-# # Database migration config
-# set(SILICA_MIGRATION_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/migration.json)
-# if (APPLE)
-#     install(FILES ${SILICA_MIGRATION_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/silica.app/Contents/MacOS)
-# else ()
-#     install(FILES ${SILICA_MIGRATION_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-# endif()
+file(GLOB TEST_FILES *_Tests.cpp)
+foreach(TEST_FILE ${TEST_FILES})
+    string(SUBSTRING ${TEST_FILE} ${TEST_ROOT_DIRECTORY_LENGTH} -1 TEST_FILE_RELATIVE)
+    string(LENGTH ${TEST_FILE_RELATIVE} TEST_FILE_RELATIVE_LENGTH)
+    math(EXPR TEST_NAME_LENGTH "${TEST_FILE_RELATIVE_LENGTH} - 4")
+    string(SUBSTRING ${TEST_FILE_RELATIVE} 0 ${TEST_NAME_LENGTH} TEST_NAME)
 
-# install(FILES DESTINATION)
-# install(TARGETS silica LIBRARY DESTINATION ${LIB_DESTINATION} ARCHIVE DESTINATION ${LIB_DESTINATION} RUNTIME DESTINATION ${LIB_DESTINATION})
+    get_filename_component(TEST_TARGET ${TEST_FILE} NAME_WE)
+
+    add_executable(${TEST_TARGET} ${TEST_FILE} ${EXTERNAL_SRCS})
+    set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
+    target_link_libraries(${TEST_TARGET} ${TEST_LINK_LIBRARIES})
+    add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+endforeach(TEST_FILE)

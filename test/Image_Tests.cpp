@@ -5,7 +5,24 @@
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
 
-#include "TestImage.h"
+class TestImage : public QObject
+{
+    Q_OBJECT
+private slots:
+    void initTestCase();
+    void init();
+    void cleanup();
+    void loadThumbnail();
+    void loadThumbnail_data();
+    void hotspots();
+    void hotspots_data();
+};
+
+void TestImage::initTestCase()
+{
+    QVERIFY2(LocalDatabase::instance()->migrate(),
+             "Fail to migrate database");
+}
 
 void TestImage::init()
 {
@@ -82,3 +99,6 @@ void TestImage::hotspots_data()
         << QUrl("file://" + currentDir + "/assets/me.jpg")
         << (QList<QRect>() << QRect(0, 0, 10, 10) << QRect(10, 10, 20, 20));
 }
+
+QTEST_MAIN(TestImage)
+ #include "Image_Tests.moc"

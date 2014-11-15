@@ -8,7 +8,24 @@
 #include "../src/playlist/MinRankFilter.h"
 #include "../src/playlist/NotEqualRankFilter.h"
 
-#include "TestPlayList.h"
+class TestPlayList : public QObject
+{
+    Q_OBJECT
+private slots:
+    void initTestCase();
+
+    void sortByName();
+    void sortByName_data();
+
+    void sortByAspectRatio();
+    void sortByAspectRatio_data();
+
+    void setFilter();
+    void setFilter_data();
+
+private:
+    QTemporaryDir m_tmpDir;
+};
 
 Q_DECLARE_METATYPE(AbstractPlayListFilter *)
 
@@ -240,3 +257,6 @@ void TestPlayList::setFilter_data()
         << 3
         << 0;
 }
+
+QTEST_MAIN(TestPlayList)
+ #include "PlayList_Tests.moc"

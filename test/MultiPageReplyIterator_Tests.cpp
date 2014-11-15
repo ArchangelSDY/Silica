@@ -8,8 +8,21 @@
 #include "deps/QtMockWebServer/src/QueueDispatcher.h"
 #include "deps/QtMockWebServer/src/RecordedRequest.h"
 
-#include "TestMultiPageReplyIterator.h"
 #include "utils/MultiSignalSpy.h"
+
+class TestMultiPageReplyIterator : public QObject
+{
+    Q_OBJECT
+private slots:
+    void init();
+    void cleanup();
+    void gotPage();
+    void gotPage_data();
+
+private:
+    QtMockWebServer *m_mockServer;
+    QNetworkAccessManager m_mgr;
+};
 
 Q_DECLARE_METATYPE(MockResponse)
 
@@ -84,3 +97,6 @@ void TestMultiPageReplyIterator::gotPage_data()
                 << MockResponse().setStatus("404"))
         << 3;
 }
+
+QTEST_MAIN(TestMultiPageReplyIterator)
+ #include "MultiPageReplyIterator_Tests.moc"
