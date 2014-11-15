@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
 #include <QSettings>
 
 #include "GlobalConfig.h"
@@ -22,8 +23,25 @@ GlobalConfig *GlobalConfig::instance()
 
 void GlobalConfig::load()
 {
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+#ifdef Q_OS_OSX
+    QString baseConfigDir = qApp->applicationDirPath() + "/../Resources";
+    if (!QFile::exists(baseConfigDir)) {
+        baseConfigDir = qApp->applicationDirPath();
+    }
+#else
+    QString baseConfigDir = qApp->applicationDirPath();
+#endif
+
+    // Init config path
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                       baseConfigDir + "/config");
     QSettings settings;
     qDebug() << "Config: " << settings.fileName();
+    if (!QFile::exists(settings.fileName())) {
+        qDebug() << "Config does not exist. Init with a default one.";
+        QFile::copy(settings.fileName() + ".default", settings.fileName());
+    }
 
     // Zip dirs
     int size = settings.beginReadArray("ZipDirs");
@@ -40,10 +58,10 @@ void GlobalConfig::load()
     qDebug() << "WallpaperDir: " << m_wallpaperDir;
 
     // Local database path
-    m_localDatabasePath = qApp->applicationDirPath() + "/local.db";
+    m_localDatabasePath = baseConfigDir + "/local.db";
 
     // Migration config path
-    m_migrationConfigPath = qApp->applicationDirPath() + "/migration.json";
+    m_migrationConfigPath = ":/assets/migration.json";
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);

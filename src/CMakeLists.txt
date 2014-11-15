@@ -56,30 +56,46 @@ target_link_libraries(silica
     Qt5::Widgets
 )
 
-# We have to use our own Info.plist template to support Retina display.
-set_target_properties(silica
-    PROPERTIES MACOSX_BUNDLE_INFO_PLIST
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.in
-)
-
-set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(TARGETS silica BUNDLE DESTINATION ${RUNTIME_DESTINATION} RUNTIME DESTINATION ${RUNTIME_DESTINATION})
-
-# Default config file
-set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini)
 if (APPLE)
-    install(FILES ${SILICA_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/silica.app/Contents/MacOS/config/Asuna)
+
+    # We have to use our own Info.plist template to support Retina display.
+    set_target_properties(silica
+        PROPERTIES MACOSX_BUNDLE_INFO_PLIST
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.in
+    )
+
+    set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX})
+    install(TARGETS silica
+        BUNDLE DESTINATION ${RUNTIME_DESTINATION}
+        RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+    )
+
+
 else ()
-    install(FILES ${SILICA_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/config/Asuna)
+
+    set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+    install(TARGETS silica
+        RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+    )
+
 endif()
 
-# Database migration config
-set(SILICA_MIGRATION_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/migration.json)
+set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini.default)
+install(FILES ${SILICA_CONFIG} DESTINATION ./config/Asuna)
+
+
+set(CPACK_GENERATOR "Bundle")
+set(CPACK_PACKAGE_EXECUTABLES "silica;Silica")
+
 if (APPLE)
-    install(FILES ${SILICA_MIGRATION_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/silica.app/Contents/MacOS)
-else ()
-    install(FILES ${SILICA_MIGRATION_CONFIG} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+
+    set(CPACK_BUNDLE_STARTUP_COMMAND "src/silica")
+    set(CPACK_BUNDLE_NAME "silica")
+    set(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/Info.plist)
+    set(CPACK_BUNDLE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/logo.icns)
+
+else()
+
 endif()
 
-# install(FILES DESTINATION)
-# install(TARGETS silica LIBRARY DESTINATION ${LIB_DESTINATION} ARCHIVE DESTINATION ${LIB_DESTINATION} RUNTIME DESTINATION ${LIB_DESTINATION})
+include(CPack)

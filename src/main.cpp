@@ -11,10 +11,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Asuna");
     QCoreApplication::setApplicationName("Silica");
 
-    QSettings::setDefaultFormat(QSettings::IniFormat);
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                       QCoreApplication::applicationDirPath() + "/config");
-
     if (!LocalDatabase::instance()->migrate()) {
         qCritical("Fail to migrate database! Will exit now.");
         return 1;

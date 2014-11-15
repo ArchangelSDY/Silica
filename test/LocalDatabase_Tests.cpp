@@ -26,6 +26,7 @@ private slots:
 
 void TestLocalDatabase::initTestCase()
 {
+    Q_INIT_RESOURCE(silica);
     QVERIFY2(LocalDatabase::instance()->migrate(),
              "Fail to migrate database");
 
