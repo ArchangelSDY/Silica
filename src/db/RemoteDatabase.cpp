@@ -2,6 +2,7 @@
 #include <QNetworkConfiguration>
 
 #include "AsunaDatabase.h"
+#include "GlobalConfig.h"
 #include "RemoteDatabase.h"
 
 RemoteDatabase *RemoteDatabase::s_instance = 0;
@@ -17,8 +18,7 @@ RemoteDatabase *RemoteDatabase::instance()
 
 RemoteDatabase::RemoteDatabase()
 {
-    m_cache.setCacheDirectory(
-        QCoreApplication::applicationDirPath() + "/netcache");
+    m_cache.setCacheDirectory(GlobalConfig::instance()->netCachePath());
     m_manager.setCache(&m_cache);
 }
 

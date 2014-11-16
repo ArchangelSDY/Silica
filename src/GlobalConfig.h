@@ -15,6 +15,7 @@ public:
     const QString &localDatabasePath() const { return m_localDatabasePath; }
     const QString &migrationConfigPath() const { return m_migrationConfigPath; }
     const QString &thumbnailPath() const { return m_thumbnailPath; }
+    const QString &netCachePath() const { return m_netCachePath; }
     const QSize &galleryItemSize() const { return m_galleryItemSize; }
 private:
     GlobalConfig();
@@ -27,6 +28,7 @@ private:
     QString m_localDatabasePath;
     QString m_migrationConfigPath;
     QString m_thumbnailPath;
+    QString m_netCachePath;
     QSize m_galleryItemSize;
 };
 

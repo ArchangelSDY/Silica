@@ -25,17 +25,17 @@ void GlobalConfig::load()
 {
     QSettings::setDefaultFormat(QSettings::IniFormat);
 #ifdef Q_OS_OSX
-    QString baseConfigDir = qApp->applicationDirPath() + "/../Resources";
-    if (!QFile::exists(baseConfigDir)) {
-        baseConfigDir = qApp->applicationDirPath();
+    QString baseDir = qApp->applicationDirPath() + "/../Resources";
+    if (!QFile::exists(baseDir)) {
+        baseDir = qApp->applicationDirPath();
     }
 #else
-    QString baseConfigDir = qApp->applicationDirPath();
+    QString baseDir = qApp->applicationDirPath();
 #endif
 
     // Init config path
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                       baseConfigDir + "/config");
+                       baseDir + "/config");
     QSettings settings;
     qDebug() << "Config: " << settings.fileName();
     if (!QFile::exists(settings.fileName())) {
@@ -58,13 +58,16 @@ void GlobalConfig::load()
     qDebug() << "WallpaperDir: " << m_wallpaperDir;
 
     // Local database path
-    m_localDatabasePath = baseConfigDir + "/local.db";
+    m_localDatabasePath = baseDir + "/local.db";
 
     // Migration config path
     m_migrationConfigPath = ":/assets/migration.json";
 
     // Thumbnail path
-    m_thumbnailPath = baseConfigDir + "/thumbnails";
+    m_thumbnailPath = baseDir + "/thumbnails";
+
+    // Network cache path
+    m_netCachePath = baseDir + "/netcache";
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
