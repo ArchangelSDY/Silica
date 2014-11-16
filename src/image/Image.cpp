@@ -8,12 +8,12 @@
 
 #include <quazipfile.h>
 
+#include "GlobalConfig.h"
 #include "LocalDatabase.h"
 #include "Image.h"
 #include "ImageRank.h"
 #include "ImageSourceManager.h"
 
-static const QString THUMBNAIL_FOLDER = "thumbnails";
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
@@ -282,13 +282,12 @@ void Image::computeThumbnailPath()
         QString name = hash.mid(2);
 
         QStringList pathParts;
-        pathParts << QCoreApplication::applicationDirPath()
-                  << THUMBNAIL_FOLDER << sub << name;
+        pathParts << GlobalConfig::instance()->thumbnailPath() << sub << name;
         m_thumbnailPath = pathParts.join(QDir::separator());
 
         QDir dir;
-        dir.mkpath(QCoreApplication::applicationDirPath() + QDir::separator() +
-                   THUMBNAIL_FOLDER + QDir::separator() + sub);
+        dir.mkpath(GlobalConfig::instance()->thumbnailPath() +
+                   QDir::separator() + sub);
     }
 }
 

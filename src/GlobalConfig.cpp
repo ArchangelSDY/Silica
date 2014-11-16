@@ -63,6 +63,9 @@ void GlobalConfig::load()
     // Migration config path
     m_migrationConfigPath = ":/assets/migration.json";
 
+    // Thumbnail path
+    m_thumbnailPath = baseConfigDir + "/thumbnails";
+
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
 
