@@ -64,12 +64,14 @@ if (APPLE)
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.in
     )
 
-    set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX})
-    install(TARGETS silica
-        BUNDLE DESTINATION ${RUNTIME_DESTINATION}
-        RUNTIME DESTINATION ${RUNTIME_DESTINATION}
-    )
-
+    # Do not install executable if PACK_BUNDLE defined, or executable will
+    # be packed into Resources too.
+    if (NOT PACK_BUNDLE)
+        install(TARGETS silica
+            BUNDLE DESTINATION .
+            RUNTIME DESTINATION .
+        )
+    endif()
 
 else ()
 
@@ -84,11 +86,11 @@ set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini.default)
 install(FILES ${SILICA_CONFIG} DESTINATION ./config/Asuna)
 
 
-set(CPACK_GENERATOR "Bundle")
 set(CPACK_PACKAGE_EXECUTABLES "silica;Silica")
 
 if (APPLE)
 
+    set(CPACK_GENERATOR "Bundle")
     set(CPACK_BUNDLE_STARTUP_COMMAND "src/silica")
     set(CPACK_BUNDLE_NAME "silica")
     set(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/Info.plist)
