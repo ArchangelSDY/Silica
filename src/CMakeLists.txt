@@ -85,19 +85,15 @@ endif()
 set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini.default)
 install(FILES ${SILICA_CONFIG} DESTINATION ./config/Asuna)
 
-
+set(CPACK_GENERATOR "TGZ;ZIP")
 set(CPACK_PACKAGE_EXECUTABLES "silica;Silica")
 
 if (APPLE)
-
-    set(CPACK_GENERATOR "Bundle")
+    set(CPACK_GENERATOR "${CPACK_GENERATOR};Bundle")
     set(CPACK_BUNDLE_STARTUP_COMMAND "src/silica")
     set(CPACK_BUNDLE_NAME "silica")
     set(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/Info.plist)
     set(CPACK_BUNDLE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/logo.icns)
-
-else()
-
 endif()
 
 include(CPack)
