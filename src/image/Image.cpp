@@ -231,8 +231,10 @@ void Image::loadThumbnail(bool makeImmediately)
 
     m_isLoadingThumbnail = true;
 
+    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
+        QDir::separator() + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
-        new LoadThumbnailTask(m_thumbnailPath, makeImmediately);
+        new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
     connect(loadThumbnailTask, SIGNAL(loaded(QImage *, bool)),
             this, SLOT(thumbnailReaderFinished(QImage *, bool)));
     QThreadPool::globalInstance()->reserveThread();
@@ -250,8 +252,10 @@ void Image::makeThumbnail()
 
     m_isMakingThumbnail = true;
 
+    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
+        QDir::separator() + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
-        new MakeThumbnailTask(new QImage(*m_image), m_thumbnailPath);
+        new MakeThumbnailTask(new QImage(*m_image), thumbnailFullPath);
     connect(makeThumbnailTask, SIGNAL(thumbnailMade(QImage*)),
             this, SLOT(thumbnailMade(QImage*)));
     QThreadPool::globalInstance()->reserveThread();
@@ -281,8 +285,7 @@ void Image::computeThumbnailPath()
         QString sub = hash.left(2);
         QString name = hash.mid(2);
 
-        QStringList pathParts;
-        pathParts << GlobalConfig::instance()->thumbnailPath() << sub << name;
+        QStringList pathParts = QStringList() << sub << name;
         m_thumbnailPath = pathParts.join(QDir::separator());
 
         QDir dir;

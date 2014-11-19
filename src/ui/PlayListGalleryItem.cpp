@@ -1,3 +1,4 @@
+#include <QDir>
 #include <QGraphicsScene>
 #include <QPainter>
 
@@ -40,7 +41,10 @@ void PlayListGalleryItem::loadThumbnail()
     if (m_thumbnail) {
         delete m_thumbnail;
     }
-    m_thumbnail = new QImage(m_record->coverPath());
+
+    QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
+        QDir::separator() + m_record->coverPath();
+    m_thumbnail = new QImage(coverFullPath);
     if (m_thumbnail->isNull()) {
         m_thumbnail->load(":/res/album.png");
     }
