@@ -1,3 +1,5 @@
+#include <QRegExp>
+
 #include "ImageSourceManager.h"
 #include "PlayList.h"
 
@@ -89,6 +91,40 @@ void PlayList::watchedPlayListAppended(int start)
 static bool imageNameLessThan(const QSharedPointer<Image> &left,
                               const QSharedPointer<Image> &right)
 {
+    static QRegExp numberRegex("(\\d+)");
+
+    if (left->name().split(numberRegex) == right->name().split(numberRegex)) {
+        // Names are similar except number parts
+
+        // Extract number parts from left
+        numberRegex.indexIn(left->name());
+        QStringList leftNumberStrs = numberRegex.capturedTexts();
+        QList<int> leftNumbers;
+        foreach (const QString &str, leftNumberStrs) {
+            leftNumbers << str.toInt();
+        }
+
+        // Extract number parts from right
+        numberRegex.indexIn(right->name());
+        QStringList rightNumberStrs = numberRegex.capturedTexts();
+        QList<int> rightNumbers;
+        foreach (const QString &str, rightNumberStrs) {
+            rightNumbers << str.toInt();
+        }
+
+        int len = qMin(leftNumbers.length(), rightNumbers.length());
+        if (len > 0) {
+            // Compare using first different number
+            for (int i = 0; i < len; ++i) {
+                int delta = rightNumbers[i] - leftNumbers[i];
+                if (delta != 0) {
+                    return delta > 0;
+                }
+            }
+        }
+    }
+
+    // Fallback to string comparison
     return left->name() < right->name();
 }
 
