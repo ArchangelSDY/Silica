@@ -242,9 +242,14 @@ void MainWindow::loadSelectedPlayList()
         const QList<QGraphicsItem *> &galleryItems =
             ui->gallery->scene()->items(Qt::AscendingOrder);
         if (coverIndex >= 0 && coverIndex < galleryItems.count()) {
-            QGraphicsItem *coverImageItem = galleryItems.at(coverIndex);
+            GalleryItem *coverImageItem =
+                static_cast<GalleryItem *>(galleryItems.at(coverIndex));
             ui->gallery->scene()->clearSelection();
-            coverImageItem->setSelected(true);
+
+            // This has to be async because QGraphicsItem::setSelected() will
+            // have no effect if item is not visible while our item will remain
+            // hide until thumbnail loaded.
+            coverImageItem->scheduleSelectedAfterShown();
         }
     }
 }

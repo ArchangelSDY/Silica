@@ -21,13 +21,21 @@ public:
      */
     virtual bool isReadyToShow();
 
+    /**
+     * @brief Make this item selected after shown.
+     */
+    void scheduleSelectedAfterShown();
+
 protected:
+    virtual QVariant itemChange(GraphicsItemChange change,
+                                const QVariant &value);
     void setRenderer(AbstractGalleryItemRenderer *renderer);
 
     AbstractRendererFactory *m_rendererFactory;
     AbstractGalleryItemRenderer *m_renderer;
     QImage *m_thumbnail;
     bool m_isReadyToShow;
+    bool m_selectedAfterShownScheduled;
 };
 
 #endif // GALLERYITEM_H

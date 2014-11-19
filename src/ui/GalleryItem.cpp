@@ -1,3 +1,5 @@
+#include <QVariant>
+
 #include "GalleryItem.h"
 
 GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
@@ -5,7 +7,8 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     QGraphicsItem(parent) ,
     m_rendererFactory(rendererFactory) ,
     m_renderer(0) ,
-    m_thumbnail(0)
+    m_thumbnail(0) ,
+    m_selectedAfterShownScheduled(false)
 {
     // Hide until thumbnail is ready.
     // It will show during next view layout after thumbnail is loaded
@@ -38,4 +41,21 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 bool GalleryItem::isReadyToShow()
 {
     return m_thumbnail && !m_thumbnail->isNull();
+}
+
+void GalleryItem::scheduleSelectedAfterShown()
+{
+    m_selectedAfterShownScheduled = true;
+}
+
+QVariant GalleryItem::itemChange(GraphicsItemChange change,
+                                 const QVariant &value)
+{
+    if (change == ItemVisibleHasChanged) {
+        if (value.toBool() && m_selectedAfterShownScheduled) {
+            setSelected(true);
+            m_selectedAfterShownScheduled = false;
+        }
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
