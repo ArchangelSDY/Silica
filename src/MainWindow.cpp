@@ -1,6 +1,8 @@
 #include <QDesktopWidget>
+#include <QDir>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGraphicsPixmapItem>
 #include <QInputDialog>
 #include <QMenuBar>
@@ -278,10 +280,12 @@ void MainWindow::processCommandLineOptions()
 
 void MainWindow::promptToOpenImage()
 {
-    QString defaultDir;
-    const QList<QString> &zipDirs = GlobalConfig::instance()->zipDirs();
-    if (zipDirs.count() > 0) {
-        defaultDir = zipDirs[0];
+    static QString defaultDir;
+    if (defaultDir.isEmpty()) {
+        const QList<QString> &zipDirs = GlobalConfig::instance()->zipDirs();
+        if (zipDirs.count() > 0) {
+            defaultDir = zipDirs[0];
+        }
     }
 
     QList<QUrl> images = QFileDialog::getOpenFileUrls(
@@ -291,6 +295,10 @@ void MainWindow::promptToOpenImage()
     if (images.count() == 0) {
         return;
     }
+
+    // Record dir for next open
+    QFileInfo firstFileInfo(images[0].toLocalFile());
+    defaultDir = firstFileInfo.absoluteDir().path();
 
     // Hack for zip and 7z
     // FIXME: Better way to handle this?
