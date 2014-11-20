@@ -56,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->graphicsView, SLOT(paint(Image *)));
     connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
             ui->graphicsView, SLOT(paintThumbnail(Image *)));
+    connect(m_navigator, SIGNAL(paint(Image *)),
+            ui->sideView, SLOT(paint(Image *)));
+    connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
+            ui->sideView, SLOT(paintThumbnail(Image *)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -179,6 +183,8 @@ void MainWindow::setupExtraUi()
             m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageGallery->layout()->setMargin(0);
+    ui->pageGallery->layout()->setSpacing(0);
+    ui->sideView->hide();
     connect(ui->gallery, SIGNAL(enterItem()),
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
@@ -542,6 +548,11 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             case Qt::Key_G:
                 switchViews();
+                break;
+            case Qt::Key_Backslash:
+                ui->sideView->isVisible() ?
+                    ui->sideView->hide() :
+                    ui->sideView->show();
                 break;
             case Qt::Key_T: {
                 QDockWidget *sidebar = ui->sidebar;
