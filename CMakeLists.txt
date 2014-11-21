@@ -1,6 +1,7 @@
 project (silica)
 cmake_minimum_required(VERSION 2.8.11)
 
+find_package(Threads)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)

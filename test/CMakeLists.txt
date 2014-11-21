@@ -50,6 +50,18 @@ qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
 add_library(silicafortest STATIC ${EXTERNAL_SRCS})
+set(SILICAFORTEST_LINK_LIBRARIES
+    ${CMAKE_THREAD_LIBS_INIT}
+    qt7z
+    qtdbmigration
+    qtrar
+    quazip
+    Qt5::Core
+    Qt5::Network
+    Qt5::Sql
+    Qt5::Widgets
+)
+target_link_libraries(silicafortest ${SILICAFORTEST_LINK_LIBRARIES})
 
 add_subdirectory(deps/QtMockWebServer)
 
@@ -63,16 +75,8 @@ file(
 )
 
 set(TEST_LINK_LIBRARIES
-    qt7z
-    qtdbmigration
     qtmockwebserver
-    qtrar
-    quazip
-    Qt5::Core
-    Qt5::Network
-    Qt5::Sql
     Qt5::Test
-    Qt5::Widgets
 )
 
 set(TEST_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})

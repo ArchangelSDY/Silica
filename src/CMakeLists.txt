@@ -46,6 +46,7 @@ add_subdirectory(deps/QtDBMigration)
 
 add_executable(silica ${SRCS})
 target_link_libraries(silica
+    ${CMAKE_THREAD_LIBS_INIT}
     qt7z
     qtrar
     qtdbmigration
