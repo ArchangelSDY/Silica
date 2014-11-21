@@ -19,6 +19,9 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
 ImageGalleryView::~ImageGalleryView()
 {
     delete m_rendererFactory;
+    if (m_rankFilterMenuManager) {
+        delete m_rankFilterMenuManager;
+    }
 }
 
 void ImageGalleryView::setPlayList(PlayList *playList)
