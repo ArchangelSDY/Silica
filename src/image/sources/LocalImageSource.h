@@ -6,7 +6,7 @@
 class LocalImageSource : public ImageSource
 {
 public:
-    LocalImageSource(QString path);
+    LocalImageSource(ImageSourceFactory *factory, QString path);
 
     virtual bool open();
 

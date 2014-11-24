@@ -9,6 +9,11 @@
 #include "GlobalConfig.h"
 #include "ImageSource.h"
 
+ImageSource::ImageSource(ImageSourceFactory *factory) :
+    m_factory(factory)
+{
+}
+
 ImageSource::~ImageSource()
 {
     m_device.clear();

@@ -5,6 +5,8 @@
 #include <QSharedPointer>
 #include <QUrl>
 
+#include "ImageSourceFactory.h"
+
 class ImageSource
 {
 public:
@@ -27,10 +29,15 @@ public:
     }
 
 protected:
-    ImageSource() {}
+    ImageSource(ImageSourceFactory *factory);
 
     QString searchRealPath(QString path);
+    inline bool requestPassword(QByteArray password)
+    {
+        return m_factory->requestPassword(password);
+    }
 
+    ImageSourceFactory *m_factory;
     QString m_name;
     QByteArray m_hash;
     QUrl m_url;

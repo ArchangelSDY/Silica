@@ -3,13 +3,16 @@
 
 #include <QObject>
 
-#include "ImageSource.h"
+class ImageSource;
+class ImageSourceManager;
 
 class ImageSourceFactory : public QObject
 {
+    friend class ImageSource;
+
     Q_OBJECT
 public:
-    explicit ImageSourceFactory(QObject *parent = 0);
+    explicit ImageSourceFactory(ImageSourceManager *m_mgr, QObject *parent = 0);
 
     virtual QString name() const = 0;
     virtual QString fileNamePattern() const = 0;
@@ -20,6 +23,11 @@ public:
     virtual QList<ImageSource *> createMultiple(const QString &path) = 0;
 
     virtual void clearCache() {}
+
+protected:
+    bool requestPassword(QByteArray &password);
+
+    ImageSourceManager *m_mgr;
 };
 
 #endif // IMAGESOURCEFACTORY_H

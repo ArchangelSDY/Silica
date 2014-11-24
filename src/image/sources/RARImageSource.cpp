@@ -1,12 +1,20 @@
+#include <QByteArray>
 #include <QCryptographicHash>
 #include <QTextStream>
+#include <QDebug>
 
+#include "deps/QtRAR/src/qtrar.h"
 #include "deps/QtRAR/src/qtrarfile.h"
+#include "deps/QtRAR/src/qtrarfileinfo.h"
 
 #include "RARImageSource.h"
 
-RARImageSource::RARImageSource(const QString &arcPath,
-                               const QString &imageName)
+RARImageSource::RARImageSource(ImageSourceFactory *factory,
+                               const QString &arcPath,
+                               const QString &imageName,
+                               const QByteArray &password) :
+    ImageSource(factory) ,
+    m_password(password)
 {
     m_arcPath = searchRealPath(arcPath);
     m_name = imageName;
@@ -25,8 +33,27 @@ RARImageSource::RARImageSource(const QString &arcPath,
 
 bool RARImageSource::open()
 {
-    m_device.reset(new QtRARFile(m_arcPath, m_name));
-    return m_device->open(QIODevice::ReadOnly);
+    QtRARFile *file = new QtRARFile(m_arcPath, m_name);
+    bool ok = file->open(QIODevice::ReadOnly);
+
+    if (m_password.isEmpty()) {
+        QtRARFileInfo info;
+        file->fileInfo(&info);
+        if (info.isEncrypted()) {
+            ImageSource::requestPassword(m_password);
+        }
+    }
+
+    if (!m_password.isEmpty()) {
+        if (file->isOpen()) {
+            file->close();
+        }
+
+        ok = file->open(QIODevice::ReadOnly, m_password.data());
+    }
+
+    m_device.reset(file);
+    return ok;
 }
 
 bool RARImageSource::copy(const QString &destPath)

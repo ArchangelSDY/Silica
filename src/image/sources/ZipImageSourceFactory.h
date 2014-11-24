@@ -7,6 +7,8 @@ class ZipImageSourceFactory : public ImageSourceFactory
 {
     Q_OBJECT
 public:
+    ZipImageSourceFactory(ImageSourceManager *mgr);
+
     QString name() const;
     QString fileNamePattern() const;
     QString urlScheme() const;

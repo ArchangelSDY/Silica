@@ -6,6 +6,11 @@
 #include "ZipImageSource.h"
 #include "ZipImageSourceFactory.h"
 
+ZipImageSourceFactory::ZipImageSourceFactory(ImageSourceManager *mgr) :
+    ImageSourceFactory(mgr)
+{
+}
+
 QString ZipImageSourceFactory::name() const
 {
     return "Zip";
@@ -33,7 +38,7 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
             zipUrl.setFragment("");
             QString zipPath = zipUrl.toLocalFile();
 
-            return new ZipImageSource(zipPath, imageName);
+            return new ZipImageSource(this, zipPath, imageName);
         } else {
             // Unsupported image format
             return 0;

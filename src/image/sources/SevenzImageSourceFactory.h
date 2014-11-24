@@ -14,6 +14,8 @@ class SevenzImageSourceFactory : public ImageSourceFactory
 
     friend class SevenzImageSource;
 public:
+    SevenzImageSourceFactory(ImageSourceManager *mgr);
+
     QString name() const;
     QString fileNamePattern() const;
     QString urlScheme() const;

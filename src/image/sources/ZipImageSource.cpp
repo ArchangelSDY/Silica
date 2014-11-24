@@ -5,7 +5,9 @@
 
 #include "ZipImageSource.h"
 
-ZipImageSource::ZipImageSource(QString zipPath, QString imageName)
+ZipImageSource::ZipImageSource(ImageSourceFactory *factory,
+                               QString zipPath, QString imageName) :
+    ImageSource(factory)
 {
     m_zipPath = searchRealPath(zipPath);
     m_name = imageName;

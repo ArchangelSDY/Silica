@@ -3,12 +3,13 @@
 
 #include "ImageSource.h"
 
-class Qt7zPackage;
+class ImageSourceFactory;
 
 class ZipImageSource : public ImageSource
 {
 public:
-    ZipImageSource(QString zipPath, QString imageName);
+    ZipImageSource(ImageSourceFactory *factory,
+                   QString zipPath, QString imageName);
 
     virtual bool open();
 

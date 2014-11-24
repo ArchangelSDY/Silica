@@ -11,12 +11,13 @@
 ImageSourceManager *ImageSourceManager::m_instance = 0;
 
 ImageSourceManager::ImageSourceManager(QObject *parent) :
-    QObject(parent)
+    QObject(parent) ,
+    m_client(0)
 {
-    registerFactory(new LocalImageSourceFactory());
-    registerFactory(new RARImageSourceFactory());
-    registerFactory(new SevenzImageSourceFactory());
-    registerFactory(new ZipImageSourceFactory());
+    registerFactory(new LocalImageSourceFactory(this));
+    registerFactory(new RARImageSourceFactory(this));
+    registerFactory(new SevenzImageSourceFactory(this));
+    registerFactory(new ZipImageSourceFactory(this));
 }
 
 ImageSourceManager *ImageSourceManager::instance()
@@ -33,6 +34,10 @@ ImageSourceManager::~ImageSourceManager()
     for (QHash<QString, ImageSourceFactory *>::iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         delete it.value();
+    }
+
+    if (m_client) {
+        delete m_client;
     }
 }
 
@@ -126,4 +131,12 @@ void ImageSourceManager::registerFactory(ImageSourceFactory *factory)
     if (factory) {
         m_factories.insert(factory->urlScheme(), factory);
     }
+}
+
+void ImageSourceManager::setClient(ImageSourceManagerClient *client)
+{
+    if (m_client) {
+        delete m_client;
+    }
+    m_client = client;
 }

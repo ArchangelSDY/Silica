@@ -5,6 +5,11 @@
 #include "LocalImageSource.h"
 #include "LocalImageSourceFactory.h"
 
+LocalImageSourceFactory::LocalImageSourceFactory(ImageSourceManager *mgr) :
+    ImageSourceFactory(mgr)
+{
+}
+
 QString LocalImageSourceFactory::name() const
 {
     return "Images";
@@ -23,7 +28,7 @@ QString LocalImageSourceFactory::urlScheme() const
 ImageSource *LocalImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
-        return new LocalImageSource(url.toLocalFile());
+        return new LocalImageSource(this, url.toLocalFile());
     } else {
         return 0;
     }
@@ -31,7 +36,7 @@ ImageSource *LocalImageSourceFactory::createSingle(const QUrl &url)
 
 ImageSource *LocalImageSourceFactory::createSingle(const QString &path)
 {
-    return new LocalImageSource(path);
+    return new LocalImageSource(this, path);
 }
 
 QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QUrl &url)

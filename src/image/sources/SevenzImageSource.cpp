@@ -7,11 +7,11 @@
 #include "Qt7zPackage.h"
 
 #include "SevenzImageSource.h"
+#include "SevenzImageSourceFactory.h"
 
-SevenzImageSource::SevenzImageSource(QString packagePath, QString imageName,
-                                     SevenzImageSourceFactory *factory) :
-    ImageSource() ,
-    m_factory(factory)
+SevenzImageSource::SevenzImageSource(ImageSourceFactory *factory,
+                                     QString packagePath, QString imageName) :
+    ImageSource(factory)
 {
     m_packagePath = searchRealPath(packagePath);
     m_name = imageName;
@@ -43,16 +43,18 @@ bool SevenzImageSource::open()
     hashBuilder << QString::number(threadId, 16)
                 << "#" << m_packagePath;
 
-    m_factory->m_mutex.lock();
-    QSharedPointer<Qt7zPackage> pkg = m_factory->m_packageCache.find(hash);
+    SevenzImageSourceFactory *factory =
+        static_cast<SevenzImageSourceFactory *>(m_factory);
+    factory->m_mutex.lock();
+    QSharedPointer<Qt7zPackage> pkg = factory->m_packageCache.find(hash);
     if (pkg.isNull()) {
         pkg = QSharedPointer<Qt7zPackage>(new Qt7zPackage(m_packagePath));
         pkg->open();
         if (pkg->isOpen()) {
-           m_factory->m_packageCache.insert(hash, pkg);
+           factory->m_packageCache.insert(hash, pkg);
         }
     }
-    m_factory->m_mutex.unlock();
+    factory->m_mutex.unlock();
 
     if (!pkg->isOpen()) {
         delete buffer;

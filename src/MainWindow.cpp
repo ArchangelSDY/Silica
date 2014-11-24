@@ -14,6 +14,7 @@
 #include "GlobalConfig.h"
 #include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
+#include "ImageSourceManagerClientImpl.h"
 #include "LocalPlayListRecord.h"
 #include "MainMenuBarManager.h"
 #include "MainWindow.h"
@@ -206,6 +207,10 @@ void MainWindow::setupExtraUi()
             ui->basketView, SLOT(playListAppend(int)));
     connect(m_navigator->basket(), SIGNAL(itemsChanged()),
             ui->basketView, SLOT(playListChange()));
+
+    // Init image source manager client
+    ImageSourceManager::instance()->setClient(
+        new ImageSourceManagerClientImpl(this));
 
     // TODO: Lazy load here
     loadSavedPlayLists();

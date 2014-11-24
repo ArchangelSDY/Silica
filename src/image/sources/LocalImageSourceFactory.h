@@ -8,6 +8,8 @@ class LocalImageSourceFactory : public ImageSourceFactory
 {
     Q_OBJECT
 public:
+    LocalImageSourceFactory(ImageSourceManager *mgr);
+
     QString name() const;
     QString fileNamePattern() const;
     QString urlScheme() const;

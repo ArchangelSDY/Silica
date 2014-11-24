@@ -1,10 +1,16 @@
 #include <QFileInfo>
 #include <QImageReader>
+#include <QString>
 
 #include "deps/QtRAR/src/qtrar.h"
 
 #include "RARImageSource.h"
 #include "RARImageSourceFactory.h"
+
+RARImageSourceFactory::RARImageSourceFactory(ImageSourceManager *mgr) :
+    ImageSourceFactory(mgr)
+{
+}
 
 QString RARImageSourceFactory::name() const
 {
@@ -23,6 +29,12 @@ QString RARImageSourceFactory::urlScheme() const
 
 ImageSource *RARImageSourceFactory::createSingle(const QUrl &url)
 {
+    return createSingle(url, QByteArray());
+}
+
+ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
+                                                 const QByteArray &password)
+{
     if (url.scheme() == urlScheme()) {
         QString imageName = url.fragment();
         QFileInfo imageFile(imageName);
@@ -33,7 +45,7 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url)
             rarUrl.setFragment("");
             QString rarPath = rarUrl.toLocalFile();
 
-            return new RARImageSource(rarPath, imageName);
+            return new RARImageSource(this, rarPath, imageName, password);
         } else {
             // Unsupported image format
             return 0;
@@ -49,7 +61,6 @@ ImageSource *RARImageSourceFactory::createSingle(const QString &path)
     Q_UNIMPLEMENTED();
     return 0;
 }
-
 
 QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
 {
@@ -67,13 +78,27 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
         bool success = rar.open(QtRAR::OpenModeList);
 
         if (success) {
+            QByteArray password;
+            if (rar.isHeadersEncrypted()) {
+                rar.close();
+
+                if (!requestPassword(password)) {
+                    return imageSources;
+                }
+
+                success = rar.open(QtRAR::OpenModeList, password);
+                if (!success) {
+                    return imageSources;
+                }
+            }
+
             QStringList fileNameList = rar.fileNameList();
 
             foreach(const QString &name, fileNameList) {
                 QUrl imageUrl = url;
                 imageUrl.setFragment(name);
 
-                ImageSource *source = createSingle(imageUrl);
+                ImageSource *source = createSingle(imageUrl, password);
                 if (source) {
                     imageSources << source;
                 }

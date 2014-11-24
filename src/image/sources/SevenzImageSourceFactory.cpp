@@ -12,6 +12,11 @@ FrequencyCache<QString, QSharedPointer<Qt7zPackage> >
 
 QMutex SevenzImageSourceFactory::m_mutex;
 
+SevenzImageSourceFactory::SevenzImageSourceFactory(ImageSourceManager *mgr) :
+    ImageSourceFactory(mgr)
+{
+}
+
 QString SevenzImageSourceFactory::name() const
 {
     return "7z";
@@ -39,7 +44,7 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
             sevenzUrl.setFragment("");
             QString sevenzPath = sevenzUrl.toLocalFile();
 
-            return new SevenzImageSource(sevenzPath, imageName, this);
+            return new SevenzImageSource(this, sevenzPath, imageName);
         } else {
             // Unsupported image format
             return 0;

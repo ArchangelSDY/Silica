@@ -5,7 +5,8 @@
 
 #include "LocalImageSource.h"
 
-LocalImageSource::LocalImageSource(QString path)
+LocalImageSource::LocalImageSource(ImageSourceFactory *factory, QString path) :
+    ImageSource(factory)
 {
     QString realPath = searchRealPath(path);
     if (!realPath.isEmpty()) {
