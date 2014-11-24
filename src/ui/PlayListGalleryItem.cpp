@@ -1,6 +1,5 @@
 #include <QDir>
 #include <QGraphicsScene>
-#include <QPainter>
 
 #include "CompactImageRenderer.h"
 #include "CompactTitleRenderer.h"
@@ -8,8 +7,6 @@
 #include "LooseImageRenderer.h"
 #include "LooseImageBackgroundRenderer.h"
 #include "PlayListGalleryItem.h"
-
-const QColor PlayListGalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
 
 PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
                                          AbstractRendererFactory *rendererFactory,
@@ -64,26 +61,4 @@ void PlayListGalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 QRectF PlayListGalleryItem::boundingRect() const
 {
     return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());
-}
-
-void PlayListGalleryItem::paint(QPainter *painter,
-                                const QStyleOptionGraphicsItem *,
-                                QWidget *)
-{
-    painter->setRenderHints(
-        QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    painter->setPen(Qt::NoPen);
-    painter->setBackground(scene()->palette().background());
-    painter->setBrush(scene()->palette().foreground());
-
-    // Clear painter first
-    painter->eraseRect(boundingRect());
-
-    // Render
-    m_renderer->paint(painter);
-
-    // Draw a mask if selected
-    if (isSelected()) {
-        painter->fillRect(boundingRect(), PlayListGalleryItem::SELECTED_COLOR);
-    }
 }

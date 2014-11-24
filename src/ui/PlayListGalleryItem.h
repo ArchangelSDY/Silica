@@ -25,13 +25,7 @@ public:
 private slots:
     void loadThumbnail();
 
-protected:
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionGraphicsItem *, QWidget *);
-
 private:
-    static const QColor SELECTED_COLOR;
-
     PlayListRecord *m_record;
 };
 

@@ -1,6 +1,9 @@
+#include <QPalette>
 #include <QVariant>
 
 #include "GalleryItem.h"
+
+const QColor GalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
 
 GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent) :
@@ -46,6 +49,28 @@ bool GalleryItem::isReadyToShow()
 void GalleryItem::scheduleSelectedAfterShown()
 {
     m_selectedAfterShownScheduled = true;
+}
+
+void GalleryItem::paint(QPainter *painter,
+                        const QStyleOptionGraphicsItem *option,
+                        QWidget *widget)
+{
+    painter->setRenderHints(
+        QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter->setPen(Qt::NoPen);
+    painter->setBackground(scene()->palette().background());
+    painter->setBrush(scene()->palette().foreground());
+
+    // Clear painter first
+    painter->eraseRect(boundingRect());
+
+    // Render
+    m_renderer->paint(painter);
+
+    // Draw a mask if selected
+    if (isSelected()) {
+        painter->fillRect(boundingRect(), GalleryItem::SELECTED_COLOR);
+    }
 }
 
 QVariant GalleryItem::itemChange(GraphicsItemChange change,

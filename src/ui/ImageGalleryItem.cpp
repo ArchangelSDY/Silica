@@ -1,5 +1,4 @@
 #include <QGraphicsScene>
-#include <QPainter>
 
 #include "GalleryView.h"
 #include "GlobalConfig.h"
@@ -51,23 +50,4 @@ void ImageGalleryItem::thumbnailLoaded()
             }
         }
     }
-}
-
-void ImageGalleryItem::paint(QPainter *painter,
-                        const QStyleOptionGraphicsItem *,
-                        QWidget *)
-{
-    painter->setRenderHints(
-        QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    painter->setBrush(scene()->palette().foreground());
-    painter->setBackground(scene()->palette().background());
-
-    // Background
-    if (isSelected()) {
-        painter->drawRect(boundingRect());
-    } else {
-        painter->eraseRect(boundingRect());
-    }
-
-    m_renderer->paint(painter);
 }

@@ -24,10 +24,6 @@ public:
 private slots:
     void thumbnailLoaded();
 
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-               QWidget *widget);
-
 private:
     ImagePtr m_image;
 };

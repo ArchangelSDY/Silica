@@ -1,6 +1,7 @@
 #ifndef GALLERYITEM_H
 #define GALLERYITEM_H
 
+#include <QColor>
 #include <QGraphicsItem>
 
 #include "AbstractGalleryItemRenderer.h"
@@ -27,6 +28,11 @@ public:
     void scheduleSelectedAfterShown();
 
 protected:
+    static const QColor SELECTED_COLOR;
+
+    virtual void paint(QPainter *painter,
+                       const QStyleOptionGraphicsItem *option,
+                       QWidget *widget);
     virtual QVariant itemChange(GraphicsItemChange change,
                                 const QVariant &value);
     void setRenderer(AbstractGalleryItemRenderer *renderer);

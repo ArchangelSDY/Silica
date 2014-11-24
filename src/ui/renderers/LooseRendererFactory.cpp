@@ -1,10 +1,14 @@
-#include "LooseImageRenderer.h"
-#include "LooseImageBackgroundRenderer.h"
-#include "LooseRendererFactory.h"
+#include "GlobalConfig.h"
+#include "ui/renderers/BoundingRectExpandRenderer.h"
+#include "ui/renderers/LooseImageRenderer.h"
+#include "ui/renderers/LooseImageBackgroundRenderer.h"
+#include "ui/renderers/LooseRendererFactory.h"
 
 AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForImageGallery()
 {
-    return new LooseImageRenderer();
+    return new BoundingRectExpandRenderer(
+        QRect(QPoint(0, 0), GlobalConfig::instance()->galleryItemSize()),
+        new LooseImageRenderer());
 }
 
 AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForPlayListGallery(
