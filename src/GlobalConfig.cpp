@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QImage>
 #include <QSettings>
 
 #include "GlobalConfig.h"
@@ -12,17 +13,28 @@ GlobalConfig::GlobalConfig()
     load();
 }
 
-GlobalConfig *GlobalConfig::instance()
+GlobalConfig *GlobalConfig::create()
 {
     if (!m_instance) {
         m_instance = new GlobalConfig();
+    } else {
+        qWarning("GlobalConfig: already created!");
     }
 
     return m_instance;
 }
 
+GlobalConfig *GlobalConfig::instance()
+{
+    Q_ASSERT_X(m_instance, "GlobalConfig", "Instance not created!");
+    return m_instance;
+}
+
 void GlobalConfig::load()
 {
+    QCoreApplication::setOrganizationName("Asuna");
+    QCoreApplication::setApplicationName("Silica");
+
     QSettings::setDefaultFormat(QSettings::IniFormat);
 #ifdef Q_OS_OSX
     QString baseDir = qApp->applicationDirPath() + "/../Resources";
@@ -77,4 +89,12 @@ void GlobalConfig::load()
 #else
     qDebug() << "OpenGL Disabled";
 #endif
+
+    // Register meta types
+    qRegisterMetaType<QList<QImage *> >("QList<QImage*>");
+    qRegisterMetaType<QList<int> >("QList<int>");
+
+    // Set plugin path
+    QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");
+    QCoreApplication::addLibraryPath(baseDir + "/plugins");
 }

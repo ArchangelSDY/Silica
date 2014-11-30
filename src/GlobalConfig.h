@@ -8,6 +8,7 @@
 class GlobalConfig
 {
 public:
+    static GlobalConfig *create();
     static GlobalConfig *instance();
 
     QList<QString> zipDirs() const { return m_zipDirs; }

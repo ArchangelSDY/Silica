@@ -1,3 +1,9 @@
+add_subdirectory(deps/qwebpa)
+add_subdirectory(deps/quazip)
+add_subdirectory(deps/Qt7z)
+add_subdirectory(deps/QtRAR)
+add_subdirectory(deps/QtDBMigration)
+
 # set all include directories for in and out of source builds
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -39,11 +45,6 @@ qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
-add_subdirectory(deps/quazip)
-add_subdirectory(deps/Qt7z)
-add_subdirectory(deps/QtRAR)
-add_subdirectory(deps/QtDBMigration)
-
 add_executable(silica ${SRCS})
 target_link_libraries(silica
     ${CMAKE_THREAD_LIBS_INIT}
@@ -55,6 +56,12 @@ target_link_libraries(silica
     Qt5::Network
     Qt5::Sql
     Qt5::Widgets
+)
+
+add_custom_command(TARGET silica POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_BINARY_DIR}/deps/qwebpa/src/imageformats
+    $<TARGET_FILE_DIR:silica>/plugins/imageformats
 )
 
 if (APPLE)

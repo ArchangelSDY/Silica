@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QtGlobal>
 
+#include "GlobalConfig.h"
 #include "LocalDatabase.h"
 #include "MainWindow.h"
 
@@ -8,12 +9,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // TODO: move to a better place
-    qRegisterMetaType<QList<QImage *> >("QList<QImage*>");
-    qRegisterMetaType<QList<int> >("QList<int>");
-
-    QCoreApplication::setOrganizationName("Asuna");
-    QCoreApplication::setApplicationName("Silica");
+    GlobalConfig::create();
 
     if (!LocalDatabase::instance()->migrate()) {
         qCritical("Fail to migrate database! Will exit now.");

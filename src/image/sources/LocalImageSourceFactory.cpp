@@ -17,7 +17,7 @@ QString LocalImageSourceFactory::name() const
 
 QString LocalImageSourceFactory::fileNamePattern() const
 {
-    return "*.png *.jpg *.gif";
+    return "*.png *.jpg *.gif *.webp";
 }
 
 QString LocalImageSourceFactory::urlScheme() const
