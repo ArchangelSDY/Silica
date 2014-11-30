@@ -7,71 +7,10 @@
 #include "ImageHotspot.h"
 #include "ImageSource.h"
 
-typedef QList<QSharedPointer<Image> > ImageList;
-typedef QSharedPointer<Image> ImagePtr;
-
 class ImageRank;
 
-class LoadImageTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    LoadImageTask(QSharedPointer<ImageSource> imageSource) :
-        QRunnable() ,
-        m_imageSource(imageSource) {}
-
-    void run();
-
-signals:
-    void loaded(QImage *image);
-
-private:
-    QSharedPointer<ImageSource> m_imageSource;
-};
-
-class LoadThumbnailTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    LoadThumbnailTask(QString thumbnailPath, bool makeImmediately) :
-        QRunnable() ,
-        m_thumbnailPath(thumbnailPath) ,
-        m_makeImmediately(makeImmediately) {}
-
-    void run();
-
-signals:
-    void loaded(QImage *thumbnail, bool makeImmediately);
-
-private:
-    QString m_thumbnailPath;
-    bool m_makeImmediately;
-};
-
-class MakeThumbnailTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    MakeThumbnailTask(QImage *image, const QString &path) :
-        QRunnable() ,
-        m_image(image) ,
-        m_path(path) {}
-
-    ~MakeThumbnailTask()
-    {
-        delete m_image;
-    }
-
-    void run();
-
-signals:
-    void thumbnailMade(QImage *thumbnail);
-
-private:
-      QImage *m_image;
-      QString m_path;
-};
-
+typedef QList<QSharedPointer<Image> > ImageList;
+typedef QSharedPointer<Image> ImagePtr;
 
 class Image : public QObject
 {
@@ -99,8 +38,7 @@ public:
     Status status() const { return m_status; }
     QImage data()
     {
-        Q_ASSERT(m_image);
-        return *m_image;
+        return *(defaultFrame());
     }
     QImage thumbnail() {
         Q_ASSERT(m_thumbnail);
@@ -134,18 +72,32 @@ public:
     QSize size() const { return m_size; }
     QVariantHash &extraInfo() { return m_extraInfo; }
 
+    bool isAnimation() const;
+    QList<int> durations() const;
+    QList<QImage *> frames() const;
+    int frameCount() const;
+
 signals:
     void loaded();
     void thumbnailLoaded();
 
     void hotpotsLoaded();
 
-public slots:
-    void imageReaderFinished(QImage *image);
+private slots:
+    void imageReaderFinished(QList<QImage *> images, QList<int> durations);
     void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
     void thumbnailMade(QImage *thumbnail);
 
 private:
+    inline QImage *defaultFrame() const
+    {
+        Q_ASSERT(!m_frames.isEmpty());
+        return m_frames[0];
+    }
+
+    void destroyFrames();
+    void resetFrames(QImage *defaultFrame = new QImage(),
+                     int defaultDuration = 0);
     void unloadIfNeeded();
     void makeThumbnail();
     void computeThumbnailPath();
@@ -153,7 +105,6 @@ private:
 
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
-    QImage *m_image;
     QImage *m_thumbnail;
     QString m_thumbnailPath;
     int m_loadRequestsCount;
@@ -169,6 +120,10 @@ private:
 
     QSize m_size;
     QVariantHash m_extraInfo;
+
+    QList<QImage *> m_frames;
+    QList<int> m_durations;
+    bool m_isAnimation;
 };
 
 #endif // IMAGE_H

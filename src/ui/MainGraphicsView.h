@@ -2,12 +2,14 @@
 #define MAINGRAPHICSVIEW_H
 
 #include <QGraphicsView>
+#include <QTimer>
 #include <QWheelEvent>
 
 #include "HotspotsEditor.h"
 #include "Image.h"
 #include "Navigator.h"
 
+class Image;
 class RankVoteView;
 class RemoteWallpapersManager;
 
@@ -35,6 +37,7 @@ signals:
     void mouseDoubleClicked();
 
 private slots:
+    void paint();
     void paint(Image *image);
     void paintThumbnail(Image *image);
     void focusOnRect(QRectF rect);
@@ -50,9 +53,13 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
+    void scheduleAnimation();
+    void resetImage(Image *image);
+
     Navigator *m_navigator;
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
+    Image *m_image;
     bool m_shouldRepaintThumbnailOnShown;
 
     FitMode m_fitInView;
@@ -62,6 +69,9 @@ private:
 
     RankVoteView *m_rankVoteView;
     RemoteWallpapersManager *m_remoteWallpapersMgr;
+
+    QTimer m_animationTimer;
+    int m_curFrameNumber;
 };
 
 #endif // MAINGRAPHICSVIEW_H

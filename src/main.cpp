@@ -8,6 +8,10 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // TODO: move to a better place
+    qRegisterMetaType<QList<QImage *> >("QList<QImage*>");
+    qRegisterMetaType<QList<int> >("QList<int>");
+
     QCoreApplication::setOrganizationName("Asuna");
     QCoreApplication::setApplicationName("Silica");
 

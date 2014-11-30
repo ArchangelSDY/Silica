@@ -2,6 +2,7 @@
 #include <QMenu>
 #include <QSignalMapper>
 
+#include "Image.h"
 #include "Navigator.h"
 #include "MainGraphicsView.h"
 #include "RankVoteView.h"
@@ -14,11 +15,13 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_navigator(0) ,
     m_scene(new QGraphicsScene(this)) ,
     m_imageItem(new QGraphicsPixmapItem()) ,
+    m_image(0),
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit) ,
     m_hotspotsEditor(0) ,
     m_rankVoteView(new RankVoteView(&m_navigator, this)) ,
-    m_remoteWallpapersMgr(new RemoteWallpapersManager(this))
+    m_remoteWallpapersMgr(new RemoteWallpapersManager(this)) ,
+    m_curFrameNumber(0)
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
@@ -31,6 +34,10 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     // Hotspots editor must be initialized after scene's added to view
     // because its mode indicator needs a parent widget
     m_hotspotsEditor = new HotspotsEditor(m_scene, &m_navigator);
+
+    m_animationTimer.setSingleShot(true);
+    connect(&m_animationTimer, SIGNAL(timeout()),
+            this, SLOT(paint()));
 }
 
 void MainGraphicsView::setNavigator(Navigator *navigator)
@@ -42,22 +49,51 @@ void MainGraphicsView::setNavigator(Navigator *navigator)
             this, SLOT(focusOnRect(QRectF)));
 }
 
+void MainGraphicsView::resetImage(Image *image)
+{
+    m_image = image;
+    m_curFrameNumber = 0;
+    m_animationTimer.stop();
+}
+
+void MainGraphicsView::paint()
+{
+    paint(m_image);
+}
+
 void MainGraphicsView::paint(Image *image)
 {
     if (image) {
+        if (m_image != image) {
+            resetImage(image);
+        }
+
         m_shouldRepaintThumbnailOnShown = false;
 
-        QPixmap pixmap = QPixmap::fromImage(image->data());
+        if (m_curFrameNumber < 0 || m_curFrameNumber >= image->frameCount()) {
+            m_curFrameNumber = 0;
+        }
+
+        QImage *frame = image->frames()[m_curFrameNumber];
+        QPixmap pixmap = QPixmap::fromImage(*frame);
         m_scene->setSceneRect(pixmap.rect());
         m_imageItem->setPixmap(pixmap);
 
         fitInViewIfNecessary();
+
+        if (m_image->isAnimation()) {
+            scheduleAnimation();
+        }
     }
 }
 
 void MainGraphicsView::paintThumbnail(Image *image)
 {
     if (image) {
+        if (m_image != image) {
+            resetImage(image);
+        }
+
         if (isVisible()) {
             m_shouldRepaintThumbnailOnShown = false;
 
@@ -264,4 +300,13 @@ void MainGraphicsView::toggleFitInView()
     m_focusedRect = QRectF();
 
     m_fitInView = static_cast<MainGraphicsView::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
+}
+
+void MainGraphicsView::scheduleAnimation()
+{
+    if (m_image && m_image->isAnimation() && m_image->frameCount() > 1) {
+        int duration = m_image->durations()[m_curFrameNumber];
+        m_animationTimer.start(duration);
+        m_curFrameNumber = (m_curFrameNumber + 1) % (m_image->frameCount());
+    }
 }
