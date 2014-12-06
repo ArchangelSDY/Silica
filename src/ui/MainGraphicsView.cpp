@@ -64,6 +64,9 @@ void MainGraphicsView::paint()
 void MainGraphicsView::paint(Image *image)
 {
     if (image) {
+        // No need to try fitting in view if image didn't change
+        bool shouldFitInView = (m_image != image);
+
         if (m_image != image) {
             resetImage(image);
         }
@@ -79,7 +82,9 @@ void MainGraphicsView::paint(Image *image)
         m_scene->setSceneRect(pixmap.rect());
         m_imageItem->setPixmap(pixmap);
 
-        fitInViewIfNecessary();
+        if (shouldFitInView) {
+            fitInViewIfNecessary();
+        }
 
         if (m_image->isAnimation()) {
             scheduleAnimation();
