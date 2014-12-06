@@ -38,7 +38,7 @@ signals:
 
 private slots:
     void paint();
-    void paint(Image *image);
+    void paint(Image *image, bool shouldFitInView = true);
     void paintThumbnail(Image *image);
     void focusOnRect(QRectF rect);
 

@@ -58,15 +58,12 @@ void MainGraphicsView::resetImage(Image *image)
 
 void MainGraphicsView::paint()
 {
-    paint(m_image);
+    paint(m_image, false);
 }
 
-void MainGraphicsView::paint(Image *image)
+void MainGraphicsView::paint(Image *image, bool shouldFitInView)
 {
     if (image) {
-        // No need to try fitting in view if image didn't change
-        bool shouldFitInView = (m_image != image);
-
         if (m_image != image) {
             resetImage(image);
         }
