@@ -1,3 +1,4 @@
+#include <QBuffer>
 #include <QCryptographicHash>
 #include <QTextStream>
 #include <QUrl>
@@ -26,8 +27,20 @@ ZipImageSource::ZipImageSource(ImageSourceFactory *factory,
 
 bool ZipImageSource::open()
 {
-    m_device.reset(new QuaZipFile(m_zipPath, m_name));
-    return m_device->open(QIODevice::ReadOnly);
+    QuaZipFile zipFile(m_zipPath, m_name);
+    if (zipFile.open(QIODevice::ReadOnly)) {
+        m_device.reset(new QBuffer());
+        if (!m_device->open(QIODevice::ReadWrite)) {
+            m_device.clear();
+            return false;
+        }
+
+        m_device->write(zipFile.readAll());
+        m_device->reset();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool ZipImageSource::copy(const QString &destPath)
