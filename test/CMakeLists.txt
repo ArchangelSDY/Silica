@@ -43,7 +43,7 @@ file(GLOB EXTERNAL_SRCS
 )
 
 file(GLOB FORMS "../src/*.ui" "../src/ui/*.ui")
-file(GLOB RESOURCES "../src/*.qrc")
+file(GLOB RESOURCES "*.qrc" "../src/*.qrc")
 
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
@@ -52,6 +52,7 @@ set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 add_library(silicafortest STATIC ${EXTERNAL_SRCS})
 set(SILICAFORTEST_LINK_LIBRARIES
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OpenCV_LIBS}
     qt7z
     qtdbmigration
     qtrar

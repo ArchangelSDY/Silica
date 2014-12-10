@@ -48,6 +48,7 @@ set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 add_executable(silica ${SRCS})
 target_link_libraries(silica
     ${CMAKE_THREAD_LIBS_INIT}
+    ${OpenCV_LIBS}
     qt7z
     qtrar
     qtdbmigration

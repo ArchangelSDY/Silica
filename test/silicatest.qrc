@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/me.jpg</file>
+        <file>assets/pack.zip</file>
+        <file>assets/silica.png</file>
+    </qresource>
+</RCC>

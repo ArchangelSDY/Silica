@@ -7,6 +7,7 @@ find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Test REQUIRED)
+find_package(OpenCV REQUIRED)
 
 set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 # if there is no QT_ROOT, try to deduce it from Qt QtCore include
