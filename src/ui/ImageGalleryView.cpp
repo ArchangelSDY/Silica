@@ -74,16 +74,16 @@ QMenu *ImageGalleryView::createContextMenu()
     sorts->addAction(tr("Name"), this, SLOT(sortByName()));
     sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
 
+    QMenu *groups = menu->addMenu(tr("Group By"));
+    groups->addAction(tr("None"), this, SLOT(disableGrouping()));
+    groups->addAction(tr("Thumb Hist"), this, SLOT(groupByThumbHist()));
+
     menu->addMenu(m_rankFilterMenuManager->menu());
 
     QMenu *renderers = menu->addMenu(tr("Layout"));
     renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
     renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
-
-    QMenu *groups = menu->addMenu(tr("Group By"));
-    groups->addAction(tr("None"), this, SLOT(disableGrouping()));
-    groups->addAction(tr("Thumb Hist"), this, SLOT(groupByThumbHist()));
 
     if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =
