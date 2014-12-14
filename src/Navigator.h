@@ -32,6 +32,8 @@ public:
     void goFirst();
     void goLast();
     void goIndexUntilSuccess(int index, int delta);
+    void goPrevGroup();
+    void goNextGroup();
 
     Image* currentImage() const { return m_currentImage; }
     ImagePtr currentImagePtr();

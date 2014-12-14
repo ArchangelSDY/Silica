@@ -226,6 +226,63 @@ void Navigator::goLast()
     goIndex(m_playList->count() - 1);
 }
 
+void Navigator::goPrevGroup()
+{
+    int cmpGroup = m_playList->groupForImage(m_currentImage);
+    int initIndex = m_currentIndex;
+    int index = m_currentIndex;
+    bool isInPrevGroup = false;
+
+    do {
+        --index;
+        if (index < 0 || index >= m_playList->count()) {
+            index = (index + m_playList->count()) % m_playList->count();
+        }
+
+        const ImagePtr &image = m_playList->at(index);
+        int group = m_playList->groupForImage(image.data());
+        if (group != cmpGroup) {
+            if (!isInPrevGroup) {
+                // Now at the end of prev group. Try to find the head.
+                isInPrevGroup = true;
+                cmpGroup = group;
+            } else {
+                break;
+            }
+        }
+    } while (index != initIndex);
+
+    // Now at the end of prev prev group. Next is the head of prev group.
+    ++index;
+    if (index < 0 || index >= m_playList->count()) {
+        index = (index + m_playList->count()) % m_playList->count();
+    }
+
+    goIndex(index);
+}
+
+void Navigator::goNextGroup()
+{
+    int initGroup = m_playList->groupForImage(m_currentImage);
+    int initIndex = m_currentIndex;
+    int index = m_currentIndex;
+
+    do {
+        ++index;
+        if (index < 0 || index >= m_playList->count()) {
+            index = (index + m_playList->count()) % m_playList->count();
+        }
+
+        const ImagePtr &image = m_playList->at(index);
+        int group = m_playList->groupForImage(image.data());
+        if (group != initGroup) {
+            break;
+        }
+    } while (index != initIndex);
+
+    goIndex(index);
+}
+
 void Navigator::imageLoaded()
 {
     Image *loadedImage = static_cast<Image*>(QObject::sender());

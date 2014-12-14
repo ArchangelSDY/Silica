@@ -537,6 +537,12 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                     m_navigator->goPrev();
                 }
                 break;
+            case Qt::Key_L:
+                m_navigator->goNextGroup();
+                break;
+            case Qt::Key_H:
+                m_navigator->goPrevGroup();
+                break;
             case Qt::Key_F:
                 ui->graphicsView->toggleFitInView();
                 ui->graphicsView->fitInViewIfNecessary();
