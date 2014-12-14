@@ -28,6 +28,7 @@ include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(src)
 

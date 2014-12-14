@@ -1,9 +1,12 @@
 #include <QRegExp>
+#include <vector>
+#include <opencv2/core/core.hpp>
 
-#include "ImageSourceManager.h"
+#include "image/Image.h"
+#include "image/ImageHistogram.h"
+#include "image/ImageSourceManager.h"
+#include "playlist/DoNothingFilter.h"
 #include "PlayList.h"
-
-#include "DoNothingFilter.h"
 
 PlayList::PlayList() :
     m_record(0) ,
@@ -142,8 +145,71 @@ static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByAspectRatio()
 {
-    qSort(m_filteredImages.begin(), m_filteredImages.end(), imageAspectRatioLessThan);
+    qSort(m_filteredImages.begin(), m_filteredImages.end(),
+          imageAspectRatioLessThan);
     emit itemsChanged();
+}
+
+static bool isHistSame(ImageHistogram* const &left,
+                        ImageHistogram* const &right)
+{
+    if (!left || !right) {
+        return false;
+    }
+
+    double distance = left->compare(*right);
+    return distance >= 0.95;
+}
+
+bool PlayList::groupLessThan(const QSharedPointer<Image> &left,
+                                 const QSharedPointer<Image> &right)
+{
+    int leftGroup = this->m_imageGroups.value(left.data());
+    int rightGroup = this->m_imageGroups.value(right.data());
+
+    if (leftGroup != rightGroup) {
+        return leftGroup < rightGroup;
+    } else {
+        return imageNameLessThan(left, right);
+    }
+}
+
+void PlayList::sortByGroup()
+{
+    auto lessThanFunc = std::bind(&PlayList::groupLessThan, this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2);
+    qSort(m_filteredImages.begin(), m_filteredImages.end(), lessThanFunc);
+
+    emit itemsChanged();
+}
+
+int PlayList::groupForImage(Image * const image)
+{
+    return m_imageGroups.value(image, -1);
+}
+
+void PlayList::groupByThumbHist()
+{
+    std::vector<ImageHistogram *> hists;
+
+    ImageList::const_iterator it = m_allImages.begin();
+    while (it != m_allImages.end()) {
+        hists.push_back((*it)->thumbHist());
+        ++it;
+    }
+
+    Q_ASSERT(hists.size() == m_allImages.size());
+
+    std::vector<int> labels;
+    cv::partition(hists, labels, isHistSame);
+
+    Q_ASSERT(labels.size() == m_allImages.size());
+
+    m_imageGroups.clear();
+    for (int i = 0; i < m_allImages.size(); ++i) {
+        m_imageGroups.insert(m_allImages[i].data(), labels[i]);
+    }
 }
 
 void PlayList::setFilter(AbstractPlayListFilter *filter)

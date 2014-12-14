@@ -177,7 +177,7 @@ QString PlayListGalleryView::groupForItem(QGraphicsItem *rawItem)
     }
 }
 
-void PlayListGalleryView::sortByGroup(QList<QGraphicsItem *> *items)
+void PlayListGalleryView::sortItemByGroup(QList<QGraphicsItem *> *items)
 {
     qSort(items->begin(), items->end(), m_groupLessThan);
 }

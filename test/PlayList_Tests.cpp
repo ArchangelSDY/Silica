@@ -2,8 +2,10 @@
 #include <QSignalSpy>
 #include <QTest>
 
-#include "../src/image/ImageRank.h"
 #include "../src/PlayList.h"
+#include "../src/GlobalConfig.h"
+#include "../src/db/LocalDatabase.h"
+#include "../src/image/ImageRank.h"
 #include "../src/playlist/EqualRankFilter.h"
 #include "../src/playlist/MinRankFilter.h"
 #include "../src/playlist/NotEqualRankFilter.h"
@@ -20,6 +22,9 @@ private slots:
     void sortByAspectRatio();
     void sortByAspectRatio_data();
 
+    void sortByThumbHist();
+    void sortByThumbHist_data();
+
     void setFilter();
     void setFilter_data();
 
@@ -31,6 +36,13 @@ Q_DECLARE_METATYPE(AbstractPlayListFilter *)
 
 void TestPlayList::initTestCase()
 {
+    Q_INIT_RESOURCE(silica);
+    Q_INIT_RESOURCE(silicatest);
+    GlobalConfig::create();
+    if (!LocalDatabase::instance()->migrate()) {
+        QFAIL("Fail to migrate database! Will exit now.");
+    }
+
     const QString &tmpDirPath = m_tmpDir.path();
 
     QImage imgLisbeth(100, 100, QImage::Format_ARGB32);
@@ -125,6 +137,49 @@ void TestPlayList::sortByAspectRatio_data()
         << (QList<QUrl>() << asunaUrl << silicaUrl)
         << "silica.png"
         << "asuna.png";
+}
+
+void TestPlayList::sortByThumbHist()
+{
+    QFETCH(QList<QUrl>, srcUrls);
+    QFETCH(QStringList, sortedImageNames);
+
+    PlayList pl(srcUrls);
+    QCOMPARE(pl.size(), srcUrls.size());
+
+    for (int i = 0; i < pl.size(); ++i) {
+        ImagePtr image = pl[i];
+        QSignalSpy spy(image.data(), SIGNAL(thumbnailLoaded()));
+        image->loadThumbnail(true);
+        spy.wait();
+    }
+
+    pl.sortByGroup();
+
+    QStringList actSortedImageNames;
+    for (int i = 0; i < pl.size(); ++i) {
+        actSortedImageNames << pl[i]->name();
+    }
+
+    QCOMPARE(actSortedImageNames, sortedImageNames);
+}
+
+void TestPlayList::sortByThumbHist_data()
+{
+    const QString &tmpDirPath = m_tmpDir.path();
+    QUrl silicaUrl = QUrl::fromLocalFile(
+        tmpDirPath + QDir::separator() + "silica.png");
+    QUrl asunaUrl = QUrl::fromLocalFile(
+        tmpDirPath + QDir::separator() + "asuna.png");
+
+    QTest::addColumn<QList<QUrl> >("srcUrls");
+    QTest::addColumn<QStringList>("sortedImageNames");
+
+    QTest::newRow("Normal")
+        << (QList<QUrl>()
+            << silicaUrl << asunaUrl << silicaUrl)
+        << (QStringList()
+            << "silica.png" << "silica.png" << "asuna.png");
 }
 
 void TestPlayList::setFilter()

@@ -21,10 +21,13 @@ public slots:
 protected slots:
     void sortByName();
     void sortByAspectRatio();
+    void sortByThumbHist();
 
     void setAsCover();
     void addToBasket();
     void removeSelected();
+
+    void groupByThumbHist();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
@@ -34,6 +37,12 @@ protected:
 
     PlayList *m_playList;
     RankFilterMenuManager *m_rankFilterMenuManager;
+
+    enum GroupMode {
+        GroupByThumbHist,
+    };
+    GroupMode m_groupMode;
+    virtual QString groupForItem(QGraphicsItem *);
 };
 
 #endif // IMAGEGALLERYVIEW_H

@@ -1,5 +1,7 @@
 #include <QMenu>
 #include <QMessageBox>
+#include <QRunnable>
+#include <QThreadPool>
 
 #include "CompactRendererFactory.h"
 #include "ImageGalleryItem.h"
@@ -11,7 +13,8 @@
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_playList(0) ,
-    m_rankFilterMenuManager(0)
+    m_rankFilterMenuManager(0) ,
+    m_groupMode(GroupByThumbHist)
 {
     m_rendererFactory = new LooseRendererFactory();
 }
@@ -78,6 +81,10 @@ QMenu *ImageGalleryView::createContextMenu()
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
     renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
 
+    QMenu *groups = menu->addMenu(tr("Group By"));
+    groups->addAction(tr("None"), this, SLOT(disableGrouping()));
+    groups->addAction(tr("Thumb Hist"), this, SLOT(groupByThumbHist()));
+
     if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =
             menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
@@ -119,6 +126,16 @@ void ImageGalleryView::sortByAspectRatio()
     }
 
     m_playList->sortByAspectRatio();
+}
+
+void ImageGalleryView::sortByThumbHist()
+{
+    if (!m_playList) {
+        return;
+    }
+
+    m_playList->groupByThumbHist();
+    m_playList->sortByGroup();
 }
 
 void ImageGalleryView::setAsCover()
@@ -167,5 +184,43 @@ void ImageGalleryView::removeSelected()
                 record->removeImage(toRemove);
             }
         }
+    }
+}
+
+QString ImageGalleryView::groupForItem(QGraphicsItem *rawItem)
+{
+    ImageGalleryItem *item = static_cast<ImageGalleryItem *>(rawItem);
+    const ImagePtr &image = item->image();
+    if (!image.isNull()) {
+        int group = m_playList->groupForImage(image.data());
+        return QString::number(group);
+    } else {
+        return QString();
+    }
+}
+
+class GroupByThumbHistTask : public QRunnable
+{
+public:
+    GroupByThumbHistTask(PlayList *pl) : m_pl(pl) {}
+    void run()
+    {
+        m_pl->groupByThumbHist();;
+        m_pl->sortByGroup();
+    }
+
+private:
+    PlayList *m_pl;
+};
+
+void ImageGalleryView::groupByThumbHist()
+{
+    m_groupMode = GroupByThumbHist;
+    enableGrouping();
+
+    if (m_playList) {
+        GroupByThumbHistTask *task = new GroupByThumbHistTask(m_playList);
+        task->setAutoDelete(true);
+        QThreadPool::globalInstance()->start(task);
     }
 }

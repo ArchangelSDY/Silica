@@ -1,6 +1,7 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
+#include <QHash>
 #include <QUrl>
 
 #include "AbstractPlayListFilter.h"
@@ -24,6 +25,10 @@ public:
 
     void sortByName();
     void sortByAspectRatio();
+    void sortByGroup();
+
+    int groupForImage(Image * const image);
+    void groupByThumbHist();
 
     void setFilter(AbstractPlayListFilter *filter);
 
@@ -130,10 +135,14 @@ private slots:
     void watchedPlayListAppended(int start);
 
 private:
+    bool groupLessThan(const ImagePtr &left, const ImagePtr &right);
+
     ImageList m_allImages;
     ImageList m_filteredImages;
     PlayListRecord *m_record;
     AbstractPlayListFilter *m_filter;   // Should never be 0
+
+    QHash<Image *, int> m_imageGroups;
 };
 
 #endif // PLAYLIST_H

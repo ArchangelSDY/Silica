@@ -42,7 +42,14 @@ protected:
     void setRendererFactory(AbstractRendererFactory *factory);
 
     virtual QString groupForItem(QGraphicsItem *) { return QString(); }
-    virtual void sortByGroup(QList<QGraphicsItem *> *) {}
+    /**
+     * @brief Sort GalleryItem by group.
+     *
+     * Note that this method MUST NOT be used to sort the model (for example,
+     * PlayList) because model sorting will often trigger re-creation of
+     * GalleryItems, which may cause invalid pointers during layout.
+     */
+    virtual void sortItemByGroup(QList<QGraphicsItem *> *) {}
 
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;

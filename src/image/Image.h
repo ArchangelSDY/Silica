@@ -7,6 +7,7 @@
 #include "ImageHotspot.h"
 #include "ImageSource.h"
 
+class ImageHistogram;
 class ImageRank;
 
 typedef QList<QSharedPointer<Image> > ImageList;
@@ -77,16 +78,18 @@ public:
     QList<QImage *> frames() const;
     int frameCount() const;
 
+    ImageHistogram *thumbHist() const;
+
 signals:
     void loaded();
     void thumbnailLoaded();
-
     void hotpotsLoaded();
 
 private slots:
     void imageReaderFinished(QList<QImage *> images, QList<int> durations);
     void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
     void thumbnailMade(QImage *thumbnail);
+    void initThumbHist();
 
 private:
     inline QImage *defaultFrame() const
@@ -124,6 +127,8 @@ private:
     QList<QImage *> m_frames;
     QList<int> m_durations;
     bool m_isAnimation;
+
+    ImageHistogram *m_thumbHist;
 };
 
 #endif // IMAGE_H

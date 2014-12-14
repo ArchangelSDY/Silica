@@ -67,7 +67,7 @@ void GalleryView::layout()
 
     QStringList itemGroups;
     if (m_enableGrouping) {
-        sortByGroup(&items);
+        sortItemByGroup(&items);
 
         foreach (QGraphicsItem *item, items) {
             itemGroups << groupForItem(item);

@@ -28,7 +28,7 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
     QString groupForItem(QGraphicsItem *);
-    void sortByGroup(QList<QGraphicsItem *> *items);
+    void sortItemByGroup(QList<QGraphicsItem *> *items);
 
 private:
     bool (*m_groupLessThan)(QGraphicsItem *, QGraphicsItem *);

@@ -11,6 +11,7 @@
 #include "GlobalConfig.h"
 #include "LocalDatabase.h"
 #include "Image.h"
+#include "ImageHistogram.h"
 #include "ImageRank.h"
 #include "ImageSourceManager.h"
 
@@ -166,11 +167,15 @@ Image::Image(QUrl url, QObject *parent) :
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false)
+    m_isAnimation(false) ,
+    m_thumbHist(0)
 {
     resetFrames();
     computeThumbnailPath();
     loadMetaFromDatabase();
+
+    connect(this, SIGNAL(thumbnailLoaded()),
+            this, SLOT(initThumbHist()));
 }
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
@@ -185,11 +190,15 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false)
+    m_isAnimation(false) ,
+    m_thumbHist(0)
 {
     resetFrames();
     computeThumbnailPath();
     loadMetaFromDatabase();
+
+    connect(this, SIGNAL(thumbnailLoaded()),
+            this, SLOT(initThumbHist()));
 }
 
 Image::~Image()
@@ -198,6 +207,9 @@ Image::~Image()
 
     m_imageSource.clear();
 
+    if (m_thumbHist) {
+        delete m_thumbHist;
+    }
     if (m_thumbnail) {
         delete m_thumbnail;
     }
@@ -463,6 +475,23 @@ QList<QImage *> Image::frames() const
 int Image::frameCount() const
 {
     return m_frames.count();
+}
+
+ImageHistogram *Image::thumbHist() const
+{
+    return m_thumbHist;
+}
+
+void Image::initThumbHist()
+{
+    if (!m_thumbnail || m_thumbnail->isNull()) {
+        return;
+    }
+
+    // No need to create again if there's already one
+    if (!m_thumbHist) {
+        m_thumbHist = new ImageHistogram(*m_thumbnail);
+    }
 }
 
 #include "Image.moc"
