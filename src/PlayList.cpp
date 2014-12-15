@@ -1,4 +1,5 @@
 #include <QRegExp>
+#include <functional>
 #include <vector>
 #include <opencv2/core/core.hpp>
 
