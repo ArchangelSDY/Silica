@@ -1,3 +1,10 @@
+option(ENABLE_OPENGL "Enable OpenGL" OFF)
+if(ENABLE_OPENGL)
+    add_definitions(-DENABLE_OPENGL)
+    find_package(Qt5OpenGL REQUIRED)
+    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+endif(ENABLE_OPENGL)
+
 add_subdirectory(deps/qwebpa)
 add_subdirectory(deps/quazip)
 add_subdirectory(deps/Qt7z)
@@ -45,8 +52,7 @@ qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
-add_executable(silica ${SRCS})
-target_link_libraries(silica
+set(LINK_LIBS
     ${CMAKE_THREAD_LIBS_INIT}
     ${OpenCV_LIBS}
     qt7z
@@ -58,6 +64,13 @@ target_link_libraries(silica
     Qt5::Sql
     Qt5::Widgets
 )
+
+if(ENABLE_OPENGL)
+    set(LINK_LIBS ${LINK_LIBS} Qt5::OpenGL)
+endif(ENABLE_OPENGL)
+
+add_executable(silica ${SRCS})
+target_link_libraries(silica ${LINK_LIBS})
 
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory

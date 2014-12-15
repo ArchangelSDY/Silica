@@ -1,5 +1,6 @@
 #ifdef ENABLE_OPENGL
-#include <QGLWidget>
+#include <QGL>
+#include <QOpenGLWidget>
 #endif
 
 #include <QGraphicsItem>
@@ -21,7 +22,8 @@ GalleryView::GalleryView(QWidget *parent) :
     m_layoutNeeded(true)
 {
 #ifdef ENABLE_OPENGL
-    setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    // setViewport(new QOpenGLWidget(QGLFormat(QGL::SampleBuffers)));
+    setViewport(new QOpenGLWidget(this));
 #endif
 
     setDragMode(QGraphicsView::RubberBandDrag);
