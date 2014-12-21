@@ -20,13 +20,16 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
         m_record->name(), m_record->count()));
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
-
-    loadThumbnail();
 }
 
 PlayListGalleryItem::~PlayListGalleryItem()
 {
     delete m_record;
+}
+
+void PlayListGalleryItem::load()
+{
+    loadThumbnail();
 }
 
 void PlayListGalleryItem::loadThumbnail()

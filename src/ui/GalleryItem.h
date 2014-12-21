@@ -10,11 +10,13 @@
 class GalleryItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+    Q_INTERFACES(QGraphicsItem)
 public:
     explicit GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent = 0);
     virtual ~GalleryItem();
 
+    virtual void load() = 0;
     virtual void setRendererFactory(AbstractRendererFactory *factory) = 0;
 
     /**

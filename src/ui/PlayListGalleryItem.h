@@ -20,6 +20,7 @@ public:
     QRectF boundingRect() const;
     PlayListRecord *record() { return m_record; }
 
+    void load();
     void setRendererFactory(AbstractRendererFactory *factory);
 
 private slots:

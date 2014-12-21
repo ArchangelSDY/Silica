@@ -1,17 +1,19 @@
+#include <QAbstractAnimation>
 #include <QConicalGradient>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
-#include <QDebug>
 
 #include "LoadingIndicator.h"
 
-LoadingIndicator::LoadingIndicator(QWidget *parent) :
+LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     QWidget(parent) ,
     m_parent(parent) ,
+    m_size(size) ,
     m_aniSpin(new QPropertyAnimation(this, "angle", this))
 {
     hide();
+    setMinimumSize(size);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
@@ -26,11 +28,15 @@ LoadingIndicator::LoadingIndicator(QWidget *parent) :
 
 void LoadingIndicator::start()
 {
+    if (m_aniSpin->state() == QAbstractAnimation::Running) {
+        return;
+    }
+
     QPropertyAnimation *aniScale =
         new QPropertyAnimation(this, "minimumSize", this);
     aniScale->setDuration(200);
     aniScale->setStartValue(QSize(0, 0));
-    aniScale->setEndValue(QSize(25, 25));
+    aniScale->setEndValue(m_size);
     aniScale->setLoopCount(1);
     aniScale->setEasingCurve(QEasingCurve(QEasingCurve::OutCubic));
     aniScale->start(QAbstractAnimation::DeleteWhenStopped);
@@ -41,6 +47,10 @@ void LoadingIndicator::start()
 
 void LoadingIndicator::stop()
 {
+    if (m_aniSpin->state() != QAbstractAnimation::Running) {
+        return;
+    }
+
     QPropertyAnimation *aniScale =
         new QPropertyAnimation(this, "minimumSize", this);
     aniScale->setDuration(200);

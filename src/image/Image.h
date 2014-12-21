@@ -83,6 +83,7 @@ public:
 signals:
     void loaded();
     void thumbnailLoaded();
+    void thumbnailLoadFailed();
     void hotpotsLoaded();
 
 private slots:

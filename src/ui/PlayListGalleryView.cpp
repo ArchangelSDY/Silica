@@ -60,6 +60,7 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
             m_rendererFactory);
         m_scene->addItem(item);
         connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
+        item->load();
     }
 
     scheduleLayout();

@@ -186,8 +186,9 @@ void MainWindow::setupExtraUi()
     m_toolBar->addWidget(toolBarSpacing);
 
     // Loading indicator
-    LoadingIndicator *loadInd = new LoadingIndicator(m_toolBar);
+    LoadingIndicator *loadInd = new LoadingIndicator(QSize(25, 25), m_toolBar);
     QWidget *loadIndWrapper = new QWidget(m_toolBar);
+    loadIndWrapper->setMinimumSize(loadInd->minimumSize());
     loadIndWrapper->setLayout(new QGridLayout(loadIndWrapper));
     loadIndWrapper->layout()->setContentsMargins(0, 0, 0, 5);
     loadIndWrapper->layout()->addWidget(loadInd);

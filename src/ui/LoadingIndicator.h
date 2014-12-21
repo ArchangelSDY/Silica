@@ -10,7 +10,7 @@ class LoadingIndicator : public QWidget
     Q_OBJECT
     Q_PROPERTY(qreal angle READ angle WRITE setAngle NOTIFY angleChanged)
 public:
-    explicit LoadingIndicator(QWidget *parent = 0);
+    explicit LoadingIndicator(const QSize &size, QWidget *parent = 0);
 
     qreal angle() const;
     void setAngle(qreal angle);
@@ -27,6 +27,7 @@ protected:
 
 private:
     QWidget *m_parent;
+    QSize m_size;
     qreal m_angle;
 
     QPropertyAnimation *m_aniSpin;

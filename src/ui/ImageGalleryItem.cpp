@@ -16,6 +16,12 @@ ImageGalleryItem::ImageGalleryItem(ImagePtr image,
 
     connect(m_image.data(), SIGNAL(thumbnailLoaded()),
             this, SLOT(thumbnailLoaded()));
+    connect(m_image.data(), SIGNAL(thumbnailLoadFailed()),
+            this, SLOT(thumbnailLoaded()));
+}
+
+void ImageGalleryItem::load()
+{
     m_image->loadThumbnail(true);
 }
 
@@ -49,7 +55,7 @@ void ImageGalleryItem::thumbnailLoaded()
                 view->scheduleLayout();
             }
         }
-
-        emit readyToShow();
     }
+
+    emit readyToShow();
 }

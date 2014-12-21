@@ -326,6 +326,8 @@ void Image::thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately)
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
         scheduleUnload();   // Release memory after thumbnail generated
+    } else {
+        emit thumbnailLoadFailed();
     }
 }
 
@@ -357,7 +359,12 @@ void Image::makeThumbnail()
 {
     Q_ASSERT(defaultFrame());
 
-    if (defaultFrame()->isNull() || m_isMakingThumbnail) {
+    if (defaultFrame()->isNull()) {
+        emit thumbnailLoadFailed();
+        return;
+    }
+
+    if (m_isMakingThumbnail) {
         return;
     }
 
@@ -383,6 +390,8 @@ void Image::thumbnailMade(QImage *thumbnail)
         LocalDatabase::instance()->insertImage(this);
 
         emit thumbnailLoaded();
+    } else if (m_thumbnail->isNull()) {
+        emit thumbnailLoadFailed();
     }
 
     m_isMakingThumbnail = false;

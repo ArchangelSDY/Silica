@@ -58,6 +58,7 @@ void ImageGalleryView::playListAppend(int start)
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
         m_scene->addItem(item);
         connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
+        item->load();
     }
 
     scheduleLayout();

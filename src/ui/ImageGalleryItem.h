@@ -19,6 +19,7 @@ public:
     QRectF boundingRect() const;
     ImagePtr image() { return m_image; }
 
+    void load();
     void setRendererFactory(AbstractRendererFactory *factory);
 
 private slots:
