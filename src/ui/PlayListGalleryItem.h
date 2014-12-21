@@ -7,7 +7,7 @@
 #include "GalleryItem.h"
 #include "PlayListRecord.h"
 
-class PlayListGalleryItem : public QObject, public GalleryItem
+class PlayListGalleryItem : public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)

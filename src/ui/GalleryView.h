@@ -16,6 +16,8 @@ public:
 
 signals:
     void enterItem();
+    void loadStart();
+    void loadEnd();
 
 public slots:
     virtual void scheduleLayout();
@@ -28,6 +30,8 @@ protected slots:
     void enableGrouping();
     void disableGrouping();
 
+    void itemReadyToShow();
+
 private slots:
     virtual void layout();
 
@@ -38,6 +42,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void clear();
+    virtual void incrItemsToLoad(int count);
 
     void setRendererFactory(AbstractRendererFactory *factory);
 
@@ -56,6 +61,7 @@ protected:
     bool m_enableGrouping;
     bool m_layoutNeeded;
     QTimer m_layoutTimer;
+    int m_loadingItemsCount;
 
 private:
     static const int LAYOUT_INTERVAL = 10;

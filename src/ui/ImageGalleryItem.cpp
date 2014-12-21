@@ -49,5 +49,7 @@ void ImageGalleryItem::thumbnailLoaded()
                 view->scheduleLayout();
             }
         }
+
+        emit readyToShow();
     }
 }

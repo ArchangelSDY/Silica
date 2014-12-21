@@ -19,7 +19,8 @@ GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
     m_enableGrouping(false) ,
-    m_layoutNeeded(true)
+    m_layoutNeeded(true) ,
+    m_loadingItemsCount(0)
 {
 #ifdef ENABLE_OPENGL
     // setViewport(new QOpenGLWidget(QGLFormat(QGL::SampleBuffers)));
@@ -53,6 +54,7 @@ void GalleryView::clear()
         delete item;
     }
     m_scene->clear();
+    m_loadingItemsCount = 0;
 }
 
 void GalleryView::layout()
@@ -167,4 +169,20 @@ void GalleryView::disableGrouping()
 {
     m_enableGrouping = false;
     scheduleLayout();
+}
+
+void GalleryView::itemReadyToShow()
+{
+    m_loadingItemsCount--;
+    if (m_loadingItemsCount <= 0) {
+        emit loadEnd();
+    }
+}
+
+void GalleryView::incrItemsToLoad(int count)
+{
+    m_loadingItemsCount += count;
+    if (m_loadingItemsCount > 0) {
+        emit loadStart();
+    }
 }

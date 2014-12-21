@@ -49,12 +49,15 @@ void ImageGalleryView::playListChange(PlayList *playList)
 
 void ImageGalleryView::playListAppend(int start)
 {
+    incrItemsToLoad(m_playList->count() - start);
+
     for (int i = start; i < m_playList->count(); ++i) {
         ImagePtr image = m_playList->at(i);
 
         // Paint thumbnail
         ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
         m_scene->addItem(item);
+        connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
     }
 
     scheduleLayout();

@@ -7,7 +7,7 @@
 #include "GalleryItem.h"
 #include "Image.h"
 
-class ImageGalleryItem : public QObject, public GalleryItem
+class ImageGalleryItem : public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)

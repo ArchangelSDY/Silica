@@ -7,8 +7,9 @@
 #include "AbstractGalleryItemRenderer.h"
 #include "AbstractRendererFactory.h"
 
-class GalleryItem : public QGraphicsItem
+class GalleryItem : public QObject, public QGraphicsItem
 {
+    Q_OBJECT
 public:
     explicit GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent = 0);
@@ -26,6 +27,9 @@ public:
      * @brief Make this item selected after shown.
      */
     void scheduleSelectedAfterShown();
+
+signals:
+    void readyToShow();
 
 protected:
     static const QColor SELECTED_COLOR;

@@ -49,6 +49,8 @@ void PlayListGalleryItem::loadThumbnail()
     // Replace with new render since cover image has changed
     setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
         m_record->name(), m_record->count()));
+
+    emit readyToShow();
 }
 
 void PlayListGalleryItem::setRendererFactory(AbstractRendererFactory *factory)

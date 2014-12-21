@@ -4,9 +4,12 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGraphicsPixmapItem>
+#include <QGridLayout>
 #include <QInputDialog>
+#include <QLayout>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QSizePolicy>
 #include <QStackedLayout>
 #include <QStatusBar>
 #include <QToolBar>
@@ -21,6 +24,7 @@
 #include "PlayList.h"
 #include "PlayListGalleryItem.h"
 #include "RemotePlayListRecord.h"
+#include "ui/LoadingIndicator.h"
 
 #include "ui_MainWindow.h"
 
@@ -174,6 +178,22 @@ void MainWindow::setupExtraUi()
     // Fav view is the default
     m_actToolBarFav->setChecked(true);
     addToolBar(Qt::LeftToolBarArea, m_toolBar);
+
+    // Toolbar spacing
+    QWidget *toolBarSpacing = new QWidget(m_toolBar);
+    toolBarSpacing->setSizePolicy(
+        QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
+    m_toolBar->addWidget(toolBarSpacing);
+
+    // Loading indicator
+    LoadingIndicator *loadInd = new LoadingIndicator(m_toolBar);
+    QWidget *loadIndWrapper = new QWidget(m_toolBar);
+    loadIndWrapper->setLayout(new QGridLayout(loadIndWrapper));
+    loadIndWrapper->layout()->setContentsMargins(0, 0, 0, 5);
+    loadIndWrapper->layout()->addWidget(loadInd);
+    m_toolBar->addWidget(loadIndWrapper);
+    connect(ui->gallery, SIGNAL(loadStart()), loadInd, SLOT(start()));
+    connect(ui->gallery, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
 
 
     // Stacked views
