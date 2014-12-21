@@ -132,16 +132,6 @@ void ImageGalleryView::sortByAspectRatio()
     m_playList->sortByAspectRatio();
 }
 
-void ImageGalleryView::sortByThumbHist()
-{
-    if (!m_playList) {
-        return;
-    }
-
-    m_playList->groupByThumbHist();
-    m_playList->sortByGroup();
-}
-
 void ImageGalleryView::setAsCover()
 {
     if (m_playList && scene()->selectedItems().count() > 0) {
@@ -203,8 +193,9 @@ QString ImageGalleryView::groupForItem(QGraphicsItem *rawItem)
     }
 }
 
-class GroupByThumbHistTask : public QRunnable
+class GroupByThumbHistTask : public QObject, public QRunnable
 {
+    Q_OBJECT
 public:
     GroupByThumbHistTask(PlayList *pl) : m_pl(pl) {}
     void run()
@@ -225,6 +216,11 @@ void ImageGalleryView::groupByThumbHist()
     if (m_playList) {
         GroupByThumbHistTask *task = new GroupByThumbHistTask(m_playList);
         task->setAutoDelete(true);
+        connect(task, SIGNAL(destroyed()), this, SIGNAL(groupingEnd()));
         QThreadPool::globalInstance()->start(task);
+        emit groupingStart();
     }
 }
+
+
+#include "ImageGalleryView.moc"

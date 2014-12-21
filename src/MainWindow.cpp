@@ -195,6 +195,8 @@ void MainWindow::setupExtraUi()
     m_toolBar->addWidget(loadIndWrapper);
     connect(ui->gallery, SIGNAL(loadStart()), loadInd, SLOT(start()));
     connect(ui->gallery, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
+    connect(ui->gallery, SIGNAL(groupingStart()), loadInd, SLOT(start()));
+    connect(ui->gallery, SIGNAL(groupingEnd()), loadInd, SLOT(stop()));
 
 
     // Stacked views

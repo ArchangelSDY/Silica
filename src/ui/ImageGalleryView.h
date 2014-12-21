@@ -12,6 +12,10 @@ public:
     explicit ImageGalleryView(QWidget *parent = 0);
     ~ImageGalleryView();
 
+signals:
+    void groupingStart();
+    void groupingEnd();
+
 public slots:
     void setPlayList(PlayList *playList);
 
@@ -21,7 +25,6 @@ public slots:
 protected slots:
     void sortByName();
     void sortByAspectRatio();
-    void sortByThumbHist();
 
     void setAsCover();
     void addToBasket();
