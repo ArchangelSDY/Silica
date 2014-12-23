@@ -40,6 +40,8 @@ file(GLOB EXTERNAL_SRCS
     "../src/ui/hotspots/*.cpp"
     "../src/ui/renderers/*.cpp"
     "utils/*.cpp"
+
+    "${CMAKE_CURRENT_BINARY_DIR}/../src/Definitions.cpp"
 )
 
 file(GLOB FORMS "../src/*.ui" "../src/ui/*.ui")

@@ -440,6 +440,17 @@ void MainWindow::promptToSaveRemotePlayList()
     }
 }
 
+void MainWindow::showAbout()
+{
+    QString text;
+    QTextStream builder(&text);
+    builder << "Build Revision: "
+            << GlobalConfig::instance()->buildRevision() << "\n"
+            << "Build Timestamp: "
+            << GlobalConfig::instance()->buildTimestamp();
+    QMessageBox::about(this, tr("About Silica"), text);
+}
+
 void MainWindow::imageLoaded(Image *image)
 {
     // Title bar
@@ -598,6 +609,9 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             case Qt::Key_B:
                 ui->basketPane->setVisible(!ui->basketPane->isVisible());
+                break;
+            case Qt::Key_F1:
+                showAbout();
                 break;
             case Qt::Key_F10:
                 if (!isFullScreen()) {

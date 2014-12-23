@@ -18,6 +18,10 @@ public:
     const QString &thumbnailPath() const { return m_thumbnailPath; }
     const QString &netCachePath() const { return m_netCachePath; }
     const QSize &galleryItemSize() const { return m_galleryItemSize; }
+
+    const char *buildRevision() const;
+    const char *buildTimestamp() const;
+
 private:
     GlobalConfig();
 

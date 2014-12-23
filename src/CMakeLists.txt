@@ -52,6 +52,20 @@ qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
 
+# Generate compile time definitions
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+include(GetGitRevisionDescription)
+git_describe(BUILD_GIT_SHA1 "--always")
+string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Definitions.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+    @ONLY
+)
+list(APPEND SRCS
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+)
+
 set(LINK_LIBS
     ${CMAKE_THREAD_LIBS_INIT}
     ${OpenCV_LIBS}

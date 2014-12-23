@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QSettings>
 
+#include "Definitions.h"
 #include "GlobalConfig.h"
 
 GlobalConfig* GlobalConfig::m_instance = 0;
@@ -97,4 +98,14 @@ void GlobalConfig::load()
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");
     QCoreApplication::addLibraryPath(baseDir + "/plugins");
+}
+
+const char *GlobalConfig::buildRevision() const
+{
+    return g_BUILD_GIT_SHA1;
+}
+
+const char *GlobalConfig::buildTimestamp() const
+{
+    return g_BUILD_TIMESTAMP;
 }

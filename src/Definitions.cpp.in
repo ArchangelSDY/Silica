@@ -1,0 +1,2 @@
+const char *g_BUILD_GIT_SHA1 = "@BUILD_GIT_SHA1@";
+const char *g_BUILD_TIMESTAMP = "@BUILD_TIMESTAMP@";

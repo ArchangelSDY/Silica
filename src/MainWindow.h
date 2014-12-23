@@ -47,6 +47,7 @@ private:
     void promptToOpenImage();
     void promptToSaveImage();
     void promptToSaveLocalPlayList();
+    void showAbout();
 
     void updateSidebarTitle();
     void switchViews();
