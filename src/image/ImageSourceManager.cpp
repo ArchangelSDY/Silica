@@ -116,6 +116,17 @@ QString ImageSourceManager::fileDialogFilters() const
     return parts.join(";;");
 }
 
+QStringList ImageSourceManager::dirIterFilters() const
+{
+    QStringList filters;
+    for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();
+         it != m_factories.end(); ++it) {
+        ImageSourceFactory *factory = it.value();
+        filters << factory->fileNamePattern().split(" ");
+    }
+    return filters;
+}
+
 void ImageSourceManager::clearCache()
 {
     for (QHash<QString, ImageSourceFactory *>::iterator it = m_factories.begin();

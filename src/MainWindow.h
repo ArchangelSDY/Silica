@@ -45,6 +45,7 @@ private:
     void setupExtraUi();
     void processCommandLineOptions();
     void promptToOpenImage();
+    void promptToOpenDir();
     void promptToSaveImage();
     void promptToSaveLocalPlayList();
     void showAbout();

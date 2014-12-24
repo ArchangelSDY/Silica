@@ -25,6 +25,7 @@ public:
 
     QStringList urlPatterns() const;
     QString fileDialogFilters() const;
+    QStringList dirIterFilters() const;
 
     void clearCache();
 

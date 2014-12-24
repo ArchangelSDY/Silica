@@ -351,6 +351,46 @@ void MainWindow::promptToOpenImage()
     m_navigator->setPlayList(playList, true);
 }
 
+void MainWindow::promptToOpenDir()
+{
+    static QString lastParentDir;
+
+    QString dir = QFileDialog::getExistingDirectory(
+    this, tr("Open Folder"), lastParentDir);
+    if (dir.isEmpty()) {
+        return;
+    }
+
+    // Record parent dir for next open
+    QDir lastDir(dir);
+    lastDir.cdUp();
+    lastParentDir = lastDir.absolutePath();
+
+    QList<QUrl> images;
+    QDirIterator iter(dir, ImageSourceManager::instance()->dirIterFilters(),
+                   QDir::Files, QDirIterator::Subdirectories);
+    while (iter.hasNext()) {
+        QString path = iter.next();
+        QUrl url = QUrl::fromLocalFile(path);
+
+        // Hack for zip and 7z
+        // FIXME: Better way to handle this?
+        if (url.path().endsWith(".zip")) {
+         url.setScheme("zip");
+        } else if (url.path().endsWith(".7z")) {
+         url.setScheme("sevenz");
+        } else if (url.path().endsWith(".rar")) {
+         url.setScheme("rar");
+        }
+
+        images << url;
+    }
+
+    PlayList *playList = new PlayList(images);
+    // Navigator takes ownership of PlayList in this case
+    m_navigator->setPlayList(playList, true);
+}
+
 void MainWindow::promptToSaveImage()
 {
     if (ui->gallery->scene()->selectedItems().count() > 0) {
@@ -650,6 +690,14 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             case Qt::Key_9:
                 ui->graphicsView->fitGridInView(ev->text().toInt());
                 break;
+        }
+
+        ev->accept();
+    } else if (ev->modifiers() == Qt::ShiftModifier) {
+        switch (ev->key()) {
+        case Qt::Key_O:
+            promptToOpenDir();
+            break;
         }
 
         ev->accept();
