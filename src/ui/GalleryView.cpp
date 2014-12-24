@@ -1,8 +1,3 @@
-#ifdef ENABLE_OPENGL
-#include <QGL>
-#include <QOpenGLWidget>
-#endif
-
 #include <QGraphicsItem>
 
 #include "AbstractGalleryViewRenderer.h"
@@ -22,11 +17,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_layoutNeeded(true) ,
     m_loadingItemsCount(0)
 {
-#ifdef ENABLE_OPENGL
-    // setViewport(new QOpenGLWidget(QGLFormat(QGL::SampleBuffers)));
-    setViewport(new QOpenGLWidget(this));
-#endif
-
     setDragMode(QGraphicsView::RubberBandDrag);
 
     QPalette palette;

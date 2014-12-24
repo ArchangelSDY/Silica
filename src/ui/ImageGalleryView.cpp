@@ -1,3 +1,8 @@
+#ifdef ENABLE_OPENGL
+#include <QGL>
+#include <QOpenGLWidget>
+#endif
+
 #include <QMenu>
 #include <QMessageBox>
 #include <QRunnable>
@@ -16,6 +21,10 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
     m_rankFilterMenuManager(0) ,
     m_groupMode(GroupByThumbHist)
 {
+#ifdef ENABLE_OPENGL
+    setViewport(new QOpenGLWidget(this));
+#endif
+
     m_rendererFactory = new LooseRendererFactory();
 }
 
