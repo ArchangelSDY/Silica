@@ -64,6 +64,10 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
 {
     QList<ImageSource *> imageSources;
 
+    if (!isValidFileName(url.path())) {
+        return imageSources;
+    }
+
     if (url.hasFragment()) {
         imageSources << createSingle(url);
     } else {
