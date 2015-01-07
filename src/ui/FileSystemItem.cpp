@@ -33,6 +33,11 @@ QRectF FileSystemItem::boundingRect() const
     return m_renderer->boundingRect();
 }
 
+QString FileSystemItem::path() const
+{
+    return m_path;
+}
+
 void FileSystemItem::load()
 {
     if (!m_rendererFactory) {

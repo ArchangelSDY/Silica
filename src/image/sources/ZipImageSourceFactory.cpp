@@ -90,7 +90,7 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
 
 QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QString &path)
 {
-    Q_UNUSED(path);
-    Q_UNIMPLEMENTED();
-    return QList<ImageSource *>();
+    QUrl url = QUrl::fromLocalFile(path);
+    url.setScheme(urlScheme());
+    return createMultiple(url);
 }

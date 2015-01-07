@@ -17,6 +17,7 @@ public:
     virtual ~FileSystemItem();
 
     QRectF boundingRect() const;
+    QString path() const;
 
     void load();
     void setRendererFactory(AbstractRendererFactory *factory);

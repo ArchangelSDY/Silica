@@ -50,6 +50,7 @@ class ImageSourceManagerClient
 public:
     virtual ~ImageSourceManagerClient() {}
 
+    // FIXME(sdy): not thread safe!
     virtual bool requestPassword(QByteArray &password) = 0;
 };
 

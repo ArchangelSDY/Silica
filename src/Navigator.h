@@ -60,6 +60,7 @@ signals:
     void focusOnRect(QRectF rect);
 
 public slots:
+    // TODO(sdy): separate `setOwnedPlayList()` out
     void setPlayList(PlayList *, bool takeOwnership = false);
     void reloadPlayList();
 

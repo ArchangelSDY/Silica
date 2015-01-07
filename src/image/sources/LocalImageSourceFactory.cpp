@@ -53,7 +53,7 @@ QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path
     QList<ImageSource *> imageSources;
     QFileInfo file(path);
 
-    if (!file.exists()) {
+    if (!file.exists() || !isValidFileName(file.fileName())) {
         return imageSources;
     }
 

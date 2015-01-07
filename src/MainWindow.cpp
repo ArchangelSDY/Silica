@@ -15,16 +15,18 @@
 #include <QToolBar>
 
 #include "GlobalConfig.h"
-#include "ImageGalleryItem.h"
 #include "ImageSourceManager.h"
 #include "ImageSourceManagerClientImpl.h"
 #include "LocalPlayListRecord.h"
 #include "MainMenuBarManager.h"
 #include "MainWindow.h"
 #include "PlayList.h"
-#include "PlayListGalleryItem.h"
 #include "RemotePlayListRecord.h"
+#include "ui/FileSystemItem.h"
+#include "ui/ImageGalleryItem.h"
 #include "ui/LoadingIndicator.h"
+#include "ui/PlayListGalleryItem.h"
+
 
 #include "ui_MainWindow.h"
 
@@ -213,6 +215,10 @@ void MainWindow::setupExtraUi()
 
     // Stacked views
     ui->pageFileSystemLayout->setMargin(0);
+    connect(ui->fsView, SIGNAL(enterItem()),
+            this, SLOT(loadSelectedPath()));
+    connect(ui->fsView, SIGNAL(enterItem()),
+            m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageFav->layout()->setMargin(0);
     connect(ui->playListGallery, SIGNAL(enterItem()),
@@ -282,7 +288,7 @@ void MainWindow::loadSelectedPlayList()
         }
 
         // Navigator should take ownership of PlayList in this case
-        m_navigator->setPlayList(pl);
+        m_navigator->setPlayList(pl, true);
 
         // Make cover image of first playlist item selected
         PlayListGalleryItem *firstItem =
@@ -301,6 +307,24 @@ void MainWindow::loadSelectedPlayList()
             // hide until thumbnail loaded.
             coverImageItem->scheduleSelectedAfterShown();
         }
+    }
+}
+
+void MainWindow::loadSelectedPath()
+{
+    QList<QGraphicsItem *> selectedItems =
+        ui->fsView->scene()->selectedItems();
+    if (selectedItems.count() > 0) {
+        PlayList *pl = new PlayList();
+        foreach (QGraphicsItem *item, selectedItems) {
+            FileSystemItem *fsItem =
+                static_cast<FileSystemItem *>(item);
+            QString path = fsItem->path();
+            pl->addPath(path);
+        }
+
+        // Navigator should take ownership of PlayList in this case
+        m_navigator->setPlayList(pl, true);
     }
 }
 
@@ -323,7 +347,7 @@ void MainWindow::processCommandLineOptions()
         }
     }
 
-    m_navigator->setPlayList(playList);
+    m_navigator->setPlayList(playList, true);
 }
 
 void MainWindow::promptToOpenImage()
