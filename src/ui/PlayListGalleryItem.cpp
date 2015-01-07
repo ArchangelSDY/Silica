@@ -46,7 +46,7 @@ void PlayListGalleryItem::loadThumbnail()
         QDir::separator() + m_record->coverPath();
     QImage *thumbnail = new QImage(coverFullPath);
     if (thumbnail->isNull()) {
-        thumbnail->load(":/res/album.png");
+        thumbnail->load(":/res/playlist.png");
     }
 
     setThumbnail(thumbnail);
