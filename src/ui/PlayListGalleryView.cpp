@@ -58,9 +58,7 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
     for (int i = 0; i < records.count(); ++i) {
         PlayListGalleryItem *item = new PlayListGalleryItem(records[i],
             m_rendererFactory);
-        m_scene->addItem(item);
-        connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
-        item->load();
+        addItem(item);
     }
 
     scheduleLayout();

@@ -15,3 +15,9 @@ AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForPlayLi
         new CompactTitleRenderer(title,
         new CompactImageRenderer()));
 }
+
+AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForFileSystemView(
+    const QString &title)
+{
+    return new CompactTitleRenderer(title, new CompactImageRenderer());
+}

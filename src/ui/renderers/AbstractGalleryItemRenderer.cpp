@@ -22,6 +22,15 @@ void AbstractGalleryItemRenderer::setImage(const QImage *image)
     }
 }
 
+QRect AbstractGalleryItemRenderer::boundingRect() const
+{
+    if (m_parentRenderer) {
+        return m_boundingRect.united(m_parentRenderer->boundingRect());
+    } else {
+        return m_boundingRect;
+    }
+}
+
 void AbstractGalleryItemRenderer::layout()
 {
     if (m_parentRenderer) {

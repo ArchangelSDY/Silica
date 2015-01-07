@@ -55,8 +55,11 @@ private:
 
     Ui::MainWindow *ui;
     Navigator *m_navigator;
+
+    // TODO: Separate toolbar logic out
     QToolBar *m_toolBar;
     QActionGroup *m_toolBarActs;
+    QAction *m_actToolBarFS;
     QAction *m_actToolBarFav;
     QAction *m_actToolBarGallery;
     QAction *m_actToolBarImage;

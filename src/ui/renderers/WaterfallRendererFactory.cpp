@@ -15,6 +15,12 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForPlay
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }
 
+AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForFileSystemView(
+    const QString &)
+{
+    return new LooseImageBackgroundRenderer(new LooseImageRenderer());
+}
+
 AbstractGalleryViewRenderer *WaterfallRendererFactory::createViewRenderer(
     QGraphicsScene *scene)
 {

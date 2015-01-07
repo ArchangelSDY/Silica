@@ -54,10 +54,8 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
     }
 }
 
-ImageSource *SevenzImageSourceFactory::createSingle(const QString &path)
+ImageSource *SevenzImageSourceFactory::createSingle(const QString &)
 {
-    Q_UNUSED(path);
-    Q_UNIMPLEMENTED();
     return 0;
 }
 

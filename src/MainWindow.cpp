@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_navigator(Navigator::instance()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
+    m_actToolBarFS(0) ,
     m_actToolBarFav(0) ,
     m_actToolBarGallery(0) ,
     m_actToolBarImage(0)
@@ -153,6 +154,17 @@ void MainWindow::setupExtraUi()
     m_toolBarActs->addAction(m_actToolBarFav);
     toolBarSigMapper->setMapping(m_actToolBarFav, 0);
 
+    // File system icon
+    QIcon toolbarFSIcon(":/res/toolbar/fs.png");
+    toolbarFSIcon.addFile(":/res/toolbar/fs-active.png",
+                          QSize(), QIcon::Active, QIcon::On);
+    m_actToolBarFS = m_toolBar->addAction(
+        toolbarFSIcon, tr("File System"), toolBarSigMapper, SLOT(map()));
+    m_actToolBarFS->setCheckable(true);
+    m_actToolBarFS->setShortcut(Qt::CTRL + Qt::Key_2);
+    m_toolBarActs->addAction(m_actToolBarFS);
+    toolBarSigMapper->setMapping(m_actToolBarFS, 1);
+
     // Gallery icon
     QIcon toolBarGalleryIcon(":/res/toolbar/gallery.png");
     toolBarGalleryIcon.addFile(":/res/toolbar/gallery-active.png",
@@ -160,9 +172,9 @@ void MainWindow::setupExtraUi()
     m_actToolBarGallery = m_toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
     m_actToolBarGallery->setCheckable(true);
-    m_actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
+    m_actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_3);
     m_toolBarActs->addAction(m_actToolBarGallery);
-    toolBarSigMapper->setMapping(m_actToolBarGallery, 1);
+    toolBarSigMapper->setMapping(m_actToolBarGallery, 2);
 
     // Image icon
     QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
@@ -170,10 +182,10 @@ void MainWindow::setupExtraUi()
                              QSize(), QIcon::Active, QIcon::On);
     m_actToolBarImage = m_toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
-    m_actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
+    m_actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_4);
     m_actToolBarImage->setCheckable(true);
     m_toolBarActs->addAction(m_actToolBarImage);
-    toolBarSigMapper->setMapping(m_actToolBarImage, 2);
+    toolBarSigMapper->setMapping(m_actToolBarImage, 3);
 
     // Fav view is the default
     m_actToolBarFav->setChecked(true);
@@ -200,6 +212,8 @@ void MainWindow::setupExtraUi()
 
 
     // Stacked views
+    ui->pageFileSystemLayout->setMargin(0);
+
     ui->pageFav->layout()->setMargin(0);
     connect(ui->playListGallery, SIGNAL(enterItem()),
             this, SLOT(loadSelectedPlayList()));
@@ -367,7 +381,7 @@ void MainWindow::promptToOpenDir()
     lastParentDir = lastDir.absolutePath();
 
     QList<QUrl> images;
-    QDirIterator iter(dir, ImageSourceManager::instance()->dirIterFilters(),
+    QDirIterator iter(dir, ImageSourceManager::instance()->nameFilters(),
                    QDir::Files, QDirIterator::Subdirectories);
     while (iter.hasNext()) {
         QString path = iter.next();

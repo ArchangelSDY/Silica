@@ -116,7 +116,7 @@ QString ImageSourceManager::fileDialogFilters() const
     return parts.join(";;");
 }
 
-QStringList ImageSourceManager::dirIterFilters() const
+QStringList ImageSourceManager::nameFilters() const
 {
     QStringList filters;
     for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();

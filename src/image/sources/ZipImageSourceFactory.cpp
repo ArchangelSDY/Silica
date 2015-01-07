@@ -48,10 +48,8 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
     }
 }
 
-ImageSource *ZipImageSourceFactory::createSingle(const QString &path)
+ImageSource *ZipImageSourceFactory::createSingle(const QString &)
 {
-    Q_UNUSED(path);
-    Q_UNIMPLEMENTED();
     return 0;
 }
 

@@ -9,6 +9,8 @@ public:
     AbstractGalleryItemRenderer *createItemRendererForImageGallery();
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &, const int);
+    AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
+        const QString &title);
 };
 
 #endif // LOOSERENDERERFACTORY_H

@@ -15,6 +15,8 @@ public:
     virtual AbstractGalleryItemRenderer *createItemRendererForImageGallery() = 0;
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count) = 0;
+    virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
+        const QString &title) = 0;
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
         QGraphicsScene *scene);

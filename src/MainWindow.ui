@@ -87,6 +87,13 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="pageFileSystem">
+       <layout class="QHBoxLayout" name="pageFileSystemLayout">
+        <item>
+         <widget class="FileSystemView" name="fsView" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="pageGallery">
        <layout class="QHBoxLayout" name="galleryLayout">
         <item>
@@ -244,6 +251,11 @@
    <class>MainImageGalleryView</class>
    <extends>QGraphicsView</extends>
    <header>ui/MainImageGalleryView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FileSystemView</class>
+   <extends>QWidget</extends>
+   <header>filesystemview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

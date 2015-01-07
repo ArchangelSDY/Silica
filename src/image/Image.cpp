@@ -233,7 +233,7 @@ void Image::load(int priority)
     LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
     connect(loadImageTask, SIGNAL(loaded(QList<QImage*>, QList<int>)),
             this, SLOT(imageReaderFinished(QList<QImage*>, QList<int>)));
-    QThreadPool::globalInstance()->reserveThread();
+    // QThreadPool::globalInstance()->reserveThread();
     QThreadPool::globalInstance()->start(loadImageTask, priority);
 }
 
@@ -277,7 +277,7 @@ void Image::imageReaderFinished(QList<QImage *> images, QList<int> durations)
     Q_ASSERT(images.count() > 0);
     Q_ASSERT(durations.count() > 0);
 
-    QThreadPool::globalInstance()->releaseThread();
+    // QThreadPool::globalInstance()->releaseThread();
     m_isLoadingImage = false;
 
     destroyFrames();
@@ -315,7 +315,7 @@ void Image::imageReaderFinished(QList<QImage *> images, QList<int> durations)
 
 void Image::thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately)
 {
-    QThreadPool::globalInstance()->releaseThread();
+    // QThreadPool::globalInstance()->releaseThread();
     m_isLoadingThumbnail = false;
 
     if (thumbnail) {
@@ -350,7 +350,7 @@ void Image::loadThumbnail(bool makeImmediately)
         new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
     connect(loadThumbnailTask, SIGNAL(loaded(QImage *, bool)),
             this, SLOT(thumbnailReaderFinished(QImage *, bool)));
-    QThreadPool::globalInstance()->reserveThread();
+    // QThreadPool::globalInstance()->reserveThread();
     // Thumbnail loading should be low priority
     QThreadPool::globalInstance()->start(loadThumbnailTask, LowPriority);
 }
@@ -376,13 +376,13 @@ void Image::makeThumbnail()
         new MakeThumbnailTask(new QImage(*defaultFrame()), thumbnailFullPath);
     connect(makeThumbnailTask, SIGNAL(thumbnailMade(QImage*)),
             this, SLOT(thumbnailMade(QImage*)));
-    QThreadPool::globalInstance()->reserveThread();
+    // QThreadPool::globalInstance()->reserveThread();
     QThreadPool::globalInstance()->start(makeThumbnailTask);
 }
 
 void Image::thumbnailMade(QImage *thumbnail)
 {
-    QThreadPool::globalInstance()->releaseThread();
+    // QThreadPool::globalInstance()->releaseThread();
     if (thumbnail) {
         delete m_thumbnail;
         m_thumbnail = thumbnail;

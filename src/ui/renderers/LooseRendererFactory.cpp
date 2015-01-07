@@ -16,3 +16,9 @@ AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForPlayList
 {
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }
+
+AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForFileSystemView(
+    const QString &)
+{
+    return new LooseImageBackgroundRenderer(new LooseImageRenderer());
+}

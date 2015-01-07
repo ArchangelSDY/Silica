@@ -7,6 +7,8 @@
 #include "Navigator.h"
 #include "PlayList.h"
 
+class GalleryItem;
+
 class GalleryView : public QGraphicsView
 {
     Q_OBJECT
@@ -44,6 +46,7 @@ protected:
     virtual void clear();
     virtual void incrItemsToLoad(int count);
 
+    void addItem(GalleryItem *item);
     void setRendererFactory(AbstractRendererFactory *factory);
 
     virtual QString groupForItem(QGraphicsItem *) { return QString(); }

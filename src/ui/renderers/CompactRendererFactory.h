@@ -9,6 +9,8 @@ public:
     AbstractGalleryItemRenderer *createItemRendererForImageGallery();
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count);
+    AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
+        const QString &title);
 };
 
 #endif // COMPACTRENDERERFACTORY_H

@@ -119,6 +119,13 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void GalleryView::addItem(GalleryItem *item)
+{
+    m_scene->addItem(item);
+    connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
+    item->load();
+}
+
 void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
 {
     delete m_rendererFactory;

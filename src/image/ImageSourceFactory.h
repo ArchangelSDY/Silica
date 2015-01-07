@@ -26,6 +26,7 @@ public:
 
 protected:
     bool requestPassword(QByteArray &password);
+    bool isValidFileName(const QString &name);
 
     ImageSourceManager *m_mgr;
 };

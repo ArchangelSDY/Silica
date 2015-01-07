@@ -11,7 +11,7 @@ public:
 
     void setImage(const QImage *image);
 
-    virtual QRect boundingRect() const { return m_boundingRect; }
+    virtual QRect boundingRect() const;
     virtual void layout();
     virtual void paint(QPainter *painter);
 

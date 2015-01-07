@@ -1,7 +1,8 @@
 #include <QPalette>
 #include <QVariant>
 
-#include "GalleryItem.h"
+#include "ui/GalleryItem.h"
+#include "ui/GalleryView.h"
 
 const QColor GalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
 
@@ -39,6 +40,28 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 
     prepareGeometryChange();
     m_renderer->layout();
+}
+
+void GalleryItem::setThumbnail(QImage *thumbnail)
+{
+    if (!thumbnail->isNull()) {
+        m_thumbnail = thumbnail;
+        m_renderer->setImage(m_thumbnail);
+        m_renderer->layout();
+        update(boundingRect());
+        if (scene()) {
+            QList<QGraphicsView *> views = scene()->views();
+            if (!views.isEmpty()) {
+                GalleryView *view = static_cast<GalleryView *>(views[0]);
+                view->scheduleLayout();
+            }
+        }
+    } else {
+        delete thumbnail;
+    }
+
+    // We always consider it ready no matter whether thumbnail is null
+    emit readyToShow();
 }
 
 bool GalleryItem::isReadyToShow()

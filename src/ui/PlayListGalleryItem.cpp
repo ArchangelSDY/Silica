@@ -44,16 +44,16 @@ void PlayListGalleryItem::loadThumbnail()
 
     QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
         QDir::separator() + m_record->coverPath();
-    m_thumbnail = new QImage(coverFullPath);
-    if (m_thumbnail->isNull()) {
-        m_thumbnail->load(":/res/album.png");
+    QImage *thumbnail = new QImage(coverFullPath);
+    if (thumbnail->isNull()) {
+        thumbnail->load(":/res/album.png");
     }
+
+    setThumbnail(thumbnail);
 
     // Replace with new render since cover image has changed
     setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
         m_record->name(), m_record->count()));
-
-    emit readyToShow();
 }
 
 void PlayListGalleryItem::setRendererFactory(AbstractRendererFactory *factory)

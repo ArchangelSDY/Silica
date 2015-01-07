@@ -42,7 +42,9 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change,
                                 const QVariant &value);
     void setRenderer(AbstractGalleryItemRenderer *renderer);
+    void setThumbnail(QImage *thumbnail);
 
+    // TODO: should not be accessed by derived classes directly
     AbstractRendererFactory *m_rendererFactory;
     AbstractGalleryItemRenderer *m_renderer;
     QImage *m_thumbnail;

@@ -39,23 +39,5 @@ QRectF ImageGalleryItem::boundingRect() const
 void ImageGalleryItem::thumbnailLoaded()
 {
     const QImage &thumbnailImage = m_image->thumbnail();
-    if (!thumbnailImage.isNull()) {
-        m_thumbnail = new QImage(thumbnailImage);
-        m_renderer->setImage(const_cast<QImage *>(m_thumbnail));
-
-        prepareGeometryChange();
-        m_renderer->layout();
-
-        update(boundingRect());
-
-        if (scene()) {
-            QList<QGraphicsView *> views = scene()->views();
-            if (!views.isEmpty()) {
-                GalleryView *view = static_cast<GalleryView *>(views[0]);
-                view->scheduleLayout();
-            }
-        }
-    }
-
-    emit readyToShow();
+    setThumbnail(new QImage(thumbnailImage));
 }

@@ -55,10 +55,8 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
     }
 }
 
-ImageSource *RARImageSourceFactory::createSingle(const QString &path)
+ImageSource *RARImageSourceFactory::createSingle(const QString &)
 {
-    Q_UNUSED(path);
-    Q_UNIMPLEMENTED();
     return 0;
 }
 

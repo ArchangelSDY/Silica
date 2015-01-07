@@ -9,5 +9,9 @@
         <file>res/toolbar/image-view.png</file>
         <file>res/album.png</file>
         <file>assets/migration.json</file>
+        <file>res/folder.png</file>
+        <file>res/image.png</file>
+        <file>res/toolbar/fs.png</file>
+        <file>res/toolbar/fs-active.png</file>
     </qresource>
 </RCC>

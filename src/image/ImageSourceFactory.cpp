@@ -1,3 +1,6 @@
+#include <QRegExp>
+#include <QStringList>
+
 #include "ImageSourceFactory.h"
 #include "ImageSourceManager.h"
 
@@ -15,4 +18,17 @@ bool ImageSourceFactory::requestPassword(QByteArray &password)
     } else {
         return false;
     }
+}
+
+bool ImageSourceFactory::isValidFileName(const QString &name)
+{
+    QStringList patterns = fileNamePattern().split(' ');
+    foreach (const QString &pattern, patterns) {
+        QRegExp reg(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
+        if (reg.exactMatch(name)) {
+            return true;
+        }
+    }
+
+    return false;
 }
