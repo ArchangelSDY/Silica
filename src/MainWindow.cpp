@@ -223,8 +223,8 @@ void MainWindow::setupExtraUi()
     ui->pageFileSystemLayout->setMargin(0);
     connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadOrEnterSelectedPath()));
-    connect(ui->fsView, SIGNAL(openDir(QString)),
-            this, SLOT(loadSelectedDir(QString)));
+    connect(ui->fsView, SIGNAL(keyEnterPressed()),
+            this, SLOT(loadSelectedPath()));
 
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
@@ -320,20 +320,27 @@ void MainWindow::loadOrEnterSelectedPath()
     QList<QGraphicsItem *> selectedItems =
         ui->fsView->scene()->selectedItems();
     if (selectedItems.count() > 0) {
-        // If first selected item is a directory, navigate into it
         FileSystemItem *firstItem =
             static_cast<FileSystemItem *>(selectedItems[0]);
         if (firstItem->fileInfo().isDir()) {
+            // If first selected item is a directory, navigate into it
             ui->fsView->setRootPath(firstItem->path());
-            return;
+        } else {
+            // Load all selected items
+            loadSelectedPath();
         }
+    }
+}
 
+void MainWindow::loadSelectedPath()
+{
+    QList<QGraphicsItem *> selectedItems = ui->fsView->scene()->selectedItems();
+    if (selectedItems.count() > 0) {
         PlayList *pl = new PlayList();
+
         foreach (QGraphicsItem *item, selectedItems) {
-            FileSystemItem *fsItem =
-                static_cast<FileSystemItem *>(item);
-            QString path = fsItem->path();
-            pl->addPath(path);
+            FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
+            pl->addPath(fsItem->path());
         }
         pl->sortByName();
 
@@ -343,19 +350,6 @@ void MainWindow::loadOrEnterSelectedPath()
         // Show gallery view
         m_actToolBarGallery->trigger();
     }
-}
-
-void MainWindow::loadSelectedDir(QString dir)
-{
-    PlayList *pl = new PlayList();
-    pl->addPath(dir);
-    pl->sortByName();
-
-    // Navigator should take ownership of PlayList in this case
-    m_navigator->setPlayList(pl, true);
-
-    // Show gallery view
-    m_actToolBarGallery->trigger();
 }
 
 void MainWindow::processCommandLineOptions()

@@ -34,7 +34,7 @@ private slots:
     void loadSavedPlayLists();
     void loadSelectedPlayList();
     void loadOrEnterSelectedPath();
-    void loadSelectedDir(QString dir);
+    void loadSelectedPath();
 
     void promptToSaveRemotePlayList();
 
