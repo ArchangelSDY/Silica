@@ -94,7 +94,7 @@ void GalleryView::showEvent(QShowEvent *)
 void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
 {
     if (scene()->selectedItems().length() > 0) {
-        emit enterItem();
+        emit mouseDoubleClicked();
     }
 }
 
@@ -113,10 +113,20 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
         }
 
         event->accept();
-        emit enterItem();
+        emit keyEnterPressed();
     } else {
         QGraphicsView::keyPressEvent(event);
     }
+}
+
+void GalleryView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(event);
 }
 
 void GalleryView::addItem(GalleryItem *item)

@@ -3,6 +3,7 @@
 
 #include "ui/GalleryItem.h"
 
+class QFileInfo;
 class Image;
 class ImageSource;
 
@@ -18,6 +19,7 @@ public:
 
     QRectF boundingRect() const;
     QString path() const;
+    QFileInfo fileInfo() const;
 
     void load();
     void setRendererFactory(AbstractRendererFactory *factory);

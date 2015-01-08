@@ -24,7 +24,6 @@ private slots:
     void groupByName();
 
 protected:
-    virtual void mousePressEvent(QMouseEvent *event);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
     QString groupForItem(QGraphicsItem *);

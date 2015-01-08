@@ -11,8 +11,17 @@ class FileSystemView : public GalleryView
 public:
     explicit FileSystemView(QWidget *parent = 0);
 
+signals:
+    void openDir(QString dir);
+
 public slots:
     void setRootPath(const QString &path);
+
+private slots:
+    void triggerOpenDir();
+
+protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
     QStringList m_entries;

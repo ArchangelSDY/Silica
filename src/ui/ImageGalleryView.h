@@ -34,7 +34,6 @@ protected slots:
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
 
     virtual QMenu *createContextMenu();
 

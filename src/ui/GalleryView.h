@@ -17,7 +17,8 @@ public:
     ~GalleryView();
 
 signals:
-    void enterItem();
+    void mouseDoubleClicked();
+    void keyEnterPressed();
     void loadStart();
     void loadEnd();
 
@@ -41,6 +42,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
+    virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void clear();

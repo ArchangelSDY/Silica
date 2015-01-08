@@ -109,16 +109,6 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     menu.exec(event->globalPos());
 }
 
-void PlayListGalleryView::mousePressEvent(QMouseEvent *ev)
-{
-    if (ev->button() == Qt::RightButton) {
-        ev->accept();
-        return;
-    }
-
-    QGraphicsView::mousePressEvent(ev);
-}
-
 void PlayListGalleryView::renameSelectedItem()
 {
     if (scene()->selectedItems().count() > 0) {

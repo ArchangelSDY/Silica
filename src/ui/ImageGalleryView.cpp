@@ -111,16 +111,6 @@ QMenu *ImageGalleryView::createContextMenu()
     return menu;
 }
 
-void ImageGalleryView::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::RightButton) {
-        event->accept();
-        return;
-    }
-
-    QGraphicsView::mousePressEvent(event);
-}
-
 void ImageGalleryView::sortByName()
 {
     if (!m_playList) {

@@ -33,7 +33,8 @@ private slots:
     void imageLoaded(Image *image);
     void loadSavedPlayLists();
     void loadSelectedPlayList();
-    void loadSelectedPath();
+    void loadOrEnterSelectedPath();
+    void loadSelectedDir(QString dir);
 
     void promptToSaveRemotePlayList();
 

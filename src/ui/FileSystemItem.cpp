@@ -38,6 +38,11 @@ QString FileSystemItem::path() const
     return m_path;
 }
 
+QFileInfo FileSystemItem::fileInfo() const
+{
+    return QFileInfo(m_path);
+}
+
 void FileSystemItem::load()
 {
     if (!m_rendererFactory) {

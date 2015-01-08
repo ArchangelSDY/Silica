@@ -214,22 +214,24 @@ void MainWindow::setupExtraUi()
 
 
     // Stacked views
-    ui->pageFileSystemLayout->setMargin(0);
-    connect(ui->fsView, SIGNAL(enterItem()),
-            this, SLOT(loadSelectedPath()));
-    connect(ui->fsView, SIGNAL(enterItem()),
-            m_actToolBarGallery, SLOT(trigger()));
-
     ui->pageFav->layout()->setMargin(0);
-    connect(ui->playListGallery, SIGNAL(enterItem()),
+    connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadSelectedPlayList()));
-    connect(ui->playListGallery, SIGNAL(enterItem()),
-            m_actToolBarGallery, SLOT(trigger()));
+    connect(ui->playListGallery, SIGNAL(keyEnterPressed()),
+            this, SLOT(loadSelectedPlayList()));
+
+    ui->pageFileSystemLayout->setMargin(0);
+    connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
+            this, SLOT(loadOrEnterSelectedPath()));
+    connect(ui->fsView, SIGNAL(openDir(QString)),
+            this, SLOT(loadSelectedDir(QString)));
 
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
     ui->sideView->hide();
-    connect(ui->gallery, SIGNAL(enterItem()),
+    connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
+            m_actToolBarImage, SLOT(trigger()));
+    connect(ui->gallery, SIGNAL(keyEnterPressed()),
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
             m_actToolBarGallery, SLOT(trigger()));
@@ -307,14 +309,25 @@ void MainWindow::loadSelectedPlayList()
             // hide until thumbnail loaded.
             coverImageItem->scheduleSelectedAfterShown();
         }
+
+        // Show gallery view
+        m_actToolBarGallery->trigger();
     }
 }
 
-void MainWindow::loadSelectedPath()
+void MainWindow::loadOrEnterSelectedPath()
 {
     QList<QGraphicsItem *> selectedItems =
         ui->fsView->scene()->selectedItems();
     if (selectedItems.count() > 0) {
+        // If first selected item is a directory, navigate into it
+        FileSystemItem *firstItem =
+            static_cast<FileSystemItem *>(selectedItems[0]);
+        if (firstItem->fileInfo().isDir()) {
+            ui->fsView->setRootPath(firstItem->path());
+            return;
+        }
+
         PlayList *pl = new PlayList();
         foreach (QGraphicsItem *item, selectedItems) {
             FileSystemItem *fsItem =
@@ -322,10 +335,27 @@ void MainWindow::loadSelectedPath()
             QString path = fsItem->path();
             pl->addPath(path);
         }
+        pl->sortByName();
 
         // Navigator should take ownership of PlayList in this case
         m_navigator->setPlayList(pl, true);
+
+        // Show gallery view
+        m_actToolBarGallery->trigger();
     }
+}
+
+void MainWindow::loadSelectedDir(QString dir)
+{
+    PlayList *pl = new PlayList();
+    pl->addPath(dir);
+    pl->sortByName();
+
+    // Navigator should take ownership of PlayList in this case
+    m_navigator->setPlayList(pl, true);
+
+    // Show gallery view
+    m_actToolBarGallery->trigger();
 }
 
 void MainWindow::processCommandLineOptions()
