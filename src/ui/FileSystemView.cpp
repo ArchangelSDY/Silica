@@ -32,6 +32,9 @@ void FileSystemView::setRootPath(const QString &path)
     }
 
     scheduleLayout();
+
+    // Reset scroll position
+    centerOn(0, 0);
 }
 
 void FileSystemView::cdUp()
