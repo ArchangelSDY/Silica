@@ -14,7 +14,14 @@ public:
 public slots:
     void setRootPath(const QString &path);
 
+protected slots:
+    void removeSelectedOnDisk();
+
+protected:
+    virtual void contextMenuEvent(QContextMenuEvent *event);
+
 private:
+    QString m_rootPath;
     QStringList m_entries;
 };
 

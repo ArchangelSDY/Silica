@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMenu>
+#include <QMessageBox>
 
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
@@ -17,7 +18,8 @@ void FileSystemView::setRootPath(const QString &path)
 {
     clear();
 
-    QDir dir(path);
+    m_rootPath = path;
+    QDir dir(m_rootPath);
     QFileInfoList entrieInfos = dir.entryInfoList(
         ImageSourceManager::instance()->nameFilters(),
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
@@ -30,4 +32,35 @@ void FileSystemView::setRootPath(const QString &path)
     }
 
     scheduleLayout();
+}
+
+void FileSystemView::removeSelectedOnDisk()
+{
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+
+    QString msg = tr("Remove %1 files on disk?").arg(selectedItems.count());
+    if (QMessageBox::question(
+            this, tr("Remove On Disk"), msg) == QMessageBox::Yes) {
+        foreach (QGraphicsItem *item, selectedItems) {
+            FileSystemItem *fsItem =
+                static_cast<FileSystemItem *>(item);
+            QFile::remove(fsItem->path());
+        }
+    }
+
+    // Refresh
+    setRootPath(m_rootPath);
+}
+
+void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = new QMenu(this);
+
+    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    if (selectedItems.count() > 0) {
+        menu->addAction(tr("Remove On Disk"), this,
+                        SLOT(removeSelectedOnDisk()));
+    }
+
+    menu->exec(event->globalPos());
 }
