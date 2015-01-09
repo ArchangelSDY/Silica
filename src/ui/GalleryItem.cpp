@@ -47,6 +47,7 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     if (!thumbnail->isNull()) {
         m_thumbnail = thumbnail;
         m_renderer->setImage(m_thumbnail);
+        prepareGeometryChange();
         m_renderer->layout();
         update(boundingRect());
         if (scene()) {
