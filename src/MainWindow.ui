@@ -78,7 +78,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stackedViews">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="pageFav">
        <layout class="QGridLayout" name="gridLayout_4">
@@ -88,7 +88,54 @@
        </layout>
       </widget>
       <widget class="QWidget" name="pageFileSystem">
-       <layout class="QHBoxLayout" name="pageFileSystemLayout">
+       <layout class="QVBoxLayout" name="pageFileSystemLayout">
+        <item>
+         <widget class="QWidget" name="fsToolBar" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">             color: #FFFFFF;
+             background-color: #47505A;
+             padding: 0.3em 1em;
+             border-top: 1px solid #333333;
+             border-bottom: 1px solid #000000;
+             max-height: 1em;</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="fsBtnCdUp">
+             <property name="maximumSize">
+              <size>
+               <width>16</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: none</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="silica.qrc">
+               <normaloff>:/res/toolbar/dir-up.png</normaloff>
+               <normalon>:/res/toolbar/dir-up-active.png</normalon>:/res/toolbar/dir-up.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item>
          <widget class="FileSystemView" name="fsView" native="true"/>
         </item>
@@ -258,6 +305,8 @@
    <header>ui/FileSystemView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="silica.qrc"/>
+ </resources>
  <connections/>
 </ui>

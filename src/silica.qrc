@@ -13,5 +13,7 @@
         <file>res/toolbar/fs.png</file>
         <file>res/toolbar/fs-active.png</file>
         <file>res/playlist.png</file>
+        <file>res/toolbar/dir-up-active.png</file>
+        <file>res/toolbar/dir-up.png</file>
     </qresource>
 </RCC>

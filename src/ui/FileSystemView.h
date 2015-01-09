@@ -13,6 +13,7 @@ public:
 
 public slots:
     void setRootPath(const QString &path);
+    void cdUp();
 
 protected slots:
     void removeSelectedOnDisk();

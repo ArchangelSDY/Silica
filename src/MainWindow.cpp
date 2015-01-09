@@ -220,7 +220,15 @@ void MainWindow::setupExtraUi()
     connect(ui->playListGallery, SIGNAL(keyEnterPressed()),
             this, SLOT(loadSelectedPlayList()));
 
+    // Fils system tab toolbar
     ui->pageFileSystemLayout->setMargin(0);
+    ui->pageFileSystemLayout->setSpacing(0);
+    ui->fsToolBar->layout()->setSpacing(0);
+    ui->fsToolBar->layout()->setAlignment(Qt::AlignLeft);
+    connect(ui->fsBtnCdUp, SIGNAL(clicked()),
+            ui->fsView, SLOT(cdUp()));
+
+    // File system view
     connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadOrEnterSelectedPath()));
     connect(ui->fsView, SIGNAL(keyEnterPressed()),

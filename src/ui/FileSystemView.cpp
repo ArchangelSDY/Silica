@@ -34,6 +34,13 @@ void FileSystemView::setRootPath(const QString &path)
     scheduleLayout();
 }
 
+void FileSystemView::cdUp()
+{
+    QDir dir(m_rootPath);
+    dir.cdUp();
+    setRootPath(dir.absolutePath());
+}
+
 void FileSystemView::removeSelectedOnDisk()
 {
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
