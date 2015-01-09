@@ -255,7 +255,7 @@
   <customwidget>
    <class>FileSystemView</class>
    <extends>QWidget</extends>
-   <header>filesystemview.h</header>
+   <header>ui/FileSystemView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
