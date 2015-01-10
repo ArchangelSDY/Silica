@@ -211,6 +211,8 @@ void MainWindow::setupExtraUi()
     connect(ui->gallery, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
     connect(ui->gallery, SIGNAL(groupingStart()), loadInd, SLOT(start()));
     connect(ui->gallery, SIGNAL(groupingEnd()), loadInd, SLOT(stop()));
+    connect(ui->fsView, SIGNAL(loadStart()), loadInd, SLOT(start()));
+    connect(ui->fsView, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
 
 
     // Stacked views
@@ -229,6 +231,7 @@ void MainWindow::setupExtraUi()
             ui->fsView, SLOT(cdUp()));
 
     // File system view
+    ui->fsView->setRootPath(QDir::homePath());
     connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadOrEnterSelectedPath()));
     connect(ui->fsView, SIGNAL(keyEnterPressed()),

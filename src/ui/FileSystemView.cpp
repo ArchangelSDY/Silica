@@ -25,6 +25,8 @@ void FileSystemView::setRootPath(const QString &path)
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
         QDir::Name | QDir::DirsFirst);
 
+    incrItemsToLoad(entrieInfos.count());
+
     foreach (const QFileInfo &info, entrieInfos) {
         FileSystemItem *item = new FileSystemItem(info.absoluteFilePath(),
                                                   m_rendererFactory);
