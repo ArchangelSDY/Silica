@@ -81,7 +81,7 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
 
         if (success) {
             QByteArray password;
-            if (rar.isHeadersEncrypted()) {
+            if (rar.isHeadersEncrypted() || rar.isFilesEncrypted()) {
                 rar.close();
 
                 if (!requestPassword(password)) {
