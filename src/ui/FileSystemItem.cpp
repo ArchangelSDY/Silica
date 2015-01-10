@@ -1,4 +1,4 @@
-#include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 
 #include "image/Image.h"
@@ -53,21 +53,16 @@ void FileSystemItem::load()
         delete m_thumbnail;
     }
 
-    // TODO(sdy): do at background
     QFileInfo finfo(m_path);
     if (finfo.isDir()) {
         // For directory, try to use first image inside as cover
-
-        QDir dir(finfo.absoluteFilePath());
-        QFileInfoList inDirImageInfos = dir.entryInfoList(
-            ImageSourceManager::instance()->nameFilters(),
-            QDir::Files);
-
-        // Find an image to show as cover
+        QDirIterator dirIter(finfo.absoluteFilePath(),
+                             ImageSourceManager::instance()->nameFilters(),
+                             QDir::Files);
         bool found = false;
-        for (int i = 0; i < inDirImageInfos.count(); ++i) {
+        while (dirIter.hasNext()) {
             ImageSource *src = ImageSourceManager::instance()->createSingle(
-                inDirImageInfos[i].absoluteFilePath());
+                dirIter.next());
             if (src) {
                 loadCover(src);
                 found = true;
