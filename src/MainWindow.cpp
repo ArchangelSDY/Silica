@@ -364,8 +364,13 @@ void MainWindow::loadSelectedPath()
         // Navigator should take ownership of PlayList in this case
         m_navigator->setPlayList(pl, true);
 
-        // Show gallery view
-        m_actToolBarGallery->trigger();
+        if (pl->count() > 1) {
+            // Show gallery view
+            m_actToolBarGallery->trigger();
+        } else {
+            // Show image view
+            m_actToolBarImage->trigger();
+        }
     }
 }
 
