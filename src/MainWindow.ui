@@ -107,10 +107,10 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <property name="topMargin">
-            <number>0</number>
+            <number>1</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>1</number>
            </property>
            <item>
             <widget class="QPushButton" name="fsBtnCdUp">
