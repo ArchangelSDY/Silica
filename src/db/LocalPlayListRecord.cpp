@@ -20,7 +20,7 @@ PlayList *LocalPlayListRecord::playList()
         QStringList imageUrls =
             LocalDatabase::instance()->queryImageUrlsForLocalPlayListRecord(m_id);
         foreach (const QString &imageUrl, imageUrls) {
-            m_playList->addPath(QUrl(imageUrl));
+            m_playList->addMultiplePath(QUrl(imageUrl));
         }
     }
 

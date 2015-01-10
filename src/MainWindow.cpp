@@ -351,7 +351,22 @@ void MainWindow::loadSelectedPath()
 
         foreach (QGraphicsItem *item, selectedItems) {
             FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
-            pl->addPath(fsItem->path());
+            pl->addMultiplePath(fsItem->path());
+        }
+
+        // If only one item selected and only one image in playlist,
+        // add siblings too
+        if (selectedItems.count() == 1 && pl->count() == 1) {
+            FileSystemItem *fsItem =
+                static_cast<FileSystemItem *>(selectedItems[0]);
+            QDir curDir = fsItem->fileInfo().dir();
+            QFileInfoList entries = curDir.entryInfoList(
+                ImageSourceManager::instance()->nameFilters(),
+                QDir::Files | QDir::NoDotAndDotDot,
+                QDir::Name);
+            foreach (const QFileInfo &info, entries) {
+                pl->addSinglePath(info.absoluteFilePath());
+            }
         }
 
         // Empty playlist will not be loaded
@@ -387,9 +402,9 @@ void MainWindow::processCommandLineOptions()
     foreach (const QString& imagePath, imagePaths) {
         QString pattern = imagePath.left(imagePath.indexOf("://"));
         if (urlPatterns.contains(pattern)) {
-            playList->addPath(QUrl(imagePath));
+            playList->addMultiplePath(QUrl(imagePath));
         } else {
-            playList->addPath(imagePath);
+            playList->addMultiplePath(imagePath);
         }
     }
 

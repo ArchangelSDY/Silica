@@ -20,7 +20,7 @@ PlayList::PlayList(const QList<QUrl> &imageUrls) :
     m_filter(AbstractPlayListFilter::defaultFilter())
 {
     foreach(const QUrl &imageUrl, imageUrls) {
-        addPath(imageUrl);
+        addMultiplePath(imageUrl);
     }
 }
 
@@ -37,7 +37,29 @@ PlayList::~PlayList()
     delete m_filter;
 }
 
-void PlayList::addPath(const QString &path)
+void PlayList::addSinglePath(const QString &path)
+{
+    ImageSource *imageSource =
+        ImageSourceManager::instance()->createSingle(path);
+    if (imageSource) {
+        *this << QSharedPointer<Image>(new Image(imageSource));
+    }
+}
+
+void PlayList::addSinglePath(const QUrl &url)
+{
+    if (url.isEmpty()) {
+        return;
+    }
+
+    ImageSource *imageSource =
+        ImageSourceManager::instance()->createSingle(url);
+    if (imageSource) {
+        *this << QSharedPointer<Image>(new Image(imageSource));
+    }
+}
+
+void PlayList::addMultiplePath(const QString &path)
 {
     QList<ImageSource *> imageSources =
         ImageSourceManager::instance()->createMultiple(path);
@@ -46,7 +68,7 @@ void PlayList::addPath(const QString &path)
     }
 }
 
-void PlayList::addPath(const QUrl &url)
+void PlayList::addMultiplePath(const QUrl &url)
 {
     if (url.isEmpty()) {
         return;

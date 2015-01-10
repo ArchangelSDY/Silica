@@ -20,8 +20,10 @@ public:
     PlayListRecord *record() { return m_record; }
     void setRecord(PlayListRecord *record) { m_record = record; }
 
-    void addPath(const QString &);
-    void addPath(const QUrl &);
+    void addSinglePath(const QString &);
+    void addSinglePath(const QUrl &);
+    void addMultiplePath(const QString &);
+    void addMultiplePath(const QUrl &);
 
     void sortByName();
     void sortByAspectRatio();
