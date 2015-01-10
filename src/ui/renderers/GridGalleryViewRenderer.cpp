@@ -1,6 +1,7 @@
 #include "GalleryItem.h"
 #include "GlobalConfig.h"
 #include "GridGalleryViewRenderer.h"
+#include <QDebug>
 
 static const qreal GROUP_PADDING_ROW = 0.1;
 
@@ -63,8 +64,9 @@ void GridGalleryViewRenderer::layout(QList<QGraphicsItem *> &items,
         }
     }
 
-    QRectF newSceneRect(0, 0,
-        maxColumns * galleryItemSize.width(),
-        (curRow + 1) * galleryItemSize.height());
+    QSizeF newSceneSize(maxColumns * galleryItemSize.width(),
+                        (curRow + 1) * galleryItemSize.height());
+    newSceneSize = newSceneSize.expandedTo(QSize(0, viewGeometry.height()));
+    QRectF newSceneRect(QPointF(0, 0), newSceneSize);
     m_scene->setSceneRect(newSceneRect);
 }

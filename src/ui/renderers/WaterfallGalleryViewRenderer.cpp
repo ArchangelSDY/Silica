@@ -78,8 +78,9 @@ void WaterfallGalleryViewRenderer::layout(
         maxColumnHeight = qMax(maxColumnHeight, y);
     }
 
-    QRectF newSceneRect(0, 0,
-        maxColumns * galleryItemSize.width(),
-        maxColumnHeight);
+    QSizeF newSceneSize(maxColumns * galleryItemSize.width(),
+                        maxColumnHeight);
+    newSceneSize = newSceneSize.expandedTo(QSize(0, viewGeometry.height()));
+    QRectF newSceneRect(QPointF(0, 0), newSceneSize);
     m_scene->setSceneRect(newSceneRect);
 }
