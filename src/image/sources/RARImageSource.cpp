@@ -1,7 +1,6 @@
 #include <QByteArray>
 #include <QCryptographicHash>
 #include <QTextStream>
-#include <QDebug>
 
 #include "deps/QtRAR/src/qtrar.h"
 #include "deps/QtRAR/src/qtrarfile.h"
