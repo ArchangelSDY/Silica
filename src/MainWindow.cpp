@@ -350,6 +350,12 @@ void MainWindow::loadSelectedPath()
             FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
             pl->addPath(fsItem->path());
         }
+
+        // Empty playlist will not be loaded
+        if (pl->count() == 0) {
+            return;
+        }
+
         pl->sortByName();
 
         // Navigator should take ownership of PlayList in this case
