@@ -10,19 +10,27 @@ public:
     CompactImageRenderer(
         AbstractGalleryItemRenderer *parentRenderer = 0,
         QImage *image = 0,
-        const QRect &imageRect = QRect(
-            QPoint(BORDER, BORDER),
-            GlobalConfig::instance()->galleryItemSize()
-                - QSize(2 * BORDER, 2 * BORDER)));
+        const QRect &boundingRect = QRect(
+            QPoint(0, 0), GlobalConfig::instance()->galleryItemSize()));
 
     virtual void layout();
     virtual void paint(QPainter *painter);
 
-private:
-    static const int BORDER;
+    AbstractGalleryItemRenderer *setBorder(
+        int border, const QColor &color = Qt::transparent);
+    AbstractGalleryItemRenderer *setPadding(
+        int padding, const QColor &color = Qt::transparent);
+    AbstractGalleryItemRenderer *translate(int dx, int dy);
 
+private:
     QRect m_imageRect;
     QRect m_imageSourceRect;
+    int m_border;
+    QColor m_borderColor;
+    int m_padding;
+    QColor m_paddingColor;
+    int m_translateX;
+    int m_translateY;
 };
 
 #endif // COMPACTIMAGERENDERER_H

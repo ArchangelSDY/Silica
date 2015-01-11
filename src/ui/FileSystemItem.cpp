@@ -70,10 +70,9 @@ void FileSystemItem::load()
         if (!found) {
             // No suitable image found.
             //
-            // Since it's a folder, we set a dummy thumbnail and leave render
-            // factory to create background icon. Null image cannot be used here
-            // because it will not trigger a paint.
-            setThumbnail(new QImage(1, 1, QImage::Format_ARGB32));
+            // Since it's a folder, we set a null thumbnail and leave render
+            // factory to create background icon.
+            setThumbnail(new QImage());
         }
     } else {
         // Individual file

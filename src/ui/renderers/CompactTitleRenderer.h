@@ -12,8 +12,9 @@ public:
     virtual void layout();
     virtual void paint(QPainter *painter);
 
-private:
     static const int TITLE_HEIGHT;
+
+private:
     static const int TITLE_LEFT_PADDING;
 
     QString m_title;

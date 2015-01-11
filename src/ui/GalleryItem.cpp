@@ -50,21 +50,17 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
-    if (!thumbnail->isNull()) {
-        m_thumbnail = thumbnail;
-        m_renderer->setImage(m_thumbnail);
-        prepareGeometryChange();
-        m_renderer->layout();
-        update(boundingRect());
-        if (scene()) {
-            QList<QGraphicsView *> views = scene()->views();
-            if (!views.isEmpty()) {
-                GalleryView *view = static_cast<GalleryView *>(views[0]);
-                view->scheduleLayout();
-            }
+    m_thumbnail = thumbnail;
+    m_renderer->setImage(m_thumbnail);
+    prepareGeometryChange();
+    m_renderer->layout();
+    update(boundingRect());
+    if (scene()) {
+        QList<QGraphicsView *> views = scene()->views();
+        if (!views.isEmpty()) {
+            GalleryView *view = static_cast<GalleryView *>(views[0]);
+            view->scheduleLayout();
         }
-    } else {
-        delete thumbnail;
     }
 
     // We always consider it ready no matter whether thumbnail is null
@@ -73,7 +69,7 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
 
 bool GalleryItem::isReadyToShow()
 {
-    return m_thumbnail && !m_thumbnail->isNull();
+    return m_thumbnail != 0;
 }
 
 void GalleryItem::scheduleSelectedAfterShown()
