@@ -18,7 +18,7 @@ public:
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count) = 0;
     virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QFileInfo &pathInfo) = 0;
+        const QFileInfo &pathInfo, bool useDefaultFolderCover) = 0;
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
         QGraphicsScene *scene);

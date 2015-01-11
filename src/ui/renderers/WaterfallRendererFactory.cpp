@@ -16,7 +16,7 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForPlay
 }
 
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForFileSystemView(
-    const QFileInfo &)
+    const QFileInfo &, bool)
 {
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }

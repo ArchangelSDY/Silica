@@ -10,7 +10,7 @@ public:
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &, const int);
     AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QFileInfo &);
+        const QFileInfo &, bool);
 };
 
 #endif // LOOSERENDERERFACTORY_H

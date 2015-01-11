@@ -33,6 +33,7 @@ private:
 
     QFileInfo m_pathInfo;
     Image *m_coverImage;
+    bool m_useDefaultFolderCover;
 };
 
 #endif // FILESYSTEMITEM_H

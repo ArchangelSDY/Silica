@@ -11,10 +11,10 @@ FileSystemItem::FileSystemItem(const QString &path,
                                QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
     m_pathInfo(QFileInfo(path)) ,
-    m_coverImage(0)
+    m_coverImage(0) ,
+    m_useDefaultFolderCover(true)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-
     setToolTip(m_pathInfo.fileName());
     createRenderer();
 }
@@ -61,6 +61,7 @@ void FileSystemItem::load()
             ImageSource *src = ImageSourceManager::instance()->createSingle(
                 dirIter.next());
             if (src) {
+                m_useDefaultFolderCover = false;
                 loadCover(src);
                 found = true;
                 break;
@@ -69,10 +70,7 @@ void FileSystemItem::load()
 
         if (!found) {
             // No suitable image found.
-            //
-            // Since it's a folder, we set a null thumbnail and leave render
-            // factory to create background icon.
-            setThumbnail(new QImage());
+            setThumbnail(new QImage(":/res/folder.png"));
         }
     } else {
         // Individual file
@@ -86,12 +84,15 @@ void FileSystemItem::load()
             setThumbnail(new QImage(":/res/image.png"));
         }
     }
+
+    // Re-create render here to refresh "m_useDefaultFolderCover"
+    createRenderer();
 }
 
 void FileSystemItem::createRenderer()
 {
-    setRenderer(
-        m_rendererFactory->createItemRendererForFileSystemView(m_pathInfo));
+    setRenderer(m_rendererFactory->createItemRendererForFileSystemView(
+        m_pathInfo, m_useDefaultFolderCover));
 }
 
 void FileSystemItem::coverThumbnailLoaded()

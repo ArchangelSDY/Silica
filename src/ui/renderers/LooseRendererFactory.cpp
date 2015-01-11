@@ -18,7 +18,7 @@ AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForPlayList
 }
 
 AbstractGalleryItemRenderer *LooseRendererFactory::createItemRendererForFileSystemView(
-    const QFileInfo &)
+    const QFileInfo &, bool)
 {
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }
