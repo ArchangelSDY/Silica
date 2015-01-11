@@ -10,7 +10,7 @@ public:
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count);
     AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QString &title);
+        const QFileInfo &pathInfo);
 };
 
 #endif // COMPACTRENDERERFACTORY_H

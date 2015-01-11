@@ -10,7 +10,7 @@ public:
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count);
     virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QString &title);
+        const QFileInfo &);
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
         QGraphicsScene *scene);

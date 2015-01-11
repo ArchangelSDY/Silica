@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include <QString>
 
+class QFileInfo;
+
 class AbstractGalleryItemRenderer;
 class AbstractGalleryViewRenderer;
 
@@ -16,7 +18,7 @@ public:
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
         const QString &title, const int count) = 0;
     virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QString &title) = 0;
+        const QFileInfo &pathInfo) = 0;
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
         QGraphicsScene *scene);

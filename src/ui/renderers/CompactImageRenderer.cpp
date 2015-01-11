@@ -1,11 +1,16 @@
 #include "CompactImageRenderer.h"
 #include "GlobalConfig.h"
+#include "Image.h"
 
 const int CompactImageRenderer::BORDER = 1;
 
-CompactImageRenderer::CompactImageRenderer() :
-    AbstractGalleryItemRenderer()
+CompactImageRenderer::CompactImageRenderer(
+        AbstractGalleryItemRenderer *parentRenderer,
+        QImage *image, const QRect &imageRect) :
+    AbstractGalleryItemRenderer(parentRenderer) ,
+    m_imageRect(imageRect)
 {
+    m_image = image;
 }
 
 void CompactImageRenderer::layout()
@@ -14,11 +19,9 @@ void CompactImageRenderer::layout()
         return;
     }
 
-    QSize margins(2 * CompactImageRenderer::BORDER, 2 * CompactImageRenderer::BORDER);
-    m_imageRect.setSize(GlobalConfig::instance()->galleryItemSize() - margins);
-    m_imageRect.moveTo(BORDER, BORDER);
-    const QSize &imageSize = m_image->size();
+    AbstractGalleryItemRenderer::layout();
 
+    const QSize &imageSize = m_image->size();
     QSize sourcePaintSize = m_imageRect.size().scaled(
         imageSize, Qt::KeepAspectRatio);
     m_imageSourceRect.setSize(sourcePaintSize);
@@ -32,6 +35,10 @@ void CompactImageRenderer::layout()
 
 void CompactImageRenderer::paint(QPainter *painter)
 {
+    if (m_parentRenderer) {
+        m_parentRenderer->paint(painter);
+    }
+
     if (!m_image) {
         return;
     }

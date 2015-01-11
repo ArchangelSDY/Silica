@@ -10,13 +10,12 @@ FileSystemItem::FileSystemItem(const QString &path,
                                AbstractRendererFactory *rendererFactory,
                                QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
-    m_path(path) ,
+    m_pathInfo(QFileInfo(path)) ,
     m_coverImage(0)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
 
-    QFileInfo info(m_path);
-    setToolTip(info.fileName());
+    setToolTip(m_pathInfo.fileName());
     createRenderer();
 }
 
@@ -34,12 +33,12 @@ QRectF FileSystemItem::boundingRect() const
 
 QString FileSystemItem::path() const
 {
-    return m_path;
+    return m_pathInfo.absoluteFilePath();
 }
 
 QFileInfo FileSystemItem::fileInfo() const
 {
-    return QFileInfo(m_path);
+    return m_pathInfo;
 }
 
 void FileSystemItem::load()
@@ -52,10 +51,9 @@ void FileSystemItem::load()
         delete m_thumbnail;
     }
 
-    QFileInfo finfo(m_path);
-    if (finfo.isDir()) {
+    if (m_pathInfo.isDir()) {
         // For directory, try to use first image inside as cover
-        QDirIterator dirIter(finfo.absoluteFilePath(),
+        QDirIterator dirIter(m_pathInfo.absoluteFilePath(),
                              ImageSourceManager::instance()->nameFilters(),
                              QDir::Files);
         bool found = false;
@@ -70,13 +68,17 @@ void FileSystemItem::load()
         }
 
         if (!found) {
-            // No suitable image found
-            setThumbnail(new QImage(":/res/folder.png"));
+            // No suitable image found.
+            //
+            // Since it's a folder, we set a dummy thumbnail and leave render
+            // factory to create background icon. Null image cannot be used here
+            // because it will not trigger a paint.
+            setThumbnail(new QImage(1, 1, QImage::Format_ARGB32));
         }
     } else {
         // Individual file
         ImageSource *src = ImageSourceManager::instance()->createSingle(
-            finfo.absoluteFilePath());
+            m_pathInfo.absoluteFilePath());
         if (src) {
             // Load thumbnail for image file
             loadCover(src);
@@ -89,7 +91,8 @@ void FileSystemItem::load()
 
 void FileSystemItem::createRenderer()
 {
-    setRenderer(m_rendererFactory->createItemRendererForFileSystemView(m_path));
+    setRenderer(
+        m_rendererFactory->createItemRendererForFileSystemView(m_pathInfo));
 }
 
 void FileSystemItem::coverThumbnailLoaded()

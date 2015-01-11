@@ -3,7 +3,8 @@
 AbstractGalleryItemRenderer::AbstractGalleryItemRenderer(
     AbstractGalleryItemRenderer *parentRenderer) :
     m_parentRenderer(parentRenderer) ,
-    m_image(0)
+    m_image(0) ,
+    m_isOwnImage(false)
 {
 }
 
@@ -12,11 +13,18 @@ AbstractGalleryItemRenderer::~AbstractGalleryItemRenderer()
     if (m_parentRenderer) {
         delete m_parentRenderer;
     }
+    if (m_isOwnImage && m_image) {
+        delete m_image;
+    }
 }
 
-void AbstractGalleryItemRenderer::setImage(const QImage *image)
+void AbstractGalleryItemRenderer::setImage(const QImage *image,
+                                           bool isOwnImage)
 {
-    m_image = image;
+    if (!m_image) {
+        m_image = image;
+    }
+    m_isOwnImage = isOwnImage;
     if (m_parentRenderer) {
         m_parentRenderer->setImage(image);
     }

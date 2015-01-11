@@ -31,7 +31,7 @@ private slots:
 private:
     void loadCover(ImageSource *src);
 
-    QString m_path;
+    QFileInfo m_pathInfo;
     Image *m_coverImage;
 };
 

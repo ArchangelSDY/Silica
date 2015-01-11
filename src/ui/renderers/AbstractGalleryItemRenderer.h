@@ -9,7 +9,7 @@ public:
     AbstractGalleryItemRenderer(AbstractGalleryItemRenderer *parentRenderer = 0);
     virtual ~AbstractGalleryItemRenderer();
 
-    void setImage(const QImage *image);
+    void setImage(const QImage *image, bool isOwnImage = false);
 
     virtual QRect boundingRect() const;
     virtual void layout();
@@ -19,6 +19,7 @@ protected:
     AbstractGalleryItemRenderer *m_parentRenderer;
     QRect m_boundingRect;
     const QImage *m_image;
+    bool m_isOwnImage;
 };
 
 #endif // ABSTRACTGALLERYITEMRENDERER_H
