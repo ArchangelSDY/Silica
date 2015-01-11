@@ -21,7 +21,7 @@ public:
     PlayListRecord *record() { return m_record; }
 
     void load();
-    void setRendererFactory(AbstractRendererFactory *factory);
+    virtual void createRenderer();
 
 private slots:
     void loadThumbnail();

@@ -42,6 +42,12 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
     m_renderer->layout();
 }
 
+void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
+{
+    m_rendererFactory = factory;
+    createRenderer();
+}
+
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
     if (!thumbnail->isNull()) {

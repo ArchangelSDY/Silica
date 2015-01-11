@@ -17,7 +17,7 @@ public:
     virtual ~GalleryItem();
 
     virtual void load() = 0;
-    virtual void setRendererFactory(AbstractRendererFactory *factory) = 0;
+    void setRendererFactory(AbstractRendererFactory *factory);
 
     /**
      * @brief Call by GalleryView during layout to check if thumbnail is ready.
@@ -42,6 +42,7 @@ protected:
     virtual QVariant itemChange(GraphicsItemChange change,
                                 const QVariant &value);
     void setRenderer(AbstractGalleryItemRenderer *renderer);
+    virtual void createRenderer() = 0;
     void setThumbnail(QImage *thumbnail);
 
     // TODO: should not be accessed by derived classes directly

@@ -20,7 +20,7 @@ public:
     ImagePtr image() { return m_image; }
 
     void load();
-    void setRendererFactory(AbstractRendererFactory *factory);
+    virtual void createRenderer();
 
 private slots:
     void thumbnailLoaded();

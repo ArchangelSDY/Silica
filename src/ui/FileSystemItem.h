@@ -22,7 +22,7 @@ public:
     QFileInfo fileInfo() const;
 
     void load();
-    void setRendererFactory(AbstractRendererFactory *factory);
+    virtual void createRenderer();
 
 private slots:
     void coverThumbnailLoaded();

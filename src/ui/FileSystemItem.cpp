@@ -17,8 +17,7 @@ FileSystemItem::FileSystemItem(const QString &path,
 
     QFileInfo info(m_path);
     setToolTip(info.fileName());
-    setRenderer(m_rendererFactory->createItemRendererForFileSystemView(
-        info.fileName()));
+    createRenderer();
 }
 
 FileSystemItem::~FileSystemItem()
@@ -88,9 +87,8 @@ void FileSystemItem::load()
     }
 }
 
-void FileSystemItem::setRendererFactory(AbstractRendererFactory *factory)
+void FileSystemItem::createRenderer()
 {
-    m_rendererFactory = factory;
     setRenderer(m_rendererFactory->createItemRendererForFileSystemView(m_path));
 }
 
