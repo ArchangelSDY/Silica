@@ -22,7 +22,7 @@ FileSystemItem::FileSystemItem(const QString &path,
 FileSystemItem::~FileSystemItem()
 {
     if (m_coverImage) {
-        delete m_coverImage;
+        m_coverImage->deleteLater();
     }
 }
 
@@ -103,14 +103,14 @@ void FileSystemItem::coverThumbnailLoaded()
     } else {
         setThumbnail(new QImage(":/res/image.png"));
     }
-    delete m_coverImage;
+    m_coverImage->deleteLater();
     m_coverImage = 0;
 }
 
 void FileSystemItem::coverThumbnailLoadFailed()
 {
     setThumbnail(new QImage(":/res/image.png"));
-    delete m_coverImage;
+    m_coverImage->deleteLater();
     m_coverImage = 0;
 }
 
