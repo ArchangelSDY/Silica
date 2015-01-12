@@ -1,4 +1,5 @@
-#include <qglobal.h>
+#include <QtGlobal>
+#include <QUuid>
 
 #ifdef Q_OS_UNIX
 #include <sys/types.h>
@@ -14,9 +15,33 @@
 #include "ImageHistogram.h"
 #include "ImageRank.h"
 #include "ImageSourceManager.h"
+#include "util/ConcurrentHash.h"
 
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
+
+static ConcurrentHash<QUuid, bool> s_liveImages;
+
+class LiveImageRunnable : public QRunnable
+{
+public:
+    LiveImageRunnable(const QUuid &uuid, QRunnable *wrapped) :
+        m_uuid(uuid) ,
+        m_wrapped(wrapped)
+    {
+    }
+
+    void run()
+    {
+        if (m_wrapped && s_liveImages.contains(m_uuid)) {
+            m_wrapped->run();
+        }
+    }
+
+private:
+    QUuid m_uuid;
+    QRunnable *m_wrapped;
+};
 
 // ---------- Load Image Task ----------
 class LoadImageTask : public QObject, public QRunnable
@@ -30,7 +55,7 @@ public:
     void run();
 
 signals:
-    void loaded(QList<QImage *> image, QList<int> durations);
+    void loaded(QList<QSharedPointer<QImage> > images, QList<int> durations);
 
 private:
     QSharedPointer<ImageSource> m_imageSource;
@@ -38,7 +63,7 @@ private:
 
 void LoadImageTask::run()
 {
-    QList<QImage *> images;
+    QList<QSharedPointer<QImage> > images;
     QList<int> durations;
     if (!m_imageSource.isNull() && m_imageSource->open()) {
         QImageReader reader(m_imageSource->device());
@@ -46,7 +71,7 @@ void LoadImageTask::run()
         forever {
             QImage image = reader.read();
             if (!image.isNull()) {
-                images << new QImage(image);
+                images << QSharedPointer<QImage>::create(image);
                 durations << reader.nextImageDelay();
             } else {
                 break;
@@ -57,7 +82,7 @@ void LoadImageTask::run()
     }
 
     if (images.isEmpty()) {
-        images << new QImage();
+        images << QSharedPointer<QImage>::create();
         durations << 0;
     }
 
@@ -77,7 +102,7 @@ public:
     void run();
 
 signals:
-    void loaded(QImage *thumbnail, bool makeImmediately);
+    void loaded(QSharedPointer<QImage> thumbnail, bool makeImmediately);
 
 private:
     QString m_thumbnailPath;
@@ -96,17 +121,18 @@ void LoadThumbnailTask::run()
         buf.modtime = now;
         utime(m_thumbnailPath.toUtf8().data(), &buf);
 #endif
-        QImage *image = new QImage(m_thumbnailPath);
+        QSharedPointer<QImage> image =
+            QSharedPointer<QImage>::create(m_thumbnailPath);
         if (!image->isNull()) {
             emit loaded(image, m_makeImmediately);
         } else {
             // Broken thumbnail, delete it
-            delete image;
+            image.clear();
             file.remove();
-            emit loaded(0, m_makeImmediately);
+            emit loaded(QSharedPointer<QImage>(), m_makeImmediately);
         }
     } else {
-        emit loaded(0, m_makeImmediately);
+        emit loaded(QSharedPointer<QImage>(), m_makeImmediately);
     }
 }
 
@@ -128,7 +154,7 @@ public:
     void run();
 
 signals:
-    void thumbnailMade(QImage *thumbnail);
+    void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
 private:
       QImage *m_image;
@@ -138,15 +164,15 @@ private:
 void MakeThumbnailTask::run()
 {
     if (!m_image) {
-        emit thumbnailMade(0);
+        emit thumbnailMade(QSharedPointer<QImage>());
         return;
     }
 
     int height = qMax<int>(
         THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
 
-    QImage *thumbnail = new QImage(m_image->scaledToHeight(height,
-        Qt::SmoothTransformation));
+    QSharedPointer<QImage> thumbnail = QSharedPointer<QImage>(
+        new QImage(m_image->scaledToHeight(height, Qt::SmoothTransformation)));
     thumbnail->save(m_path, "JPG");
     emit thumbnailMade(thumbnail);
 }
@@ -157,6 +183,7 @@ const QSize Image::UNKNOWN_SIZE = QSize(-1, -1);
 
 Image::Image(QUrl url, QObject *parent) :
     QObject(parent) ,
+    m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(url)) ,
     m_thumbnail(new QImage()) ,
@@ -170,6 +197,8 @@ Image::Image(QUrl url, QObject *parent) :
     m_isAnimation(false) ,
     m_thumbHist(0)
 {
+    s_liveImages.insert(m_uuid, true);
+
     resetFrames();
     computeThumbnailPath();
     loadMetaFromDatabase();
@@ -180,6 +209,7 @@ Image::Image(QUrl url, QObject *parent) :
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
     QObject(parent) ,
+    m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,
     m_imageSource(imageSource) ,
     m_thumbnail(new QImage()) ,
@@ -193,6 +223,8 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
     m_isAnimation(false) ,
     m_thumbHist(0)
 {
+    s_liveImages.insert(m_uuid, true);
+
     resetFrames();
     computeThumbnailPath();
     loadMetaFromDatabase();
@@ -203,6 +235,8 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
 
 Image::~Image()
 {
+    s_liveImages.remove(m_uuid);
+
     destroyFrames();
 
     m_imageSource.clear();
@@ -231,10 +265,13 @@ void Image::load(int priority)
     m_isLoadingImage = true;
 
     LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
-    connect(loadImageTask, SIGNAL(loaded(QList<QImage*>, QList<int>)),
-            this, SLOT(imageReaderFinished(QList<QImage*>, QList<int>)));
-    // QThreadPool::globalInstance()->reserveThread();
-    QThreadPool::globalInstance()->start(loadImageTask, priority);
+    connect(loadImageTask,
+            SIGNAL(loaded(QList<QSharedPointer<QImage> >, QList<int>)),
+            this,
+            SLOT(imageReaderFinished(QList<QSharedPointer<QImage> >, QList<int>)));
+    QThreadPool::globalInstance()->start(
+        new LiveImageRunnable(m_uuid, loadImageTask),
+        priority);
 }
 
 void Image::scheduleUnload()
@@ -272,16 +309,18 @@ void Image::resetFrames(QImage *defaultFrame, int defaultDuration)
     m_durations << defaultDuration;
 }
 
-void Image::imageReaderFinished(QList<QImage *> images, QList<int> durations)
+void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
+                                QList<int> durations)
 {
     Q_ASSERT(images.count() > 0);
     Q_ASSERT(durations.count() > 0);
 
-    // QThreadPool::globalInstance()->releaseThread();
     m_isLoadingImage = false;
 
     destroyFrames();
-    m_frames = images;
+    foreach (const QSharedPointer<QImage> &image, images) {
+        m_frames.append(new QImage(*image));
+    }
     m_durations = durations;
 
     if (m_thumbnail->isNull()) {
@@ -313,14 +352,15 @@ void Image::imageReaderFinished(QList<QImage *> images, QList<int> durations)
     unloadIfNeeded();
 }
 
-void Image::thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately)
+void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
+                                    bool makeImmediately)
 {
     // QThreadPool::globalInstance()->releaseThread();
     m_isLoadingThumbnail = false;
 
     if (thumbnail) {
         delete m_thumbnail;
-        m_thumbnail = thumbnail;
+        m_thumbnail = new QImage(*thumbnail);
 
         emit thumbnailLoaded();
     } else if (makeImmediately) {
@@ -348,11 +388,12 @@ void Image::loadThumbnail(bool makeImmediately)
         QDir::separator() + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
         new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
-    connect(loadThumbnailTask, SIGNAL(loaded(QImage *, bool)),
-            this, SLOT(thumbnailReaderFinished(QImage *, bool)));
-    // QThreadPool::globalInstance()->reserveThread();
+    connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
+            this, SLOT(thumbnailReaderFinished(QSharedPointer<QImage>, bool)));
     // Thumbnail loading should be low priority
-    QThreadPool::globalInstance()->start(loadThumbnailTask, LowPriority);
+    QThreadPool::globalInstance()->start(
+        new LiveImageRunnable(m_uuid, loadThumbnailTask),
+        LowPriority);
 }
 
 void Image::makeThumbnail()
@@ -374,18 +415,18 @@ void Image::makeThumbnail()
         QDir::separator() + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
         new MakeThumbnailTask(new QImage(*defaultFrame()), thumbnailFullPath);
-    connect(makeThumbnailTask, SIGNAL(thumbnailMade(QImage*)),
-            this, SLOT(thumbnailMade(QImage*)));
-    // QThreadPool::globalInstance()->reserveThread();
-    QThreadPool::globalInstance()->start(makeThumbnailTask);
+    connect(makeThumbnailTask, SIGNAL(thumbnailMade(QSharedPointer<QImage>)),
+            this, SLOT(thumbnailMade(QSharedPointer<QImage>)));
+    QThreadPool::globalInstance()->start(
+        new LiveImageRunnable(m_uuid, makeThumbnailTask));
 }
 
-void Image::thumbnailMade(QImage *thumbnail)
+void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
     // QThreadPool::globalInstance()->releaseThread();
     if (thumbnail) {
         delete m_thumbnail;
-        m_thumbnail = thumbnail;
+        m_thumbnail = new QImage(*thumbnail);
 
         LocalDatabase::instance()->insertImage(this);
 

@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QImage>
 #include <QSettings>
+#include <QSharedPointer>
 
 #include "Definitions.h"
 #include "GlobalConfig.h"
@@ -94,6 +95,8 @@ void GlobalConfig::load()
     // Register meta types
     qRegisterMetaType<QList<QImage *> >("QList<QImage*>");
     qRegisterMetaType<QList<int> >("QList<int>");
+    qRegisterMetaType<QSharedPointer<QImage> >("QSharedPointer<QImage>");
+    qRegisterMetaType<QList<QSharedPointer<QImage> > >("QList<QSharedPointer<QImage> >");
 
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");

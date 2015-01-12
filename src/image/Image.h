@@ -7,6 +7,8 @@
 #include "ImageHotspot.h"
 #include "ImageSource.h"
 
+class QUuid;
+
 class ImageHistogram;
 class ImageRank;
 
@@ -87,9 +89,9 @@ signals:
     void hotpotsLoaded();
 
 private slots:
-    void imageReaderFinished(QList<QImage *> images, QList<int> durations);
-    void thumbnailReaderFinished(QImage *thumbnail, bool makeImmediately);
-    void thumbnailMade(QImage *thumbnail);
+    void imageReaderFinished(QList<QSharedPointer<QImage> > images, QList<int> durations);
+    void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail, bool makeImmediately);
+    void thumbnailMade(QSharedPointer<QImage> thumbnail);
     void initThumbHist();
 
 private:
@@ -107,6 +109,7 @@ private:
     void computeThumbnailPath();
     void loadMetaFromDatabase();
 
+    QUuid m_uuid;
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
     QImage *m_thumbnail;
