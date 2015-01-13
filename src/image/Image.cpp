@@ -276,7 +276,9 @@ void Image::load(int priority)
 
 void Image::scheduleUnload()
 {
-    unloadIfNeeded();
+    if (m_status == Image::LoadComplete) {
+        unloadIfNeeded();
+    }
 }
 
 void Image::unloadIfNeeded()
