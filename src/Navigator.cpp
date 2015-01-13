@@ -25,6 +25,7 @@ Navigator *Navigator::instance()
 Navigator::Navigator(QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
+    m_currentUuid(QUuid()) ,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
     m_cachedImages(MAX_CACHE) ,
@@ -54,6 +55,7 @@ void Navigator::reset()
     m_cachedImages.clear();
     m_currentImage = 0;
     m_currentIndex = -1;
+    m_currentUuid = QUuid();
     m_reverseNavigation = false;
     if (m_playList) {
         if (m_ownPlayList) {
@@ -112,9 +114,8 @@ void Navigator::reloadPlayList()
     // Cached index may be incorrect after filtering, clear cache.
     m_cachedImages.clear();
 
-    // Current index may be incorrect after filtering, reset to first image and
-    // force to reload it.
-    goIndex(0, true);
+    // Try to find new index of current image and reload it.
+    goUuid(m_currentUuid, true);
 }
 
 Image* Navigator::loadIndex(int index, bool shouldPaint)
@@ -170,6 +171,7 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     }
 
     m_currentIndex = index;
+    m_currentUuid = image->uuid();
     m_currentImage = image;
 
     emit paint(image);
@@ -182,6 +184,26 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     preload();
 
     return true;
+}
+
+bool Navigator::goUuid(const QUuid &uuid, bool forceReloadCurrent)
+{
+    if (uuid.isNull()) {
+        return false;
+    }
+
+    int index = 0;
+    for (; index < m_playList->count(); ++index) {
+        if (m_playList->at(index)->uuid() == uuid) {
+            break;
+        }
+    }
+
+    if (index < m_playList->count()) {
+        return goIndex(index, forceReloadCurrent);
+    } else {
+        return goIndex(0, forceReloadCurrent);
+    }
 }
 
 void Navigator::goIndexUntilSuccess(int index, int delta)

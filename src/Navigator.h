@@ -2,6 +2,7 @@
 #define NAVIGATOR_H
 
 #include <QObject>
+#include <QUuid>
 
 #include "Image.h"
 #include "ImagesCache.h"
@@ -72,6 +73,14 @@ public slots:
      */
     bool goIndex(int index, bool forceReloadCurrent = false);
 
+    /**
+     * @brief Go to specific image of `uuid`.
+     * @param uuid Image uuid.
+     * @param forceReloadCurrent If true, load even if current index not changed.
+     * @return true if loaded successfully.
+     */
+    bool goUuid(const QUuid &uuid, bool forceReloadCurrent = false);
+
     void imageLoaded();
     void thumbnailLoaded();
 
@@ -95,6 +104,7 @@ private:
     void setCacheStragegy();
 
     int m_currentIndex;
+    QUuid m_currentUuid;
     Image* m_currentImage;
     bool m_reverseNavigation;
     bool m_isLooping;

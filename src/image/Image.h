@@ -38,6 +38,7 @@ public:
         LowestPriority = -2,
     };
 
+    QUuid uuid() const { return m_uuid; }
     Status status() const { return m_status; }
     QImage data()
     {
