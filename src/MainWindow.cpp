@@ -365,7 +365,10 @@ void MainWindow::loadSelectedPath()
                 QDir::Files | QDir::NoDotAndDotDot,
                 QDir::Name);
             foreach (const QFileInfo &info, entries) {
-                pl->addSinglePath(info.absoluteFilePath());
+                // Avoid duplicate
+                if (info.absoluteFilePath() != fsItem->path()) {
+                    pl->addSinglePath(info.absoluteFilePath());
+                }
             }
         }
 
