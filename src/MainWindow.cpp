@@ -370,14 +370,14 @@ void MainWindow::loadSelectedPath()
                     pl->addSinglePath(info.absoluteFilePath());
                 }
             }
+        } else {
+            pl->sortByName();
         }
 
         // Empty playlist will not be loaded
         if (pl->count() == 0) {
             return;
         }
-
-        pl->sortByName();
 
         // Navigator should take ownership of PlayList in this case
         m_navigator->setPlayList(pl, true);
