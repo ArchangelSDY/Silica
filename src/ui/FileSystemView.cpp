@@ -9,7 +9,8 @@
 #include "ui/renderers/CompactRendererFactory.h"
 
 FileSystemView::FileSystemView(QWidget *parent) :
-    GalleryView(parent)
+    GalleryView(parent) ,
+    m_sortFlags(QDir::Name | QDir::DirsFirst)
 {
     m_rendererFactory = new CompactRendererFactory();
 }
@@ -23,7 +24,7 @@ void FileSystemView::setRootPath(const QString &path)
     QFileInfoList entrieInfos = dir.entryInfoList(
         ImageSourceManager::instance()->nameFilters(),
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-        QDir::Name | QDir::DirsFirst);
+        m_sortFlags);
 
     incrItemsToLoad(entrieInfos.count());
 
@@ -44,6 +45,31 @@ void FileSystemView::cdUp()
     QDir dir(m_rootPath);
     dir.cdUp();
     setRootPath(dir.absolutePath());
+}
+
+void FileSystemView::sortByFlag(QDir::SortFlag flag)
+{
+    // Cannot use QFlags::testFlag() here because Qt sets QDir::Name == 0x00
+    // so that testFlag() will fail.
+    bool isReversed = ((m_sortFlags & flag) == flag)
+        && ((m_sortFlags & QDir::Reversed) == QDir::Reversed);
+    if (isReversed) {
+        m_sortFlags = flag | QDir::DirsFirst;
+    } else {
+        m_sortFlags = flag | QDir::DirsFirst | QDir::Reversed;
+    }
+
+    setRootPath(m_rootPath);
+}
+
+void FileSystemView::sortByName()
+{
+    sortByFlag(QDir::Name);
+}
+
+void FileSystemView::sortByModifiedTime()
+{
+    sortByFlag(QDir::Time);
 }
 
 void FileSystemView::removeSelectedOnDisk()
@@ -68,6 +94,24 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu(this);
 
+    QMenu *menuSort = menu->addMenu(tr("Sort By"));
+    QActionGroup *grpSorts = new QActionGroup(menu);
+    QAction *actSortByName = menuSort->addAction(tr("Name"),
+        this, SLOT(sortByName()));
+    grpSorts->addAction(actSortByName);
+    actSortByName->setCheckable(true);
+    QAction *actSortByModified = menuSort->addAction(tr("Last Modified"),
+        this, SLOT(sortByModifiedTime()));
+    grpSorts->addAction(actSortByModified);
+    actSortByModified->setCheckable(true);
+    actSortByModified->setChecked((m_sortFlags & QDir::Time) == QDir::Time);
+    // Hack here because Qt sets QDir::Name == 0x00.....WTF
+    if (grpSorts->checkedAction() == 0) {
+        actSortByName->setChecked(true);
+    }
+
+    menu->addSeparator();
+
     QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
     if (selectedItems.count() > 0) {
         menu->addAction(tr("Remove On Disk"), this,
@@ -75,4 +119,5 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
     }
 
     menu->exec(event->globalPos());
+    connect(menu, SIGNAL(aboutToHide()), menu, SLOT(deleteLater()));
 }

@@ -16,6 +16,10 @@ public slots:
     void cdUp();
 
 protected slots:
+    void sortByFlag(QDir::SortFlag flag);
+    void sortByName();
+    void sortByModifiedTime();
+
     void removeSelectedOnDisk();
 
 protected:
@@ -24,6 +28,7 @@ protected:
 private:
     QString m_rootPath;
     QStringList m_entries;
+    QDir::SortFlags m_sortFlags;
 };
 
 #endif // FILESYSTEMVIEW_H
