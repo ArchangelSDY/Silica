@@ -5,6 +5,9 @@ if(ENABLE_OPENGL)
     include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 endif(ENABLE_OPENGL)
 
+add_definitions(-DQTRAR_STATIC)
+add_definitions(-DQUAZIP_STATIC)
+
 add_subdirectory(deps/qwebpa)
 add_subdirectory(deps/quazip)
 add_subdirectory(deps/Qt7z)
@@ -68,6 +71,7 @@ list(APPEND SRCS
 
 set(LINK_LIBS
     ${CMAKE_THREAD_LIBS_INIT}
+    ${ZLIB_LIBRARIES}
     ${OpenCV_LIBS}
     qt7z
     qtrar
@@ -83,7 +87,12 @@ if(ENABLE_OPENGL)
     set(LINK_LIBS ${LINK_LIBS} Qt5::OpenGL)
 endif(ENABLE_OPENGL)
 
-add_executable(silica ${SRCS})
+if (WIN32)
+    add_executable(silica WIN32 ${SRCS})
+else (WIN32)
+    add_executable(silica ${SRC})
+endif (WIN32)
+
 target_link_libraries(silica ${LINK_LIBS})
 
 add_custom_command(TARGET silica POST_BUILD

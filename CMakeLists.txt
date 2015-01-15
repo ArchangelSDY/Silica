@@ -2,6 +2,7 @@ project (silica)
 cmake_minimum_required(VERSION 2.8.11)
 
 find_package(Threads)
+find_package(ZLIB REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Sql REQUIRED)
@@ -14,11 +15,14 @@ set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${QT_QTCORE_INCLUDE_DIR}/../..)
 endif()
+
+include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${Qt5Core_INCLUDE_DIRS})
 include_directories(${Qt5Network_INCLUDE_DIRS})
 include_directories(${Qt5Sql_INCLUDE_DIRS})
 include_directories(${Qt5Test_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # All build libraries are moved to this directory
 # SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
