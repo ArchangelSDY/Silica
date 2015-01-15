@@ -90,7 +90,7 @@ endif(ENABLE_OPENGL)
 if (WIN32)
     add_executable(silica WIN32 ${SRCS})
 else (WIN32)
-    add_executable(silica ${SRC})
+    add_executable(silica ${SRCS})
 endif (WIN32)
 
 target_link_libraries(silica ${LINK_LIBS})
