@@ -1,10 +1,69 @@
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QThreadPool>
 
 #include "image/Image.h"
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
 #include "ui/GalleryView.h"
+
+class LoadRunnable : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    LoadRunnable(FileSystemItem *item) : m_item(item) {}
+
+    virtual void run()
+    {
+        if (m_item->m_pathInfo.isDir()) {
+            // For directory, try to use first image inside as cover
+            QDirIterator dirIter(m_item->m_pathInfo.absoluteFilePath(),
+                                 ImageSourceManager::instance()->nameFilters(),
+                                 QDir::Files);
+            bool found = false;
+            while (dirIter.hasNext()) {
+                QString path = dirIter.next();
+                ImageSource *src = ImageSourceManager::instance()->createSingle(
+                    path);
+                if (src) {
+                    m_item->m_useDefaultFolderCover = false;
+                    emit loadCover(path);
+                    found = true;
+                    delete src;
+                    break;
+                }
+            }
+
+            if (!found) {
+                // No suitable image found.
+                emit gotThumbnail(":/res/folder.png");
+            }
+        } else {
+            // Individual file
+            QString path = m_item->m_pathInfo.absoluteFilePath();
+            ImageSource *src =
+                ImageSourceManager::instance()->createSingle(path);
+            if (src) {
+                // Load thumbnail for image file
+                emit loadCover(path);
+                delete src;
+            } else {
+                // Not valid image
+                emit gotThumbnail(":/res/image.png");
+            }
+        }
+
+        emit done();
+    }
+
+signals:
+    void gotThumbnail(QString path);
+    void loadCover(QString path);
+    void done();
+
+private:
+    FileSystemItem *m_item;
+};
 
 FileSystemItem::FileSystemItem(const QString &path,
                                AbstractRendererFactory *rendererFactory,
@@ -51,40 +110,23 @@ void FileSystemItem::load()
         delete m_thumbnail;
     }
 
-    if (m_pathInfo.isDir()) {
-        // For directory, try to use first image inside as cover
-        QDirIterator dirIter(m_pathInfo.absoluteFilePath(),
-                             ImageSourceManager::instance()->nameFilters(),
-                             QDir::Files);
-        bool found = false;
-        while (dirIter.hasNext()) {
-            ImageSource *src = ImageSourceManager::instance()->createSingle(
-                dirIter.next());
-            if (src) {
-                m_useDefaultFolderCover = false;
-                loadCover(src);
-                found = true;
-                break;
-            }
-        }
+    LoadRunnable *r = new LoadRunnable(this);
+    connect(r, SIGNAL(gotThumbnail(QString)),
+            this, SLOT(gotThumbnail(QString)));
+    connect(r, SIGNAL(loadCover(QString)),
+            this, SLOT(loadCover(QString)));
+    connect(r, SIGNAL(done()),
+            this, SLOT(loaded()));
+    QThreadPool::globalInstance()->start(r);
+}
 
-        if (!found) {
-            // No suitable image found.
-            setThumbnail(new QImage(":/res/folder.png"));
-        }
-    } else {
-        // Individual file
-        ImageSource *src = ImageSourceManager::instance()->createSingle(
-            m_pathInfo.absoluteFilePath());
-        if (src) {
-            // Load thumbnail for image file
-            loadCover(src);
-        } else {
-            // Not valid image
-            setThumbnail(new QImage(":/res/image.png"));
-        }
-    }
+void FileSystemItem::gotThumbnail(QString path)
+{
+    setThumbnail(new QImage(path));
+}
 
+void FileSystemItem::loaded()
+{
     // Re-create render here to refresh "m_useDefaultFolderCover"
     createRenderer();
 }
@@ -114,8 +156,9 @@ void FileSystemItem::coverThumbnailLoadFailed()
     m_coverImage = 0;
 }
 
-void FileSystemItem::loadCover(ImageSource *src)
+void FileSystemItem::loadCover(QString path)
 {
+    ImageSource *src = ImageSourceManager::instance()->createSingle(path);
     m_coverImage = new Image(src);
     connect(m_coverImage, SIGNAL(thumbnailLoaded()),
             this, SLOT(coverThumbnailLoaded()));
@@ -124,3 +167,5 @@ void FileSystemItem::loadCover(ImageSource *src)
     m_coverImage->loadThumbnail(true);
 }
 
+
+#include "FileSystemItem.moc"

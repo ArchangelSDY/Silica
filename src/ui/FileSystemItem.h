@@ -11,6 +11,7 @@ class FileSystemItem : public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
+    friend class LoadRunnable;
 public:
     explicit FileSystemItem(const QString &path,
                             AbstractRendererFactory *rendererFactory,
@@ -25,12 +26,13 @@ public:
     virtual void createRenderer();
 
 private slots:
+    void gotThumbnail(QString path);
+    void loadCover(QString path);
+    void loaded();
     void coverThumbnailLoaded();
     void coverThumbnailLoadFailed();
 
 private:
-    void loadCover(ImageSource *src);
-
     QFileInfo m_pathInfo;
     Image *m_coverImage;
     bool m_useDefaultFolderCover;

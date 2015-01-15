@@ -40,8 +40,13 @@ GalleryView::~GalleryView()
 void GalleryView::clear()
 {
     // Clear first
-    foreach (const QGraphicsItem *item, m_scene->items()) {
-        delete item;
+    foreach (QGraphicsItem *rawItem, m_scene->items()) {
+        GalleryItem *item = static_cast<GalleryItem *>(rawItem);
+        if (item) {
+            item->deleteLater();
+        } else {
+            delete rawItem;
+        }
     }
     m_scene->clear();
     m_loadingItemsCount = 0;
