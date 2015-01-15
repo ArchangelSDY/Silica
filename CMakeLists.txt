@@ -32,7 +32,10 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+
+if (("$CMAKE_CXX_COMPILER_ID" STREQUAL "GNU") OR ("$CMAKE_CXX_COMPILER_ID" MATCHES "Clang"))
+	set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+endif ()
 
 add_subdirectory(src)
 
