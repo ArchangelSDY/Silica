@@ -14,7 +14,7 @@
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
-    m_searchBox(new QLineEdit) ,
+    m_searchBox(new QLineEdit(this)) ,
     m_enableGrouping(false) ,
     m_layoutNeeded(true) ,
     m_loadingItemsCount(0)
@@ -36,7 +36,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_searchBox->hide();
     connect(m_searchBox, SIGNAL(textEdited(QString)),
             this, SLOT(setNameFilter(QString)));
-    m_scene->addWidget(m_searchBox);
 
     setScene(m_scene);
 
