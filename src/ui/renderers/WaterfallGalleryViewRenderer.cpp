@@ -9,7 +9,7 @@ WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
 }
 
 void WaterfallGalleryViewRenderer::layout(
-        QList<QGraphicsItem *> &items, const QStringList &itemGroups,
+        QList<GalleryItem *> &items, const QStringList &itemGroups,
         const QRect &viewGeometry)
 {
     bool isGroupingEnabled = !itemGroups.isEmpty();
@@ -31,7 +31,7 @@ void WaterfallGalleryViewRenderer::layout(
     }
 
     for (int i = 0; i < items.length(); ++i) {
-        GalleryItem *item = static_cast<GalleryItem *>(items[i]);
+        GalleryItem *item = items[i];
 
         // Group break
         if (isGroupingEnabled) {

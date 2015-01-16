@@ -1,7 +1,9 @@
 #ifndef ABSTRACTGALLERYVIEWRENDERER_H
 #define ABSTRACTGALLERYVIEWRENDERER_H
 
-#include <QGraphicsScene>
+class QGraphicsScene;
+
+class GalleryItem;
 
 class AbstractGalleryViewRenderer
 {
@@ -13,7 +15,7 @@ public:
 
     virtual ~AbstractGalleryViewRenderer() {}
 
-    virtual void layout(QList<QGraphicsItem *> &items,
+    virtual void layout(QList<GalleryItem *> &items,
                         const QStringList &itemGroups,
                         const QRect &viewGeometry) = 0;
 

@@ -74,12 +74,12 @@ void FileSystemView::sortByModifiedTime()
 
 void FileSystemView::removeSelectedOnDisk()
 {
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
     QString msg = tr("Remove %1 files on disk?").arg(selectedItems.count());
     if (QMessageBox::question(
             this, tr("Remove On Disk"), msg) == QMessageBox::Yes) {
-        foreach (QGraphicsItem *item, selectedItems) {
+        foreach (GalleryItem *item, selectedItems) {
             FileSystemItem *fsItem =
                 static_cast<FileSystemItem *>(item);
             QFile::remove(fsItem->path());
@@ -112,7 +112,7 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 
     menu->addSeparator();
 
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
     if (selectedItems.count() > 0) {
         menu->addAction(tr("Remove On Disk"), this,
                         SLOT(removeSelectedOnDisk()));

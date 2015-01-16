@@ -44,7 +44,7 @@ protected:
         GroupByThumbHist,
     };
     GroupMode m_groupMode;
-    virtual QString groupForItem(QGraphicsItem *);
+    virtual QString groupForItem(GalleryItem *);
 };
 
 #endif // IMAGEGALLERYVIEW_H

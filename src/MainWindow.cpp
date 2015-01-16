@@ -280,11 +280,11 @@ void MainWindow::loadSavedPlayLists()
 
 void MainWindow::loadSelectedPlayList()
 {
-    QList<QGraphicsItem *> selectedItems =
-        ui->playListGallery->scene()->selectedItems();
+    QList<GalleryItem *> selectedItems =
+        ui->playListGallery->selectedGalleryItems();
     if (selectedItems.count() > 0) {
         PlayList *pl = new PlayList();
-        foreach (QGraphicsItem *item, selectedItems) {
+        foreach (GalleryItem *item, selectedItems) {
             PlayListGalleryItem *playListItem =
                 static_cast<PlayListGalleryItem *>(item);
 
@@ -308,11 +308,9 @@ void MainWindow::loadSelectedPlayList()
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
         int coverIndex = firstItem->record()->coverIndex();
 
-        const QList<QGraphicsItem *> &galleryItems =
-            ui->gallery->scene()->items(Qt::AscendingOrder);
-        if (coverIndex >= 0 && coverIndex < galleryItems.count()) {
-            GalleryItem *coverImageItem =
-                static_cast<GalleryItem *>(galleryItems.at(coverIndex));
+        QList<GalleryItem *> items = ui->gallery->galleryItems();
+        if (coverIndex >= 0 && coverIndex < items.count()) {
+            GalleryItem *coverImageItem = items.at(coverIndex);
             ui->gallery->scene()->clearSelection();
 
             // This has to be async because QGraphicsItem::setSelected() will
@@ -328,8 +326,7 @@ void MainWindow::loadSelectedPlayList()
 
 void MainWindow::loadOrEnterSelectedPath()
 {
-    QList<QGraphicsItem *> selectedItems =
-        ui->fsView->scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
     if (selectedItems.count() > 0) {
         FileSystemItem *firstItem =
             static_cast<FileSystemItem *>(selectedItems[0]);
@@ -345,11 +342,11 @@ void MainWindow::loadOrEnterSelectedPath()
 
 void MainWindow::loadSelectedPath()
 {
-    QList<QGraphicsItem *> selectedItems = ui->fsView->scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
     if (selectedItems.count() > 0) {
         PlayList *pl = new PlayList();
 
-        foreach (QGraphicsItem *item, selectedItems) {
+        foreach (GalleryItem *item, selectedItems) {
             FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
             pl->addMultiplePath(fsItem->path());
         }
@@ -495,7 +492,9 @@ void MainWindow::promptToOpenDir()
 
 void MainWindow::promptToSaveImage()
 {
-    if (ui->gallery->scene()->selectedItems().count() > 0) {
+    QList<GalleryItem *> selectedGalleryItems =
+        ui->gallery->selectedGalleryItems();
+    if (selectedGalleryItems.count() > 0) {
         QString destDir = QFileDialog::getExistingDirectory(
             this, "Save to", GlobalConfig::instance()->wallpaperDir());
 
@@ -503,7 +502,7 @@ void MainWindow::promptToSaveImage()
             return;
         }
 
-        foreach (QGraphicsItem *item, ui->gallery->scene()->selectedItems()) {
+        foreach (GalleryItem *item, selectedGalleryItems) {
             ImageGalleryItem *imageGalleryItem =
                 static_cast<ImageGalleryItem *>(item);
             ImagePtr image = imageGalleryItem->image();
@@ -650,9 +649,9 @@ void MainWindow::navigationChange(int index)
     ui->playListWidget->setCurrentRow(index);
 
     // Gallery widget
-    if (index >= 0 && index < ui->gallery->scene()->items().count()) {
-        QGraphicsItem *selectedItem =
-            ui->gallery->scene()->items(Qt::AscendingOrder).at(index);
+    QList<GalleryItem *> galleryItems = ui->gallery->galleryItems();
+    if (index >= 0 && index < galleryItems.count()) {
+        QGraphicsItem *selectedItem = galleryItems.at(index);
         if (selectedItem) {
             ui->gallery->scene()->clearSelection();
             selectedItem->setSelected(true);
@@ -684,11 +683,11 @@ void MainWindow::updateStatus(QString message)
 
 void MainWindow::gallerySelectionChanged()
 {
-    QGraphicsScene *scene = ui->gallery->scene();
-    if (scene->selectedItems().length() > 0) {
-        QGraphicsItem * const item = scene->selectedItems()[0];
-        const QList<QGraphicsItem *> &allItems =
-            scene->items(Qt::AscendingOrder);
+    QList<GalleryItem *> selectedGalleryItems =
+        ui->gallery->selectedGalleryItems();
+    if (selectedGalleryItems.length() > 0) {
+        GalleryItem *item = selectedGalleryItems[0];
+        QList<GalleryItem *> allItems = ui->gallery->galleryItems();
         int index = allItems.indexOf(item);
         m_navigator->goIndex(index);
     }

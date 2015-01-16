@@ -10,7 +10,7 @@ GridGalleryViewRenderer::GridGalleryViewRenderer(QGraphicsScene *scene) :
 {
 }
 
-void GridGalleryViewRenderer::layout(QList<QGraphicsItem *> &items,
+void GridGalleryViewRenderer::layout(QList<GalleryItem *> &items,
         const QStringList &itemGroups, const QRect &viewGeometry)
 {
     bool isGroupingEnabled = !itemGroups.isEmpty();
@@ -29,7 +29,7 @@ void GridGalleryViewRenderer::layout(QList<QGraphicsItem *> &items,
     }
 
     for (int i = 0; i < items.length(); ++i) {
-        GalleryItem *item = static_cast<GalleryItem *>(items[i]);
+        GalleryItem *item = items[i];
 
         bool shouldBreakLine = false;
         // Break line if exceeds columns limit

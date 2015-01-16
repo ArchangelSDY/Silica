@@ -96,15 +96,16 @@ QMenu *ImageGalleryView::createContextMenu()
     renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
     renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
 
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
     if (m_playList && m_playList->record()) {
         QAction *actSetAsCover =
             menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
-        if (scene()->selectedItems().count() == 0) {
+        if (selectedItems.count() == 0) {
             actSetAsCover->setEnabled(false);
         }
     }
 
-    if (!scene()->selectedItems().isEmpty()) {
+    if (!selectedItems.isEmpty()) {
         menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
     }
 
@@ -131,9 +132,10 @@ void ImageGalleryView::sortByAspectRatio()
 
 void ImageGalleryView::setAsCover()
 {
-    if (m_playList && scene()->selectedItems().count() > 0) {
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    if (m_playList && selectedItems.count() > 0) {
         ImageGalleryItem *item =
-            static_cast<ImageGalleryItem *>(scene()->selectedItems()[0]);
+            static_cast<ImageGalleryItem *>(selectedItems[0]);
         PlayListRecord *record = m_playList->record();
 
         if (record) {
@@ -145,7 +147,7 @@ void ImageGalleryView::setAsCover()
 
 void ImageGalleryView::addToBasket()
 {
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
     for (int i = 0; i < selectedItems.count(); ++i) {
         ImageGalleryItem *item =
             static_cast<ImageGalleryItem *>(selectedItems[i]);
@@ -157,12 +159,12 @@ void ImageGalleryView::addToBasket()
 
 void ImageGalleryView::removeSelected()
 {
-    QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
     QString msg = tr("Remove %1 images?").arg(selectedItems.count());
     if (QMessageBox::question(
             this, tr("Images Remove"), msg) == QMessageBox::Yes) {
-        foreach (QGraphicsItem *item, selectedItems) {
+        foreach (GalleryItem *item, selectedItems) {
             ImageGalleryItem *galleryItem =
                 static_cast<ImageGalleryItem *>(item);
             ImagePtr toRemove = galleryItem->image();
@@ -178,7 +180,7 @@ void ImageGalleryView::removeSelected()
     }
 }
 
-QString ImageGalleryView::groupForItem(QGraphicsItem *rawItem)
+QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
 {
     ImageGalleryItem *item = static_cast<ImageGalleryItem *>(rawItem);
     const ImagePtr &image = item->image();

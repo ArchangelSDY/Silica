@@ -8,7 +8,7 @@ class WaterfallGalleryViewRenderer : public AbstractGalleryViewRenderer
 public:
     WaterfallGalleryViewRenderer(QGraphicsScene *scene);
 
-    void layout(QList<QGraphicsItem *> &items,
+    void layout(QList<GalleryItem *> &items,
                 const QStringList &itemGroups,
                 const QRect &viewGeometry);
 

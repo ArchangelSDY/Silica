@@ -20,7 +20,7 @@ QMenu *MainImageGalleryView::createContextMenu()
     QMenu *menu = ImageGalleryView::createContextMenu();
 
     // Basket
-    if (!scene()->selectedItems().isEmpty()) {
+    if (!selectedGalleryItems().isEmpty()) {
         menu->addSeparator();
         menu->addAction(tr("Add to Basket"), this, SLOT(addToBasket()));
     }

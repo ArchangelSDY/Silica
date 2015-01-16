@@ -26,11 +26,11 @@ private slots:
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
-    QString groupForItem(QGraphicsItem *);
-    void sortItemByGroup(QList<QGraphicsItem *> *items);
+    QString groupForItem(GalleryItem *);
+    void sortItemByGroup(QList<GalleryItem *> *items);
 
 private:
-    bool (*m_groupLessThan)(QGraphicsItem *, QGraphicsItem *);
+    bool (*m_groupLessThan)(GalleryItem *, GalleryItem *);
 };
 
 #endif // PLAYLISTGALLERYVIEW_H

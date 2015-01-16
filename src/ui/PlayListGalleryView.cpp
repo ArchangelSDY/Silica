@@ -7,8 +7,8 @@
 #include "PlayListGalleryItem.h"
 #include "PlayListGalleryView.h"
 
-static bool playListTypeLessThan(QGraphicsItem *left,
-                                 QGraphicsItem *right)
+static bool playListTypeLessThan(GalleryItem *left,
+                                 GalleryItem *right)
 
 {
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
@@ -26,8 +26,8 @@ static bool playListTypeLessThan(QGraphicsItem *left,
     }
 }
 
-static bool playListNameLessThan(QGraphicsItem *left,
-                                 QGraphicsItem *right)
+static bool playListNameLessThan(GalleryItem *left,
+                                 GalleryItem *right)
 
 {
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
@@ -67,6 +67,7 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
 void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
     QMenu *menuNew = menu.addMenu(tr("New"));
     menuNew->addAction(tr("Remote PlayList"), this,
@@ -74,13 +75,13 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 
     QAction *actRename =
         menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
-    if (scene()->selectedItems().count() == 0) {
+    if (selectedItems.count() == 0) {
         actRename->setEnabled(false);
     }
 
     QAction *actRemove =
         menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
-    if (scene()->selectedItems().count() == 0) {
+    if (selectedItems.count() == 0) {
         actRemove->setEnabled(false);
     }
 
@@ -111,9 +112,10 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 
 void PlayListGalleryView::renameSelectedItem()
 {
-    if (scene()->selectedItems().count() > 0) {
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    if (selectedItems.count() > 0) {
         PlayListGalleryItem *item =
-            static_cast<PlayListGalleryItem *>(scene()->selectedItems()[0]);
+            static_cast<PlayListGalleryItem *>(selectedItems[0]);
         PlayListRecord *record = item->record();
 
         QString newName = QInputDialog::getText(
@@ -129,12 +131,11 @@ void PlayListGalleryView::renameSelectedItem()
 
 void PlayListGalleryView::removeSelectedItems()
 {
-    if (scene()->selectedItems().count() > 0) {
-        QList<QGraphicsItem *> selectedItems = scene()->selectedItems();
-
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    if (selectedItems.count() > 0) {
         // Build message with playlists names
         QStringList playListNames;
-        foreach(QGraphicsItem *item, selectedItems) {
+        foreach(GalleryItem *item, selectedItems) {
             PlayListGalleryItem *playListItem =
                 static_cast<PlayListGalleryItem *>(item);
             playListNames.append(playListItem->record()->name());
@@ -157,7 +158,7 @@ void PlayListGalleryView::removeSelectedItems()
     }
 }
 
-QString PlayListGalleryView::groupForItem(QGraphicsItem *rawItem)
+QString PlayListGalleryView::groupForItem(GalleryItem *rawItem)
 {
     PlayListGalleryItem *item = static_cast<PlayListGalleryItem *>(rawItem);
     if (m_groupLessThan == playListTypeLessThan) {
@@ -169,7 +170,7 @@ QString PlayListGalleryView::groupForItem(QGraphicsItem *rawItem)
     }
 }
 
-void PlayListGalleryView::sortItemByGroup(QList<QGraphicsItem *> *items)
+void PlayListGalleryView::sortItemByGroup(QList<GalleryItem *> *items)
 {
     qSort(items->begin(), items->end(), m_groupLessThan);
 }

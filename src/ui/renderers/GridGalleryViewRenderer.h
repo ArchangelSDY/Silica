@@ -8,7 +8,7 @@ class GridGalleryViewRenderer : public AbstractGalleryViewRenderer
 public:
     GridGalleryViewRenderer(QGraphicsScene *scene);
 
-    virtual void layout(QList<QGraphicsItem *> &items,
+    virtual void layout(QList<GalleryItem *> &items,
                 const QStringList &itemGroups,
                 const QRect &viewGeometry);
 };

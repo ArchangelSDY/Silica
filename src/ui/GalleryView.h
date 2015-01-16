@@ -16,6 +16,9 @@ public:
     explicit GalleryView(QWidget *parent = 0);
     ~GalleryView();
 
+    QList<GalleryItem *> galleryItems() const;
+    QList<GalleryItem *> selectedGalleryItems() const;
+
 signals:
     void mouseDoubleClicked();
     void keyEnterPressed();
@@ -51,7 +54,7 @@ protected:
     void addItem(GalleryItem *item);
     void setRendererFactory(AbstractRendererFactory *factory);
 
-    virtual QString groupForItem(QGraphicsItem *) { return QString(); }
+    virtual QString groupForItem(GalleryItem *) { return QString(); }
     /**
      * @brief Sort GalleryItem by group.
      *
@@ -59,7 +62,7 @@ protected:
      * PlayList) because model sorting will often trigger re-creation of
      * GalleryItems, which may cause invalid pointers during layout.
      */
-    virtual void sortItemByGroup(QList<QGraphicsItem *> *) {}
+    virtual void sortItemByGroup(QList<GalleryItem *> *) {}
 
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;

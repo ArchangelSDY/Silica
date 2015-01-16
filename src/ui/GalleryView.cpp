@@ -37,16 +37,35 @@ GalleryView::~GalleryView()
     delete m_scene;
 }
 
+QList<GalleryItem *> GalleryView::galleryItems() const
+{
+    QList<GalleryItem *> items;
+    foreach (QGraphicsItem *rawItem, scene()->items(Qt::AscendingOrder)) {
+        GalleryItem *item = dynamic_cast<GalleryItem *>(rawItem);
+        if (item) {
+            items << item;
+        }
+    }
+    return items;
+}
+
+QList<GalleryItem *> GalleryView::selectedGalleryItems() const
+{
+    QList<GalleryItem *> items;
+    foreach (QGraphicsItem *rawItem, scene()->selectedItems()) {
+        GalleryItem *item = dynamic_cast<GalleryItem *>(rawItem);
+        if (item) {
+            items << item;
+        }
+    }
+    return items;
+}
+
 void GalleryView::clear()
 {
     // Clear first
-    foreach (QGraphicsItem *rawItem, m_scene->items()) {
-        GalleryItem *item = static_cast<GalleryItem *>(rawItem);
-        if (item) {
-            item->deleteLater();
-        } else {
-            delete rawItem;
-        }
+    foreach (GalleryItem *item, galleryItems()) {
+        item->deleteLater();
     }
     m_scene->clear();
     m_loadingItemsCount = 0;
@@ -58,17 +77,16 @@ void GalleryView::layout()
         return;
     }
 
-    if (!isVisible() || m_scene->items().length() == 0) {
+    QList<GalleryItem *> items = galleryItems();
+    if (!isVisible() || items.length() == 0) {
         return;
     }
-
-    QList<QGraphicsItem *> items = m_scene->items(Qt::AscendingOrder);
 
     QStringList itemGroups;
     if (m_enableGrouping) {
         sortItemByGroup(&items);
 
-        foreach (QGraphicsItem *item, items) {
+        foreach (GalleryItem *item, items) {
             itemGroups << groupForItem(item);
         }
     }
@@ -98,7 +116,7 @@ void GalleryView::showEvent(QShowEvent *)
 
 void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
 {
-    if (scene()->selectedItems().length() > 0) {
+    if (selectedGalleryItems().length() > 0) {
         emit mouseDoubleClicked();
     }
 }
@@ -107,9 +125,8 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Return) {
         // If not item is selected, select the first one
-        if (scene()->selectedItems().count() == 0) {
-            const QList<QGraphicsItem *> &items =
-                scene()->items(Qt::AscendingOrder);
+        if (selectedGalleryItems().count() == 0) {
+            QList<GalleryItem *> items = galleryItems();
             if (items.count() > 0) {
                 items[0]->setSelected(true);
             } else {
@@ -147,9 +164,8 @@ void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
     m_rendererFactory = factory;
 
     // Update renderers for each item
-    foreach (QGraphicsItem *item, scene()->items()) {
-        GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
-        galleryItem->setRendererFactory(m_rendererFactory);
+    foreach (GalleryItem *item, galleryItems()) {
+        item->setRendererFactory(m_rendererFactory);
     }
 
     scheduleLayout();
