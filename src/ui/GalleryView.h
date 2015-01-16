@@ -7,6 +7,8 @@
 #include "Navigator.h"
 #include "PlayList.h"
 
+class QLineEdit;
+
 class GalleryItem;
 
 class GalleryView : public QGraphicsView
@@ -39,6 +41,9 @@ protected slots:
 
     void itemReadyToShow();
 
+    void enterSearch();
+    void leaveSearch();
+
 private slots:
     virtual void layout();
 
@@ -68,6 +73,7 @@ protected:
     virtual void markItemIsFiltered(GalleryItem *item);
 
     QGraphicsScene *m_scene;
+    QLineEdit *m_searchBox;
     AbstractRendererFactory *m_rendererFactory;
     bool m_enableGrouping;
     bool m_layoutNeeded;

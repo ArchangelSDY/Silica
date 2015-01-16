@@ -14,6 +14,7 @@
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
+    m_searchBox(new QLineEdit) ,
     m_enableGrouping(false) ,
     m_layoutNeeded(true) ,
     m_loadingItemsCount(0)
@@ -26,10 +27,16 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene->setPalette(palette);
     m_scene->setBackgroundBrush(palette.background());
 
-    QLineEdit *searchBox = new QLineEdit(this);
-    connect(searchBox, SIGNAL(textEdited(QString)),
+    m_searchBox->setStyleSheet(
+        "border: none;"
+        "padding: 0 0.5em;"
+        "min-width: 15em;"
+        "max-height: 1.5em");
+    m_searchBox->setAttribute(Qt::WA_MacShowFocusRect, false);
+    m_searchBox->hide();
+    connect(m_searchBox, SIGNAL(textEdited(QString)),
             this, SLOT(setNameFilter(QString)));
-    m_scene->addWidget(searchBox, Qt::Tool);
+    m_scene->addWidget(m_searchBox);
 
     setScene(m_scene);
 
@@ -130,6 +137,7 @@ void GalleryView::scheduleLayout()
 void GalleryView::setNameFilter(const QString &nameFilter)
 {
     m_nameFilter = nameFilter;
+    m_searchBox->setText(m_nameFilter);
     foreach (GalleryItem *item, galleryItems()) {
         markItemIsFiltered(item);
     }
@@ -168,6 +176,12 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
 
         event->accept();
         emit keyEnterPressed();
+    } else if (event->key() == Qt::Key_Slash && !m_searchBox->isVisible()) {
+        enterSearch();
+        event->accept();
+    } else if (event->key() == Qt::Key_Escape && m_searchBox->isVisible()) {
+        leaveSearch();
+        event->accept();
     } else {
         QGraphicsView::keyPressEvent(event);
     }
@@ -252,4 +266,20 @@ void GalleryView::markItemIsFiltered(GalleryItem *item)
 {
     bool isFiltered = item->name().contains(m_nameFilter, Qt::CaseInsensitive);
     item->setData(GalleryItem::KEY_IS_NAME_FILTERED, isFiltered);
+}
+
+void GalleryView::enterSearch()
+{
+    QRect pos(QPoint(geometry().width() - m_searchBox->width(), 0),
+              m_searchBox->size());
+    m_searchBox->setGeometry(pos);
+    m_searchBox->show();
+    m_searchBox->setFocus();
+}
+
+void GalleryView::leaveSearch()
+{
+    m_searchBox->hide();
+    setNameFilter(QString());
+    setFocus();
 }

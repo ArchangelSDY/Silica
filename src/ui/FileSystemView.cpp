@@ -38,6 +38,8 @@ void FileSystemView::setRootPath(const QString &path)
 
     // Reset scroll position
     centerOn(0, 0);
+
+    leaveSearch();
 }
 
 void FileSystemView::cdUp()
