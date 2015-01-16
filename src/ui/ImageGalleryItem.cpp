@@ -30,6 +30,11 @@ void ImageGalleryItem::createRenderer()
     setRenderer(m_rendererFactory->createItemRendererForImageGallery());
 }
 
+QString ImageGalleryItem::name() const
+{
+    return !m_image.isNull() ? m_image->name() : QString();
+}
+
 QRectF ImageGalleryItem::boundingRect() const
 {
     return m_renderer->boundingRect();

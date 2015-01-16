@@ -60,6 +60,11 @@ void PlayListGalleryItem::createRenderer()
         m_record->name(), m_record->count()));
 }
 
+QString PlayListGalleryItem::name() const
+{
+    return m_record->name();
+}
+
 QRectF PlayListGalleryItem::boundingRect() const
 {
     return QRectF(QPointF(0, 0), GlobalConfig::instance()->galleryItemSize());

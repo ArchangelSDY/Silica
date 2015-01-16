@@ -16,6 +16,9 @@ public:
                          QGraphicsItem *parent = 0);
     virtual ~GalleryItem();
 
+    static const int KEY_IS_NAME_FILTERED = 1;
+    virtual QString name() const;
+
     virtual void load() = 0;
     void setRendererFactory(AbstractRendererFactory *factory);
 

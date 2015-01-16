@@ -17,6 +17,7 @@ public:
                                  QGraphicsItem *parent = 0);
     ~PlayListGalleryItem();
 
+    QString name() const;
     QRectF boundingRect() const;
     PlayListRecord *record() { return m_record; }
 

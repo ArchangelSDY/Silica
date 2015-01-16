@@ -85,6 +85,11 @@ FileSystemItem::~FileSystemItem()
     }
 }
 
+QString FileSystemItem::name() const
+{
+    return m_pathInfo.fileName();
+}
+
 QRectF FileSystemItem::boundingRect() const
 {
     return m_renderer->boundingRect();

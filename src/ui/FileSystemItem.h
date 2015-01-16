@@ -18,6 +18,7 @@ public:
                             QGraphicsItem *parent = 0);
     virtual ~FileSystemItem();
 
+    QString name() const;
     QRectF boundingRect() const;
     QString path() const;
     QFileInfo fileInfo() const;

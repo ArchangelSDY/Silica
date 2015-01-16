@@ -32,6 +32,11 @@ GalleryItem::~GalleryItem()
     }
 }
 
+QString GalleryItem::name() const
+{
+    return QString();
+}
+
 void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 {
     delete m_renderer;

@@ -1,4 +1,5 @@
 #include <QGraphicsItem>
+#include <QLineEdit>
 
 #include "AbstractGalleryViewRenderer.h"
 #include "CompactRendererFactory.h"
@@ -24,6 +25,11 @@ GalleryView::GalleryView(QWidget *parent) :
     palette.setBrush(QPalette::Foreground, QColor("#71929E"));
     m_scene->setPalette(palette);
     m_scene->setBackgroundBrush(palette.background());
+
+    QLineEdit *searchBox = new QLineEdit(this);
+    connect(searchBox, SIGNAL(textEdited(QString)),
+            this, SLOT(setNameFilter(QString)));
+    m_scene->addWidget(searchBox, Qt::Tool);
 
     setScene(m_scene);
 
@@ -73,12 +79,29 @@ void GalleryView::clear()
 
 void GalleryView::layout()
 {
-    if (!m_layoutNeeded) {
+    if (!m_layoutNeeded || !isVisible()) {
         return;
     }
 
     QList<GalleryItem *> items = galleryItems();
-    if (!isVisible() || items.length() == 0) {
+    if (items.count() == 0) {
+        return;
+    }
+
+    // Remove and hide items that does not match name filter
+    QList<GalleryItem *>::iterator iter = items.begin();
+    while (iter != items.end()) {
+        GalleryItem *item = *iter;
+        QVariant isNameFiltered = item->data(GalleryItem::KEY_IS_NAME_FILTERED);
+        if (!isNameFiltered.isNull() && !isNameFiltered.toBool()) {
+            item->hide();
+            iter = items.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+
+    if (items.count() == 0) {
         return;
     }
 
@@ -102,6 +125,15 @@ void GalleryView::layout()
 void GalleryView::scheduleLayout()
 {
     m_layoutNeeded = true;
+}
+
+void GalleryView::setNameFilter(const QString &nameFilter)
+{
+    m_nameFilter = nameFilter;
+    foreach (GalleryItem *item, galleryItems()) {
+        markItemIsFiltered(item);
+    }
+    scheduleLayout();
 }
 
 void GalleryView::resizeEvent(QResizeEvent *)
@@ -154,6 +186,7 @@ void GalleryView::mousePressEvent(QMouseEvent *event)
 void GalleryView::addItem(GalleryItem *item)
 {
     m_scene->addItem(item);
+    markItemIsFiltered(item);
     connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
     item->load();
 }
@@ -213,4 +246,10 @@ void GalleryView::incrItemsToLoad(int count)
     if (m_loadingItemsCount > 0) {
         emit loadStart();
     }
+}
+
+void GalleryView::markItemIsFiltered(GalleryItem *item)
+{
+    bool isFiltered = item->name().contains(m_nameFilter, Qt::CaseInsensitive);
+    item->setData(GalleryItem::KEY_IS_NAME_FILTERED, isFiltered);
 }

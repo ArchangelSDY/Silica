@@ -16,6 +16,7 @@ public:
                               AbstractRendererFactory *rendererFactory,
                               QGraphicsItem *parent = 0);
 
+    QString name() const;
     QRectF boundingRect() const;
     ImagePtr image() { return m_image; }
 

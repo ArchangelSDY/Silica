@@ -27,6 +27,7 @@ signals:
 
 public slots:
     virtual void scheduleLayout();
+    void setNameFilter(const QString &nameFilter);
 
 protected slots:
     void setLooseRenderer();
@@ -64,12 +65,15 @@ protected:
      */
     virtual void sortItemByGroup(QList<GalleryItem *> *) {}
 
+    virtual void markItemIsFiltered(GalleryItem *item);
+
     QGraphicsScene *m_scene;
     AbstractRendererFactory *m_rendererFactory;
     bool m_enableGrouping;
     bool m_layoutNeeded;
     QTimer m_layoutTimer;
     int m_loadingItemsCount;
+    QString m_nameFilter;
 
 private:
     static const int LAYOUT_INTERVAL = 10;
