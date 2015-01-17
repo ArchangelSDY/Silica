@@ -126,11 +126,13 @@ void GalleryView::layout()
     delete renderer;
 
     m_layoutNeeded = false;
+    m_layoutTimer.stop();
 }
 
 void GalleryView::scheduleLayout()
 {
     m_layoutNeeded = true;
+    m_layoutTimer.start();
 }
 
 void GalleryView::setNameFilter(const QString &nameFilter)
