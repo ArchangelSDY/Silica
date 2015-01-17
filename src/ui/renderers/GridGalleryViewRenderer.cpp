@@ -1,7 +1,6 @@
 #include "GalleryItem.h"
 #include "GlobalConfig.h"
 #include "GridGalleryViewRenderer.h"
-#include <QDebug>
 
 static const qreal GROUP_PADDING_ROW = 0.1;
 

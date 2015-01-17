@@ -1,3 +1,4 @@
+#include <QCache>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QThreadPool>
@@ -6,6 +7,8 @@
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
 #include "ui/GalleryView.h"
+
+static QCache<QString, QImage> g_coverCache(500);
 
 class LoadRunnable : public QObject, public QRunnable
 {
@@ -115,19 +118,26 @@ void FileSystemItem::load()
         delete m_thumbnail;
     }
 
-    LoadRunnable *r = new LoadRunnable(this);
-    connect(r, SIGNAL(gotThumbnail(QString)),
-            this, SLOT(gotThumbnail(QString)));
-    connect(r, SIGNAL(loadCover(QString)),
-            this, SLOT(loadCover(QString)));
-    connect(r, SIGNAL(done()),
-            this, SLOT(loaded()));
-    QThreadPool::globalInstance()->start(r);
+    QImage *cachedCover = g_coverCache[m_pathInfo.absoluteFilePath()];
+    if (cachedCover) {
+        setThumbnail(new QImage(*cachedCover));
+    } else {
+        LoadRunnable *r = new LoadRunnable(this);
+        connect(r, SIGNAL(gotThumbnail(QString)),
+                this, SLOT(gotThumbnail(QString)));
+        connect(r, SIGNAL(loadCover(QString)),
+                this, SLOT(loadCover(QString)));
+        connect(r, SIGNAL(done()),
+                this, SLOT(loaded()));
+        QThreadPool::globalInstance()->start(r);
+    }
 }
 
 void FileSystemItem::gotThumbnail(QString path)
 {
-    setThumbnail(new QImage(path));
+    QImage *coverImage = new QImage(path);
+    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    setThumbnail(new QImage(*coverImage));
 }
 
 void FileSystemItem::loaded()
@@ -145,18 +155,23 @@ void FileSystemItem::createRenderer()
 void FileSystemItem::coverThumbnailLoaded()
 {
     QImage thumbnail = m_coverImage->thumbnail();
+    QImage *coverImage = 0;
     if (!thumbnail.isNull()) {
-        setThumbnail(new QImage(m_coverImage->thumbnail()));
+        coverImage = new QImage(m_coverImage->thumbnail());
     } else {
-        setThumbnail(new QImage(":/res/image.png"));
+        coverImage = new QImage(":/res/image.png");
     }
+    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    setThumbnail(new QImage(*coverImage));
     m_coverImage->deleteLater();
     m_coverImage = 0;
 }
 
 void FileSystemItem::coverThumbnailLoadFailed()
 {
-    setThumbnail(new QImage(":/res/image.png"));
+    QImage *coverImage = new QImage(":/res/image.png");
+    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    setThumbnail(new QImage(*coverImage));
     m_coverImage->deleteLater();
     m_coverImage = 0;
 }
