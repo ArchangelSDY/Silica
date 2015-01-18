@@ -84,7 +84,7 @@ void FileSystemView::removeSelectedOnDisk()
         foreach (GalleryItem *item, selectedItems) {
             FileSystemItem *fsItem =
                 static_cast<FileSystemItem *>(item);
-            QFile::remove(fsItem->path());
+            fsItem->removeOnDisk();
         }
     }
 

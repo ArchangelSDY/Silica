@@ -25,6 +25,7 @@ public:
 
     void load();
     virtual void createRenderer();
+    void removeOnDisk();
 
 private slots:
     void gotThumbnail(QString path);

@@ -187,5 +187,12 @@ void FileSystemItem::loadCover(QString path)
     m_coverImage->loadThumbnail(true);
 }
 
+void FileSystemItem::removeOnDisk()
+{
+    QFile::remove(path());
+    // Remove cover cache of parent directory in case used as cover image
+    g_coverCache.remove(m_pathInfo.dir().absolutePath());
+}
+
 
 #include "FileSystemItem.moc"
