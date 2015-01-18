@@ -14,13 +14,13 @@ class LoadRunnable : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadRunnable(FileSystemItem *item) : m_item(item) {}
+    LoadRunnable(const QFileInfo &pathInfo) : m_pathInfo(pathInfo) {}
 
     virtual void run()
     {
-        if (m_item->m_pathInfo.isDir()) {
+        if (m_pathInfo.isDir()) {
             // For directory, try to use first image inside as cover
-            QDirIterator dirIter(m_item->m_pathInfo.absoluteFilePath(),
+            QDirIterator dirIter(m_pathInfo.absoluteFilePath(),
                                  ImageSourceManager::instance()->nameFilters(),
                                  QDir::Files);
             bool found = false;
@@ -29,7 +29,7 @@ public:
                 ImageSource *src = ImageSourceManager::instance()->createSingle(
                     path);
                 if (src) {
-                    m_item->m_useDefaultFolderCover = false;
+                    emit markIsDefaultFolderCover(false);
                     emit loadCover(path);
                     found = true;
                     delete src;
@@ -43,7 +43,7 @@ public:
             }
         } else {
             // Individual file
-            QString path = m_item->m_pathInfo.absoluteFilePath();
+            QString path = m_pathInfo.absoluteFilePath();
             ImageSource *src =
                 ImageSourceManager::instance()->createSingle(path);
             if (src) {
@@ -60,12 +60,13 @@ public:
     }
 
 signals:
+    void markIsDefaultFolderCover(bool isDefault);
     void gotThumbnail(QString path);
     void loadCover(QString path);
     void done();
 
 private:
-    FileSystemItem *m_item;
+    QFileInfo m_pathInfo;
 };
 
 FileSystemItem::FileSystemItem(const QString &path,
@@ -122,7 +123,9 @@ void FileSystemItem::load()
     if (cachedCover) {
         setThumbnail(new QImage(*cachedCover));
     } else {
-        LoadRunnable *r = new LoadRunnable(this);
+        LoadRunnable *r = new LoadRunnable(m_pathInfo);
+        connect(r, SIGNAL(markIsDefaultFolderCover(bool)),
+                this, SLOT(markIsDefaultFolderCover(bool)));
         connect(r, SIGNAL(gotThumbnail(QString)),
                 this, SLOT(gotThumbnail(QString)));
         connect(r, SIGNAL(loadCover(QString)),
@@ -131,6 +134,11 @@ void FileSystemItem::load()
                 this, SLOT(loaded()));
         QThreadPool::globalInstance()->start(r);
     }
+}
+
+void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
+{
+    m_useDefaultFolderCover = isDefault;
 }
 
 void FileSystemItem::gotThumbnail(QString path)
