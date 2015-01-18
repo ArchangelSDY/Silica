@@ -225,17 +225,21 @@ void MainWindow::setupExtraUi()
     // Fils system tab toolbar
     ui->pageFileSystemLayout->setMargin(0);
     ui->pageFileSystemLayout->setSpacing(0);
-    ui->fsToolBar->layout()->setSpacing(0);
+    ui->fsToolBar->layout()->setSpacing(15);
     ui->fsToolBar->layout()->setAlignment(Qt::AlignLeft);
     connect(ui->fsBtnCdUp, SIGNAL(clicked()),
             ui->fsView, SLOT(cdUp()));
+    connect(ui->fsEditPath, SIGNAL(editingFinished()),
+            this, SLOT(fsRootPathChanged()));
 
     // File system view
-    ui->fsView->setRootPath(QDir::homePath());
     connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadOrEnterSelectedPath()));
     connect(ui->fsView, SIGNAL(keyEnterPressed()),
             this, SLOT(loadSelectedPath()));
+    connect(ui->fsView, SIGNAL(rootPathChanged(QString)),
+            ui->fsEditPath, SLOT(setText(QString)));
+    ui->fsView->setRootPath(QDir::homePath());
 
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
@@ -579,6 +583,11 @@ void MainWindow::promptToSaveRemotePlayList()
                 QString("Failed to save playList %1!").arg(tags), 2000);
         }
     }
+}
+
+void MainWindow::fsRootPathChanged()
+{
+    ui->fsView->setRootPath(ui->fsEditPath->text());
 }
 
 void MainWindow::showAbout()

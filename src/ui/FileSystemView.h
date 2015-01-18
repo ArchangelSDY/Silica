@@ -11,6 +11,9 @@ class FileSystemView : public GalleryView
 public:
     explicit FileSystemView(QWidget *parent = 0);
 
+signals:
+    void rootPathChanged(const QString &path);
+
 public slots:
     void setRootPath(const QString &path);
     void cdUp();

@@ -38,6 +38,8 @@ private slots:
 
     void promptToSaveRemotePlayList();
 
+    void fsRootPathChanged();
+
 protected:
     virtual void keyPressEvent(QKeyEvent *);
     virtual void resizeEvent(QResizeEvent *);

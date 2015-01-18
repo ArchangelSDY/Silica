@@ -17,6 +17,10 @@ FileSystemView::FileSystemView(QWidget *parent) :
 
 void FileSystemView::setRootPath(const QString &path)
 {
+    if (m_rootPath == path) {
+        return;
+    }
+
     clear();
 
     m_rootPath = path;
@@ -40,6 +44,8 @@ void FileSystemView::setRootPath(const QString &path)
     centerOn(0, 0);
 
     leaveSearch();
+
+    emit rootPathChanged(m_rootPath);
 }
 
 void FileSystemView::cdUp()

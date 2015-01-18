@@ -133,6 +133,17 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QLineEdit" name="fsEditPath">
+             <property name="styleSheet">
+              <string notr="true">border: none;
+padding: 0 0.25em;
+color: #47505A;
+background-color: white;
+margin: 0.05em;</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
