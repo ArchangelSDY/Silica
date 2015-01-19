@@ -51,9 +51,11 @@ protected:
     // TODO: should not be accessed by derived classes directly
     AbstractRendererFactory *m_rendererFactory;
     AbstractGalleryItemRenderer *m_renderer;
-    QImage *m_thumbnail;
     bool m_isReadyToShow;
     bool m_selectedAfterShownScheduled;
+
+private:
+    QImage *m_thumbnail;
 };
 
 #endif // GALLERYITEM_H

@@ -115,11 +115,6 @@ void FileSystemItem::load()
         return;
     }
 
-    if (m_thumbnail) {
-        delete m_thumbnail;
-        m_thumbnail = 0;
-    }
-
     QImage *cachedCover = g_coverCache[m_pathInfo.absoluteFilePath()];
     if (cachedCover) {
         setThumbnail(new QImage(*cachedCover));
