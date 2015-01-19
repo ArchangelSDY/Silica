@@ -68,7 +68,10 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
     }
 
     if (url.hasFragment()) {
-        imageSources << createSingle(url);
+        ImageSource *source = createSingle(url);
+        if (source) {
+            imageSources << source;
+        }
     } else {
         // Add all files in the 7z package
         QUrl fileUrl = url;

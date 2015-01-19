@@ -63,12 +63,15 @@ QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path
         dir.setNameFilters(filters);
 
         foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
-            imageSources << createSingle(fileInfo.absoluteFilePath());
+            ImageSource *source = createSingle(fileInfo.absoluteFilePath());
+            if (source) {
+                imageSources << source;
+            }
         }
     } else {
         ImageSource *source = createSingle(path);
         if (source) {
-            imageSources << createSingle(path);
+            imageSources << source;
         }
     }
 
