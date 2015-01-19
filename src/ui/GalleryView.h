@@ -58,6 +58,7 @@ protected:
     virtual void incrItemsToLoad(int count);
 
     void addItem(GalleryItem *item);
+    AbstractRendererFactory *rendererFactory();
     void setRendererFactory(AbstractRendererFactory *factory);
 
     virtual QString groupForItem(GalleryItem *) { return QString(); }
@@ -74,7 +75,6 @@ protected:
 
     QGraphicsScene *m_scene;
     QLineEdit *m_searchBox;
-    AbstractRendererFactory *m_rendererFactory;
     bool m_enableGrouping;
     bool m_layoutNeeded;
     QTimer m_layoutTimer;
@@ -83,6 +83,8 @@ protected:
 
 private:
     static const int LAYOUT_INTERVAL = 10;
+
+    AbstractRendererFactory *m_rendererFactory;
 };
 
 #endif // GALLERYVIEW_H

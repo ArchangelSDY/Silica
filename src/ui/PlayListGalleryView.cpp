@@ -43,7 +43,7 @@ PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_groupLessThan(playListTypeLessThan)
 {
-    m_rendererFactory = new CompactRendererFactory();
+    setRendererFactory(new CompactRendererFactory());
 
     // Default
     groupByType();
@@ -57,7 +57,7 @@ void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
 
     for (int i = 0; i < records.count(); ++i) {
         PlayListGalleryItem *item = new PlayListGalleryItem(records[i],
-            m_rendererFactory);
+            rendererFactory());
         addItem(item);
     }
 

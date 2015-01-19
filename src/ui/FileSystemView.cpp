@@ -12,7 +12,7 @@ FileSystemView::FileSystemView(QWidget *parent) :
     GalleryView(parent) ,
     m_sortFlags(QDir::Name | QDir::DirsFirst)
 {
-    m_rendererFactory = new CompactRendererFactory();
+    setRendererFactory(new CompactRendererFactory());
 }
 
 void FileSystemView::setRootPath(const QString &path)
@@ -34,7 +34,7 @@ void FileSystemView::setRootPath(const QString &path)
 
     foreach (const QFileInfo &info, entrieInfos) {
         FileSystemItem *item = new FileSystemItem(info.absoluteFilePath(),
-                                                  m_rendererFactory);
+                                                  rendererFactory());
         addItem(item);
     }
 

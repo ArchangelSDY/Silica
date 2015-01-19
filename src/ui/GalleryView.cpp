@@ -17,7 +17,8 @@ GalleryView::GalleryView(QWidget *parent) :
     m_searchBox(new QLineEdit(this)) ,
     m_enableGrouping(false) ,
     m_layoutNeeded(true) ,
-    m_loadingItemsCount(0)
+    m_loadingItemsCount(0) ,
+    m_rendererFactory(0)
 {
     setDragMode(QGraphicsView::RubberBandDrag);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -49,6 +50,7 @@ GalleryView::GalleryView(QWidget *parent) :
 GalleryView::~GalleryView()
 {
     delete m_scene;
+    delete m_rendererFactory;
 }
 
 QList<GalleryItem *> GalleryView::galleryItems() const
@@ -208,9 +210,16 @@ void GalleryView::addItem(GalleryItem *item)
     item->load();
 }
 
+AbstractRendererFactory *GalleryView::rendererFactory()
+{
+    return m_rendererFactory;
+}
+
 void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
 {
-    delete m_rendererFactory;
+    if (m_rendererFactory) {
+        delete m_rendererFactory;
+    }
     m_rendererFactory = factory;
 
     // Update renderers for each item

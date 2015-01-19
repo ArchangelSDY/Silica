@@ -25,12 +25,11 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
     setViewport(new QOpenGLWidget(this));
 #endif
 
-    m_rendererFactory = new LooseRendererFactory();
+    setRendererFactory(new LooseRendererFactory());
 }
 
 ImageGalleryView::~ImageGalleryView()
 {
-    delete m_rendererFactory;
     if (m_rankFilterMenuManager) {
         delete m_rankFilterMenuManager;
     }
@@ -64,7 +63,7 @@ void ImageGalleryView::playListAppend(int start)
         ImagePtr image = m_playList->at(i);
 
         // Paint thumbnail
-        ImageGalleryItem *item = new ImageGalleryItem(image, m_rendererFactory);
+        ImageGalleryItem *item = new ImageGalleryItem(image, rendererFactory());
         addItem(item);
     }
 
