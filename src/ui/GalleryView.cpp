@@ -20,6 +20,8 @@ GalleryView::GalleryView(QWidget *parent) :
     m_loadingItemsCount(0)
 {
     setDragMode(QGraphicsView::RubberBandDrag);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor("#323A44"));
