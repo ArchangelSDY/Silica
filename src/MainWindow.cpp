@@ -1,5 +1,7 @@
+#include <QCompleter>
 #include <QDesktopWidget>
 #include <QDir>
+#include <QDirModel>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -239,6 +241,10 @@ void MainWindow::setupExtraUi()
             this, SLOT(loadSelectedPath()));
     connect(ui->fsView, SIGNAL(rootPathChanged(QString)),
             ui->fsEditPath, SLOT(setText(QString)));
+    QCompleter *fsEditPathComp = new QCompleter(ui->fsEditPath);
+    fsEditPathComp->setModel(new QDirModel(fsEditPathComp));
+    fsEditPathComp->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->fsEditPath->setCompleter(fsEditPathComp);
     ui->fsView->setRootPath(QDir::homePath());
 
     ui->pageGallery->layout()->setMargin(0);
