@@ -5,6 +5,7 @@
 #include "../src/db/LocalPlayListRecord.h"
 #include "../src/db/PlayListRecord.h"
 #include "../src/db/RemotePlayListRecord.h"
+#include "../src/GlobalConfig.h"
 #include "../src/PlayList.h"
 
 class TestLocalDatabase : public QObject
@@ -27,6 +28,7 @@ private slots:
 void TestLocalDatabase::initTestCase()
 {
     Q_INIT_RESOURCE(silica);
+    GlobalConfig::create();
     QVERIFY2(LocalDatabase::instance()->migrate(),
              "Fail to migrate database");
 
