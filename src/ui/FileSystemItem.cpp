@@ -117,6 +117,7 @@ void FileSystemItem::load()
 
     if (m_thumbnail) {
         delete m_thumbnail;
+        m_thumbnail = 0;
     }
 
     QImage *cachedCover = g_coverCache[m_pathInfo.absoluteFilePath()];

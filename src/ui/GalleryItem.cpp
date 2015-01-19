@@ -55,6 +55,9 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
+    if (m_thumbnail) {
+        delete m_thumbnail;
+    }
     m_thumbnail = thumbnail;
     m_renderer->setImage(m_thumbnail);
     prepareGeometryChange();

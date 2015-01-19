@@ -39,6 +39,7 @@ void PlayListGalleryItem::loadThumbnail()
 
     if (m_thumbnail) {
         delete m_thumbnail;
+        m_thumbnail = 0;
     }
 
     QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
