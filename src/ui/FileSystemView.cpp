@@ -13,6 +13,8 @@ FileSystemView::FileSystemView(QWidget *parent) :
     m_sortFlags(QDir::Name | QDir::DirsFirst)
 {
     setRendererFactory(new CompactRendererFactory());
+    connect(&m_pathWatcher, SIGNAL(directoryChanged(QString)),
+            this, SLOT(refreshView()));
 }
 
 void FileSystemView::setRootPath(const QString &path)
@@ -20,25 +22,13 @@ void FileSystemView::setRootPath(const QString &path)
     if (m_rootPath == path) {
         return;
     }
-
-    clear();
-
-    m_rootPath = path;
-    QDir dir(m_rootPath);
-    QFileInfoList entrieInfos = dir.entryInfoList(
-        ImageSourceManager::instance()->nameFilters(),
-        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
-        m_sortFlags);
-
-    incrItemsToLoad(entrieInfos.count());
-
-    foreach (const QFileInfo &info, entrieInfos) {
-        FileSystemItem *item = new FileSystemItem(info.absoluteFilePath(),
-                                                  rendererFactory());
-        addItem(item);
+    if (!m_rootPath.isEmpty()) {
+        m_pathWatcher.removePath(m_rootPath);
     }
+    m_rootPath = path;
+    m_pathWatcher.addPath(m_rootPath);
 
-    scheduleLayout();
+    refreshView();
 
     // Reset scroll position
     centerOn(0, 0);
@@ -67,7 +57,7 @@ void FileSystemView::sortByFlag(QDir::SortFlag flag)
         m_sortFlags = flag | QDir::DirsFirst | QDir::Reversed;
     }
 
-    setRootPath(m_rootPath);
+    refreshView();
 }
 
 void FileSystemView::sortByName()
@@ -78,6 +68,27 @@ void FileSystemView::sortByName()
 void FileSystemView::sortByModifiedTime()
 {
     sortByFlag(QDir::Time);
+}
+
+void FileSystemView::refreshView()
+{
+    clear();
+
+    QDir dir(m_rootPath);
+    QFileInfoList entrieInfos = dir.entryInfoList(
+        ImageSourceManager::instance()->nameFilters(),
+        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+        m_sortFlags);
+
+    incrItemsToLoad(entrieInfos.count());
+
+    foreach (const QFileInfo &info, entrieInfos) {
+        FileSystemItem *item = new FileSystemItem(info.absoluteFilePath(),
+                                                  rendererFactory());
+        addItem(item);
+    }
+
+    scheduleLayout();
 }
 
 void FileSystemView::removeSelectedOnDisk()
@@ -94,8 +105,7 @@ void FileSystemView::removeSelectedOnDisk()
         }
     }
 
-    // Refresh
-    setRootPath(m_rootPath);
+    refreshView();
 }
 
 void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
