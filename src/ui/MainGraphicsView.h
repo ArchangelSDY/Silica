@@ -24,6 +24,7 @@ public:
     };
 
     explicit MainGraphicsView(QWidget *parent = 0);
+    virtual ~MainGraphicsView();
 
     void setNavigator(Navigator *navigator);
 

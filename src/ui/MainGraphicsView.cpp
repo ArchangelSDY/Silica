@@ -40,6 +40,11 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
             this, SLOT(paint()));
 }
 
+MainGraphicsView::~MainGraphicsView()
+{
+    delete m_hotspotsEditor;
+}
+
 void MainGraphicsView::setNavigator(Navigator *navigator)
 {
     m_navigator = navigator;
