@@ -31,6 +31,13 @@ public:
     {
     }
 
+    ~LiveImageRunnable()
+    {
+        if (m_wrapped) {
+            delete m_wrapped;
+        }
+    }
+
     void run()
     {
         if (m_wrapped && s_liveImages.contains(m_uuid)) {
