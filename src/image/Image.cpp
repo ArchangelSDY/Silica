@@ -364,10 +364,9 @@ void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
 void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
                                     bool makeImmediately)
 {
-    // QThreadPool::globalInstance()->releaseThread();
     m_isLoadingThumbnail = false;
 
-    if (thumbnail) {
+    if (!thumbnail.isNull() && !thumbnail->isNull()) {
         delete m_thumbnail;
         m_thumbnail = new QImage(*thumbnail);
 
@@ -432,8 +431,7 @@ void Image::makeThumbnail()
 
 void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
-    // QThreadPool::globalInstance()->releaseThread();
-    if (thumbnail) {
+    if (!thumbnail.isNull() && !thumbnail->isNull()) {
         delete m_thumbnail;
         m_thumbnail = new QImage(*thumbnail);
 
