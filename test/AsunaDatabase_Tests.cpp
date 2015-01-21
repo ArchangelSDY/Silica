@@ -4,6 +4,7 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include "../src/GlobalConfig.h"
 #include "../src/image/Image.h"
 #include "../src/db/AsunaDatabase.h"
 #include "utils/MultiSignalSpy.h"
@@ -15,6 +16,7 @@ class TestAsunaDatabase : public QObject
 {
     Q_OBJECT
 private slots:
+    void initTestCase();
     void init();
     void cleanup();
     void queryImagesByTag();
@@ -28,6 +30,11 @@ private:
 };
 
 Q_DECLARE_METATYPE(MockResponse)
+
+void TestAsunaDatabase::initTestCase()
+{
+    GlobalConfig::create();
+}
 
 void TestAsunaDatabase::init()
 {

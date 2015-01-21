@@ -1,6 +1,7 @@
 #include <QtSql>
 #include <QTest>
 
+#include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
 #include "../src/image/ImageRank.h"
@@ -20,6 +21,7 @@ private slots:
 void TestImageRank::initTestCase()
 {
     Q_INIT_RESOURCE(silica);
+    GlobalConfig::create();
     QVERIFY2(LocalDatabase::instance()->migrate(),
              "Fail to migrate database");
 }
