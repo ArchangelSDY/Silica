@@ -14,6 +14,7 @@ class GalleryItem;
 class GalleryView : public QGraphicsView
 {
     Q_OBJECT
+    friend class AbstractGalleryViewRenderer;
 public:
     explicit GalleryView(QWidget *parent = 0);
     ~GalleryView();
@@ -85,6 +86,7 @@ private:
     static const int LAYOUT_INTERVAL = 10;
 
     AbstractRendererFactory *m_rendererFactory;
+    QList<QGraphicsItem *> m_itemGroupTitles;
 };
 
 #endif // GALLERYVIEW_H

@@ -3,8 +3,8 @@
 #include "WaterfallGalleryViewRenderer.h"
 
 WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
-        QGraphicsScene *scene) :
-    AbstractGalleryViewRenderer(scene)
+        GalleryView *galleryView) :
+    AbstractGalleryViewRenderer(galleryView)
 {
 }
 
@@ -82,5 +82,5 @@ void WaterfallGalleryViewRenderer::layout(
                         maxColumnHeight);
     newSceneSize = newSceneSize.expandedTo(QSize(0, viewGeometry.height()));
     QRectF newSceneRect(QPointF(0, 0), newSceneSize);
-    m_scene->setSceneRect(newSceneRect);
+    scene()->setSceneRect(newSceneRect);
 }

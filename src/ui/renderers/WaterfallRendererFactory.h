@@ -13,7 +13,7 @@ public:
         const QFileInfo &, bool);
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
-        QGraphicsScene *scene);
+        GalleryView *galleryView);
 };
 
 #endif // WATERFALLRENDERERFACTORY_H

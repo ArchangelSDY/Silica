@@ -22,7 +22,7 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForFile
 }
 
 AbstractGalleryViewRenderer *WaterfallRendererFactory::createViewRenderer(
-    QGraphicsScene *scene)
+    GalleryView *galleryView)
 {
-    return new WaterfallGalleryViewRenderer(scene);
+    return new WaterfallGalleryViewRenderer(galleryView);
 }

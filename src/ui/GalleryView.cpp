@@ -125,7 +125,7 @@ void GalleryView::layout()
     }
 
     AbstractGalleryViewRenderer *renderer =
-        m_rendererFactory->createViewRenderer(m_scene);
+        m_rendererFactory->createViewRenderer(this);
     renderer->layout(items, itemGroups, geometry());
     delete renderer;
 

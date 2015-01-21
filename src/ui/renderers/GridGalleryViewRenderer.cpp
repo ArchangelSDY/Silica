@@ -1,11 +1,14 @@
+#include <QGraphicsItem>
+
 #include "GalleryItem.h"
 #include "GlobalConfig.h"
 #include "GridGalleryViewRenderer.h"
+#include "ItemGroupTitle.h"
 
-static const qreal GROUP_PADDING_ROW = 0.1;
+static const qreal GROUP_PADDING_ROW = 0.3;
 
-GridGalleryViewRenderer::GridGalleryViewRenderer(QGraphicsScene *scene) :
-    AbstractGalleryViewRenderer(scene)
+GridGalleryViewRenderer::GridGalleryViewRenderer(GalleryView *galleryView) :
+    AbstractGalleryViewRenderer(galleryView)
 {
 }
 
@@ -19,39 +22,49 @@ void GridGalleryViewRenderer::layout(QList<GalleryItem *> &items,
     if (maxColumns == 0) {
         return;
     }
+    qreal sceneWidth = maxColumns * galleryItemSize.width();
+    qreal groupTitleHeight = GROUP_PADDING_ROW * galleryItemSize.height();
 
     qreal curRow = 0, curColumn = -1;
 
     QString curGroup;
     if (isGroupingEnabled) {
         curGroup = itemGroups[0];
+        QRectF titleRect(0, curRow * galleryItemSize.height(),
+                         sceneWidth,
+                         groupTitleHeight);
+        createGroupTitle(itemGroups[0], titleRect);
+        curRow += GROUP_PADDING_ROW;
     }
 
     for (int i = 0; i < items.length(); ++i) {
         GalleryItem *item = items[i];
 
-        bool shouldBreakLine = false;
         // Break line if exceeds columns limit
         if (curColumn == maxColumns - 1) {
-            shouldBreakLine = true;
-        }
-
-        // Break line if group changs
-        if (isGroupingEnabled) {
-            if (itemGroups[i] != curGroup) {
-                curRow += GROUP_PADDING_ROW;    // Add additional padding row
-
-                shouldBreakLine = true;
-            }
-
-            curGroup = itemGroups[i];
-        }
-
-        if (shouldBreakLine) {
             curRow += 1;
             curColumn = 0;
         } else {
             curColumn += 1;
+        }
+
+        // Add group title row
+        if (isGroupingEnabled) {
+            if (itemGroups[i] != curGroup) {
+                // Break line first
+                curRow += 1;
+
+                QRectF titleRect(0, curRow * galleryItemSize.height(),
+                                 sceneWidth,
+                                 groupTitleHeight);
+                createGroupTitle(itemGroups[i], titleRect);
+
+                // Move to next item row
+                curRow += GROUP_PADDING_ROW;
+                curColumn = 0;
+            }
+
+            curGroup = itemGroups[i];
         }
 
         qreal x = curColumn * galleryItemSize.width();
@@ -63,9 +76,28 @@ void GridGalleryViewRenderer::layout(QList<GalleryItem *> &items,
         }
     }
 
-    QSizeF newSceneSize(maxColumns * galleryItemSize.width(),
+    QSizeF newSceneSize(sceneWidth,
                         (curRow + 1) * galleryItemSize.height());
     newSceneSize = newSceneSize.expandedTo(QSize(0, viewGeometry.height()));
     QRectF newSceneRect(QPointF(0, 0), newSceneSize);
-    m_scene->setSceneRect(newSceneRect);
+    scene()->setSceneRect(newSceneRect);
+}
+
+void GridGalleryViewRenderer::createGroupTitle(const QString &title,
+                                               const QRectF &rect)
+{
+    ItemGroupTitle *item = new ItemGroupTitle(title);
+    item->setPos(rect.topLeft());
+    item->setMinSize(rect.size());
+    itemGroupTitles() << item;
+    scene()->addItem(item);
+}
+
+void GridGalleryViewRenderer::destroyGroupTitles()
+{
+    foreach (QGraphicsItem *title, itemGroupTitles()) {
+        scene()->removeItem(title);
+        delete title;
+    }
+    itemGroupTitles().clear();
 }

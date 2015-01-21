@@ -8,6 +8,7 @@ class QFileInfo;
 
 class AbstractGalleryItemRenderer;
 class AbstractGalleryViewRenderer;
+class GalleryView;
 
 class AbstractRendererFactory
 {
@@ -21,7 +22,7 @@ public:
         const QFileInfo &pathInfo, bool useDefaultFolderCover) = 0;
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
-        QGraphicsScene *scene);
+        GalleryView *galleryView);
 };
 
 #endif // ABSTRACTRENDERERFACTORY_H

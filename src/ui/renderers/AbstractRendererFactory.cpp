@@ -2,7 +2,7 @@
 #include "GridGalleryViewRenderer.h"
 
 AbstractGalleryViewRenderer *AbstractRendererFactory::createViewRenderer(
-        QGraphicsScene *scene)
+        GalleryView *galleryView)
 {
-    return new GridGalleryViewRenderer(scene);
+    return new GridGalleryViewRenderer(galleryView);
 }
