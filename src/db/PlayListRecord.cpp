@@ -4,6 +4,11 @@
 #include "PlayListRecord.h"
 #include "RemotePlayListRecord.h"
 
+const char *PlayListRecord::PlayListTypeNames[] = {
+    "Local",
+    "Remote",
+};
+
 PlayListRecord::PlayListRecord(const QString &name,
                                const QString &coverPath,
                                PlayList *playList,
@@ -29,6 +34,16 @@ void PlayListRecord::setCount(int count)
     }
 
     m_count = count;
+}
+
+PlayListRecord::PlayListType PlayListRecord::type() const
+{
+    return m_type;
+}
+
+QString PlayListRecord::typeName() const
+{
+    return QString(PlayListTypeNames[m_type]);
 }
 
 int PlayListRecord::coverIndex()

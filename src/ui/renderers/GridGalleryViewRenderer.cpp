@@ -5,7 +5,7 @@
 #include "GridGalleryViewRenderer.h"
 #include "ItemGroupTitle.h"
 
-static const qreal GROUP_PADDING_ROW = 0.3;
+static const qreal GROUP_PADDING_ROW = 0.2;
 
 GridGalleryViewRenderer::GridGalleryViewRenderer(GalleryView *galleryView) :
     AbstractGalleryViewRenderer(galleryView)

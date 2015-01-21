@@ -31,8 +31,10 @@ public:
         LocalPlayList,
         RemotePlayList,
     };
+    static const char *PlayListTypeNames[];
 
-    PlayListType type() const { return m_type; }
+    PlayListType type() const;
+    QString typeName() const;
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
     int coverIndex();
