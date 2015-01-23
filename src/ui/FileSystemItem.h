@@ -36,6 +36,8 @@ private slots:
     void coverThumbnailLoadFailed();
 
 private:
+    QString coverCacheKey() const;
+
     QFileInfo m_pathInfo;
     Image *m_coverImage;
     bool m_useDefaultFolderCover;

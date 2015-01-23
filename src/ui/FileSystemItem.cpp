@@ -115,7 +115,7 @@ void FileSystemItem::load()
         return;
     }
 
-    QImage *cachedCover = g_coverCache[m_pathInfo.absoluteFilePath()];
+    QImage *cachedCover = g_coverCache[coverCacheKey()];
     if (cachedCover) {
         setThumbnail(new QImage(*cachedCover));
     } else {
@@ -140,7 +140,7 @@ void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
 void FileSystemItem::gotThumbnail(QString path)
 {
     QImage *coverImage = new QImage(path);
-    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
 }
 
@@ -165,7 +165,7 @@ void FileSystemItem::coverThumbnailLoaded()
     } else {
         coverImage = new QImage(":/res/image.png");
     }
-    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
     m_coverImage->deleteLater();
     m_coverImage = 0;
@@ -174,7 +174,7 @@ void FileSystemItem::coverThumbnailLoaded()
 void FileSystemItem::coverThumbnailLoadFailed()
 {
     QImage *coverImage = new QImage(":/res/image.png");
-    g_coverCache.insert(m_pathInfo.absoluteFilePath(), coverImage);
+    g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
     m_coverImage->deleteLater();
     m_coverImage = 0;
@@ -194,8 +194,13 @@ void FileSystemItem::loadCover(QString path)
 void FileSystemItem::removeOnDisk()
 {
     QFile::remove(path());
-    // Remove cover cache of parent directory in case used as cover image
-    g_coverCache.remove(m_pathInfo.dir().absolutePath());
+}
+
+QString FileSystemItem::coverCacheKey() const
+{
+    return QString("%1_%2")
+        .arg(m_pathInfo.absoluteFilePath())
+        .arg(QString::number(m_pathInfo.lastModified().toMSecsSinceEpoch()));
 }
 
 
