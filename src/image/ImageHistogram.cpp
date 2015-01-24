@@ -40,6 +40,14 @@ cv::Mat ImageHistogramPrivate::imageToCvMat(const QImage &image)
                     const_cast<uchar *>(image.bits()), image.bytesPerLine());
         return mat;
     }
+    case QImage::Format_ARGB32_Premultiplied:
+    {
+        QImage npImage = image.convertToFormat(QImage::Format_ARGB32);
+        cv::Mat mat(npImage.height(), npImage.width(), CV_8UC4,
+                    const_cast<uchar *>(npImage.bits()),
+                    npImage.bytesPerLine());
+        return mat;
+    }
     case QImage::Format_RGB888:
     {
         QImage swapped = image.rgbSwapped();

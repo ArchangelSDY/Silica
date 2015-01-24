@@ -199,6 +199,11 @@ bool PlayList::groupLessThan(const QSharedPointer<Image> &left,
 
 void PlayList::sortByGroup()
 {
+    // Make groups if needed
+    if (m_imageGroups.count() != count()) {
+        groupByThumbHist();
+    }
+
     auto lessThanFunc = std::bind(&PlayList::groupLessThan, this,
                                   std::placeholders::_1,
                                   std::placeholders::_2);
