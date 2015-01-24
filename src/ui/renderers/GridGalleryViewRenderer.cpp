@@ -51,8 +51,10 @@ void GridGalleryViewRenderer::layout(QList<GalleryItem *> &items,
         // Add group title row
         if (isGroupingEnabled) {
             if (itemGroups[i] != curGroup) {
-                // Break line first
-                curRow += 1;
+                // Break line first if current item is not at row head
+                if (curColumn > 0) {
+                    curRow += 1;
+                }
 
                 QRectF titleRect(0, curRow * galleryItemSize.height(),
                                  sceneWidth,
