@@ -57,6 +57,7 @@ void MainGraphicsView::setNavigator(Navigator *navigator)
 void MainGraphicsView::resetImage(Image *image)
 {
     m_image = image;
+    m_focusedRect = QRectF();
     m_curFrameNumber = 0;
     m_animationTimer.stop();
 }

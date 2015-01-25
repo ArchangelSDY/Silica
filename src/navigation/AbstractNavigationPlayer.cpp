@@ -6,3 +6,7 @@ AbstractNavigationPlayer::AbstractNavigationPlayer(Navigator *navigator,
     m_navigator(navigator)
 {
 }
+
+void AbstractNavigationPlayer::reset()
+{
+}

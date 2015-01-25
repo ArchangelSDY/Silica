@@ -93,6 +93,7 @@ void Navigator::setPlayList(PlayList *playList, bool takeOwnership)
     emit playListChange(m_playList);
 
     goIndex(0);
+    m_player->reset();
 }
 
 void Navigator::playListAppended(int start)

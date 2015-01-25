@@ -44,6 +44,14 @@ void ExpandingNavigationPlayer::goPrev()
     m_navigator->focusOnRect(focused);
 }
 
+void ExpandingNavigationPlayer::reset()
+{
+    calcFocused();
+    m_curIndex = 0;
+    QRectF focused = m_toBeFocused.at(m_curIndex);
+    m_navigator->focusOnRect(focused);
+}
+
 void ExpandingNavigationPlayer::calcFocused()
 {
     Image *curImage = m_navigator->currentImage();

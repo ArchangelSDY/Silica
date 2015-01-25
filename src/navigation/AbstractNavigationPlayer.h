@@ -13,6 +13,7 @@ public:
 
     virtual void goNext() = 0;
     virtual void goPrev() = 0;
+    virtual void reset();
 
     enum Type {
         NormalType,

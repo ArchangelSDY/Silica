@@ -15,6 +15,7 @@ public:
 
     void goNext();
     void goPrev();
+    void reset();
 
     Type type() const { return AbstractNavigationPlayer::ExpandingType; }
 
