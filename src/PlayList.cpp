@@ -1,4 +1,4 @@
-#include <QRegExp>
+#include <QRegularExpression>
 #include <functional>
 #include <vector>
 #include <opencv2/core/core.hpp>
@@ -117,25 +117,27 @@ void PlayList::watchedPlayListAppended(int start)
 static bool imageNameLessThan(const QSharedPointer<Image> &left,
                               const QSharedPointer<Image> &right)
 {
-    static QRegExp numberRegex("(\\d+)");
+    static QRegularExpression numberRegex("(\\d+)");
 
     if (left->name().split(numberRegex) == right->name().split(numberRegex)) {
         // Names are similar except number parts
 
         // Extract number parts from left
-        numberRegex.indexIn(left->name());
-        QStringList leftNumberStrs = numberRegex.capturedTexts();
         QList<int> leftNumbers;
-        foreach (const QString &str, leftNumberStrs) {
-            leftNumbers << str.toInt();
+        QRegularExpressionMatchIterator leftIter =
+            numberRegex.globalMatch(left->name());
+        while (leftIter.hasNext()) {
+            QRegularExpressionMatch m = leftIter.next();
+            leftNumbers << m.captured(1).toInt();
         }
 
         // Extract number parts from right
-        numberRegex.indexIn(right->name());
-        QStringList rightNumberStrs = numberRegex.capturedTexts();
         QList<int> rightNumbers;
-        foreach (const QString &str, rightNumberStrs) {
-            rightNumbers << str.toInt();
+        QRegularExpressionMatchIterator rightIter =
+            numberRegex.globalMatch(right->name());
+        while (rightIter.hasNext()) {
+            QRegularExpressionMatch m = rightIter.next();
+            rightNumbers << m.captured(1).toInt();
         }
 
         int len = qMin(leftNumbers.length(), rightNumbers.length());

@@ -1,14 +1,29 @@
 #include <QImage>
 #include <QSignalSpy>
+#include <QStringList>
 #include <QTest>
 
 #include "../src/PlayList.h"
 #include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/ImageRank.h"
+#include "../src/image/ImageSource.h"
 #include "../src/playlist/EqualRankFilter.h"
 #include "../src/playlist/MinRankFilter.h"
 #include "../src/playlist/NotEqualRankFilter.h"
+
+class MockImageSource : public ImageSource
+{
+public:
+    MockImageSource(const QString &name) :
+        ImageSource(0)
+    {
+        m_name = name;
+    }
+
+    bool open() { return true; }
+    bool copy(const QString &) { return true; }
+};
 
 class TestPlayList : public QObject
 {
@@ -60,38 +75,50 @@ void TestPlayList::initTestCase()
 
 void TestPlayList::sortByName()
 {
-    QFETCH(QList<QUrl>, srcUrls);
-    QFETCH(QString, firstItemName);
-    QFETCH(QString, secondItemName);
+    QFETCH(QStringList, unsortedNames);
+    QFETCH(QStringList, sortedNames);
 
-    PlayList pl(srcUrls);
+    PlayList pl;
+    foreach (const QString &name, unsortedNames) {
+        pl << QSharedPointer<Image>::create(new MockImageSource(name));
+    }
+
     pl.sortByName();
 
-    QCOMPARE(pl.at(0)->name(), firstItemName);
-    QCOMPARE(pl.at(1)->name(), secondItemName);
+    QCOMPARE(pl.count(), sortedNames.count());
+    for (int i = 0; i < pl.count(); ++i) {
+        QCOMPARE(pl[i]->name(), sortedNames[i]);
+    }
 }
 
 void TestPlayList::sortByName_data()
 {
-    const QString &tmpDirPath = m_tmpDir.path();
-    QUrl silicaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "silica.png");
-    QUrl asunaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "asuna.png");
-
-    QTest::addColumn<QList<QUrl> >("srcUrls");
-    QTest::addColumn<QString>("firstItemName");
-    QTest::addColumn<QString>("secondItemName");
+    QTest::addColumn<QStringList>("unsortedNames");
+    QTest::addColumn<QStringList>("sortedNames");
 
     QTest::newRow("silica asuna")
-        << (QList<QUrl>() << silicaUrl << asunaUrl)
-        << "asuna.png"
-        << "silica.png";
+        << (QStringList() << "silica.png" << "asuna.png")
+        << (QStringList() << "asuna.png" << "silica.png");
 
     QTest::newRow("asuna silica")
-        << (QList<QUrl>() << asunaUrl << silicaUrl)
-        << "asuna.png"
-        << "silica.png";
+        << (QStringList() << "asuna.png" << "silica.png")
+        << (QStringList() << "asuna.png" << "silica.png");
+
+    QTest::newRow("numbers in name")
+        << (QStringList() << "silica_10.png"
+                          << "silica_1.png"
+                          << "silica_2.png")
+        << (QStringList() << "silica_1.png"
+                          << "silica_2.png"
+                          << "silica_10.png");
+
+    QTest::newRow("numbers in name 2")
+        << (QStringList() << "IMG_20150101_0030_1.jpg"
+                          << "IMG_20150101_0030_10.jpg"
+                          << "IMG_20150101_0030_2.jpg")
+        << (QStringList() << "IMG_20150101_0030_1.jpg"
+                          << "IMG_20150101_0030_2.jpg"
+                          << "IMG_20150101_0030_10.jpg");
 }
 
 void TestPlayList::sortByAspectRatio()
