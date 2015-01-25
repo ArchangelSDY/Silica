@@ -81,9 +81,9 @@ void GalleryView::clear()
 {
     // Clear first
     foreach (GalleryItem *item, galleryItems()) {
+        m_scene->removeItem(item);
         item->deleteLater();
     }
-    m_scene->clear();
     m_loadingItemsCount = 0;
 }
 
