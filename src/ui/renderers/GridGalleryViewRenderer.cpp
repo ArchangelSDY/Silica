@@ -24,8 +24,9 @@ void GridGalleryViewRenderer::layout(QList<GalleryItem *> &items,
     }
     qreal sceneWidth = maxColumns * galleryItemSize.width();
     qreal groupTitleHeight = GROUP_PADDING_ROW * galleryItemSize.height();
-
     qreal curRow = 0, curColumn = -1;
+
+    destroyGroupTitles();
 
     QString curGroup;
     if (isGroupingEnabled) {
