@@ -46,8 +46,13 @@ void LooseImageRenderer::paint(QPainter *painter)
         QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
 
     // Border
-    painter->setBrush(Qt::white);
-    painter->setPen(Qt::white);
+    if (!m_image->isNull()) {
+        painter->setBrush(Qt::white);
+        painter->setPen(Qt::white);
+    } else {
+        painter->setBrush(QColor("#8a92a2"));
+        painter->setPen(QColor("#8a92a2"));
+    }
     painter->drawRoundedRect(m_borderRect,
         LooseImageRenderer::BORDER, LooseImageRenderer::BORDER);
 
