@@ -11,17 +11,16 @@ WaterfallImageRenderer::WaterfallImageRenderer() :
 
 void WaterfallImageRenderer::layout()
 {
-    if (!m_image) {
+    if (!m_image || m_image->size().isEmpty()) {
         return;
     }
 
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-    QSize sizeWithoutPadding(
-        itemSize.width() - 2 * WaterfallImageRenderer::PADDING,
-        INT_MAX
-    );
-    m_imageRect.setSize(
-        m_image->size().scaled(sizeWithoutPadding, Qt::KeepAspectRatio));
+    const QSize &imageSize = m_image->size();
+    qreal imageWidth = itemSize.width() - 2 * WaterfallImageRenderer::PADDING;
+    qreal factor = imageWidth / imageSize.width();
+    qreal imageHeight = imageSize.height() * factor;
+    m_imageRect.setSize(QSize(imageWidth, imageHeight));
 
     m_imageRect.moveTo(
         WaterfallImageRenderer::PADDING,
