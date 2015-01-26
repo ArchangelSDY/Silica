@@ -181,7 +181,7 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
 
         event->accept();
         emit keyEnterPressed();
-    } else if (event->key() == Qt::Key_Slash && !m_searchBox->isVisible()) {
+    } else if (event->key() == Qt::Key_Slash) {
         enterSearch();
         event->accept();
     } else if (event->key() == Qt::Key_Escape && m_searchBox->isVisible()) {
