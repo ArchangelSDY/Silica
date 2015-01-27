@@ -10,3 +10,13 @@ AbstractNavigationPlayer::AbstractNavigationPlayer(Navigator *navigator,
 void AbstractNavigationPlayer::reset()
 {
 }
+
+QDialog *AbstractNavigationPlayer::configureDialog() const
+{
+    return 0;
+}
+
+bool AbstractNavigationPlayer::isConfigurable() const
+{
+    return configureDialog() != 0;
+}

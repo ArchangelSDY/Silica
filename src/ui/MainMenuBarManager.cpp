@@ -1,4 +1,5 @@
 #include "ExpandingNavigationPlayer.h"
+#include "FixedRegionNavigationPlayer.h"
 #include "HotspotsNavigationPlayer.h"
 #include "MainMenuBarManager.h"
 #include "Navigator.h"
@@ -40,6 +41,13 @@ void MainMenuBarManager::init()
     actSetExpandingPlayer->setCheckable(true);
     actSetExpandingPlayer->setChecked(
         m_navigator->player()->type() == AbstractNavigationPlayer::ExpandingType);
+
+    QAction *actSetFixedRegionPlayer = playersMenu->addAction(
+        tr("Fixed Region Player"), this, SLOT(setFixedRegionPlayer()));
+    playersGrp->addAction(actSetFixedRegionPlayer);
+    actSetFixedRegionPlayer->setCheckable(true);
+    actSetFixedRegionPlayer->setChecked(
+        m_navigator->player()->type() == AbstractNavigationPlayer::FixedRegionType);
 }
 
 void MainMenuBarManager::setNormalPlayer()
@@ -56,4 +64,10 @@ void MainMenuBarManager::setExpandingPlayer()
 {
     m_navigator->setPlayer(
         new ExpandingNavigationPlayer(m_navigator, m_imageView));
+}
+
+void MainMenuBarManager::setFixedRegionPlayer()
+{
+    m_navigator->setPlayer(
+        new FixedRegionNavigationPlayer(m_navigator, m_imageView));
 }

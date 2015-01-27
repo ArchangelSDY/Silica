@@ -22,6 +22,7 @@ private slots:
     void setNormalPlayer();
     void setHotspotsPlayer();
     void setExpandingPlayer();
+    void setFixedRegionPlayer();
 
 private:
     void init();

@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+class QDialog;
 class Navigator;
 
 class AbstractNavigationPlayer : public QObject
@@ -19,9 +20,13 @@ public:
         NormalType,
         HotspotsType,
         ExpandingType,
+        FixedRegionType,
     };
 
     virtual Type type() const = 0;
+
+    virtual QDialog *configureDialog() const;
+    virtual bool isConfigurable() const;
 
 protected:
     Navigator *m_navigator;
