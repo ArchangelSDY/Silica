@@ -1,5 +1,6 @@
 #include <QWidget>
 
+#include "FixedRegionConfDialog.h"
 #include "FixedRegionNavigationPlayer.h"
 #include "Navigator.h"
 
@@ -8,21 +9,41 @@ FixedRegionNavigationPlayer::FixedRegionNavigationPlayer(Navigator *navigator,
                                                          QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
     m_view(view) ,
-    m_centerPosition(0.25)
+    m_curCenterIndex(0) ,
+    m_confDialog(new FixedRegionConfDialog(m_centers, view))
 {
     // Set focused rect to null to disable focusing
     m_navigator->focusOnRect(QRectF());
+
+    // Predefined center positions
+    m_centers << 0.2 << 0.5;
+
+}
+
+FixedRegionNavigationPlayer::~FixedRegionNavigationPlayer()
+{
+    m_confDialog->deleteLater();
 }
 
 void FixedRegionNavigationPlayer::goNext()
 {
-    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() + 1, 1);
+    if (m_curCenterIndex >= m_centers.count() - 1) {
+        m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() + 1, 1);
+        m_curCenterIndex = 0;
+    } else {
+        m_curCenterIndex ++;
+    }
     m_navigator->focusOnRect(calcFocusedRect());
 }
 
 void FixedRegionNavigationPlayer::goPrev()
 {
-    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() - 1, -1);
+    if (m_curCenterIndex <= 0) {
+        m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() - 1, -1);
+        m_curCenterIndex = m_centers.count() - 1;
+    } else {
+        m_curCenterIndex --;
+    }
     m_navigator->focusOnRect(calcFocusedRect());
 }
 
@@ -33,13 +54,14 @@ QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
         return QRectF();
     }
 
+    qreal center = m_centers.at(m_curCenterIndex);
     QSize imageSize = curImage->size();
     QSize scaledViewSize = m_view->size().scaled(imageSize,
                                                  Qt::KeepAspectRatio);
 
     if (scaledViewSize.width() == imageSize.width()) {
         // Vertical
-        qreal centerY = imageSize.height() * m_centerPosition;
+        qreal centerY = imageSize.height() * center;
         qreal topLeftY = centerY - scaledViewSize.height() / 2;
         topLeftY = topLeftY >= 0 ? topLeftY : 0;
         QPointF topLeft(0, topLeftY);
@@ -53,7 +75,7 @@ QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
         return QRectF(topLeft, focusSize);
     } else {
         // Horizontal
-        qreal centerX = imageSize.width() * m_centerPosition;
+        qreal centerX = imageSize.width() * center;
         qreal topLeftX = centerX - scaledViewSize.width() / 2;
         topLeftX = topLeftX >= 0 ? topLeftX : 0;
         QPointF topLeft(topLeftX, 0);
@@ -70,6 +92,6 @@ QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
 
 QDialog *FixedRegionNavigationPlayer::configureDialog() const
 {
-    return 0;
+    return m_confDialog;
 }
 

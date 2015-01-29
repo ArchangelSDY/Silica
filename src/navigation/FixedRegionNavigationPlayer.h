@@ -1,7 +1,11 @@
 #ifndef FIXEDREGIONNAVIGATIONPLAYER_H
 #define FIXEDREGIONNAVIGATIONPLAYER_H
 
+#include <QList>
+
 #include "AbstractNavigationPlayer.h"
+
+class FixedRegionConfDialog;
 
 class FixedRegionNavigationPlayer : public AbstractNavigationPlayer
 {
@@ -10,6 +14,7 @@ public:
     explicit FixedRegionNavigationPlayer(Navigator *navigator,
                                          QWidget *view,
                                          QObject *parent = 0);
+    ~FixedRegionNavigationPlayer();
 
     void goNext();
     void goPrev();
@@ -22,7 +27,9 @@ private:
     QRectF calcFocusedRect() const;
 
     QWidget *m_view;
-    qreal m_centerPosition;
+    QList<qreal> m_centers;
+    int m_curCenterIndex;
+    FixedRegionConfDialog *m_confDialog;
 };
 
 #endif // FIXEDREGIONNAVIGATIONPLAYER_H

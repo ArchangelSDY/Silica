@@ -23,6 +23,8 @@ private slots:
     void setHotspotsPlayer();
     void setExpandingPlayer();
     void setFixedRegionPlayer();
+    void checkPlayerConfigurable();
+    void openPlayerConfDialog();
 
 private:
     void init();
@@ -31,6 +33,9 @@ private:
     QMenuBar *m_menuBar;
     Navigator *m_navigator;
     QWidget *m_imageView;
+
+    QMenu *m_menuPlayers;
+    QAction *m_actPlayerConf;
 };
 
 #endif // MAINMENUBARMANAGER_H

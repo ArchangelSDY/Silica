@@ -48,7 +48,11 @@ file(GLOB SRCS
     "ui/hotspots/*.cpp"
     "ui/renderers/*.cpp"
 )
-file(GLOB FORMS "*.ui" "ui/*.ui")
+file(GLOB FORMS
+    "*.ui"
+    "navigation/*.ui"
+    "ui/*.ui"
+)
 file(GLOB RESOURCES "*.qrc")
 
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})

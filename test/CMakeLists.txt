@@ -44,7 +44,11 @@ file(GLOB EXTERNAL_SRCS
     "${CMAKE_CURRENT_BINARY_DIR}/../src/Definitions.cpp"
 )
 
-file(GLOB FORMS "../src/*.ui" "../src/ui/*.ui")
+file(GLOB FORMS
+    "../src/*.ui"
+    "../src/navigation/*.ui"
+    "../src/ui/*.ui"
+)
 file(GLOB RESOURCES "*.qrc" "../src/*.qrc")
 
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
