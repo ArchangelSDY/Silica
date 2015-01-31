@@ -5,16 +5,17 @@
 #include <QString>
 
 #include "image/Image.h"
-#include "PlayList.h"
 
 class PlayList;
+class PlayListProvider;
 
 class PlayListRecord : public QObject
 {
     Q_OBJECT
 public:
     PlayListRecord(const QString &name, const QString &coverPath,
-        PlayList *playList = new PlayList(), QObject *parent = 0);
+        PlayList *playList = 0, QObject *parent = 0);
+    ~PlayListRecord();
 
     int id() const { return m_id; }
     void setId(int id) { m_id = id; }
@@ -30,6 +31,9 @@ public:
 
     int type() const;
     void setType(int type);
+
+    // FIXME(sdy): Builder patter
+    void setPlayListProvider(PlayListProvider *provider);
 
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
@@ -64,6 +68,7 @@ private:
     int m_count;
     int m_coverIndex;
     int m_type;
+    PlayListProvider *m_provider;
     PlayList *m_playList;
     bool m_ownPlayList;
 };

@@ -1,5 +1,7 @@
 #include "PlayListProviderManager.h"
 
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QPluginLoader>
 
 #include "db/LocalDatabase.h"
@@ -31,8 +33,11 @@ PlayListProviderManager::PlayListProviderManager()
                 PlayListProviderFactory *factory =
                     qobject_cast<PlayListProviderFactory *>(plugin);
                 if (factory) {
-                    // FIXME!!!
-                    m_providers.insert(1, factory);
+                    QJsonObject meta = loader.metaData();
+                    QJsonObject customMeta = meta["MetaData"].toObject();
+                    QString name = customMeta["name"].toString();
+
+                    registerPluginProvider(name, factory);
                 }
             }
         }
@@ -62,14 +67,7 @@ PlayListRecord *PlayListProviderManager::create(int type,
     PlayListRecord *record = new PlayListRecord(name, coverPath);
     record->setType(type);
     record->setId(id);
-
-    QObject::connect(
-        provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
-        record, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)));
-
-    QVariantHash extra;
-    extra.insert("id", id);
-    provider->request(name, extra);
+    record->setPlayListProvider(provider);
 
     return record;
 }
@@ -77,6 +75,10 @@ PlayListRecord *PlayListProviderManager::create(int type,
 void PlayListProviderManager::registerPluginProvider(const QString &name,
                                                PlayListProviderFactory *factory)
 {
+    if (name.isEmpty()) {
+        return;
+    }
+
     int typeId = LocalDatabase::instance()->queryPluginPlayListProviderType(name);
     if (typeId == PlayListRecord::UNKNOWN_TYPE) {
         typeId = LocalDatabase::instance()->insertPluginPlayListProviderType(name);

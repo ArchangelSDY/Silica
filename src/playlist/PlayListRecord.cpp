@@ -1,6 +1,7 @@
 #include "PlayListRecord.h"
 
 #include "db/LocalDatabase.h"
+#include "playlist/PlayListProvider.h"
 #include "PlayList.h"
 
 PlayListRecord::PlayListRecord(const QString &name,
@@ -14,11 +15,22 @@ PlayListRecord::PlayListRecord(const QString &name,
     m_count(PlayListRecord::EMPTY_COUNT) ,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_type(PlayListRecord::UNKNOWN_TYPE) ,
+    m_provider(0) ,
     m_playList(playList)
 {
     // If playList is given, then we do not own this playList and will not try
     // to delete it.
     m_ownPlayList = (playList == 0);
+}
+
+PlayListRecord::~PlayListRecord()
+{
+    if (m_ownPlayList && m_playList) {
+        m_playList->deleteLater();
+    }
+    if (m_provider) {
+        m_provider->deleteLater();
+    }
 }
 
 void PlayListRecord::setCount(int count)
@@ -30,6 +42,11 @@ void PlayListRecord::setCount(int count)
     // }
 
     m_count = count;
+}
+
+void PlayListRecord::setPlayListProvider(PlayListProvider *provider)
+{
+    m_provider = provider;
 }
 
 int PlayListRecord::coverIndex()
@@ -59,6 +76,18 @@ void PlayListRecord::setType(int type)
 
 PlayList *PlayListRecord::playList()
 {
+    if (!m_playList && m_provider) {
+        m_playList = new PlayList();
+
+        QObject::connect(
+            m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
+            this, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)));
+
+        QVariantHash extra;
+        extra.insert("id", m_id);
+        m_provider->request(m_name, extra);
+    }
+
     return m_playList;
 }
 
@@ -113,12 +142,14 @@ bool PlayListRecord::insertImages(const ImageList &images)
 void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
                               const QList<QVariantHash> &extraInfos)
 {
+    PlayList pl;
     for (int i = 0; i < imageUrls.count(); ++i) {
-        ImagePtr image = m_playList->addSinglePath(imageUrls[i]);
-        if (!image.isNull()) {
+        ImagePtr image = pl.addSinglePath(imageUrls[i]);
+        if (!image.isNull() && extraInfos.count() > i) {
             image->extraInfo() = extraInfos[i];
         }
     }
+    m_playList->append(&pl);
 }
 
 QList<PlayListRecord *> PlayListRecord::all()
