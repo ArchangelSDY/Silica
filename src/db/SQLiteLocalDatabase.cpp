@@ -56,6 +56,12 @@ const char *SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH = "select rank from image_ranks w
 
 const char *SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH = "insert or replace into image_ranks (rank, image_hash) values (?, ?)";
 
+const char *SQL_INSERT_PLUGIN_PLAYLIST_PROVIDER =
+        "insert into plugin_playlist_providers(name) values (?)";
+
+const char *SQL_QUERY_PLUGIN_PLAYLIST_PROVIDER =
+        "select rowid, name from plugin_playlist_providers where name = ?";
+
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -433,4 +439,44 @@ bool SQLiteLocalDatabase::updateImageRank(Image *image, int rank)
     }
 
     return true;
+}
+
+int SQLiteLocalDatabase::insertPluginPlayListProviderType(const QString &name)
+{
+    if (!m_db.isOpen()) {
+        return PlayListRecord::UNKNOWN_TYPE;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_INSERT_PLUGIN_PLAYLIST_PROVIDER);
+    q.addBindValue(name);
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return PlayListRecord::UNKNOWN_TYPE;
+    }
+
+    return q.lastInsertId().toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
+}
+
+int SQLiteLocalDatabase::queryPluginPlayListProviderType(const QString &name)
+{
+    if (!m_db.isOpen()) {
+        return PlayListRecord::UNKNOWN_TYPE;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_QUERY_PLUGIN_PLAYLIST_PROVIDER);
+    q.addBindValue(name);
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return PlayListRecord::UNKNOWN_TYPE;
+    }
+
+    while (q.next()) {
+        return q.value("rowid").toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
+    }
+
+    return PlayListRecord::UNKNOWN_TYPE;
 }

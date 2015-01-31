@@ -1,17 +1,17 @@
-// FIXME
-//#include <QtSql>
-//#include <QTest>
+#include <QtSql>
+#include <QTest>
 
-//#include "../src/db/LocalDatabase.h"
-//#include "../src/playlist/PlayListRecord.h"
-//#include "../src/GlobalConfig.h"
-//#include "../src/PlayList.h"
+#include "../src/db/LocalDatabase.h"
+#include "../src/image/ImageSource.h"
+#include "../src/playlist/PlayListRecord.h"
+#include "../src/GlobalConfig.h"
+#include "../src/PlayList.h"
 
-//class TestLocalDatabase : public QObject
-//{
-//    Q_OBJECT
-//private slots:
-//    void initTestCase();
+class TestLocalDatabase : public QObject
+{
+    Q_OBJECT
+private slots:
+    void initTestCase();
 
 //    void localPlayListsSaveAndLoad();
 //    void localPlayListsSaveAndLoad_data();
@@ -20,26 +20,29 @@
 //    void insertImagesToPlayList();
 //    void removeImagesFromPlayList();
 
-//    void insertImage();
-//    void insertImage_data();
-//};
+    void insertImage();
+    void insertImage_data();
 
-//void TestLocalDatabase::initTestCase()
-//{
-//    Q_INIT_RESOURCE(silica);
-//    GlobalConfig::create();
-//    QVERIFY2(LocalDatabase::instance()->migrate(),
-//             "Fail to migrate database");
+    void pluginPlayListProvider();
+};
 
-//    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
-//    db.setDatabaseName("local.db");
-//    db.open();
-//    db.exec("delete from playlists");
-//    db.exec("delete from playlist_images");
-//    db.exec("delete from images");
-//    db.close();
-//    QSqlDatabase::removeDatabase("TestLocalDatabase");
-//}
+void TestLocalDatabase::initTestCase()
+{
+    Q_INIT_RESOURCE(silica);
+    GlobalConfig::create();
+    QVERIFY2(LocalDatabase::instance()->migrate(),
+             "Fail to migrate database");
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
+    db.setDatabaseName("local.db");
+    db.open();
+    db.exec("delete from playlists");
+    db.exec("delete from playlist_images");
+    db.exec("delete from images");
+    db.exec("delete from plugin_playlist_providers");
+    db.close();
+    QSqlDatabase::removeDatabase("TestLocalDatabase");
+}
 
 //void TestLocalDatabase::localPlayListsSaveAndLoad()
 //{
@@ -204,32 +207,42 @@
 //    QCOMPARE(spl->at(0)->source()->hashStr(), imageA->source()->hashStr());
 //}
 
-//void TestLocalDatabase::insertImage()
-//{
-//    QFETCH(QUrl, imageUrl);
+void TestLocalDatabase::insertImage()
+{
+    QFETCH(QUrl, imageUrl);
 
-//    Image image(imageUrl);
+    Image image(imageUrl);
 
-//    bool ret = LocalDatabase::instance()->insertImage(&image);
-//    QVERIFY(ret);
+    bool ret = LocalDatabase::instance()->insertImage(&image);
+    QVERIFY(ret);
 
-//    Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
-//        image.source()->hashStr());
-//    QVERIFY(insertedImage != 0);
+    Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
+        image.source()->hashStr());
+    QVERIFY(insertedImage != 0);
 
-//    QCOMPARE(insertedImage->name(), image.name());
-//    delete insertedImage;
-//}
+    QCOMPARE(insertedImage->name(), image.name());
+    delete insertedImage;
+}
 
-//void TestLocalDatabase::insertImage_data()
-//{
-//    QTest::addColumn<QUrl>("imageUrl");
-//    const QString &currentDir = qApp->applicationDirPath();
+void TestLocalDatabase::insertImage_data()
+{
+    QTest::addColumn<QUrl>("imageUrl");
+    const QString &currentDir = qApp->applicationDirPath();
 
-//    QTest::newRow("Basic")
-//        << QUrl("file://" + currentDir + "/assets/insert_image.jpg");
-//}
+    QTest::newRow("Basic")
+        << QUrl("file://" + currentDir + "/assets/insert_image.jpg");
+}
 
-//QTEST_MAIN(TestLocalDatabase)
-// #include "LocalDatabase_Tests.moc"
-int main() {}
+void TestLocalDatabase::pluginPlayListProvider()
+{
+    QString pluginName = "com.silica.plugin";
+
+    QCOMPARE(LocalDatabase::instance()->queryPluginPlayListProviderType(pluginName),
+             -1);
+    int typeId = LocalDatabase::instance()->insertPluginPlayListProviderType(pluginName);
+    QCOMPARE(LocalDatabase::instance()->queryPluginPlayListProviderType(pluginName),
+             typeId);
+}
+
+QTEST_MAIN(TestLocalDatabase)
+ #include "LocalDatabase_Tests.moc"

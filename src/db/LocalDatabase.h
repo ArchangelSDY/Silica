@@ -7,6 +7,7 @@
 #include "image/Image.h"
 #include "image/ImageHotspot.h"
 #include "playList/PlayListRecord.h"
+#include "playlist/PlayListProviderFactory.h"
 
 class ImageRank;
 
@@ -38,6 +39,9 @@ public:
 
     virtual int queryImageRankValue(Image *image) = 0;
     virtual bool updateImageRank(Image *image, int rank) = 0;
+
+    virtual int insertPluginPlayListProviderType(const QString &name) = 0;
+    virtual int queryPluginPlayListProviderType(const QString &name) = 0;
 
     static LocalDatabase *instance();
 

@@ -534,41 +534,42 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSaveLocalPlayList()
 {
-    Image *image = m_navigator->currentImage();
-    if (!image) {
-        return;
-    }
+    // TODO
+//    Image *image = m_navigator->currentImage();
+//    if (!image) {
+//        return;
+//    }
 
-    QInputDialog dialog(this);
-    dialog.setWindowTitle("Save PlayList");
-    dialog.setLabelText("Name");
-    dialog.setComboBoxEditable(true);
+//    QInputDialog dialog(this);
+//    dialog.setWindowTitle("Save PlayList");
+//    dialog.setLabelText("Name");
+//    dialog.setComboBoxEditable(true);
 
-    QString sourceUrl = image->source()->url().toString();
-    QStringList defaultNames = sourceUrl.split(QRegularExpression("[/#]"));
-    dialog.setComboBoxItems(defaultNames);
+//    QString sourceUrl = image->source()->url().toString();
+//    QStringList defaultNames = sourceUrl.split(QRegularExpression("[/#]"));
+//    dialog.setComboBoxItems(defaultNames);
 
-    if (defaultNames.count() >= 2) {
-        dialog.setTextValue(defaultNames[defaultNames.count() - 2]);
-    }
+//    if (defaultNames.count() >= 2) {
+//        dialog.setTextValue(defaultNames[defaultNames.count() - 2]);
+//    }
 
-    dialog.exec();
+//    dialog.exec();
 
-    QString name = dialog.textValue();
-    if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
-        LocalPlayListRecord record(name, image->thumbnailPath(),
-                              m_navigator->playList());
-        if (record.save()) {
-            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
-                                     2000);
+//    QString name = dialog.textValue();
+//    if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
+//        LocalPlayListRecord record(name, image->thumbnailPath(),
+//                              m_navigator->playList());
+//        if (record.save()) {
+//            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
+//                                     2000);
 
-            // Refresh playlist gallery
-            loadSavedPlayLists();
-        } else {
-            statusBar()->showMessage(
-                QString("Failed to save playList %1!").arg(name), 2000);
-        }
-    }
+//            // Refresh playlist gallery
+//            loadSavedPlayLists();
+//        } else {
+//            statusBar()->showMessage(
+//                QString("Failed to save playList %1!").arg(name), 2000);
+//        }
+//    }
 }
 
 void MainWindow::promptToSaveRemotePlayList()

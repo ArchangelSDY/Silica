@@ -18,6 +18,9 @@ public:
 
 private:
     PlayListProviderManager();
+    void registerPluginProvider(const QString &name,
+                                PlayListProviderFactory *factory);
+    void registerProvider(int typeId, PlayListProviderFactory *factory);
 
     static PlayListProviderManager *s_instance;
     QHash<int, PlayListProviderFactory *> m_providers;

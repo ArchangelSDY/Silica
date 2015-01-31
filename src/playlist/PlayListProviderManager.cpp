@@ -2,10 +2,12 @@
 
 #include <QPluginLoader>
 
+#include "db/LocalDatabase.h"
+#include "playlist/LocalPlayListProviderFactory.h"
+#include "playlist/PlayListProvider.h"
+#include "playlist/PlayListProviderFactory.h"
+#include "playlist/PlayListRecord.h"
 #include "GlobalConfig.h"
-#include "PlayListProvider.h"
-#include "PlayListProviderFactory.h"
-#include "PlayListRecord.h"
 
 PlayListProviderManager *PlayListProviderManager::s_instance = 0;
 
@@ -19,6 +21,7 @@ PlayListProviderManager *PlayListProviderManager::instance()
 
 PlayListProviderManager::PlayListProviderManager()
 {
+    // Load plugins
     QDir pluginsDir(GlobalConfig::instance()->pluginsPath());
     if (pluginsDir.cd("playlistproviders")) {
         foreach (const QString &filename, pluginsDir.entryList(QDir::Files)) {
@@ -34,6 +37,9 @@ PlayListProviderManager::PlayListProviderManager()
             }
         }
     }
+
+    // Register internal providers
+    registerProvider(0, new LocalPlayListProviderFactory());
 }
 
 PlayListProviderManager::~PlayListProviderManager()
@@ -66,5 +72,22 @@ PlayListRecord *PlayListProviderManager::create(int type,
     provider->request(name, extra);
 
     return record;
+}
+
+void PlayListProviderManager::registerPluginProvider(const QString &name,
+                                               PlayListProviderFactory *factory)
+{
+    int typeId = LocalDatabase::instance()->queryPluginPlayListProviderType(name);
+    if (typeId == PlayListRecord::UNKNOWN_TYPE) {
+        typeId = LocalDatabase::instance()->insertPluginPlayListProviderType(name);
+    }
+
+    registerProvider(typeId, factory);
+}
+
+void PlayListProviderManager::registerProvider(int typeId,
+        PlayListProviderFactory *factory)
+{
+    m_providers.insert(typeId, factory);
 }
 

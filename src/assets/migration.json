@@ -54,6 +54,11 @@
             "version": 10,
             "applySql": "alter table images add column height integer not null default -1",
             "revertSql": ""
+        },
+        {
+            "version": 11,
+            "applySql": "create table plugin_playlist_providers (name text unique)",
+            "revertSql": ""
         }
     ]
 }

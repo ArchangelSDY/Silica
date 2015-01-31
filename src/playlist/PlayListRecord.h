@@ -42,6 +42,7 @@ public:
     bool insertImages(const ImageList &images);
 
     static QList<PlayListRecord *> all();
+    static const int UNKNOWN_TYPE = -1;
 
 signals:
     void saved();
@@ -54,7 +55,6 @@ private:
     static const int EMPTY_ID = -1;
     static const int EMPTY_COVER_INDEX = -1;
     static const int EMPTY_COUNT = -1;
-    static const int UNKNOWN_TYPE = -1;
 
     virtual void flushPlayList();
 

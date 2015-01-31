@@ -36,6 +36,7 @@ file(GLOB EXTERNAL_SRCS
     "../src/image/sources/*.cpp"
     "../src/navigation/*.cpp"
     "../src/playlist/*.cpp"
+    "../src/playlist/PlayListProvider.h"
     "../src/ui/*.cpp"
     "../src/ui/hotspots/*.cpp"
     "../src/ui/renderers/*.cpp"

@@ -36,8 +36,13 @@ public:
     int queryImageRankValue(Image *image);
     bool updateImageRank(Image *image, int rank);
 
+    int insertPluginPlayListProviderType(const QString &name);
+    int queryPluginPlayListProviderType(const QString &name);
+
 private:
     QSqlDatabase m_db;
+
+    static const int PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET = 100;
 };
 
 #endif // SQLITELOCALDATABASE_H
