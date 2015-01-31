@@ -1,7 +1,7 @@
 #ifndef ABSTRACTPLAYLISTFILTER_H
 #define ABSTRACTPLAYLISTFILTER_H
 
-#include "Image.h"
+#include "image/Image.h"
 
 class AbstractPlayListFilter
 {

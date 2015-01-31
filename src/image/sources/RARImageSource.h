@@ -1,7 +1,7 @@
 #ifndef RARIMAGESOURCE_H
 #define RARIMAGESOURCE_H
 
-#include "ImageSource.h"
+#include "image/ImageSource.h"
 
 class RARImageSource : public ImageSource
 {

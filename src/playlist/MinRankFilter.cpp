@@ -1,5 +1,6 @@
-#include "ImageRank.h"
 #include "MinRankFilter.h"
+
+#include "image/ImageRank.h"
 
 MinRankFilter::MinRankFilter(int minRank,
                              AbstractPlayListFilter *parentFilter) :

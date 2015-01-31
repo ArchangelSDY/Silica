@@ -162,7 +162,9 @@ QString PlayListGalleryView::groupForItem(GalleryItem *rawItem)
 {
     PlayListGalleryItem *item = static_cast<PlayListGalleryItem *>(rawItem);
     if (m_groupLessThan == playListTypeLessThan) {
-        return item->record()->typeName();
+        // FIXME
+        return QString::number(item->record()->type());
+        // return item->record()->typeName();
     } else if (m_groupLessThan == playListNameLessThan) {
         return item->record()->name().left(5);
     } else {

@@ -1,5 +1,6 @@
-#include "ImageRank.h"
 #include "NotEqualRankFilter.h"
+
+#include "image/ImageRank.h"
 
 NotEqualRankFilter::NotEqualRankFilter(int rank,
                                        AbstractPlayListFilter *parentFilter) :

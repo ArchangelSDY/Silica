@@ -1,5 +1,6 @@
 #include "EqualRankFilter.h"
-#include "ImageRank.h"
+
+#include "image/ImageRank.h"
 
 EqualRankFilter::EqualRankFilter(int rank,
                                  AbstractPlayListFilter *parentFilter) :

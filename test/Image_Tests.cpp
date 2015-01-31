@@ -5,6 +5,7 @@
 #include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
+#include "../src/image/ImageSource.h"
 
 class TestImage : public QObject
 {

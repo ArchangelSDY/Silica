@@ -1,7 +1,7 @@
 #ifndef RARIMAGESOURCEFACTORY_H
 #define RARIMAGESOURCEFACTORY_H
 
-#include "ImageSourceFactory.h"
+#include "image/ImageSourceFactory.h"
 
 class RARImageSourceFactory : public ImageSourceFactory
 {

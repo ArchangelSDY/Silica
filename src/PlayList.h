@@ -4,9 +4,10 @@
 #include <QHash>
 #include <QUrl>
 
-#include "AbstractPlayListFilter.h"
-#include "Image.h"
-#include "PlayListRecord.h"
+#include "image/Image.h"
+
+class AbstractPlayListFilter;
+class PlayListRecord;
 
 class PlayList : public QObject
 {
@@ -20,8 +21,8 @@ public:
     PlayListRecord *record() { return m_record; }
     void setRecord(PlayListRecord *record) { m_record = record; }
 
-    void addSinglePath(const QString &);
-    void addSinglePath(const QUrl &);
+    ImagePtr addSinglePath(const QString &);
+    ImagePtr addSinglePath(const QUrl &);
     void addMultiplePath(const QString &);
     void addMultiplePath(const QUrl &);
 
@@ -45,56 +46,16 @@ public:
         return m_filteredImages.end();
     }
 
-    inline void append(const QSharedPointer<Image> &image)
-    {
-        ImageList l;
-        l << image;
-        append(l);
-    }
-    inline void append(const ImageList &images)
-    {
-        int start = count();
-        m_allImages.append(images);
-        m_filteredImages.append(m_filter->filtered(images));
-        emit itemsAppended(start);
-    }
-    inline void append(PlayList *playList, bool watching = false)
-    {
-        int start = count();
-        m_allImages.append(playList->m_allImages);
-        m_filteredImages.append(playList->m_filteredImages);
-        emit itemsAppended(start);
+    void append(const QSharedPointer<Image> &image);
+    void append(const ImageList &images);
+    void append(PlayList *playList, bool watching = false);
 
-        if (watching) {
-            connect(playList, SIGNAL(itemsAppended(int)),
-                    this, SLOT(watchedPlayListAppended(int)));
-        }
-    }
+    QList<QSharedPointer<Image> > &operator<<(
+            const QSharedPointer<Image> &image);
+    QList<QSharedPointer<Image> > &operator<<(
+            const ImageList &images);
 
-    inline QList<QSharedPointer<Image> > &operator<<(
-            const QSharedPointer<Image> &image)
-    {
-        ImageList l;
-        l << image;
-        return (*this << l);
-    }
-    inline QList<QSharedPointer<Image> > &operator<<(
-            const ImageList &images)
-    {
-        int start = count();
-        m_allImages << images;
-        QList<QSharedPointer<Image> > &ret =
-            m_filteredImages << m_filter->filtered(images);
-        emit itemsAppended(start);
-        return ret;
-    }
-
-    inline void clear()
-    {
-        m_allImages.clear();
-        m_filteredImages.clear();
-        emit itemsChanged();
-    }
+    void clear();
 
     inline QSharedPointer<Image> &operator[](int i)
     {

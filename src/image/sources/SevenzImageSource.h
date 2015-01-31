@@ -3,7 +3,7 @@
 
 #include <QBuffer>
 
-#include "ImageSource.h"
+#include "image/ImageSource.h"
 
 class Qt7zPackage;
 

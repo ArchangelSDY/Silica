@@ -1,7 +1,7 @@
 #ifndef ZIPIMAGESOURCEFACTORY_H
 #define ZIPIMAGESOURCEFACTORY_H
 
-#include "ImageSourceFactory.h"
+#include "image/ImageSourceFactory.h"
 
 class ZipImageSourceFactory : public ImageSourceFactory
 {

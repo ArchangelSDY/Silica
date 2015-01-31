@@ -1,7 +1,7 @@
 #ifndef ZIPIMAGESOURCE_H
 #define ZIPIMAGESOURCE_H
 
-#include "ImageSource.h"
+#include "image/ImageSource.h"
 
 class ImageSourceFactory;
 

@@ -1,5 +1,6 @@
 #include "ImageHotspot.h"
-#include "LocalDatabase.h"
+
+#include "db/LocalDatabase.h"
 
 ImageHotspot::ImageHotspot(Image *image, const QRect &rect) :
     m_image(image) ,

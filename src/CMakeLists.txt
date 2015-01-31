@@ -44,6 +44,7 @@ file(GLOB SRCS
     "image/sources/*.cpp"
     "navigation/*.cpp"
     "playlist/*.cpp"
+    "playlist/PlayListProvider.h"
     "ui/*.cpp"
     "ui/hotspots/*.cpp"
     "ui/renderers/*.cpp"

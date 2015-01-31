@@ -83,6 +83,9 @@ void GlobalConfig::load()
     // Network cache path
     m_netCachePath = baseDir + "/netcache";
 
+    // Plugins path
+    m_pluginsPath = baseDir + "/plugins";
+
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
 
@@ -105,10 +108,18 @@ void GlobalConfig::load()
 
 const char *GlobalConfig::buildRevision() const
 {
+#ifdef BUILD_GIT_SHA1
     return g_BUILD_GIT_SHA1;
+#else
+    return "";
+#endif
 }
 
 const char *GlobalConfig::buildTimestamp() const
 {
+#ifdef BUILD_TIMESTAMP
     return g_BUILD_TIMESTAMP;
+#else
+    return "";
+#endif
 }

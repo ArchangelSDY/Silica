@@ -1,8 +1,8 @@
 #ifndef LOCALIMAGESOURCEFACTORY_H
 #define LOCALIMAGESOURCEFACTORY_H
 
-#include "ImageSource.h"
-#include "ImageSourceFactory.h"
+#include "image/ImageSource.h"
+#include "image/ImageSourceFactory.h"
 
 class LocalImageSourceFactory : public ImageSourceFactory
 {

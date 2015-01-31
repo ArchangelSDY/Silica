@@ -1,5 +1,6 @@
+#include "image/ImageRank.h"
+
 #include "AbstractPlayListFilter.h"
-#include "ImageRank.h"
 #include "NotEqualRankFilter.h"
 
 AbstractPlayListFilter::AbstractPlayListFilter(

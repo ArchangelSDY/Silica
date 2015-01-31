@@ -1,7 +1,7 @@
 #ifndef LOCALIMAGESOURCE_H
 #define LOCALIMAGESOURCE_H
 
-#include "ImageSource.h"
+#include "image/ImageSource.h"
 
 class LocalImageSource : public ImageSource
 {

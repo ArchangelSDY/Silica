@@ -3,8 +3,8 @@
 
 #include <QMutex>
 
-#include "FrequencyCache.h"
-#include "ImageSourceFactory.h"
+#include "image/ImageSourceFactory.h"
+#include "util/FrequencyCache.h"
 
 class Qt7zPackage;
 

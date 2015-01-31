@@ -4,9 +4,9 @@
 #include <QList>
 #include <QObject>
 
-#include "Image.h"
-#include "ImageHotspot.h"
-#include "PlayListRecord.h"
+#include "image/Image.h"
+#include "image/ImageHotspot.h"
+#include "playList/PlayListRecord.h"
 
 class ImageRank;
 
@@ -17,7 +17,7 @@ public:
     virtual bool migrate() = 0;
 
     virtual QList<PlayListRecord *> queryPlayListRecords() = 0;
-    virtual QStringList queryImageUrlsForLocalPlayListRecord(int playListId) = 0;
+    virtual QList<QUrl> queryImageUrlsForLocalPlayListRecord(int playListId) = 0;
     virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool removePlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool updatePlayListRecord(PlayListRecord *playListRecord) = 0;

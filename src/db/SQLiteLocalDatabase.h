@@ -3,8 +3,8 @@
 
 #include <QtSql>
 
-#include "Image.h"
-#include "LocalDatabase.h"
+#include "db/LocalDatabase.h"
+#include "image/Image.h"
 
 class SQLiteLocalDatabase : public LocalDatabase
 {
@@ -14,7 +14,7 @@ public:
     bool migrate();
 
     QList<PlayListRecord *> queryPlayListRecords();
-    QStringList queryImageUrlsForLocalPlayListRecord(int playListId);
+    QList<QUrl> queryImageUrlsForLocalPlayListRecord(int playListId);
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);

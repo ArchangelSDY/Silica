@@ -1,13 +1,7 @@
-#include "LocalDatabase.h"
-#include "LocalPlayListRecord.h"
-#include "PlayList.h"
 #include "PlayListRecord.h"
-#include "RemotePlayListRecord.h"
 
-const char *PlayListRecord::PlayListTypeNames[] = {
-    "Local",
-    "Remote",
-};
+#include "db/LocalDatabase.h"
+#include "PlayList.h"
 
 PlayListRecord::PlayListRecord(const QString &name,
                                const QString &coverPath,
@@ -19,6 +13,7 @@ PlayListRecord::PlayListRecord(const QString &name,
     m_coverPath(coverPath) ,
     m_count(PlayListRecord::EMPTY_COUNT) ,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
+    m_type(PlayListRecord::UNKNOWN_TYPE) ,
     m_playList(playList)
 {
     // If playList is given, then we do not own this playList and will not try
@@ -28,22 +23,13 @@ PlayListRecord::PlayListRecord(const QString &name,
 
 void PlayListRecord::setCount(int count)
 {
+    // FIXME
     // RemotePlayList does not have a fixed count
-    if (m_type == PlayListRecord::RemotePlayList) {
-        return;
-    }
+    // if (m_type == PlayListRecord::RemotePlayList) {
+    //     return;
+    // }
 
     m_count = count;
-}
-
-PlayListRecord::PlayListType PlayListRecord::type() const
-{
-    return m_type;
-}
-
-QString PlayListRecord::typeName() const
-{
-    return QString(PlayListTypeNames[m_type]);
 }
 
 int PlayListRecord::coverIndex()
@@ -59,6 +45,21 @@ int PlayListRecord::coverIndex()
     }
 
     return m_coverIndex;
+}
+
+int PlayListRecord::type() const
+{
+    return m_type;
+}
+
+void PlayListRecord::setType(int type)
+{
+    m_type = type;
+}
+
+PlayList *PlayListRecord::playList()
+{
+    return m_playList;
 }
 
 bool PlayListRecord::save()
@@ -109,19 +110,18 @@ bool PlayListRecord::insertImages(const ImageList &images)
     return ret;
 }
 
+void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
+                              const QList<QVariantHash> &extraInfos)
+{
+    for (int i = 0; i < imageUrls.count(); ++i) {
+        ImagePtr image = m_playList->addSinglePath(imageUrls[i]);
+        if (!image.isNull()) {
+            image->extraInfo() = extraInfos[i];
+        }
+    }
+}
+
 QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();
-}
-
-PlayListRecord *PlayListRecord::create(PlayListType type, const QString &name,
-                                       const QString &coverPath)
-{
-    if (type == PlayListRecord::LocalPlayList) {
-        return new LocalPlayListRecord(name, coverPath);
-    } else if (type == PlayListRecord::RemotePlayList) {
-        return new RemotePlayListRecord(name, coverPath);
-    } else {
-        return 0;
-    }
 }

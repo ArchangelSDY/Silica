@@ -1,9 +1,11 @@
-#include "QtDBMigration.h"
+#include "SQLiteLocalDatabase.h"
 
-#include "ImageRank.h"
+#include "deps/QtDBMigration/src/QtDBMigration.h"
+#include "image/ImageRank.h"
+#include "image/ImageSource.h"
+#include "playlist/PlayListProviderManager.h"
 #include "GlobalConfig.h"
 #include "PlayList.h"
-#include "SQLiteLocalDatabase.h"
 
 const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 
@@ -85,13 +87,12 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         int id = q.value(0).toInt();
         QString name = q.value(1).toString();
         QString coverPath = q.value(2).toString();
-        PlayListRecord::PlayListType type =
-            static_cast<PlayListRecord::PlayListType>(q.value(3).toInt());
+        int type = q.value(3).toInt();
         int count = q.value(4).toInt();
 
-        PlayListRecord *record = PlayListRecord::create(type, name, coverPath);
+        PlayListRecord *record = PlayListProviderManager::instance()->create(
+            type, id, name, coverPath);
         if (record) {
-            record->setId(id);
             record->setCount(count);
             records << record;
         }
@@ -100,10 +101,10 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
     return records;
 }
 
-QStringList SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
+QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
     int playListId)
 {
-    QStringList imageUrls;
+    QList<QUrl> imageUrls;
 
     if (!m_db.isOpen()) {
         return imageUrls;
@@ -120,7 +121,7 @@ QStringList SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
 
     while (q.next()) {
         QString imageUrl = q.value(0).toString();
-        imageUrls << imageUrl;
+        imageUrls << QUrl(imageUrl);
     }
 
     return imageUrls;
@@ -177,9 +178,10 @@ bool SQLiteLocalDatabase::insertImagesForPlayListRecord(
         return false;
     }
 
+    // FIXME
     // Only Local PlayList Record needs inserting related images.
     // For Remote PlayList, return with true directly.
-    if (playListRecord->type() != PlayListRecord::LocalPlayList) {
+    if (playListRecord->type() != 0) {
         return true;
     }
 

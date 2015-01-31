@@ -1,5 +1,6 @@
 #include "ImageRank.h"
-#include "LocalDatabase.h"
+
+#include "db/LocalDatabase.h"
 
 const int ImageRank::DEFAULT_VALUE = 3;
 const int ImageRank::MIN_VALUE = 1;

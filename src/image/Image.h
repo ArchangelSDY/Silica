@@ -4,16 +4,13 @@
 #include <QObject>
 #include <QtGui>
 
-#include "ImageHotspot.h"
-#include "ImageSource.h"
 
 class QUuid;
 
 class ImageHistogram;
+class ImageHotspot;
 class ImageRank;
-
-typedef QList<QSharedPointer<Image> > ImageList;
-typedef QSharedPointer<Image> ImagePtr;
+class ImageSource;
 
 class Image : public QObject
 {
@@ -135,5 +132,8 @@ private:
 
     ImageHistogram *m_thumbHist;
 };
+
+typedef QList<QSharedPointer<Image> > ImageList;
+typedef QSharedPointer<Image> ImagePtr;
 
 #endif // IMAGE_H

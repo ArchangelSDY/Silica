@@ -1,4 +1,6 @@
 #include "HotspotsNavigationPlayer.h"
+
+#include "image/ImageHotspot.h"
 #include "Navigator.h"
 
 HotspotsNavigationPlayer::HotspotsNavigationPlayer(Navigator *navigator,

@@ -1,10 +1,11 @@
+#include "ZipImageSource.h"
+
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QTextStream>
 #include <QUrl>
-#include <quazipfile.h>
 
-#include "ZipImageSource.h"
+#include "deps/quazip/quazip/quazipfile.h"
 
 ZipImageSource::ZipImageSource(ImageSourceFactory *factory,
                                QString zipPath, QString imageName) :

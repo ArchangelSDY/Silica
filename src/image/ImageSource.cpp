@@ -1,13 +1,14 @@
+#include "ImageSource.h"
+
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFileInfo>
 #include <QSettings>
 #include <QTextStream>
 #include <QUrl>
-#include <quazipfile.h>
 
+#include "deps/quazip/quazip/quazipfile.h"
 #include "GlobalConfig.h"
-#include "ImageSource.h"
 
 ImageSource::ImageSource(ImageSourceFactory *factory) :
     m_factory(factory)
@@ -26,6 +27,7 @@ QString ImageSource::searchRealPath(QString path)
         return path;
     }
 
+    // TODO: How to decouple into plugins?
     foreach (const QString &dir, GlobalConfig::instance()->zipDirs()) {
         QString realPath = dir + path;
         file = QFileInfo(realPath);

@@ -1,3 +1,5 @@
+#include "Image.h"
+
 #include <QtGlobal>
 #include <QUuid>
 
@@ -7,15 +9,15 @@
 #include <utime.h>
 #endif
 
-#include <quazipfile.h>
-
-#include "GlobalConfig.h"
-#include "LocalDatabase.h"
-#include "Image.h"
-#include "ImageHistogram.h"
-#include "ImageRank.h"
-#include "ImageSourceManager.h"
+#include "deps/quazip/quazip/quazip.h"
+#include "db/LocalDatabase.h"
+#include "image/ImageHistogram.h"
+#include "image/ImageHotspot.h"
+#include "image/ImageRank.h"
+#include "image/ImageSource.h"
+#include "image/ImageSourceManager.h"
 #include "util/ConcurrentHash.h"
+#include "GlobalConfig.h"
 
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;

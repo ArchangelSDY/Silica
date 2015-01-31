@@ -1,5 +1,7 @@
+#include <QNetworkReply>
+
 #include "NotificationWidget.h"
-#include "RemoteDatabase.h"
+// #include "RemoteDatabase.h"
 #include "RemoteWallpapersManager.h"
 
 const char *RemoteWallpapersManager::WALLPAPERS_ALBUM = "wallpapers";
@@ -12,13 +14,14 @@ RemoteWallpapersManager::RemoteWallpapersManager(QWidget *parentWidget) :
 
 void RemoteWallpapersManager::addImageToWallpapers(ImagePtr image)
 {
-    QNetworkReply *reply =
-        RemoteDatabase::instance()->addImageToAlbum(image, WALLPAPERS_ALBUM);
-    if (reply) {
-        connect(reply, SIGNAL(finished()), this, SLOT(showResult()));
-    } else {
-        showError();
-    }
+    // TODO
+//    QNetworkReply *reply =
+//        RemoteDatabase::instance()->addImageToAlbum(image, WALLPAPERS_ALBUM);
+//    if (reply) {
+//        connect(reply, SIGNAL(finished()), this, SLOT(showResult()));
+//    } else {
+//        showError();
+//    }
 }
 
 void RemoteWallpapersManager::showResult()

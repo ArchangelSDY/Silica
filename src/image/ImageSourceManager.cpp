@@ -1,12 +1,13 @@
+#include "ImageSourceManager.h"
+
 #include <QStringList>
 #include <QThreadPool>
 #include <QUrl>
 
-#include "ImageSourceManager.h"
-#include "LocalImageSourceFactory.h"
-#include "RARImageSourceFactory.h"
-#include "SevenzImageSourceFactory.h"
-#include "ZipImageSourceFactory.h"
+#include "image/sources/LocalImageSourceFactory.h"
+#include "image/sources/RARImageSourceFactory.h"
+#include "image/sources/SevenzImageSourceFactory.h"
+#include "image/sources/ZipImageSourceFactory.h"
 
 ImageSourceManager *ImageSourceManager::m_instance = 0;
 

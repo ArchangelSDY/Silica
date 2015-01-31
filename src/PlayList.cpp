@@ -6,7 +6,9 @@
 #include "image/Image.h"
 #include "image/ImageHistogram.h"
 #include "image/ImageSourceManager.h"
+#include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
+#include "playList/PlayListRecord.h"
 #include "PlayList.h"
 
 PlayList::PlayList() :
@@ -37,25 +39,87 @@ PlayList::~PlayList()
     delete m_filter;
 }
 
-void PlayList::addSinglePath(const QString &path)
+void PlayList::append(const QSharedPointer<Image> &image)
+{
+    ImageList l;
+    l << image;
+    append(l);
+}
+
+void PlayList::append(const ImageList &images)
+{
+    int start = count();
+    m_allImages.append(images);
+    m_filteredImages.append(m_filter->filtered(images));
+    emit itemsAppended(start);
+}
+
+void PlayList::append(PlayList *playList, bool watching)
+{
+    int start = count();
+    m_allImages.append(playList->m_allImages);
+    m_filteredImages.append(playList->m_filteredImages);
+    emit itemsAppended(start);
+
+    if (watching) {
+        connect(playList, SIGNAL(itemsAppended(int)),
+                this, SLOT(watchedPlayListAppended(int)));
+    }
+}
+
+QList<QSharedPointer<Image> > &PlayList::operator<<(
+        const QSharedPointer<Image> &image)
+{
+    ImageList l;
+    l << image;
+    return (*this << l);
+}
+
+QList<QSharedPointer<Image> > &PlayList::operator<<(
+        const ImageList &images)
+{
+    int start = count();
+    m_allImages << images;
+    QList<QSharedPointer<Image> > &ret =
+        m_filteredImages << m_filter->filtered(images);
+    emit itemsAppended(start);
+    return ret;
+}
+
+void PlayList::clear()
+{
+    m_allImages.clear();
+    m_filteredImages.clear();
+    emit itemsChanged();
+}
+
+ImagePtr PlayList::addSinglePath(const QString &path)
 {
     ImageSource *imageSource =
         ImageSourceManager::instance()->createSingle(path);
     if (imageSource) {
-        *this << QSharedPointer<Image>(new Image(imageSource));
+        ImagePtr image = ImagePtr::create(imageSource);
+        *this << image;
+        return image;
+    } else {
+        return ImagePtr();
     }
 }
 
-void PlayList::addSinglePath(const QUrl &url)
+ImagePtr PlayList::addSinglePath(const QUrl &url)
 {
     if (url.isEmpty()) {
-        return;
+        return ImagePtr();
     }
 
     ImageSource *imageSource =
         ImageSourceManager::instance()->createSingle(url);
     if (imageSource) {
-        *this << QSharedPointer<Image>(new Image(imageSource));
+        ImagePtr image = ImagePtr::create(imageSource);
+        *this << image;
+        return image;
+    } else {
+        return ImagePtr();
     }
 }
 

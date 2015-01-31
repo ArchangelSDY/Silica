@@ -1,5 +1,7 @@
 #include "BasketView.h"
-#include "ImageGalleryItem.h"
+
+#include "playlist/PlayListRecord.h"
+#include "ui/ImageGalleryItem.h"
 
 BasketView::BasketView(QWidget *parent) :
     ImageGalleryView(parent)

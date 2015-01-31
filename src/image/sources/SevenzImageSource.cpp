@@ -4,8 +4,7 @@
 #include <QThread>
 #include <QUrl>
 
-#include "Qt7zPackage.h"
-
+#include "deps/Qt7z/Qt7z/Qt7zPackage.h"
 #include "SevenzImageSource.h"
 #include "SevenzImageSourceFactory.h"
 

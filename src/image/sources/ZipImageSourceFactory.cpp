@@ -1,10 +1,11 @@
+#include "ZipImageSourceFactory.h"
+
 #include <QFileInfo>
 #include <QImageReader>
 #include <QUrl>
-#include <quazip.h>
 
+#include "deps/quazip/quazip/quazip.h"
 #include "ZipImageSource.h"
-#include "ZipImageSourceFactory.h"
 
 ZipImageSourceFactory::ZipImageSourceFactory(ImageSourceManager *mgr) :
     ImageSourceFactory(mgr)

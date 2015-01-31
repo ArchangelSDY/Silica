@@ -19,11 +19,9 @@
 #include "GlobalConfig.h"
 #include "ImageSourceManager.h"
 #include "ImageSourceManagerClientImpl.h"
-#include "LocalPlayListRecord.h"
 #include "MainMenuBarManager.h"
 #include "MainWindow.h"
 #include "PlayList.h"
-#include "RemotePlayListRecord.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/LoadingIndicator.h"
@@ -575,20 +573,21 @@ void MainWindow::promptToSaveLocalPlayList()
 
 void MainWindow::promptToSaveRemotePlayList()
 {
-    QString tags = QInputDialog::getText(this, "New Remote PlayList", "Tag");
-    if (!tags.isEmpty()) {
-        RemotePlayListRecord record(tags);
-        if (record.save()) {
-            statusBar()->showMessage(QString("PlayList %1 saved!").arg(tags),
-                                     2000);
+    // TODO
+//    QString tags = QInputDialog::getText(this, "New Remote PlayList", "Tag");
+//    if (!tags.isEmpty()) {
+//        RemotePlayListRecord record(tags);
+//        if (record.save()) {
+//            statusBar()->showMessage(QString("PlayList %1 saved!").arg(tags),
+//                                     2000);
 
-            // Refresh playlist gallery
-            loadSavedPlayLists();
-        } else {
-            statusBar()->showMessage(
-                QString("Failed to save playList %1!").arg(tags), 2000);
-        }
-    }
+//            // Refresh playlist gallery
+//            loadSavedPlayLists();
+//        } else {
+//            statusBar()->showMessage(
+//                QString("Failed to save playList %1!").arg(tags), 2000);
+//        }
+//    }
 }
 
 void MainWindow::fsRootPathChanged()
