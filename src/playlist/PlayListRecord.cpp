@@ -175,8 +175,16 @@ QList<PlayListRecord *> PlayListRecord::all()
 
 
 PlayListRecordBuilder::PlayListRecordBuilder() :
-    m_record(new PlayListRecord())
+    m_record(new PlayListRecord()) ,
+    m_isObtained(false)
 {
+}
+
+PlayListRecordBuilder::~PlayListRecordBuilder()
+{
+    if (!m_isObtained) {
+        delete m_record;
+    }
 }
 
 PlayListRecordBuilder &PlayListRecordBuilder::setId(int id)
@@ -229,6 +237,9 @@ PlayListRecord *PlayListRecordBuilder::obtain()
             && m_record->m_provider == 0) {
         qWarning() << QString("PlayListRecordBuilder: Cannot find PlayListProvider for type = %1")
                       .arg(m_record->m_type);
+        return 0;
     }
+
+    m_isObtained = true;
     return m_record;
 }

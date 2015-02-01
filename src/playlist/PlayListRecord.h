@@ -75,6 +75,7 @@ class PlayListRecordBuilder
 {
 public:
     PlayListRecordBuilder();
+    ~PlayListRecordBuilder();
 
     PlayListRecordBuilder &setId(int id);
     PlayListRecordBuilder &setName(const QString &name);
@@ -88,6 +89,7 @@ public:
 
 private:
     PlayListRecord *m_record;
+    bool m_isObtained;
 };
 
 #endif // PLAYLISTRECORD_H

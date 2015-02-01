@@ -102,7 +102,10 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
             .setCoverPath(coverPath)
             .setType(type)
             .setCount(count);
-        records << recordBuilder.obtain();
+        PlayListRecord *record = recordBuilder.obtain();
+        if (record) {
+            records << record;
+        }
     }
 
     return records;
