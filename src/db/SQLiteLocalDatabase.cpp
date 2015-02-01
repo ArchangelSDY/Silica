@@ -3,7 +3,6 @@
 #include "deps/QtDBMigration/src/QtDBMigration.h"
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
-#include "playlist/PlayListProviderManager.h"
 #include "GlobalConfig.h"
 #include "PlayList.h"
 
@@ -96,19 +95,14 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         int type = q.value(3).toInt();
         int count = q.value(4).toInt();
 
-        PlayListProvider *provider =
-            PlayListProviderManager::instance()->create(type);
-        if (provider) {
-            PlayListRecordBuilder recordBuilder;
-            recordBuilder
-                .setId(id)
-                .setName(name)
-                .setCoverPath(coverPath)
-                .setType(type)
-                .setCount(count)
-                .setProvider(provider);
-            records << recordBuilder.obtain();
-        }
+        PlayListRecordBuilder recordBuilder;
+        recordBuilder
+            .setId(id)
+            .setName(name)
+            .setCoverPath(coverPath)
+            .setType(type)
+            .setCount(count);
+        records << recordBuilder.obtain();
     }
 
     return records;

@@ -81,7 +81,7 @@ public:
     PlayListRecordBuilder &setCoverPath(const QString &coverPath);
     PlayListRecordBuilder &setCount(int count);
     PlayListRecordBuilder &setType(int type);
-    PlayListRecordBuilder &setProvider(PlayListProvider *provider);
+    // PlayListRecordBuilder &setProvider(PlayListProvider *provider);
     PlayListRecordBuilder &setPlayList(PlayList *playlist);
 
     PlayListRecord *obtain();

@@ -3,6 +3,7 @@
 
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/ImageSource.h"
+#include "../src/image/ImageSourceManager.h"
 #include "../src/playlist/LocalPlayListProvider.h"
 #include "../src/playlist/LocalPlayListProviderFactory.h"
 #include "../src/playlist/PlayListRecord.h"
@@ -17,10 +18,10 @@ private slots:
 
     void localPlayListsSaveAndLoad();
     void localPlayListsSaveAndLoad_data();
-//    void playListRemove();
-//    void playListUpdate();
-//    void insertImagesToPlayList();
-//    void removeImagesFromPlayList();
+    void playListRemove();
+    void playListUpdate();
+    void insertImagesToPlayList();
+    void removeImagesFromPlayList();
 
     void insertImage();
     void insertImage_data();
@@ -62,8 +63,7 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
         .setName(name)
         .setCoverPath("/cover/path.png")
         .setPlayList(&pl)
-        .setType(LocalPlayListProviderFactory::TYPE)
-        .setProvider(&provider);
+        .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
 
     int beforeCount = LocalDatabase::instance()->queryPlayListRecords().count();
@@ -93,131 +93,166 @@ void TestLocalDatabase::localPlayListsSaveAndLoad_data()
         << QString("Fav");
 }
 
-//void TestLocalDatabase::playListRemove()
-//{
-//    QList<QUrl> imageUrls;
-//    imageUrls << QUrl("file:///me.jpg");
-//    PlayList pl(imageUrls);
-//    LocalPlayListRecord record("test_remove", "cover.jpg", &pl);
-//    record.save();
+void TestLocalDatabase::playListRemove()
+{
+    PlayList pl;
+    pl.addSinglePath(":/assents/me.jpg");
 
-//    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
-//    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
-//    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_remove") {
-//        it++;
-//    }
+    PlayListRecordBuilder plrBuilder;
+    plrBuilder
+        .setName("test_remove")
+        .setCoverPath("cover.jpg")
+        .setPlayList(&pl)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record = plrBuilder.obtain();
+    record->save();
 
-//    if (it == recordsAfterSave.end()) {
-//        QFAIL("Cannot find saved playlist.");
-//        return;
-//    }
+    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
+    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_remove") {
+        it++;
+    }
 
-//    bool ok = (*it)->remove();
-//    QCOMPARE(ok, true);
+    if (it == recordsAfterSave.end()) {
+        QFAIL("Cannot find saved playlist.");
+        return;
+    }
 
-//    QList<PlayListRecord *> recordsAfterRemove = PlayListRecord::all();
-//    it = recordsAfterRemove.begin();
-//    while (it != recordsAfterRemove.end() && (*it)->name() != "test_remove") {
-//        it++;
-//    }
+    bool ok = (*it)->remove();
+    QCOMPARE(ok, true);
 
-//    QCOMPARE(it, recordsAfterRemove.end());
-//}
+    QList<PlayListRecord *> recordsAfterRemove = PlayListRecord::all();
+    it = recordsAfterRemove.begin();
+    while (it != recordsAfterRemove.end() && (*it)->name() != "test_remove") {
+        it++;
+    }
 
-//void TestLocalDatabase::playListUpdate()
-//{
-//    QList<QUrl> imageUrls;
-//    imageUrls << QUrl("file:///me.jpg");
-//    PlayList pl(imageUrls);
-//    LocalPlayListRecord record("test_update", "cover.jpg", &pl);
-//    record.save();
+    QCOMPARE(it, recordsAfterRemove.end());
 
-//    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
-//    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
-//    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_update") {
-//        it++;
-//    }
+    delete record;
+}
 
-//    if (it == recordsAfterSave.end()) {
-//        QFAIL("Cannot find saved playlist.");
-//        return;
-//    }
+void TestLocalDatabase::playListUpdate()
+{
+    PlayList pl;
+    pl.addSinglePath(":/assets/me.jpg");
 
-//    PlayListRecord *savedRecord = *it;
-//    savedRecord->setCoverPath("new_cover.jpg");
-//    savedRecord->setName("test_update_new");
-//    bool ok = savedRecord->save();
+    PlayListRecordBuilder plrBuilder;
+    plrBuilder
+        .setName("test_update")
+        .setCoverPath("cover.jpg")
+        .setPlayList(&pl)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record = plrBuilder.obtain();
+    record->save();
 
-//    QCOMPARE(ok, true);
+    QList<PlayListRecord *> recordsAfterSave = PlayListRecord::all();
+    QList<PlayListRecord *>::iterator it = recordsAfterSave.begin();
+    while (it != recordsAfterSave.end() &&  (*it)->name() != "test_update") {
+        it++;
+    }
 
-//    QList<PlayListRecord *> recordsAfterUpdate = PlayListRecord::all();
-//    it = recordsAfterUpdate.begin();
-//    while (it != recordsAfterUpdate.end() && (*it)->name() != "test_update_new") {
-//        it++;
-//    }
+    if (it == recordsAfterSave.end()) {
+        QFAIL("Cannot find saved playlist.");
+        return;
+    }
 
-//    QCOMPARE((*it)->coverPath(), QString("new_cover.jpg"));
-//}
+    PlayListRecord *savedRecord = *it;
+    savedRecord->setCoverPath("new_cover.jpg");
+    savedRecord->setName("test_update_new");
+    bool ok = savedRecord->save();
 
-//void TestLocalDatabase::insertImagesToPlayList()
-//{
-//    const QString &currentDir = qApp->applicationDirPath();
-//    ImagePtr imageA(
-//        new Image(QUrl("file://" + currentDir + "/assets/me.jpg")));
-//    ImagePtr imageB(
-//        new Image(QUrl("file://" + currentDir + "/assets/silica.png")));
+    QCOMPARE(ok, true);
 
-//    PlayList pl;
-//    pl << imageA;
+    QList<PlayListRecord *> recordsAfterUpdate = PlayListRecord::all();
+    it = recordsAfterUpdate.begin();
+    while (it != recordsAfterUpdate.end() && (*it)->name() != "test_update_new") {
+        it++;
+    }
 
-//    LocalPlayListRecord record("test", "", &pl);
-//    record.save();
-//    int rid = record.id();
+    QCOMPARE((*it)->coverPath(), QString("new_cover.jpg"));
 
-//    QVERIFY2(record.isSaved(), "PlayListRecord should be saved.");
-//    QCOMPARE(record.playList()->count(), 1);
+    delete record;
+}
 
-//    ImageList images;
-//    images << imageB;
-//    record.insertImages(images);
+void TestLocalDatabase::insertImagesToPlayList()
+{
+    ImagePtr imageA(new Image(
+        ImageSourceManager::instance()->createSingle(":/assets/me.jpg")));
+    ImagePtr imageB(new Image(
+        ImageSourceManager::instance()->createSingle(":/assets/silica.png")));
 
-//    LocalPlayListRecord dupRecord("test", "");
-//    qDebug() << "rid" << rid;
-//    dupRecord.setId(rid);
+    PlayList pl;
+    pl.append(imageA);
 
-//    PlayList *spl = dupRecord.playList();
-//    QCOMPARE(spl->count(), 2);
-//}
+    PlayListRecordBuilder plrBuilder;
+    plrBuilder
+        .setName("test_insert_images_to_playlist")
+        .setCoverPath("")
+        .setPlayList(&pl)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record = plrBuilder.obtain();
+    record->save();
+    int rid = record->id();
 
-//void TestLocalDatabase::removeImagesFromPlayList()
-//{
-//    const QString &currentDir = qApp->applicationDirPath();
-//    ImagePtr imageA(
-//        new Image(QUrl("file://" + currentDir + "/assets/me.jpg")));
-//    ImagePtr imageB(
-//        new Image(QUrl("file://" + currentDir + "/assets/silica.png")));
+    QVERIFY2(record->isSaved(), "PlayListRecord should be saved.");
+    QCOMPARE(record->playList()->count(), 1);
 
-//    PlayList pl;
-//    pl << imageA;
-//    pl << imageB;
+    ImageList images;
+    images << imageB;
+    record->insertImages(images);
+    delete record;
 
-//    LocalPlayListRecord record("test", "", &pl);
-//    record.save();
-//    int rid = record.id();
+    PlayListRecordBuilder plrBuilder2;
+    plrBuilder2
+        .setName("test_insert_images_to_playlist")
+        .setCoverPath("")
+        .setId(rid)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record2 = plrBuilder2.obtain();
 
-//    QVERIFY2(record.isSaved(), "PlayListRecord should be saved.");
-//    QCOMPARE(record.playList()->count(), 2);
+    PlayList *spl = record2->playList();
+    QCOMPARE(spl->count(), 2);
 
-//    record.removeImage(imageB);
+    delete record2;
+}
 
-//    LocalPlayListRecord dupRecord("test", "");
-//    qDebug() << "rid" << rid;
-//    dupRecord.setId(rid);
+void TestLocalDatabase::removeImagesFromPlayList()
+{
+    PlayList pl;
+    ImagePtr imageA = pl.addSinglePath(":/assets/me.jpg");
+    ImagePtr imageB = pl.addSinglePath(":/assets/silica.png");
 
-//    PlayList *spl = dupRecord.playList();
-//    QCOMPARE(spl->count(), 1);
-//    QCOMPARE(spl->at(0)->source()->hashStr(), imageA->source()->hashStr());
-//}
+    PlayListRecordBuilder plrBuilder;
+    plrBuilder
+        .setName("test_remove_images_from_playlist")
+        .setCoverPath("")
+        .setPlayList(&pl)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record = plrBuilder.obtain();
+    record->save();
+    int rid = record->id();
+
+    QVERIFY2(record->isSaved(), "PlayListRecord should be saved.");
+    QCOMPARE(record->playList()->count(), 2);
+
+    QVERIFY(record->removeImage(imageB));
+    delete record;
+
+    PlayListRecordBuilder plrBuilder2;
+    plrBuilder2
+        .setName("test_remove_images_from_playlist")
+        .setCoverPath("")
+        .setId(rid)
+        .setType(LocalPlayListProviderFactory::TYPE);
+    PlayListRecord *record2 = plrBuilder2.obtain();
+
+    PlayList *spl = record2->playList();
+    QCOMPARE(spl->count(), 1);
+    QCOMPARE(spl->at(0)->source()->hashStr(), imageA->source()->hashStr());
+
+    delete record2;
+}
 
 void TestLocalDatabase::insertImage()
 {

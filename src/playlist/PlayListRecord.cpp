@@ -2,6 +2,7 @@
 
 #include "db/LocalDatabase.h"
 #include "playlist/PlayListProvider.h"
+#include "playlist/PlayListProviderManager.h"
 #include "PlayList.h"
 
 PlayListRecord::PlayListRecord() :
@@ -113,7 +114,7 @@ void PlayListRecord::flushPlayList()
 
 bool PlayListRecord::removeImage(ImagePtr image)
 {
-    if (!m_provider && m_provider->isImagesReadOnly()){
+    if (!m_provider || m_provider->isImagesReadOnly()){
         return false;
     }
 
@@ -130,7 +131,7 @@ bool PlayListRecord::removeImage(ImagePtr image)
 
 bool PlayListRecord::insertImages(const ImageList &images)
 {
-    if (!m_provider && m_provider->isImagesReadOnly()){
+    if (!m_provider || m_provider->isImagesReadOnly()){
         return false;
     }
 
@@ -204,14 +205,15 @@ PlayListRecordBuilder &PlayListRecordBuilder::setCount(int count)
 PlayListRecordBuilder &PlayListRecordBuilder::setType(int type)
 {
     m_record->m_type = type;
+    m_record->m_provider = PlayListProviderManager::instance()->create(type);
     return *this;
 }
 
-PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *provider)
-{
-    m_record->m_provider = provider;
-    return *this;
-}
+//PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *provider)
+//{
+//    m_record->m_provider = provider;
+//    return *this;
+//}
 
 PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(PlayList *playlist)
 {
@@ -222,5 +224,10 @@ PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(PlayList *playlist)
 
 PlayListRecord *PlayListRecordBuilder::obtain()
 {
+    if (m_record->m_type != PlayListRecord::UNKNOWN_TYPE
+            && m_record->m_provider == 0) {
+        qWarning() << QString("PlayListRecordBuilder: Cannot find PlayListProvider for type = %1")
+                      .arg(m_record->m_type);
+    }
     return m_record;
 }
