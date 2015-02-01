@@ -66,7 +66,8 @@ PlayList *PlayListRecord::playList()
 
         QObject::connect(
             m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
-            this, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)));
+            this, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)),
+            static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
 
         QVariantHash extra;
         extra.insert("id", m_id);
