@@ -27,8 +27,7 @@ QString ImageSource::searchRealPath(QString path)
         return path;
     }
 
-    // TODO: How to decouple into plugins?
-    foreach (const QString &dir, GlobalConfig::instance()->zipDirs()) {
+    foreach (const QString &dir, GlobalConfig::instance()->searchDirs()) {
         QString realPath = dir + path;
         file = QFileInfo(realPath);
         if (file.exists()) {

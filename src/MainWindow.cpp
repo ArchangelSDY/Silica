@@ -423,7 +423,7 @@ void MainWindow::promptToOpenImage()
 {
     static QString defaultDir;
     if (defaultDir.isEmpty()) {
-        const QList<QString> &zipDirs = GlobalConfig::instance()->zipDirs();
+        const QList<QString> &zipDirs = GlobalConfig::instance()->searchDirs();
         if (zipDirs.count() > 0) {
             defaultDir = zipDirs[0];
         }

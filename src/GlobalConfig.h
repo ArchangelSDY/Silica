@@ -11,7 +11,7 @@ public:
     static GlobalConfig *create();
     static GlobalConfig *instance();
 
-    QList<QString> zipDirs() const { return m_zipDirs; }
+    QList<QString> searchDirs() const { return m_searchDirs; }
     const QString &wallpaperDir() const { return m_wallpaperDir; }
     const QString &localDatabasePath() const { return m_localDatabasePath; }
     const QString &migrationConfigPath() const { return m_migrationConfigPath; }
@@ -29,7 +29,7 @@ private:
     void load();
 
     static GlobalConfig *m_instance;
-    QList<QString> m_zipDirs;
+    QList<QString> m_searchDirs;
     QString m_wallpaperDir;
     QString m_localDatabasePath;
     QString m_migrationConfigPath;

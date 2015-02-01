@@ -57,13 +57,13 @@ void GlobalConfig::load()
         QFile::copy(settings.fileName() + ".default", settings.fileName());
     }
 
-    // Zip dirs
-    int size = settings.beginReadArray("ZipDirs");
+    // Search dirs
+    int size = settings.beginReadArray("SearchDirs");
     for (int i = 0; i < size; ++i) {
         settings.setArrayIndex(i);
-        m_zipDirs << settings.value("DIR").toString();
+        m_searchDirs << settings.value("DIR").toString();
 
-        qDebug() << "ZipDir: " << settings.value("DIR").toString();
+        qDebug() << "Search Dirs: " << settings.value("DIR").toString();
     }
     settings.endArray();
 
