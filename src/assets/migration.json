@@ -58,7 +58,7 @@
         {
             "version": 11,
             "applySql": "create table plugin_playlist_providers (name text unique)",
-            "revertSql": ""
+            "revertSql": "drop table plugin_playlist_providers"
         }
     ]
 }
