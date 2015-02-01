@@ -13,6 +13,7 @@ public:
     ~PlayListProviderManager();
 
     PlayListProvider *create(int type);
+    QList<int> registeredTypes() const;
 
     static PlayListProviderManager *instance();
 

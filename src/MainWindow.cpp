@@ -259,8 +259,8 @@ void MainWindow::setupExtraUi()
 
 
     // PlayList gallery
-    connect(ui->playListGallery, SIGNAL(promptToSaveRemotePlayList()),
-            this, SLOT(promptToSaveRemotePlayList()));
+    connect(ui->playListGallery, SIGNAL(promptToCreatePlayListRecord(int)),
+            this, SLOT(promptToCreatePlayListRecord(int)));
 
     // Init Basket
     ui->basketPane->hide();
@@ -577,23 +577,27 @@ void MainWindow::promptToSaveLocalPlayList()
     }
 }
 
-void MainWindow::promptToSaveRemotePlayList()
+void MainWindow::promptToCreatePlayListRecord(int type)
 {
-    // TODO
-//    QString tags = QInputDialog::getText(this, "New Remote PlayList", "Tag");
-//    if (!tags.isEmpty()) {
-//        RemotePlayListRecord record(tags);
-//        if (record.save()) {
-//            statusBar()->showMessage(QString("PlayList %1 saved!").arg(tags),
-//                                     2000);
+    QString name = QInputDialog::getText(this, "New PlayList", "Name");
+    if (!name.isEmpty()) {
+        PlayListRecordBuilder plrBuilder;
+        plrBuilder
+            .setName(name)
+            .setType(type);
+        PlayListRecord *record = plrBuilder.obtain();
+        if (record->save()) {
+            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
+                                     2000);
 
-//            // Refresh playlist gallery
-//            loadSavedPlayLists();
-//        } else {
-//            statusBar()->showMessage(
-//                QString("Failed to save playList %1!").arg(tags), 2000);
-//        }
-//    }
+            // Refresh playlist gallery
+            loadSavedPlayLists();
+        } else {
+            statusBar()->showMessage(
+                QString("Failed to save playList %1!").arg(name), 2000);
+        }
+        delete record;
+    }
 }
 
 void MainWindow::fsRootPathChanged()

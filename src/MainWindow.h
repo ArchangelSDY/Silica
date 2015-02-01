@@ -36,7 +36,7 @@ private slots:
     void loadOrEnterSelectedPath();
     void loadSelectedPath();
 
-    void promptToSaveRemotePlayList();
+    void promptToCreatePlayListRecord(int type);
 
     void fsRootPathChanged();
 

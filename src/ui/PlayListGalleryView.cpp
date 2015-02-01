@@ -1,11 +1,15 @@
+#include "PlayListGalleryView.h"
+
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSignalMapper>
 
-#include "CompactRendererFactory.h"
-#include "LooseRendererFactory.h"
-#include "PlayListGalleryItem.h"
-#include "PlayListGalleryView.h"
+#include "playlist/PlayListProvider.h"
+#include "playlist/PlayListProviderManager.h"
+#include "ui/renderers/CompactRendererFactory.h"
+#include "ui/renderers/LooseRendererFactory.h"
+#include "ui/PlayListGalleryItem.h"
 
 static bool playListTypeLessThan(GalleryItem *left,
                                  GalleryItem *right)
@@ -70,8 +74,16 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
     QMenu *menuNew = menu.addMenu(tr("New"));
-    menuNew->addAction(tr("Remote PlayList"), this,
-        SIGNAL(promptToSaveRemotePlayList()));
+    QSignalMapper *plrCreatorMap = new QSignalMapper(&menu);
+    foreach (int type, PlayListProviderManager::instance()->registeredTypes()) {
+        PlayListProvider *provider =
+            PlayListProviderManager::instance()->create(type);
+        QAction *act = menuNew->addAction(provider->typeName(), plrCreatorMap, SLOT(map()));
+        plrCreatorMap->setMapping(act, type);
+        delete provider;
+    }
+    connect(plrCreatorMap, SIGNAL(mapped(int)),
+            this, SIGNAL(promptToCreatePlayListRecord(int)));
 
     QAction *actRename =
         menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));

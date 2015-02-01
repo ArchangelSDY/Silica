@@ -65,6 +65,11 @@ PlayListProvider *PlayListProviderManager::create(int type)
     return provider;
 }
 
+QList<int> PlayListProviderManager::registeredTypes() const
+{
+    return m_providers.keys();
+}
+
 void PlayListProviderManager::registerPluginProvider(const QString &name,
                                                PlayListProviderFactory *factory)
 {

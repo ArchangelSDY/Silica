@@ -11,7 +11,7 @@ public:
     explicit PlayListGalleryView(QWidget *parent = 0);
 
 signals:
-    void promptToSaveRemotePlayList();
+    void promptToCreatePlayListRecord(int type);
 
 public slots:
     void setPlayListRecords(QList<PlayListRecord *> records);
