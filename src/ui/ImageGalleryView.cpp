@@ -185,7 +185,7 @@ QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
     const ImagePtr &image = item->image();
     if (!image.isNull()) {
         int group = m_playList->groupForImage(image.data());
-        return QString::number(group);
+        return QString(tr("Group %1").arg(group));
     } else {
         return QString();
     }
