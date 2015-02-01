@@ -96,11 +96,18 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         int type = q.value(3).toInt();
         int count = q.value(4).toInt();
 
-        PlayListRecord *record = PlayListProviderManager::instance()->create(
-            type, id, name, coverPath);
-        if (record) {
-            record->setCount(count);
-            records << record;
+        PlayListProvider *provider =
+            PlayListProviderManager::instance()->create(type);
+        if (provider) {
+            PlayListRecordBuilder recordBuilder;
+            recordBuilder
+                .setId(id)
+                .setName(name)
+                .setCoverPath(coverPath)
+                .setType(type)
+                .setCount(count)
+                .setProvider(provider);
+            records << recordBuilder.obtain();
         }
     }
 

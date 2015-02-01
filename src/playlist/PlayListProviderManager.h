@@ -3,6 +3,7 @@
 
 #include <QHash>
 
+class PlayListProvider;
 class PlayListProviderFactory;
 class PlayListRecord;
 
@@ -11,8 +12,7 @@ class PlayListProviderManager
 public:
     ~PlayListProviderManager();
 
-    PlayListRecord *create(int type, int id, const QString &name,
-                           const QString &coverPath);
+    PlayListProvider *create(int type);
 
     static PlayListProviderManager *instance();
 

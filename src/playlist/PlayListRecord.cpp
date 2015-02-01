@@ -4,23 +4,16 @@
 #include "playlist/PlayListProvider.h"
 #include "PlayList.h"
 
-PlayListRecord::PlayListRecord(const QString &name,
-                               const QString &coverPath,
-                               PlayList *playList,
-                               QObject *parent) :
-    QObject(parent) ,
+PlayListRecord::PlayListRecord() :
+    QObject(0) ,
     m_id(PlayListRecord::EMPTY_ID) ,
-    m_name(name) ,
-    m_coverPath(coverPath) ,
     m_count(PlayListRecord::EMPTY_COUNT) ,
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_type(PlayListRecord::UNKNOWN_TYPE) ,
     m_provider(0) ,
-    m_playList(playList)
+    m_playList(0) ,
+    m_ownPlayList(true) // PlayList not given and will be created by our self
 {
-    // If playList is given, then we do not own this playList and will not try
-    // to delete it.
-    m_ownPlayList = (playList == 0);
 }
 
 PlayListRecord::~PlayListRecord()
@@ -31,22 +24,6 @@ PlayListRecord::~PlayListRecord()
     if (m_provider) {
         m_provider->deleteLater();
     }
-}
-
-void PlayListRecord::setCount(int count)
-{
-    // FIXME
-    // RemotePlayList does not have a fixed count
-    // if (m_type == PlayListRecord::RemotePlayList) {
-    //     return;
-    // }
-
-    m_count = count;
-}
-
-void PlayListRecord::setPlayListProvider(PlayListProvider *provider)
-{
-    m_provider = provider;
 }
 
 int PlayListRecord::coverIndex()
@@ -67,11 +44,6 @@ int PlayListRecord::coverIndex()
 int PlayListRecord::type() const
 {
     return m_type;
-}
-
-void PlayListRecord::setType(int type)
-{
-    m_type = type;
 }
 
 PlayList *PlayListRecord::playList()
@@ -155,4 +127,58 @@ void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
 QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();
+}
+
+
+PlayListRecordBuilder::PlayListRecordBuilder() :
+    m_record(new PlayListRecord())
+{
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setId(int id)
+{
+    m_record->m_id = id;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setName(const QString &name)
+{
+    m_record->m_name = name;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setCoverPath(const QString &coverPath)
+{
+    m_record->m_coverPath = coverPath;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setCount(int count)
+{
+    m_record->m_count = count;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setType(int type)
+{
+    m_record->m_type = type;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *provider)
+{
+    m_record->m_provider = provider;
+    return *this;
+}
+
+PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(PlayList *playlist)
+{
+    m_record->m_playList = playlist;
+    m_record->m_ownPlayList = false;
+    return *this;
+}
+
+PlayListRecord *PlayListRecordBuilder::obtain()
+{
+    return m_record;
 }

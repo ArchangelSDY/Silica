@@ -52,9 +52,7 @@ PlayListProviderManager::~PlayListProviderManager()
     qDeleteAll(m_providers.begin(), m_providers.end());
 }
 
-PlayListRecord *PlayListProviderManager::create(int type,
-                                                int id, const QString &name,
-                                                const QString &coverPath)
+PlayListProvider *PlayListProviderManager::create(int type)
 {
     if (!m_providers.contains(type)) {
         return 0;
@@ -63,13 +61,7 @@ PlayListRecord *PlayListProviderManager::create(int type,
     PlayListProviderFactory *factory = m_providers.value(type);
     PlayListProvider *provider = factory->create();
 
-    // TODO: Builder pattern
-    PlayListRecord *record = new PlayListRecord(name, coverPath);
-    record->setType(type);
-    record->setId(id);
-    record->setPlayListProvider(provider);
-
-    return record;
+    return provider;
 }
 
 void PlayListProviderManager::registerPluginProvider(const QString &name,

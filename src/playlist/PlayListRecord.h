@@ -12,16 +12,15 @@ class PlayListProvider;
 class PlayListRecord : public QObject
 {
     Q_OBJECT
+    friend class PlayListRecordBuilder;
 public:
-    PlayListRecord(const QString &name, const QString &coverPath,
-        PlayList *playList = 0, QObject *parent = 0);
     ~PlayListRecord();
 
     int id() const { return m_id; }
     void setId(int id) { m_id = id; }
 
     int count() const { return m_count; }
-    void setCount(int count);
+    int type() const;
 
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }
@@ -29,15 +28,9 @@ public:
     QString coverPath() const { return m_coverPath; }
     void setCoverPath(const QString &coverPath) { m_coverPath = coverPath; }
 
-    int type() const;
-    void setType(int type);
-
-    // FIXME(sdy): Builder patter
-    void setPlayListProvider(PlayListProvider *provider);
+    int coverIndex();
 
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
-
-    int coverIndex();
 
     PlayList *playList();
     bool save();
@@ -60,6 +53,7 @@ private:
     static const int EMPTY_COVER_INDEX = -1;
     static const int EMPTY_COUNT = -1;
 
+    PlayListRecord();
     virtual void flushPlayList();
 
     int m_id;
@@ -71,6 +65,26 @@ private:
     PlayListProvider *m_provider;
     PlayList *m_playList;
     bool m_ownPlayList;
+};
+
+
+class PlayListRecordBuilder
+{
+public:
+    PlayListRecordBuilder();
+
+    PlayListRecordBuilder &setId(int id);
+    PlayListRecordBuilder &setName(const QString &name);
+    PlayListRecordBuilder &setCoverPath(const QString &coverPath);
+    PlayListRecordBuilder &setCount(int count);
+    PlayListRecordBuilder &setType(int type);
+    PlayListRecordBuilder &setProvider(PlayListProvider *provider);
+    PlayListRecordBuilder &setPlayList(PlayList *playlist);
+
+    PlayListRecord *obtain();
+
+private:
+    PlayListRecord *m_record;
 };
 
 #endif // PLAYLISTRECORD_H
