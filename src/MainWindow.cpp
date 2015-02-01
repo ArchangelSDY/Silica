@@ -16,17 +16,17 @@
 #include <QStatusBar>
 #include <QToolBar>
 
-#include "GlobalConfig.h"
-#include "ImageSourceManager.h"
-#include "ImageSourceManagerClientImpl.h"
-#include "MainMenuBarManager.h"
-#include "MainWindow.h"
-#include "PlayList.h"
+#include "image/ImageSourceManager.h"
+#include "playlist/LocalPlayListProviderFactory.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
+#include "ui/ImageSourceManagerClientImpl.h"
 #include "ui/LoadingIndicator.h"
 #include "ui/PlayListGalleryItem.h"
-
+#include "ui/MainMenuBarManager.h"
+#include "MainWindow.h"
+#include "PlayList.h"
+#include "GlobalConfig.h"
 
 #include "ui_MainWindow.h"
 
@@ -534,42 +534,47 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSaveLocalPlayList()
 {
-    // TODO
-//    Image *image = m_navigator->currentImage();
-//    if (!image) {
-//        return;
-//    }
+    Image *image = m_navigator->currentImage();
+    if (!image) {
+        return;
+    }
 
-//    QInputDialog dialog(this);
-//    dialog.setWindowTitle("Save PlayList");
-//    dialog.setLabelText("Name");
-//    dialog.setComboBoxEditable(true);
+    QInputDialog dialog(this);
+    dialog.setWindowTitle("Save PlayList");
+    dialog.setLabelText("Name");
+    dialog.setComboBoxEditable(true);
 
-//    QString sourceUrl = image->source()->url().toString();
-//    QStringList defaultNames = sourceUrl.split(QRegularExpression("[/#]"));
-//    dialog.setComboBoxItems(defaultNames);
+    QString sourceUrl = image->source()->url().toString();
+    QStringList defaultNames = sourceUrl.split(QRegularExpression("[/#]"));
+    dialog.setComboBoxItems(defaultNames);
 
-//    if (defaultNames.count() >= 2) {
-//        dialog.setTextValue(defaultNames[defaultNames.count() - 2]);
-//    }
+    if (defaultNames.count() >= 2) {
+        dialog.setTextValue(defaultNames[defaultNames.count() - 2]);
+    }
 
-//    dialog.exec();
+    dialog.exec();
 
-//    QString name = dialog.textValue();
-//    if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
-//        LocalPlayListRecord record(name, image->thumbnailPath(),
-//                              m_navigator->playList());
-//        if (record.save()) {
-//            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
-//                                     2000);
+    QString name = dialog.textValue();
+    if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
+        PlayListRecordBuilder plrBuilder;
+        plrBuilder
+            .setName(name)
+            .setCoverPath(image->thumbnailPath())
+            .setPlayList(m_navigator->playList())
+            .setType(LocalPlayListProviderFactory::TYPE);
+        PlayListRecord *record = plrBuilder.obtain();
+        if (record->save()) {
+            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
+                                     2000);
 
-//            // Refresh playlist gallery
-//            loadSavedPlayLists();
-//        } else {
-//            statusBar()->showMessage(
-//                QString("Failed to save playList %1!").arg(name), 2000);
-//        }
-//    }
+            // Refresh playlist gallery
+            loadSavedPlayLists();
+        } else {
+            statusBar()->showMessage(
+                QString("Failed to save playList %1!").arg(name), 2000);
+        }
+        delete record;
+    }
 }
 
 void MainWindow::promptToSaveRemotePlayList()
