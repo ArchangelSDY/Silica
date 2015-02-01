@@ -6,6 +6,8 @@
 class LocalPlayListProviderFactory : public PlayListProviderFactory
 {
 public:
+    static const int TYPE = 0;
+
     LocalPlayListProviderFactory();
     ~LocalPlayListProviderFactory();
 

@@ -151,7 +151,7 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     qInsertPlayList.prepare(SQL_INSERT_PLAYLIST);
     qInsertPlayList.addBindValue(playListRecord->name());
     qInsertPlayList.addBindValue(playListRecord->coverPath());
-    qInsertPlayList.addBindValue(static_cast<int>(playListRecord->type()));
+    qInsertPlayList.addBindValue(playListRecord->type());
     if (!qInsertPlayList.exec()) {
         qWarning() << qInsertPlayList.lastError()
                    << qInsertPlayList.lastQuery();
@@ -160,9 +160,7 @@ bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
     int playListId = qInsertPlayList.lastInsertId().toInt();
     playListRecord->setId(playListId);
 
-    // Bind images to playlist
-    return insertImagesForPlayListRecord(
-        playListRecord, playListRecord->playList()->toImageList());
+    return true;
 }
 
 bool SQLiteLocalDatabase::removePlayListRecord(PlayListRecord *playListRecord)
@@ -183,60 +181,63 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
     return q.exec();
 }
 
-bool SQLiteLocalDatabase::insertImagesForPlayListRecord(
-        PlayListRecord *playListRecord, const QList<ImagePtr> &images)
+bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
+        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos)
 {
-    // PlayListRecord should be saved already.
-    if (!playListRecord->isSaved()) {
-        return false;
-    }
-
-    // FIXME
-    // Only Local PlayList Record needs inserting related images.
-    // For Remote PlayList, return with true directly.
-    if (playListRecord->type() != 0) {
-        return true;
-    }
-
     // Insert images
-    foreach (const ImagePtr &image, images) {
-        insertImage(image.data());
+    foreach (const ImageInfo &info, imgInfos) {
+        insertImage(info);
     }
 
     // Insert relationship records
-    int playListId = playListRecord->id();
-    QSqlQuery qInsertPlayListImages;
-    qInsertPlayListImages.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+    int playListId = plrInfo.id;
+    QSqlQuery q;
+    q.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+
     QVariantList playListIds;
     QVariantList imageHashes;
-    foreach (const ImagePtr &image, images) {
+    foreach (const ImageInfo &info, imgInfos) {
         playListIds << playListId;
-        imageHashes << image->source()->hashStr();
+        imageHashes << info.hashStr;
     }
-    qInsertPlayListImages.addBindValue(playListIds);
-    qInsertPlayListImages.addBindValue(imageHashes);
+    q.addBindValue(playListIds);
+    q.addBindValue(imageHashes);
 
-    if (!qInsertPlayListImages.execBatch()) {
-        qWarning() << qInsertPlayListImages.lastError()
-                   << qInsertPlayListImages.lastQuery();
+    if (!q.execBatch()) {
+        qWarning() << q.lastError()
+                   << q.lastQuery();
         return false;
     }
 
     return true;
 }
 
-bool SQLiteLocalDatabase::removeImageFromPlayListRecord(
-        PlayListRecord *playListRecord, ImagePtr image)
+bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
+        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos)
 {
-    if (!m_db.isOpen() || !playListRecord || image.isNull()) {
+    if (!m_db.isOpen() || imgInfos.isEmpty()) {
         return false;
     }
 
     QSqlQuery q;
     q.prepare(SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH);
-    q.addBindValue(playListRecord->id());
-    q.addBindValue(image->source()->hashStr());
-    return q.exec();
+
+    QVariantList plrIds;
+    QVariantList imgHashes;
+    foreach (const ImageInfo &info, imgInfos) {
+        plrIds << plrInfo.id;
+        imgHashes << info.hashStr;
+    }
+
+    q.addBindValue(plrIds);
+    q.addBindValue(imgHashes);
+
+    if (!q.execBatch()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
 }
 
 int SQLiteLocalDatabase::queryImagesCount()
@@ -253,7 +254,7 @@ int SQLiteLocalDatabase::queryImagesCount()
     }
 }
 
-bool SQLiteLocalDatabase::insertImage(Image *image)
+bool SQLiteLocalDatabase::insertImage(const ImageInfo &info)
 {
     if (!m_db.isOpen()) {
         return false;
@@ -261,9 +262,9 @@ bool SQLiteLocalDatabase::insertImage(Image *image)
 
     QSqlQuery q;
     q.prepare(SQL_INSERT_IMAGE);
-    q.addBindValue(image->source()->hashStr());
-    q.addBindValue(image->name());
-    q.addBindValue(image->source()->url().toString());
+    q.addBindValue(info.hashStr);
+    q.addBindValue(info.name);
+    q.addBindValue(info.url.toString());
 
     if (!q.exec()) {
         qWarning() << q.lastError() << q.lastQuery();

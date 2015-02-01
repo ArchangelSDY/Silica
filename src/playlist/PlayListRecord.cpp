@@ -51,6 +51,13 @@ QString PlayListRecord::typeName() const
     return m_provider ? m_provider->typeName() : QString();
 }
 
+PlayListRecordInfo PlayListRecord::info() const
+{
+    PlayListRecordInfo info;
+    info.id = id();
+    return info;
+}
+
 PlayList *PlayListRecord::playList()
 {
     if (!m_playList && m_provider) {
@@ -73,6 +80,16 @@ bool PlayListRecord::save()
     bool ok = false;
     if (m_id == PlayListRecord::EMPTY_ID) {
         ok = LocalDatabase::instance()->insertPlayListRecord(this);
+
+        // Notify provider
+        if (m_playList && m_provider && !m_provider->isImagesReadOnly()) {
+            QList<ImageInfo> imageInfos;
+            imageInfos.reserve(m_playList->count());
+            for (int i = 0; i < m_playList->count(); ++i) {
+                imageInfos << m_playList->at(i)->info();
+            }
+            m_provider->onPlayListRecordCreated(info(), imageInfos);
+        }
     } else {
         ok = LocalDatabase::instance()->updatePlayListRecord(this);
     }
@@ -96,8 +113,14 @@ void PlayListRecord::flushPlayList()
 
 bool PlayListRecord::removeImage(ImagePtr image)
 {
-    bool ret = LocalDatabase::instance()->removeImageFromPlayListRecord(
-        this, image);
+    if (!m_provider && m_provider->isImagesReadOnly()){
+        return false;
+    }
+
+    QList<ImageInfo> imgInfos;
+    imgInfos.append(image->info());
+
+    bool ret = m_provider->removeImages(info(), imgInfos);
 
     // Remove cached playlist. It will be re-generated in the future
     flushPlayList();
@@ -107,8 +130,22 @@ bool PlayListRecord::removeImage(ImagePtr image)
 
 bool PlayListRecord::insertImages(const ImageList &images)
 {
-    bool ret = LocalDatabase::instance()->insertImagesForPlayListRecord(
-        this, images);
+    if (!m_provider && m_provider->isImagesReadOnly()){
+        return false;
+    }
+
+    // PlayListRecord should be saved already.
+    if (!isSaved()) {
+        return false;
+    }
+
+    QList<ImageInfo> imgInfos;
+    imgInfos.reserve(images.count());
+    foreach (const ImagePtr &image, images) {
+        imgInfos.append(image->info());
+    }
+
+    bool ret = m_provider->insertImages(info(), imgInfos);
 
     // Remove cached playlist. It will be re-generated in the future
     flushPlayList();

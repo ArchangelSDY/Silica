@@ -5,6 +5,7 @@
 #include <QString>
 
 #include "image/Image.h"
+#include "playlist/PlayListRecordInfo.h"
 
 class PlayList;
 class PlayListProvider;
@@ -22,6 +23,7 @@ public:
     int count() const { return m_count; }
     int type() const;
     QString typeName() const;
+    PlayListRecordInfo info() const;
 
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }

@@ -8,10 +8,11 @@
 LocalImageSource::LocalImageSource(ImageSourceFactory *factory, QString path) :
     ImageSource(factory)
 {
+    m_path = path;
+
     QString realPath = searchRealPath(path);
     if (!realPath.isEmpty()) {
         QFileInfo info(realPath);
-        m_path = path;
         m_name = info.fileName();
     }
 

@@ -44,7 +44,8 @@ PlayListProviderManager::PlayListProviderManager()
     }
 
     // Register internal providers
-    registerProvider(0, new LocalPlayListProviderFactory());
+    registerProvider(LocalPlayListProviderFactory::TYPE,
+                     new LocalPlayListProviderFactory());
 }
 
 PlayListProviderManager::~PlayListProviderManager()

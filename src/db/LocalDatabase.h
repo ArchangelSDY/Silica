@@ -6,6 +6,7 @@
 
 #include "image/Image.h"
 #include "image/ImageHotspot.h"
+#include "playlist/PlayListRecordInfo.h"
 #include "playList/PlayListRecord.h"
 #include "playlist/PlayListProviderFactory.h"
 
@@ -22,13 +23,13 @@ public:
     virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool removePlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool updatePlayListRecord(PlayListRecord *playListRecord) = 0;
-    virtual bool insertImagesForPlayListRecord(
-        PlayListRecord *playListRecord, const QList<ImagePtr> &images) = 0;
-    virtual bool removeImageFromPlayListRecord(
-        PlayListRecord *playListRecord, ImagePtr image) = 0;
+    virtual bool insertImagesForLocalPlayListProvider(
+        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos) = 0;
+    virtual bool removeImagesForLocalPlayListProvider(
+        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos) = 0;
 
     virtual int queryImagesCount() = 0;
-    virtual bool insertImage(Image *image) = 0;
+    virtual bool insertImage(const ImageInfo &info) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
     virtual bool updateImageSize(Image *image) = 0;
     virtual QSize queryImageSize(Image *image) = 0;

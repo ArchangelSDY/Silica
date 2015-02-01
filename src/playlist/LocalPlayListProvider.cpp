@@ -27,3 +27,28 @@ void LocalPlayListProvider::request(const QString &name,
     emit gotItems(imageUrls, extraInfos);
 }
 
+bool LocalPlayListProvider::isImagesReadOnly() const
+{
+    return false;
+}
+
+bool LocalPlayListProvider::insertImages(const PlayListRecordInfo &plrInfo,
+                                         const QList<ImageInfo> &imgInfos)
+{
+    return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
+        plrInfo, imgInfos);
+}
+
+bool LocalPlayListProvider::removeImages(const PlayListRecordInfo &plrInfo,
+                                         const QList<ImageInfo> &imgInfos)
+{
+    return LocalDatabase::instance()->removeImagesForLocalPlayListProvider(
+        plrInfo, imgInfos);
+}
+
+void LocalPlayListProvider::onPlayListRecordCreated(
+        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos)
+{
+    LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
+        plrInfo, imgInfos);
+}
