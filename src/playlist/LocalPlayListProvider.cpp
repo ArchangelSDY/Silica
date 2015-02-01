@@ -11,6 +11,11 @@ LocalPlayListProvider::~LocalPlayListProvider()
 {
 }
 
+QString LocalPlayListProvider::typeName() const
+{
+    return QObject::tr("Local");
+}
+
 void LocalPlayListProvider::request(const QString &name,
                                     const QVariantHash &extra)
 {

@@ -9,6 +9,7 @@ public:
     LocalPlayListProvider(QObject *parent = 0);
     ~LocalPlayListProvider();
 
+    QString typeName() const;
     void request(const QString &name, const QVariantHash &extra);
 };
 

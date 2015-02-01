@@ -46,6 +46,11 @@ int PlayListRecord::type() const
     return m_type;
 }
 
+QString PlayListRecord::typeName() const
+{
+    return m_provider ? m_provider->typeName() : QString();
+}
+
 PlayList *PlayListRecord::playList()
 {
     if (!m_playList && m_provider) {

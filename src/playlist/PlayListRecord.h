@@ -21,6 +21,7 @@ public:
 
     int count() const { return m_count; }
     int type() const;
+    QString typeName() const;
 
     QString name() const { return m_name; }
     void setName(const QString &name) { m_name = name; }
