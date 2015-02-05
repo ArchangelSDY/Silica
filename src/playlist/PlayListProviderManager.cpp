@@ -9,6 +9,8 @@
 #include "playlist/PlayListProvider.h"
 #include "playlist/PlayListProviderFactory.h"
 #include "playlist/PlayListRecord.h"
+#include "sapi/IPlayListProviderPlugin.h"
+#include "sapi/PlayListProviderFactoryDelegate.h"
 #include "GlobalConfig.h"
 
 PlayListProviderManager *PlayListProviderManager::s_instance = 0;
@@ -28,15 +30,17 @@ PlayListProviderManager::PlayListProviderManager()
     if (pluginsDir.cd("playlistproviders")) {
         foreach (const QString &filename, pluginsDir.entryList(QDir::Files)) {
             QPluginLoader loader(pluginsDir.absoluteFilePath(filename));
-            QObject *plugin = loader.instance();
-            if (plugin) {
-                PlayListProviderFactory *factory =
-                    qobject_cast<PlayListProviderFactory *>(plugin);
-                if (factory) {
+            QObject *instance = loader.instance();
+            if (instance) {
+                sapi::IPlayListProviderPlugin *plugin =
+                    qobject_cast<sapi::IPlayListProviderPlugin *>(instance);
+                if (plugin) {
                     QJsonObject meta = loader.metaData();
                     QJsonObject customMeta = meta["MetaData"].toObject();
                     QString name = customMeta["name"].toString();
 
+                    PlayListProviderFactory *factory =
+                        new sapi::PlayListProviderFactoryDelegate(plugin);
                     registerPluginProvider(name, factory);
                 }
             }

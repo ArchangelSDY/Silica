@@ -1,0 +1,29 @@
+#ifndef PLAYLISTPROVIDERDELEGATE_H
+#define PLAYLISTPROVIDERDELEGATE_H
+
+#include "playlist/PlayListProvider.h"
+
+namespace sapi {
+
+class IPlayListProvider;
+class IPlayListProviderPlugin;
+
+class PlayListProviderDelegate : public PlayListProvider
+{
+public:
+    PlayListProviderDelegate(IPlayListProviderPlugin *factory,
+                             IPlayListProvider *provider);
+    ~PlayListProviderDelegate();
+
+    // PlayListProvider interface
+    QString typeName() const;
+    void request(const QString &name, const QVariantHash &extra);
+
+private:
+    IPlayListProviderPlugin *m_plugin;
+    IPlayListProvider *m_provider;
+};
+
+}
+
+#endif // PLAYLISTPROVIDERDELEGATE_H

@@ -69,7 +69,7 @@ set(SILICAFORTEST_LINK_LIBRARIES
     Qt5::Sql
     Qt5::Widgets
 )
-target_link_libraries(silicafortest ${SILICAFORTEST_LINK_LIBRARIES})
+target_link_libraries(silicafortest sapi ${SILICAFORTEST_LINK_LIBRARIES})
 
 add_subdirectory(deps/QtMockWebServer)
 

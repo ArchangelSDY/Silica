@@ -92,13 +92,23 @@ if(ENABLE_OPENGL)
     set(LINK_LIBS ${LINK_LIBS} Qt5::OpenGL)
 endif(ENABLE_OPENGL)
 
+
+# Silica API library
+file(GLOB SAPI_SRCS
+    "playlist/PlayListProvider.h"
+    "sapi/*.cpp"
+)
+add_library(sapi SHARED ${SAPI_SRCS})
+target_link_libraries(sapi ${LINK_LIBS})
+
+
 if (WIN32)
     add_executable(silica WIN32 ${SRCS})
 else (WIN32)
     add_executable(silica ${SRCS})
 endif (WIN32)
 
-target_link_libraries(silica ${LINK_LIBS})
+target_link_libraries(silica sapi ${LINK_LIBS})
 
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
