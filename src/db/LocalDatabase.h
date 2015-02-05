@@ -7,7 +7,7 @@
 #include "image/Image.h"
 #include "image/ImageHotspot.h"
 #include "playlist/PlayListRecordInfo.h"
-#include "playList/PlayListRecord.h"
+#include "playlist/PlayListRecord.h"
 #include "playlist/PlayListProviderFactory.h"
 
 class ImageRank;

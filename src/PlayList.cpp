@@ -8,7 +8,7 @@
 #include "image/ImageSourceManager.h"
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
-#include "playList/PlayListRecord.h"
+#include "playlist/PlayListRecord.h"
 #include "PlayList.h"
 
 PlayList::PlayList() :
