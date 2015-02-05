@@ -116,6 +116,13 @@ add_custom_command(TARGET silica POST_BUILD
     $<TARGET_FILE_DIR:silica>/plugins/imageformats
 )
 
+file(GLOB SAPI_PUBLIC_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/I*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
+)
+install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi")
+install(TARGETS sapi LIBRARY DESTINATION "lib")
+
 if (APPLE)
 
     # We have to use our own Info.plist template to support Retina display.
