@@ -98,6 +98,7 @@ file(GLOB SAPI_SRCS
     "playlist/PlayListProvider.h"
     "sapi/*.cpp"
 )
+add_definitions(-DSAPI_LIBRARY)
 add_library(sapi SHARED ${SAPI_SRCS})
 target_link_libraries(sapi ${LINK_LIBS})
 
