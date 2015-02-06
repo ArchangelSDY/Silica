@@ -12,7 +12,8 @@ class PlayListProviderDelegate : public PlayListProvider
 {
 public:
     PlayListProviderDelegate(IPlayListProviderPlugin *factory,
-                             IPlayListProvider *provider);
+                             IPlayListProvider *provider,
+                             const QString &name);
     ~PlayListProviderDelegate();
 
     // PlayListProvider interface
@@ -23,6 +24,7 @@ public:
 private:
     IPlayListProviderPlugin *m_plugin;
     IPlayListProvider *m_provider;
+    QString m_name;
 };
 
 }

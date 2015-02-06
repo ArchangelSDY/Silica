@@ -6,8 +6,9 @@
 namespace sapi {
 
 PlayListProviderFactoryDelegate::PlayListProviderFactoryDelegate(
-        IPlayListProviderPlugin *plugin) :
-    m_plugin(plugin)
+        IPlayListProviderPlugin *plugin, const QString &name) :
+    m_plugin(plugin) ,
+    m_name(name)
 {
 }
 
@@ -18,7 +19,7 @@ PlayListProviderFactoryDelegate::~PlayListProviderFactoryDelegate()
 
 PlayListProvider *PlayListProviderFactoryDelegate::create()
 {
-    return new PlayListProviderDelegate(m_plugin, m_plugin->create());
+    return new PlayListProviderDelegate(m_plugin, m_plugin->create(), m_name);
 }
 
 }
