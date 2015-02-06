@@ -116,8 +116,9 @@ add_custom_command(TARGET silica POST_BUILD
     $<TARGET_FILE_DIR:silica>/plugins/imageformats
 )
 
-file(GLOB SAPI_PUBLIC_HEADERS
-    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/I*.h"
+set(SAPI_PUBLIC_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
 install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi")
