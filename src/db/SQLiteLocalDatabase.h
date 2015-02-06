@@ -19,12 +19,12 @@ public:
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);
     bool insertImagesForLocalPlayListProvider(
-        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos);
+        const PlayListRecord &record, const ImageList &images);
     bool removeImagesForLocalPlayListProvider(
-        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos);
+        const PlayListRecord &record, const ImageList &images);
 
     int queryImagesCount();
-    bool insertImage(const ImageInfo &imageInfo);
+    bool insertImage(Image *image);
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageSize(Image *image);
     QSize queryImageSize(Image *image);

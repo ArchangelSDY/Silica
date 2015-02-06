@@ -32,23 +32,23 @@ bool LocalPlayListProvider::isImagesReadOnly() const
     return false;
 }
 
-bool LocalPlayListProvider::insertImages(const PlayListRecordInfo &plrInfo,
-                                         const QList<ImageInfo> &imgInfos)
+bool LocalPlayListProvider::insertImages(const PlayListRecord &record,
+                                         const ImageList &images)
 {
     return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
-        plrInfo, imgInfos);
+        record, images);
 }
 
-bool LocalPlayListProvider::removeImages(const PlayListRecordInfo &plrInfo,
-                                         const QList<ImageInfo> &imgInfos)
+bool LocalPlayListProvider::removeImages(const PlayListRecord &record,
+                                         const ImageList &images)
 {
     return LocalDatabase::instance()->removeImagesForLocalPlayListProvider(
-        plrInfo, imgInfos);
+        record, images);
 }
 
 void LocalPlayListProvider::onPlayListRecordCreated(
-        const PlayListRecordInfo &plrInfo, const QList<ImageInfo> &imgInfos)
+        const PlayListRecord &record, const ImageList &images)
 {
     LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
-        plrInfo, imgInfos);
+        record, images);
 }

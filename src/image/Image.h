@@ -4,8 +4,6 @@
 #include <QObject>
 #include <QtGui>
 
-#include "image/ImageInfo.h"
-
 class QUuid;
 
 class ImageHistogram;
@@ -80,8 +78,6 @@ public:
     int frameCount() const;
 
     ImageHistogram *thumbHist() const;
-
-    ImageInfo info() const;
 
 signals:
     void loaded();

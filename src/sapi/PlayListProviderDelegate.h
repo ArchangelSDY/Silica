@@ -16,8 +16,9 @@ public:
     ~PlayListProviderDelegate();
 
     // PlayListProvider interface
-    QString typeName() const;
-    void request(const QString &name, const QVariantHash &extra);
+    QString typeName() const override;
+    void request(const QString &name, const QVariantHash &extra) override;
+
 
 private:
     IPlayListProviderPlugin *m_plugin;

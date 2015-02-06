@@ -4,10 +4,10 @@
 #include <QObject>
 #include <QVariantHash>
 
-#include "image/ImageInfo.h"
-#include "playlist/PlayListRecordInfo.h"
+#include "image/Image.h"
 
 class PlayListProviderFactory;
+class PlayListRecord;
 
 class PlayListProvider : public QObject
 {
@@ -23,13 +23,13 @@ public:
                          const QVariantHash &extra = QVariantHash()) = 0;
 
     virtual bool isImagesReadOnly() const { return true; }
-    virtual bool insertImages(const PlayListRecordInfo &plrInfo,
-                              const QList<ImageInfo> &imgInfos) { return false; }
-    virtual bool removeImages(const PlayListRecordInfo &plrInfo,
-                              const QList<ImageInfo> &imgInfos) { return false; }
+    virtual bool insertImages(const PlayListRecord &record,
+                              const ImageList &images) { return false; }
+    virtual bool removeImages(const PlayListRecord &record,
+                              const ImageList &images) { return false; }
 
-    virtual void onPlayListRecordCreated(const PlayListRecordInfo &plrInfo,
-                                       const QList<ImageInfo> &imgInfos) {}
+    virtual void onPlayListRecordCreated(const PlayListRecord &record,
+                                       const ImageList &images) {}
 
 signals:
     void gotItems(const QList<QUrl> &urls,

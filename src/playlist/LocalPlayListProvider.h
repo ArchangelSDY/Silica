@@ -14,13 +14,10 @@ public:
     void request(const QString &name, const QVariantHash &extra);
 
     bool isImagesReadOnly() const;
-    bool insertImages(const PlayListRecordInfo &plrInfo,
-                      const QList<ImageInfo> &imgInfos);
-    bool removeImages(const PlayListRecordInfo &plrInfo,
-                      const QList<ImageInfo> &imgInfos);
-
-    void onPlayListRecordCreated(const PlayListRecordInfo &plrInfo,
-                                 const QList<ImageInfo> &imgInfos);
+    bool insertImages(const PlayListRecord &record, const ImageList &images);
+    bool removeImages(const PlayListRecord &record, const ImageList &images);
+    void onPlayListRecordCreated(const PlayListRecord &record,
+                                 const ImageList &images);
 };
 
 #endif // LOCALPLAYLISTPROVIDER_H

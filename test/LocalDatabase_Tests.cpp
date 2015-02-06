@@ -259,9 +259,8 @@ void TestLocalDatabase::insertImage()
     QFETCH(QUrl, imageUrl);
 
     Image image(imageUrl);
-    ImageInfo info = image.info();
 
-    bool ret = LocalDatabase::instance()->insertImage(info);
+    bool ret = LocalDatabase::instance()->insertImage(&image);
     QVERIFY(ret);
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(

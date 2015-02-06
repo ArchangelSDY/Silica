@@ -437,7 +437,7 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
         delete m_thumbnail;
         m_thumbnail = new QImage(*thumbnail);
 
-        LocalDatabase::instance()->insertImage(info());
+        LocalDatabase::instance()->insertImage(this);
 
         emit thumbnailLoaded();
     } else if (m_thumbnail->isNull()) {
@@ -553,12 +553,4 @@ void Image::initThumbHist()
     }
 }
 
-ImageInfo Image::info() const
-{
-    ImageInfo info;
-    info.name = name();
-    info.hashStr = source()->hashStr();
-    info.url = source()->url();
-    return info;
-}
 #include "Image.moc"
