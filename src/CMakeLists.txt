@@ -144,6 +144,8 @@ else ()
 
 endif()
 
+set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Frameworks")
+
 set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini.default)
 install(FILES ${SILICA_CONFIG} DESTINATION ./config/Asuna)
 
