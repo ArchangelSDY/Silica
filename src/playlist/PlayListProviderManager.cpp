@@ -45,6 +45,9 @@ PlayListProviderManager::PlayListProviderManager()
                                                                   displayName);
                     registerPluginProvider(name, factory);
                 }
+            } else {
+                qWarning() << "[Plugin]" << loader.fileName()
+                    << loader.errorString();
             }
         }
     }
