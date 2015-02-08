@@ -1,10 +1,3 @@
-option(ENABLE_OPENGL "Enable OpenGL" OFF)
-if(ENABLE_OPENGL)
-    add_definitions(-DENABLE_OPENGL)
-    find_package(Qt5OpenGL REQUIRED)
-    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-endif(ENABLE_OPENGL)
-
 add_definitions(-DQTRAR_STATIC)
 add_definitions(-DQUAZIP_STATIC)
 

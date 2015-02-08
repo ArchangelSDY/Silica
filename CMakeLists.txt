@@ -1,5 +1,6 @@
 project (silica)
 cmake_minimum_required(VERSION 2.8.11)
+cmake_policy(SET CMP0042 NEW)   # Set MACOSX_RPATH default to ON
 
 find_package(Threads)
 find_package(ZLIB REQUIRED)
@@ -29,6 +30,14 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 #
 # set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
 # set(LIB_DESTINATION "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}" CACHE STRING "Library directory name" FORCE)
+
+# OpenGL support
+option(ENABLE_OPENGL "Enable OpenGL" OFF)
+if(ENABLE_OPENGL)
+    add_definitions(-DENABLE_OPENGL)
+    find_package(Qt5OpenGL REQUIRED)
+    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+endif(ENABLE_OPENGL)
 
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
