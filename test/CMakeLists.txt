@@ -41,6 +41,7 @@ file(GLOB EXTERNAL_SRCS
     "../src/ui/hotspots/*.cpp"
     "../src/ui/renderers/*.cpp"
     "utils/*.cpp"
+    "STestCase.cpp"
 )
 
 file(GLOB FORMS

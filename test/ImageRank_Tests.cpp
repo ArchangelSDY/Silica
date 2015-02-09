@@ -29,7 +29,7 @@ void TestImageRank::initTestCase()
 void TestImageRank::cleanup()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestImageRank");
-    db.setDatabaseName("local.db");
+    db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
     db.open();
     db.exec("delete from images");
     db.exec("delete from image_ranks");

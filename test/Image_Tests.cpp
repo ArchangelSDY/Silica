@@ -2,17 +2,16 @@
 #include <QtSql>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
 #include "../src/image/ImageSource.h"
 
-class TestImage : public QObject
+class TestImage : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
-    void init();
     void cleanup();
     void loadThumbnail();
     void loadThumbnail_data();
@@ -20,26 +19,10 @@ private slots:
     void hotspots_data();
 };
 
-void TestImage::initTestCase()
-{
-    Q_INIT_RESOURCE(silica);
-    GlobalConfig::create();
-    QVERIFY2(LocalDatabase::instance()->migrate(),
-             "Fail to migrate database");
-}
-
-void TestImage::init()
-{
-    QDir d("thumbnails");
-    if (d.exists()) {
-        d.removeRecursively();
-    }
-}
-
 void TestImage::cleanup()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestImage");
-    db.setDatabaseName("local.db");
+    db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
     db.open();
     db.exec("delete from images");
     db.exec("delete from image_hotspots");
@@ -49,9 +32,9 @@ void TestImage::cleanup()
 
 void TestImage::loadThumbnail()
 {
-    QFETCH(QUrl, imageUrl);
+    QFETCH(QString, imagePath);
 
-    Image image(imageUrl);
+    Image image(imagePath);
     QSignalSpy spyLoad(&image, SIGNAL(thumbnailLoaded()));
     image.loadThumbnail(true);
     spyLoad.wait();
@@ -68,19 +51,18 @@ void TestImage::loadThumbnail()
 
 void TestImage::loadThumbnail_data()
 {
-    QTest::addColumn<QUrl>("imageUrl");
-    const QString &currentDir = qApp->applicationDirPath();
+    QTest::addColumn<QString>("imagePath");
 
     QTest::newRow("Basic")
-        << QUrl("file://" + currentDir + "/assets/me.jpg");
+        << ":/assets/me.jpg";
 }
 
 void TestImage::hotspots()
 {
-    QFETCH(QUrl, imageUrl);
+    QFETCH(QString, imagePath);
     QFETCH(QList<QRect>, rects);
 
-    Image image(imageUrl);
+    Image image(imagePath);
     foreach (const QRect &rect, rects) {
         ImageHotspot hotspot(&image, rect);
         hotspot.save();
@@ -95,12 +77,11 @@ void TestImage::hotspots()
 
 void TestImage::hotspots_data()
 {
-    QTest::addColumn<QUrl>("imageUrl");
+    QTest::addColumn<QString>("imagePath");
     QTest::addColumn<QList<QRect> >("rects");
-    const QString &currentDir = qApp->applicationDirPath();
 
     QTest::newRow("Basic")
-        << QUrl("file://" + currentDir + "/assets/me.jpg")
+        << ":/assets/me.jpg"
         << (QList<QRect>() << QRect(0, 0, 10, 10) << QRect(10, 10, 20, 20));
 }
 

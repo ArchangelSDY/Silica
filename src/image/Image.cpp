@@ -190,7 +190,33 @@ void MakeThumbnailTask::run()
 // ---------- Image ----------
 const QSize Image::UNKNOWN_SIZE = QSize(-1, -1);
 
-Image::Image(QUrl url, QObject *parent) :
+Image::Image(const QString &path, QObject *parent) :
+    QObject(parent) ,
+    m_uuid(QUuid::createUuid()) ,
+    m_status(Image::NotLoad) ,
+    m_imageSource(ImageSourceManager::instance()->createSingle(path)) ,
+    m_thumbnail(new QImage()) ,
+    m_loadRequestsCount(0) ,
+    m_isLoadingImage(false) ,
+    m_isLoadingThumbnail(false) ,
+    m_isMakingThumbnail(false) ,
+    m_hotspotsLoaded(false) ,
+    m_rank(new ImageRank(this, this)) ,
+    m_size(Image::UNKNOWN_SIZE) ,
+    m_isAnimation(false) ,
+    m_thumbHist(0)
+{
+    s_liveImages.insert(m_uuid, true);
+
+    resetFrames();
+    computeThumbnailPath();
+    loadMetaFromDatabase();
+
+    connect(this, SIGNAL(thumbnailLoaded()),
+            this, SLOT(initThumbHist()));
+}
+
+Image::Image(const QUrl &url, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,

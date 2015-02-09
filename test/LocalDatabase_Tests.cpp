@@ -37,7 +37,7 @@ void TestLocalDatabase::initTestCase()
              "Fail to migrate database");
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
-    db.setDatabaseName("local.db");
+    db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
     db.open();
     db.exec("delete from playlists");
     db.exec("delete from playlist_images");

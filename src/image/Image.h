@@ -17,7 +17,8 @@ class Image : public QObject
 
     friend class ImageHotspot;
 public:
-    explicit Image(QUrl url, QObject *parent = 0);
+    explicit Image(const QString &path, QObject *parent = 0);
+    explicit Image(const QUrl &url, QObject *parent = 0);
     explicit Image(ImageSource *, QObject *parent = 0);
     ~Image();
 
