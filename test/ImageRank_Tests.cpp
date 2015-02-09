@@ -1,30 +1,22 @@
 #include <QtSql>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
 #include "../src/image/ImageRank.h"
 
-class TestImageRank : public QObject
+class TestImageRank : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
     void cleanup();
     void saveAndLoad();
     void saveAndLoad_data();
     void upDownVote();
     void upDownVote_data();
 };
-
-void TestImageRank::initTestCase()
-{
-    Q_INIT_RESOURCE(silica);
-    GlobalConfig::create();
-    QVERIFY2(LocalDatabase::instance()->migrate(),
-             "Fail to migrate database");
-}
 
 void TestImageRank::cleanup()
 {

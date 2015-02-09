@@ -1,6 +1,7 @@
 #include <QtSql>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/ImageSource.h"
 #include "../src/image/ImageSourceManager.h"
@@ -10,11 +11,11 @@
 #include "../src/GlobalConfig.h"
 #include "../src/PlayList.h"
 
-class TestLocalDatabase : public QObject
+class TestLocalDatabase : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
+    void initTestCase() override;
 
     void localPlayListsSaveAndLoad();
     void localPlayListsSaveAndLoad_data();
@@ -31,10 +32,7 @@ private slots:
 
 void TestLocalDatabase::initTestCase()
 {
-    Q_INIT_RESOURCE(silica);
-    GlobalConfig::create();
-    QVERIFY2(LocalDatabase::instance()->migrate(),
-             "Fail to migrate database");
+    STestCase::initTestCase();
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
     db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());

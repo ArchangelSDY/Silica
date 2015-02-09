@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/PlayList.h"
 #include "../src/GlobalConfig.h"
 #include "../src/db/LocalDatabase.h"
@@ -25,11 +26,11 @@ public:
     bool copy(const QString &) { return true; }
 };
 
-class TestPlayList : public QObject
+class TestPlayList : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
+    void initTestCase() override;
 
     void sortByName();
     void sortByName_data();
@@ -51,12 +52,7 @@ Q_DECLARE_METATYPE(AbstractPlayListFilter *)
 
 void TestPlayList::initTestCase()
 {
-    Q_INIT_RESOURCE(silica);
-    Q_INIT_RESOURCE(silicatest);
-    GlobalConfig::create();
-    if (!LocalDatabase::instance()->migrate()) {
-        QFAIL("Fail to migrate database! Will exit now.");
-    }
+    STestCase::initTestCase();
 
     const QString &tmpDirPath = m_tmpDir.path();
 

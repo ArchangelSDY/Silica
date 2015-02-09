@@ -6,7 +6,7 @@
 class STestCase : public QObject
 {
     Q_OBJECT
-private slots:
+protected slots:
     virtual void initTestCase();
 };
 

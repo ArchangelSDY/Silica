@@ -1,21 +1,16 @@
 #include <QImage>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/image/ImageHistogram.h"
 
-class TestImageHistogram : public QObject
+class TestImageHistogram : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
     void compare();
     void compare_data();
 };
-
-void TestImageHistogram::initTestCase()
-{
-    Q_INIT_RESOURCE(silicatest);
-}
 
 void TestImageHistogram::compare()
 {

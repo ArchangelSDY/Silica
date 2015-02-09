@@ -2,10 +2,11 @@
 #include <QTest>
 #include <QUrl>
 
+#include "STestCase.h"
 #include "../src/image/ImageSource.h"
 #include "../src/image/ImageSourceManager.h"
 
-class TestImageSource : public QObject
+class TestImageSource : public STestCase
 {
     Q_OBJECT
 private slots:

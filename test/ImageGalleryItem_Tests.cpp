@@ -1,6 +1,7 @@
 #include <QSignalSpy>
 #include <QTest>
 
+#include "STestCase.h"
 #include "../src/GlobalConfig.h"
 #include "../src/image/Image.h"
 #include "../src/image/ImageSourceManager.h"
@@ -9,22 +10,15 @@
 #include "../src/ui/renderers/LooseRendererFactory.h"
 #include "../src/ui/renderers/WaterfallRendererFactory.h"
 
-class TestImageGalleryItem : public QObject
+class TestImageGalleryItem : public STestCase
 {
     Q_OBJECT
 private slots:
-    void initTestCase();
     void load();
     void load_data();
 };
 
 Q_DECLARE_METATYPE(AbstractRendererFactory *)
-
-void TestImageGalleryItem::initTestCase()
-{
-    Q_INIT_RESOURCE(silicatest);
-    GlobalConfig::create();
-}
 
 void TestImageGalleryItem::load()
 {
