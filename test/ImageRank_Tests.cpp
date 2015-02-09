@@ -31,11 +31,11 @@ void TestImageRank::cleanup()
 
 void TestImageRank::saveAndLoad()
 {
-    QFETCH(QUrl, imageUrl);
+    QFETCH(QString, imagePath);
     QFETCH(int, setRank);
     QFETCH(int, savedRank);
 
-    Image image(imageUrl);
+    Image image(imagePath);
 
     int defaultRank = image.rank()->value();
     QCOMPARE(defaultRank, ImageRank::DEFAULT_VALUE);
@@ -49,25 +49,24 @@ void TestImageRank::saveAndLoad()
 
 void TestImageRank::saveAndLoad_data()
 {
-    QTest::addColumn<QUrl>("imageUrl");
+    QTest::addColumn<QString>("imagePath");
     QTest::addColumn<int>("setRank");
     QTest::addColumn<int>("savedRank");
-    const QString &currentDir = qApp->applicationDirPath();
-    QUrl imageUrl("file://" + currentDir + "/assets/me.jpg");
+    QString imagePath = ":/assets/me.jpg";
 
-    QTest::newRow("Basic") << imageUrl << 5 << 5;
-    QTest::newRow("Too large rank") << imageUrl << 10 << ImageRank::MAX_VALUE;
-    QTest::newRow("Too small rank") << imageUrl << 0 << ImageRank::MIN_VALUE;
+    QTest::newRow("Basic") << imagePath << 5 << 5;
+    QTest::newRow("Too large rank") << imagePath << 10 << ImageRank::MAX_VALUE;
+    QTest::newRow("Too small rank") << imagePath << 0 << ImageRank::MIN_VALUE;
 }
 
 void TestImageRank::upDownVote()
 {
-    QFETCH(QUrl, imageUrl);
+    QFETCH(QString, imagePath);
     QFETCH(int, oldRank);
     QFETCH(int, newRankAfterUpVote);
     QFETCH(int, newRankAfterDownVote);
 
-    Image image(imageUrl);
+    Image image(imagePath);
     image.rank()->setValue(oldRank);
 
     // Test up vote
@@ -90,21 +89,20 @@ void TestImageRank::upDownVote()
 
 void TestImageRank::upDownVote_data()
 {
-    QTest::addColumn<QUrl>("imageUrl");
+    QTest::addColumn<QString>("imagePath");
     QTest::addColumn<int>("oldRank");
     QTest::addColumn<int>("newRankAfterUpVote");
     QTest::addColumn<int>("newRankAfterDownVote");
-    const QString &currentDir = qApp->applicationDirPath();
-    QUrl imageUrl("file://" + currentDir + "/assets/me.jpg");
+    QString imagePath = ":/assets/me.jpg";
 
-    QTest::newRow("Basic") << imageUrl << 3 << 4 << 2;
+    QTest::newRow("Basic") << imagePath << 3 << 4 << 2;
     QTest::newRow("Max rank")
-        << imageUrl
+        << imagePath
         << ImageRank::MAX_VALUE
         << ImageRank::MAX_VALUE
         << ImageRank::MAX_VALUE - 1;
     QTest::newRow("Min rank")
-        << imageUrl
+        << imagePath
         << ImageRank::MIN_VALUE
         << ImageRank::MIN_VALUE + 1
         << ImageRank::MIN_VALUE;

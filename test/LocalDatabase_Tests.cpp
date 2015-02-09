@@ -254,9 +254,9 @@ void TestLocalDatabase::removeImagesFromPlayList()
 
 void TestLocalDatabase::insertImage()
 {
-    QFETCH(QUrl, imageUrl);
+    QFETCH(QString, imagePath);
 
-    Image image(imageUrl);
+    Image image(imagePath);
 
     bool ret = LocalDatabase::instance()->insertImage(&image);
     QVERIFY(ret);
@@ -271,11 +271,9 @@ void TestLocalDatabase::insertImage()
 
 void TestLocalDatabase::insertImage_data()
 {
-    QTest::addColumn<QUrl>("imageUrl");
-    const QString &currentDir = qApp->applicationDirPath();
+    QTest::addColumn<QString>("imagePath");
 
-    QTest::newRow("Basic")
-        << QUrl("file://" + currentDir + "/assets/insert_image.jpg");
+    QTest::newRow("Basic") << ":/assets/insert_image.jpg";
 }
 
 void TestLocalDatabase::pluginPlayListProvider()
