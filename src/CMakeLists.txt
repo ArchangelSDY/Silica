@@ -126,8 +126,8 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
-install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi")
-install(TARGETS sapi LIBRARY DESTINATION "lib")
+install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT applications)
+install(TARGETS sapi LIBRARY DESTINATION "lib" COMPONENT applications)
 
 if (APPLE)
 
@@ -143,6 +143,7 @@ if (APPLE)
         install(TARGETS silica
             BUNDLE DESTINATION .
             RUNTIME DESTINATION .
+            COMPONENT applications
         )
     endif()
 
@@ -151,17 +152,17 @@ else ()
     set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS silica
         RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+        COMPONENT applications
     )
 
 endif()
 
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Frameworks")
 
-set(SILICA_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/assets/Silica.ini.default)
-install(FILES ${SILICA_CONFIG} DESTINATION ./config/Asuna)
 
 set(CPACK_GENERATOR "TGZ;ZIP")
 set(CPACK_PACKAGE_EXECUTABLES "silica;Silica")
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};silica;applications;/")
 
 if (APPLE)
     set(CPACK_GENERATOR "${CPACK_GENERATOR};Bundle")
