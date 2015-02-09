@@ -81,13 +81,6 @@ void GlobalConfig::load()
     // Network cache path
     m_netCachePath = baseDirPath + "/netcache";
 
-    // Plugins path
-#ifdef Q_OS_OSX
-    m_pluginsPath = qApp->applicationDirPath() + "/../Resources/plugins";
-#else
-    m_pluginsPath = qApp->applicationDirPath() + "/plugins";
-#endif
-
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
 
