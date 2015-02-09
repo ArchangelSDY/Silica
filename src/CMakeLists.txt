@@ -1,3 +1,10 @@
+option(BUILD_PRODUCTION "Build for production" OFF)
+if(BUILD_PRODUCTION)
+    set(BUILD_ENV "Silica")
+else(BUILD_PRODUCTION)
+    set(BUILD_ENV "Silica-Dev")
+endif(BUILD_PRODUCTION)
+
 add_definitions(-DQTRAR_STATIC)
 add_definitions(-DQUAZIP_STATIC)
 

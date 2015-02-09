@@ -41,8 +41,6 @@ file(GLOB EXTERNAL_SRCS
     "../src/ui/hotspots/*.cpp"
     "../src/ui/renderers/*.cpp"
     "utils/*.cpp"
-
-    "${CMAKE_CURRENT_BINARY_DIR}/../src/Definitions.cpp"
 )
 
 file(GLOB FORMS
@@ -55,6 +53,17 @@ file(GLOB RESOURCES "*.qrc" "../src/*.qrc")
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 qt5_add_resources(RESOURCES_RCC ${RESOURCES})
 set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
+
+set(BUILD_ENV "Silica-Test")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../src/Definitions.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+    @ONLY
+)
+list(APPEND EXTERNAL_SRCS
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+)
 
 add_library(silicafortest STATIC ${EXTERNAL_SRCS})
 set(SILICAFORTEST_LINK_LIBRARIES

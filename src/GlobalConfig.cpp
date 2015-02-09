@@ -1,6 +1,8 @@
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QImage>
 #include <QSettings>
 #include <QSharedPointer>
@@ -34,28 +36,22 @@ GlobalConfig *GlobalConfig::instance()
 
 void GlobalConfig::load()
 {
-    QCoreApplication::setOrganizationName("Asuna");
+    QCoreApplication::setOrganizationName(g_BUILD_ENV);
     QCoreApplication::setApplicationName("Silica");
 
     QSettings::setDefaultFormat(QSettings::IniFormat);
-#ifdef Q_OS_OSX
-    QString baseDir = qApp->applicationDirPath() + "/../Resources";
-    if (!QFile::exists(baseDir)) {
-        baseDir = qApp->applicationDirPath();
-    }
-#else
-    QString baseDir = qApp->applicationDirPath();
-#endif
 
     // Init config path
-    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                       baseDir + "/config");
+    // TODO(sdy): Create default config
     QSettings settings;
     qDebug() << "Config: " << settings.fileName();
-    if (!QFile::exists(settings.fileName())) {
-        qDebug() << "Config does not exist. Init with a default one.";
-        QFile::copy(settings.fileName() + ".default", settings.fileName());
-    }
+
+    QFileInfo settingFileInfo(settings.fileName());
+    QDir settingDir = settingFileInfo.dir();
+    QDir d;
+    d.mkpath(settingDir.absolutePath());
+    QString baseDirPath = settingDir.absolutePath();
+
 
     // Search dirs
     int size = settings.beginReadArray("SearchDirs");
@@ -72,19 +68,25 @@ void GlobalConfig::load()
     qDebug() << "WallpaperDir: " << m_wallpaperDir;
 
     // Local database path
-    m_localDatabasePath = baseDir + "/local.db";
+    m_localDatabasePath = baseDirPath + "/local.db";
+    qDebug() << m_localDatabasePath;
 
     // Migration config path
     m_migrationConfigPath = ":/assets/migration.json";
 
     // Thumbnail path
-    m_thumbnailPath = baseDir + "/thumbnails";
+    // TODO(sdy): Make this configurable
+    m_thumbnailPath = baseDirPath + "/thumbnails";
 
     // Network cache path
-    m_netCachePath = baseDir + "/netcache";
+    m_netCachePath = baseDirPath + "/netcache";
 
     // Plugins path
-    m_pluginsPath = baseDir + "/plugins";
+#ifdef Q_OS_OSX
+    m_pluginsPath = qApp->applicationDirPath() + "/../Resources/plugins";
+#else
+    m_pluginsPath = qApp->applicationDirPath() + "/plugins";
+#endif
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
@@ -103,7 +105,11 @@ void GlobalConfig::load()
 
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");
-    QCoreApplication::addLibraryPath(baseDir + "/plugins");
+#ifdef Q_OS_OSX
+    QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/../Resources/plugins");
+#endif
+    QCoreApplication::addLibraryPath(baseDirPath + "/plugins");
+
 }
 
 const char *GlobalConfig::buildRevision() const
