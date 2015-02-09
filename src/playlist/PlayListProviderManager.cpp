@@ -26,10 +26,14 @@ PlayListProviderManager *PlayListProviderManager::instance()
 PlayListProviderManager::PlayListProviderManager()
 {
     // Load plugins
-    QDir pluginsDir(GlobalConfig::instance()->pluginsPath());
-    if (pluginsDir.cd("playlistproviders")) {
-        foreach (const QString &filename, pluginsDir.entryList(QDir::Files)) {
-            QPluginLoader loader(pluginsDir.absoluteFilePath(filename));
+    foreach (const QString &libPath, qApp->libraryPaths()) {
+        QDir libDir(libPath);
+        if (!libDir.cd("playlistproviders")) {
+            continue;
+        }
+
+        foreach (const QString &filename, libDir.entryList(QDir::Files)) {
+            QPluginLoader loader(libDir.absoluteFilePath(filename));
             QObject *instance = loader.instance();
             if (instance) {
                 sapi::IPlayListProviderPlugin *plugin =
