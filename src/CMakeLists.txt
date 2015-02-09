@@ -101,6 +101,10 @@ file(GLOB SAPI_SRCS
 add_definitions(-DSAPI_LIBRARY)
 add_library(sapi SHARED ${SAPI_SRCS})
 target_link_libraries(sapi ${LINK_LIBS})
+set_target_properties(sapi PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 
 if (WIN32)
