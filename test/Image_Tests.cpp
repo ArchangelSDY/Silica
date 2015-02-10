@@ -13,6 +13,8 @@ class TestImage : public STestCase
     Q_OBJECT
 private slots:
     void cleanup();
+    void load();
+    void load_data();
     void loadThumbnail();
     void loadThumbnail_data();
     void hotspots();
@@ -30,6 +32,53 @@ void TestImage::cleanup()
     QSqlDatabase::removeDatabase("TestImage");
 }
 
+void TestImage::load()
+{
+    QFETCH(QString, imagePath);
+    QFETCH(bool, isSuccess);
+    QFETCH(int, loadCnt);
+
+    Image image(imagePath);
+    QCOMPARE(image.status(), Image::NotLoad);
+    QVERIFY2(image.data().isNull(), "Image data should be null before load");
+
+    QSignalSpy spyLoad(&image, SIGNAL(loaded()));
+    for (int i = 0; i < loadCnt; ++i) {
+        image.load();
+    }
+    QCOMPARE(image.status(), Image::Loading);
+    QVERIFY(spyLoad.wait());
+
+    QCOMPARE(image.status(),
+             isSuccess ? Image::LoadComplete : Image::LoadError);
+    QCOMPARE(!image.data().isNull(), isSuccess);
+
+    for (int i = 0; i < loadCnt - 1; ++i) {
+        image.scheduleUnload();
+        QVERIFY2(!image.data().isNull(),
+                 "Image should not unload until last load request finished");
+    }
+    image.scheduleUnload();
+    QCOMPARE(image.status(), Image::NotLoad);
+    QVERIFY2(image.data().isNull(), "Image data should be null after unload");
+}
+
+void TestImage::load_data()
+{
+    QTest::addColumn<QString>("imagePath");
+    QTest::addColumn<bool>("isSuccess");
+    QTest::addColumn<int>("loadCnt");
+
+    QTest::newRow("Load successfully")
+        << ":/assets/silica.png"
+        << true
+        << 1;
+    QTest::newRow("Multiple loads")
+        << ":/assets/silica.png"
+        << true
+        << 3;
+}
+
 void TestImage::loadThumbnail()
 {
     QFETCH(QString, imagePath);
@@ -37,10 +86,11 @@ void TestImage::loadThumbnail()
     Image image(imagePath);
     QSignalSpy spyLoad(&image, SIGNAL(thumbnailLoaded()));
     image.loadThumbnail(true);
-    spyLoad.wait();
+    QVERIFY(spyLoad.wait());
 
     QVERIFY(!image.thumbnail().isNull());
     QVERIFY(image.thumbnail().width() > 0);
+    QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
         image.source()->hashStr());

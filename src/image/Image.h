@@ -102,7 +102,7 @@ private:
     void destroyFrames();
     void resetFrames(QImage *defaultFrame = new QImage(),
                      int defaultDuration = 0);
-    void unloadIfNeeded();
+    void checkUnload();
     void makeThumbnail();
     void computeThumbnailPath();
     void loadMetaFromDatabase();

@@ -288,35 +288,17 @@ Image::~Image()
     }
 }
 
-void Image::load(int priority)
-{
-    m_loadRequestsCount ++;
-    m_status = Image::Loading;
-
-    if (m_isLoadingImage) {
-        return;
-    }
-
-    m_isLoadingImage = true;
-
-    LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
-    connect(loadImageTask,
-            SIGNAL(loaded(QList<QSharedPointer<QImage> >, QList<int>)),
-            this,
-            SLOT(imageReaderFinished(QList<QSharedPointer<QImage> >, QList<int>)));
-    QThreadPool::globalInstance()->start(
-        new LiveImageRunnable(m_uuid, loadImageTask),
-        priority);
-}
-
 void Image::scheduleUnload()
 {
-    if (m_status == Image::LoadComplete) {
-        unloadIfNeeded();
-    }
+    // if (m_status == Image::LoadComplete) {
+
+    --m_loadRequestsCount;
+    checkUnload();
+
+    // }
 }
 
-void Image::unloadIfNeeded()
+void Image::checkUnload()
 {
     if (m_loadRequestsCount == 0) {
         // If error, keep this state to prevent further try
@@ -325,8 +307,6 @@ void Image::unloadIfNeeded()
         }
 
         resetFrames();
-    } else {
-        m_loadRequestsCount --;
     }
 }
 
@@ -344,6 +324,27 @@ void Image::resetFrames(QImage *defaultFrame, int defaultDuration)
     destroyFrames();
     m_frames << defaultFrame;
     m_durations << defaultDuration;
+}
+
+void Image::load(int priority)
+{
+    ++m_loadRequestsCount;
+    m_status = Image::Loading;
+
+    if (m_isLoadingImage) {
+        return;
+    }
+
+    m_isLoadingImage = true;
+
+    LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
+    connect(loadImageTask,
+            SIGNAL(loaded(QList<QSharedPointer<QImage> >, QList<int>)),
+            this,
+            SLOT(imageReaderFinished(QList<QSharedPointer<QImage> >, QList<int>)));
+    QThreadPool::globalInstance()->start(
+        new LiveImageRunnable(m_uuid, loadImageTask),
+        priority);
 }
 
 void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
@@ -385,8 +386,6 @@ void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
     }
 
     emit loaded();
-
-    unloadIfNeeded();
 }
 
 void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
@@ -401,7 +400,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
         emit thumbnailLoaded();
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
-        --m_loadRequestsCount;  // Release memory after thumbnail generated
+        scheduleUnload();       // Release memory after thumbnail generated
     } else {
         emit thumbnailLoadFailed();
     }
@@ -471,6 +470,8 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
     }
 
     m_isMakingThumbnail = false;
+
+    checkUnload();
 }
 
 void Image::computeThumbnailPath()
