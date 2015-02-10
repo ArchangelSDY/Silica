@@ -401,7 +401,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
         emit thumbnailLoaded();
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
-        scheduleUnload();   // Release memory after thumbnail generated
+        --m_loadRequestsCount;  // Release memory after thumbnail generated
     } else {
         emit thumbnailLoadFailed();
     }
