@@ -83,7 +83,7 @@ protected:
     QString m_nameFilter;
 
 private:
-    static const int LAYOUT_INTERVAL = 10;
+    static const int LAYOUT_INTERVAL;
 
     AbstractRendererFactory *m_rendererFactory;
     QList<QGraphicsItem *> m_itemGroupTitles;

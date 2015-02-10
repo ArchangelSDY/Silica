@@ -11,6 +11,8 @@
 #include "LooseRendererFactory.h"
 #include "WaterfallRendererFactory.h"
 
+const int GalleryView::LAYOUT_INTERVAL = 10;
+
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
