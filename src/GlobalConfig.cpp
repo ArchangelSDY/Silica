@@ -107,18 +107,10 @@ void GlobalConfig::load()
 
 const char *GlobalConfig::buildRevision() const
 {
-#ifdef BUILD_GIT_SHA1
     return g_BUILD_GIT_SHA1;
-#else
-    return "";
-#endif
 }
 
 const char *GlobalConfig::buildTimestamp() const
 {
-#ifdef BUILD_TIMESTAMP
     return g_BUILD_TIMESTAMP;
-#else
-    return "";
-#endif
 }
