@@ -160,9 +160,8 @@ if (APPLE)
 
 else ()
 
-    set(RUNTIME_DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
     install(TARGETS silica
-        RUNTIME DESTINATION ${RUNTIME_DESTINATION}
+        RUNTIME DESTINATION bin
         COMPONENT applications
     )
 
