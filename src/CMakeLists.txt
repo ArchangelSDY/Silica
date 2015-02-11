@@ -167,6 +167,8 @@ else ()
 
 endif()
 
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION "lib" COMPONENT applications)
+
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Frameworks:$ORIGIN/../lib")
 
 
