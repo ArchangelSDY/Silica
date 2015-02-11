@@ -168,7 +168,7 @@ else ()
 
 endif()
 
-set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Frameworks")
+set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Frameworks:$ORIGIN/../lib")
 
 
 set(CPACK_GENERATOR "TGZ;ZIP")
