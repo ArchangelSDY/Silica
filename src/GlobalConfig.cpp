@@ -75,8 +75,10 @@ void GlobalConfig::load()
     m_migrationConfigPath = ":/assets/migration.json";
 
     // Thumbnail path
-    // TODO(sdy): Make this configurable
-    m_thumbnailPath = baseDirPath + "/thumbnails";
+    QString defaultThumbnailPath = baseDirPath + "/thumbnails";
+    m_thumbnailPath = settings.value("ThumbnailDir", defaultThumbnailPath)
+                              .toString();
+    qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
     // Network cache path
     m_netCachePath = baseDirPath + "/netcache";
