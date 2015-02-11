@@ -148,9 +148,9 @@ if (APPLE)
         ${CMAKE_CURRENT_SOURCE_DIR}/assets/MacOSXBundleInfo.plist.in
     )
 
-    # Do not install executable if PACK_BUNDLE defined, or executable will
-    # be packed into Resources too.
-    if (NOT PACK_BUNDLE)
+    # Do not install executable when building for production, or executable
+    # will be packed into `Resources` directory too.
+    if (NOT BUILD_PRODUCTION)
         install(TARGETS silica
             BUNDLE DESTINATION .
             RUNTIME DESTINATION .
