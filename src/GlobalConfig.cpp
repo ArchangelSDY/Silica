@@ -102,7 +102,7 @@ void GlobalConfig::load()
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/../lib/plugins");
 #ifdef Q_OS_OSX
-    QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/../Resources/plugins");
+    QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/../Resources/lib/plugins");
 #endif
     QCoreApplication::addLibraryPath(baseDirPath + "/plugins");
 }
