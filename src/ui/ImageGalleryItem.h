@@ -3,9 +3,9 @@
 
 #include <QGraphicsItem>
 
-#include "AbstractGalleryItemRenderer.h"
-#include "GalleryItem.h"
-#include "Image.h"
+#include "ui/renderers/AbstractGalleryItemRenderer.h"
+#include "ui/GalleryItem.h"
+#include "image/Image.h"
 
 class ImageGalleryItem : public GalleryItem
 {

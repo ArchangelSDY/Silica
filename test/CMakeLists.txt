@@ -1,59 +1,29 @@
+add_subdirectory(deps/QtMockWebServer)
+
 # set all include directories for in and out of source builds
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/QtMockWebServer
     ${CMAKE_CURRENT_SOURCE_DIR}/../src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/db
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/image
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/playlist
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/db
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/image
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/image/caches
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/image/sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/navigation
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/playlist
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/ui
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/ui/hotspots
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/ui/renderers
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/util
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/deps/Qt7z/Qt7z
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/deps/QtDBMigration/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/deps/quazip/quazip
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB EXTERNAL_SRCS
-    "../src/GlobalConfig.cpp"
-    "../src/MainWindow.cpp"
-    "../src/Navigator.cpp"
-    "../src/PlayList.cpp"
-    "../src/db/*.cpp"
-    "../src/image/*.cpp"
-    "../src/image/caches/*.cpp"
-    "../src/image/sources/*.cpp"
-    "../src/navigation/*.cpp"
-    "../src/playlist/*.cpp"
-    "../src/playlist/PlayListProvider.h"
-    "../src/ui/*.cpp"
-    "../src/ui/hotspots/*.cpp"
-    "../src/ui/renderers/*.cpp"
+file(GLOB TEST_COMMON_SRCS
     "utils/*.cpp"
     "STestCase.cpp"
 )
 
-file(GLOB FORMS
-    "../src/*.ui"
-    "../src/navigation/*.ui"
-    "../src/ui/*.ui"
+file(GLOB TEST_COMMON_RESOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/../src/*.qrc"
+    "*.qrc"
 )
-file(GLOB RESOURCES "*.qrc" "../src/*.qrc")
 
-qt5_wrap_ui(FORMS_HEADERS ${FORMS})
-qt5_add_resources(RESOURCES_RCC ${RESOURCES})
-set(EXTERNAL_SRCS ${EXTERNAL_SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
+qt5_wrap_ui(TEST_COMMON_FORMS_HEADERS ${TEST_COMMON_FORMS})
+qt5_add_resources(TEST_COMMON_RESOURCES_RCC ${TEST_COMMON_RESOURCES})
+set(TEST_COMMON_SRCS ${TEST_COMMON_SRCS} ${TEST_COMMON_FORMS_HEADERS} ${TEST_COMMON_RESOURCES_RCC})
 
 set(BUILD_ENV "Silica-Test")
 
@@ -62,39 +32,22 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
     @ONLY
 )
-list(APPEND EXTERNAL_SRCS
+set(PER_TEST_EXTRA_SRCS
     "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
 )
 
-add_library(silicafortest STATIC ${EXTERNAL_SRCS})
-set(SILICAFORTEST_LINK_LIBRARIES
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${OpenCV_LIBS}
-    qt7z
-    qtdbmigration
-    qtrar
-    quazip
-    Qt5::Core
-    Qt5::Network
-    Qt5::Sql
-    Qt5::Widgets
+set(SILICA_TEST_COMMON_LINK_LIBRARIES
+    silicacore
+    sapi
+    qtmockwebserver
+    Qt5::Test
 )
-target_link_libraries(silicafortest sapi ${SILICAFORTEST_LINK_LIBRARIES})
-
-add_subdirectory(deps/QtMockWebServer)
+add_library(silicatestcommon ${TEST_COMMON_SRCS})
+target_link_libraries(silicatestcommon ${SILICA_TEST_COMMON_LINK_LIBRARIES})
 
 file(
     COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
-)
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/../src/assets/migration.json
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
-)
-
-set(TEST_LINK_LIBRARIES
-    qtmockwebserver
-    Qt5::Test
 )
 
 set(TEST_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -110,8 +63,8 @@ foreach(TEST_FILE ${TEST_FILES})
 
     get_filename_component(TEST_TARGET ${TEST_FILE} NAME_WE)
 
-    add_executable(${TEST_TARGET} ${TEST_FILE})
+    add_executable(${TEST_TARGET} ${TEST_FILE} ${PER_TEST_EXTRA_SRCS})
     set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
-    target_link_libraries(${TEST_TARGET} ${TEST_LINK_LIBRARIES} silicafortest)
+    target_link_libraries(${TEST_TARGET} silicatestcommon)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 endforeach(TEST_FILE)

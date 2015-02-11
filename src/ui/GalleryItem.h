@@ -4,8 +4,8 @@
 #include <QColor>
 #include <QGraphicsItem>
 
-#include "AbstractGalleryItemRenderer.h"
-#include "AbstractRendererFactory.h"
+#include "ui/renderers/AbstractGalleryItemRenderer.h"
+#include "ui/renderers/AbstractRendererFactory.h"
 
 class GalleryItem : public QObject, public QGraphicsItem
 {

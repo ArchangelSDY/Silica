@@ -36,8 +36,11 @@ include_directories(
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB SRCS
-    "*.cpp"
+file(GLOB CORE_SRCS
+    "GlobalConfig.cpp"
+    "MainWindow.cpp"
+    "PlayList.cpp"
+    "Navigator.cpp"
     "db/*.cpp"
     "image/*.cpp"
     "image/caches/*.cpp"
@@ -49,32 +52,16 @@ file(GLOB SRCS
     "ui/hotspots/*.cpp"
     "ui/renderers/*.cpp"
 )
-file(GLOB FORMS
+file(GLOB CORE_FORMS
     "*.ui"
     "navigation/*.ui"
     "ui/*.ui"
 )
-file(GLOB RESOURCES "*.qrc")
 
-qt5_wrap_ui(FORMS_HEADERS ${FORMS})
-qt5_add_resources(RESOURCES_RCC ${RESOURCES})
-set(SRCS ${SRCS} ${FORMS_HEADERS} ${RESOURCES_RCC})
+qt5_wrap_ui(CORE_FORMS_HEADERS ${CORE_FORMS})
+set(CORE_SRCS ${CORE_SRCS} ${CORE_FORMS_HEADERS})
 
-# Generate compile time definitions
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-include(GetGitRevisionDescription)
-git_describe(BUILD_GIT_SHA1 "--always")
-string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/Definitions.cpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-    @ONLY
-)
-list(APPEND SRCS
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-)
-
-set(LINK_LIBS
+set(CORE_LINK_LIBS
     ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
     ${OpenCV_LIBS}
@@ -89,9 +76,11 @@ set(LINK_LIBS
 )
 
 if(ENABLE_OPENGL)
-    set(LINK_LIBS ${LINK_LIBS} Qt5::OpenGL)
+    set(CORE_LINK_LIBS ${CORE_LINK_LIBS} Qt5::OpenGL)
 endif(ENABLE_OPENGL)
 
+add_library(silicacore STATIC ${CORE_SRCS})
+target_link_libraries(silicacore ${CORE_LINK_LIBS})
 
 # Silica API library
 file(GLOB SAPI_SRCS
@@ -100,20 +89,42 @@ file(GLOB SAPI_SRCS
 )
 add_definitions(-DSAPI_LIBRARY)
 add_library(sapi SHARED ${SAPI_SRCS})
-target_link_libraries(sapi ${LINK_LIBS})
+target_link_libraries(sapi silicacore)
 set_target_properties(sapi PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
 
+set(SILICA_SRCS
+    "main.cpp"
+)
+file(GLOB SILICA_RESOURCES "*.qrc")
+qt5_add_resources(SILICA_RESOURCES_RCC ${SILICA_RESOURCES})
+set(SILICA_SRCS ${SILICA_SRCS} ${SILICA_RESOURCES_RCC})
+
+# Generate compile time definitions
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+include(GetGitRevisionDescription)
+git_describe(BUILD_GIT_SHA1 "--always")
+string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Definitions.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+    @ONLY
+)
+
+list(APPEND SILICA_SRCS
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+)
+
 if (WIN32)
-    add_executable(silica WIN32 ${SRCS})
+    add_executable(silica WIN32 ${SILICA_SRCS})
 else (WIN32)
-    add_executable(silica ${SRCS})
+    add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
 
-target_link_libraries(silica sapi ${LINK_LIBS})
+target_link_libraries(silica sapi silicacore)
 
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
