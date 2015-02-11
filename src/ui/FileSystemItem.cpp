@@ -193,7 +193,13 @@ void FileSystemItem::loadCover(QString path)
 
 void FileSystemItem::removeOnDisk()
 {
-    QFile::remove(path());
+    QFileInfo info(path());
+    if (info.isDir()) {
+        QDir dir(path());
+        dir.removeRecursively();
+    } else {
+        QFile::remove(path());
+    }
 }
 
 QString FileSystemItem::coverCacheKey() const
