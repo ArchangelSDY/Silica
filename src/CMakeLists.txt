@@ -169,7 +169,7 @@ endif()
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION "lib" COMPONENT applications)
 
-set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path/../Resources/lib;$ORIGIN/../lib")
+set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executable_path/../Resources/lib;$ORIGIN/../lib")
 
 
 set(CPACK_GENERATOR "TGZ;ZIP")
