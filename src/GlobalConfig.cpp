@@ -44,7 +44,7 @@ void GlobalConfig::load()
     // Init config path
     // TODO(sdy): Create default config
     QSettings settings;
-    qDebug() << "Config: " << settings.fileName();
+    qDebug() << "Config:" << settings.fileName();
 
     QFileInfo settingFileInfo(settings.fileName());
     QDir settingDir = settingFileInfo.dir();
@@ -65,11 +65,11 @@ void GlobalConfig::load()
 
     // Wallpaper dir
     m_wallpaperDir = settings.value("WALLPAPER_DIR").toString();
-    qDebug() << "WallpaperDir: " << m_wallpaperDir;
+    qDebug() << "WallpaperDir:" << m_wallpaperDir;
 
     // Local database path
     m_localDatabasePath = baseDirPath + "/local.db";
-    qDebug() << m_localDatabasePath;
+    qDebug() << "Database:" << m_localDatabasePath;
 
     // Migration config path
     m_migrationConfigPath = ":/assets/migration.json";
@@ -80,8 +80,6 @@ void GlobalConfig::load()
                               .toString();
     qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
-    // Network cache path
-    m_netCachePath = baseDirPath + "/netcache";
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
