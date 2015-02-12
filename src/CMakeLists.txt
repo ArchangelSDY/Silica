@@ -1,4 +1,3 @@
-option(BUILD_PRODUCTION "Build for production" OFF)
 if(BUILD_PRODUCTION)
     set(BUILD_ENV "Silica")
 else(BUILD_PRODUCTION)
