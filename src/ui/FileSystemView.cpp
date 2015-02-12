@@ -17,6 +17,11 @@ FileSystemView::FileSystemView(QWidget *parent) :
             this, SLOT(refreshView()));
 }
 
+QString FileSystemView::rootPath() const
+{
+    return m_rootPath;
+}
+
 void FileSystemView::setRootPath(const QString &path)
 {
     if (m_rootPath == path) {

@@ -101,6 +101,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    QSettings setting;
+    setting.setValue("LAST_FILE_SYSTEM_PATH", ui->fsView->rootPath());
+
     delete ui;
 }
 
@@ -243,7 +246,10 @@ void MainWindow::setupExtraUi()
     fsEditPathComp->setModel(new QDirModel(fsEditPathComp));
     fsEditPathComp->setCaseSensitivity(Qt::CaseInsensitive);
     ui->fsEditPath->setCompleter(fsEditPathComp);
-    ui->fsView->setRootPath(QDir::homePath());
+    QSettings setting;
+    QString fsRootPath = setting.value("LAST_FILE_SYSTEM_PATH",
+                                       QDir::homePath()).toString();
+    ui->fsView->setRootPath(fsRootPath);
 
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
