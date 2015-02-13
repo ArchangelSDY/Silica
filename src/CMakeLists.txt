@@ -83,12 +83,27 @@ endif(ENABLE_OPENGL)
 add_library(silicacore STATIC ${CORE_SRCS})
 target_link_libraries(silicacore ${CORE_LINK_LIBS})
 
+# Generate compile time definitions
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+include(GetGitRevisionDescription)
+git_describe(BUILD_GIT_SHA1 "--always")
+string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/Definitions.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+    @ONLY
+)
+
+set(DEFINITION_SRCS
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+)
+
 # Silica API library
 file(GLOB SAPI_SRCS
     "sapi/*.cpp"
 )
 add_definitions(-DSAPI_LIBRARY)
-add_library(sapi SHARED ${SAPI_SRCS})
+add_library(sapi SHARED ${SAPI_SRCS} ${DEFINITION_SRCS})
 target_link_libraries(sapi silicacore)
 set_target_properties(sapi PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -101,22 +116,7 @@ set(SILICA_SRCS
 )
 file(GLOB SILICA_RESOURCES "*.qrc")
 qt5_add_resources(SILICA_RESOURCES_RCC ${SILICA_RESOURCES})
-set(SILICA_SRCS ${SILICA_SRCS} ${SILICA_RESOURCES_RCC})
-
-# Generate compile time definitions
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
-include(GetGitRevisionDescription)
-git_describe(BUILD_GIT_SHA1 "--always")
-string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/Definitions.cpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-    @ONLY
-)
-
-list(APPEND SILICA_SRCS
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-)
+set(SILICA_SRCS ${SILICA_SRCS} ${SILICA_RESOURCES_RCC} ${DEFINITION_SRCS})
 
 if (WIN32)
     add_executable(silica WIN32 ${SILICA_SRCS})
