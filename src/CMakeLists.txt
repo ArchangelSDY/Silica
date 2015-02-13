@@ -47,6 +47,8 @@ file(GLOB CORE_SRCS
     "navigation/*.cpp"
     "playlist/*.cpp"
     "playlist/PlayListProvider.h"
+    "share/*.cpp"
+    "share/Sharer.h"
     "ui/*.cpp"
     "ui/hotspots/*.cpp"
     "ui/renderers/*.cpp"
