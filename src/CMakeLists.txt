@@ -83,7 +83,6 @@ target_link_libraries(silicacore ${CORE_LINK_LIBS})
 
 # Silica API library
 file(GLOB SAPI_SRCS
-    "playlist/PlayListProvider.h"
     "sapi/*.cpp"
 )
 add_definitions(-DSAPI_LIBRARY)
@@ -132,6 +131,7 @@ add_custom_command(TARGET silica POST_BUILD
 )
 
 set(SAPI_PUBLIC_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ImageResource.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
