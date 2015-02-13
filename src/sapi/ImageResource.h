@@ -9,9 +9,11 @@
 #include <QUrl>
 #include <QVariant>
 
+#include "sapi/sapi_global.h"
+
 namespace sapi {
 
-class ImageResource
+class SAPI_EXPORT ImageResource
 {
 public:
     virtual QString name() const = 0;

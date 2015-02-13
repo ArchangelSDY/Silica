@@ -4,7 +4,7 @@
 
 namespace sapi {
 
-SharerPluginDelegate::SharerPluginDelegate(ISharer *sharer) :
+SharerPluginDelegate::SharerPluginDelegate(ISharerPlugin *sharer) :
     m_sharer(sharer)
 {
     connect(m_sharer, SIGNAL(finished(bool)),

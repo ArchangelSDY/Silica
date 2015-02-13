@@ -4,14 +4,15 @@
 #include <QObject>
 
 #include "sapi/ImageResource.h"
+#include "sapi/sapi_global.h"
 
 namespace sapi {
 
-class ISharer : public QObject
+class SAPI_EXPORT ISharerPlugin : public QObject
 {
     Q_OBJECT
 public:
-    virtual ~ISharer();
+    virtual ~ISharerPlugin();
     virtual bool share(const sapi::ImageResource &image) = 0;
 
 signals:
@@ -19,5 +20,7 @@ signals:
 };
 
 }
+
+Q_DECLARE_INTERFACE(sapi::ISharerPlugin, "com.archangelsdy.silica.plugins.sharer")
 
 #endif // ISHARER_H
