@@ -1,5 +1,5 @@
-#ifndef ISHARER_H
-#define ISHARER_H
+#ifndef ISHARERPLUGIN_H
+#define ISHARERPLUGIN_H
 
 #include <QObject>
 
@@ -23,4 +23,4 @@ signals:
 
 Q_DECLARE_INTERFACE(sapi::ISharerPlugin, "com.archangelsdy.silica.plugins.sharer")
 
-#endif // ISHARER_H
+#endif // ISHARERPLUGIN_H
