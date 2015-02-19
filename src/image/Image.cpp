@@ -199,6 +199,15 @@ void MakeThumbnailTask::run()
 // ---------- Image ----------
 const QSize Image::UNKNOWN_SIZE = QSize(-1, -1);
 
+QThreadPool *Image::s_threadPool = 0;
+QThreadPool *Image::threadPool()
+{
+    if (!s_threadPool) {
+        s_threadPool = new QThreadPool();
+    }
+    return s_threadPool;
+}
+
 Image::Image(const QString &path, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
@@ -351,7 +360,7 @@ void Image::load(int priority)
             SIGNAL(loaded(QList<QSharedPointer<QImage> >, QList<int>)),
             this,
             SLOT(imageReaderFinished(QList<QSharedPointer<QImage> >, QList<int>)));
-    QThreadPool::globalInstance()->start(
+    Image::threadPool()->start(
         new LiveImageRunnable(m_uuid, loadImageTask),
         priority);
 }
@@ -435,7 +444,7 @@ void Image::loadThumbnail(bool makeImmediately)
     connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
             this, SLOT(thumbnailReaderFinished(QSharedPointer<QImage>, bool)));
     // Thumbnail loading should be low priority
-    QThreadPool::globalInstance()->start(
+    Image::threadPool()->start(
         new LiveImageRunnable(m_uuid, loadThumbnailTask),
         LowPriority);
 }
@@ -461,7 +470,7 @@ void Image::makeThumbnail()
         new MakeThumbnailTask(new QImage(*defaultFrame()), thumbnailFullPath);
     connect(makeThumbnailTask, SIGNAL(thumbnailMade(QSharedPointer<QImage>)),
             this, SLOT(thumbnailMade(QSharedPointer<QImage>)));
-    QThreadPool::globalInstance()->start(
+    Image::threadPool()->start(
         new LiveImageRunnable(m_uuid, makeThumbnailTask));
 }
 

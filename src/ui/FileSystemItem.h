@@ -4,6 +4,7 @@
 #include "ui/GalleryItem.h"
 
 class QFileInfo;
+class QThreadPool;
 class Image;
 class ImageSource;
 
@@ -36,6 +37,9 @@ private slots:
     void coverThumbnailLoadFailed();
 
 private:
+    static QThreadPool *threadPool();
+    static QThreadPool *s_threadPool;
+
     QString coverCacheKey() const;
 
     QFileInfo m_pathInfo;

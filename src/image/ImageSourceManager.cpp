@@ -8,6 +8,7 @@
 #include "image/sources/RARImageSourceFactory.h"
 #include "image/sources/SevenzImageSourceFactory.h"
 #include "image/sources/ZipImageSourceFactory.h"
+#include "image/Image.h"
 
 ImageSourceManager *ImageSourceManager::m_instance = 0;
 
@@ -135,7 +136,7 @@ void ImageSourceManager::clearCache()
         it.value()->clearCache();
     }
 
-    QThreadPool::globalInstance()->clear();
+    Image::threadPool()->clear();
 }
 
 void ImageSourceManager::registerFactory(ImageSourceFactory *factory)

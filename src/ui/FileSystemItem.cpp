@@ -69,6 +69,15 @@ private:
     QFileInfo m_pathInfo;
 };
 
+QThreadPool *FileSystemItem::s_threadPool = 0;
+QThreadPool *FileSystemItem::threadPool()
+{
+    if (!s_threadPool) {
+        s_threadPool = new QThreadPool();
+    }
+    return s_threadPool;
+}
+
 FileSystemItem::FileSystemItem(const QString &path,
                                AbstractRendererFactory *rendererFactory,
                                QGraphicsItem *parent) :
@@ -128,7 +137,7 @@ void FileSystemItem::load()
                 this, SLOT(loadCover(QString)));
         connect(r, SIGNAL(done()),
                 this, SLOT(loaded()));
-        QThreadPool::globalInstance()->start(r);
+        threadPool()->start(r);
     }
 }
 
