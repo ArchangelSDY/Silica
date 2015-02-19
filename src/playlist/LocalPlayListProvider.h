@@ -10,6 +10,7 @@ public:
     ~LocalPlayListProvider();
 
     QString typeName() const;
+    bool canContinueProvide() const;
 
     void request(const QString &name, const QVariantHash &extra);
 

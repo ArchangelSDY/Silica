@@ -18,6 +18,7 @@ public:
     virtual ~PlayListProvider() {}
 
     virtual QString typeName() const = 0;
+    virtual bool canContinueProvide() const = 0;
 
     virtual void request(const QString &name,
                          const QVariantHash &extra = QVariantHash()) = 0;

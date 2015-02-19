@@ -42,11 +42,10 @@ PlayListProviderManager::PlayListProviderManager()
                     QJsonObject meta = loader.metaData();
                     QJsonObject customMeta = meta["MetaData"].toObject();
                     QString name = customMeta["name"].toString();
-                    QString displayName = customMeta["displayName"].toString();
 
                     PlayListProviderFactory *factory =
                         new sapi::PlayListProviderFactoryDelegate(plugin,
-                                                                  displayName);
+                                                                  customMeta);
                     registerPluginProvider(name, factory);
                 }
             } else {

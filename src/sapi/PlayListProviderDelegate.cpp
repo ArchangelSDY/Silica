@@ -6,10 +6,11 @@ namespace sapi {
 
 PlayListProviderDelegate::PlayListProviderDelegate(
         IPlayListProviderPlugin *plugin, IPlayListProvider *provider,
-        const QString &name) :
+        const QString &name, bool canContinueProvide) :
     m_plugin(plugin) ,
     m_provider(provider) ,
-    m_name(name)
+    m_name(name) ,
+    m_canContinueProvide(canContinueProvide)
 {
     connect(m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
             this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
@@ -25,6 +26,11 @@ PlayListProviderDelegate::~PlayListProviderDelegate()
 QString PlayListProviderDelegate::typeName() const
 {
     return m_name;
+}
+
+bool PlayListProviderDelegate::canContinueProvide() const
+{
+    return m_canContinueProvide;
 }
 
 void PlayListProviderDelegate::request(const QString &name,

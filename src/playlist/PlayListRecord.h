@@ -34,10 +34,13 @@ public:
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
     PlayList *playList();
+    QVariantHash providerExtra() const;
     bool save();
     bool remove();
     bool removeImage(ImagePtr image);
     bool insertImages(const ImageList &images);
+
+    void continueProvide();
 
     static QList<PlayListRecord *> all();
     static const int UNKNOWN_TYPE = -1;

@@ -1,10 +1,11 @@
-#include "AbstractNavigationPlayer.h"
-#include "ImageSourceManager.h"
 #include "Navigator.h"
-#include "NormalNavigationPlayer.h"
 
-#include "LoopImagesCacheStrategy.h"
-#include "NormalImagesCacheStrategy.h"
+#include "image/caches/LoopImagesCacheStrategy.h"
+#include "image/caches/NormalImagesCacheStrategy.h"
+#include "image/ImageSourceManager.h"
+#include "navigation/AbstractNavigationPlayer.h"
+#include "navigation/NormalNavigationPlayer.h"
+#include "playlist/PlayListRecord.h"
 
 static const int MAX_PRELOAD = 5;
 
@@ -183,6 +184,7 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     }
 
     preload();
+    checkContinueProvide();
 
     return true;
 }
@@ -393,5 +395,13 @@ void Navigator::setCacheStragegy()
     } else {
         m_cachedImages.setStrategy(
             new NormalImagesCacheStrategy(&m_cachedImages));
+    }
+}
+
+void Navigator::checkContinueProvide()
+{
+    if (m_playList->count() - m_currentIndex <= MAX_PRELOAD
+            && m_playList->record()) {
+        m_playList->record()->continueProvide();
     }
 }

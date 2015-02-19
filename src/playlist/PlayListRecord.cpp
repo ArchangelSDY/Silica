@@ -62,12 +62,17 @@ PlayList *PlayListRecord::playList()
             this, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)),
             static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
 
-        QVariantHash extra;
-        extra.insert("id", m_id);
-        m_provider->request(m_name, extra);
+        m_provider->request(m_name, providerExtra());
     }
 
     return m_playList;
+}
+
+QVariantHash PlayListRecord::providerExtra() const
+{
+    QVariantHash extra;
+    extra.insert("id", m_id);
+    return extra;
 }
 
 bool PlayListRecord::save()
@@ -135,6 +140,15 @@ bool PlayListRecord::insertImages(const ImageList &images)
     flushPlayList();
 
     return ret;
+}
+
+void PlayListRecord::continueProvide()
+{
+    if (m_provider && m_provider->canContinueProvide()) {
+        QVariantHash extra = providerExtra();
+        extra.insert("continue", true);
+        m_provider->request(m_name, extra);
+    }
 }
 
 void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,

@@ -102,6 +102,7 @@ private:
     void reset();
 
     void setCacheStragegy();
+    void checkContinueProvide();
 
     int m_currentIndex;
     QUuid m_currentUuid;
