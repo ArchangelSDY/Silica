@@ -79,6 +79,15 @@ void LoadImageTask::run()
 
         forever {
             QImage image = reader.read();
+
+            // If fail to read first frame, try to decide format from content
+            if (image.isNull() && images.isEmpty()) {
+                m_imageSource->device()->reset();
+                reader.setDevice(m_imageSource->device());
+                reader.setDecideFormatFromContent(true);
+                image = reader.read();
+            }
+
             if (!image.isNull()) {
                 images << QSharedPointer<QImage>::create(image);
                 durations << reader.nextImageDelay();
