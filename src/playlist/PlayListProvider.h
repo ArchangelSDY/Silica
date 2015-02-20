@@ -35,6 +35,7 @@ public:
 signals:
     void gotItems(const QList<QUrl> &urls,
                   const QList<QVariantHash> &extraInfos);
+    void itemsCountChanged(int count);
 };
 
 #endif // PLAYLISTPROVIDER_H

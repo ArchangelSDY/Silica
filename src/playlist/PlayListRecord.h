@@ -51,6 +51,7 @@ signals:
 private slots:
     void gotItems(const QList<QUrl> &imageUrls,
                   const QList<QVariantHash> &extraInfos);
+    void providerItemsCountChanged(int count);
 
 private:
     static const int EMPTY_ID = -1;
@@ -83,8 +84,9 @@ public:
     PlayListRecordBuilder &setCoverPath(const QString &coverPath);
     PlayListRecordBuilder &setCount(int count);
     PlayListRecordBuilder &setType(int type);
-    // PlayListRecordBuilder &setProvider(PlayListProvider *provider);
     PlayListRecordBuilder &setPlayList(PlayList *playlist);
+
+    // PlayListRecordBuilder &setProvider(PlayListProvider *provider);
 
     PlayListRecord *obtain();
 

@@ -59,6 +59,11 @@
             "version": 11,
             "applySql": "create table plugin_playlist_providers (name text unique)",
             "revertSql": "drop table plugin_playlist_providers"
+        },
+        {
+            "version": 12,
+            "applySql": "alter table playlists add column count integer not null default 0",
+            "revertSql": ""
         }
     ]
 }

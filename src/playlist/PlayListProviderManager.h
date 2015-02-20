@@ -15,13 +15,14 @@ public:
     PlayListProvider *create(int type);
     QList<int> registeredTypes() const;
 
+    void registerProvider(int typeId, PlayListProviderFactory *factory);
+
     static PlayListProviderManager *instance();
 
 private:
     PlayListProviderManager();
     void registerPluginProvider(const QString &name,
                                 PlayListProviderFactory *factory);
-    void registerProvider(int typeId, PlayListProviderFactory *factory);
 
     static PlayListProviderManager *s_instance;
     QHash<int, PlayListProviderFactory *> m_providers;

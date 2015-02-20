@@ -14,12 +14,16 @@ PlayListProviderDelegate::PlayListProviderDelegate(
 {
     connect(m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
             this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
+    connect(m_provider, SIGNAL(itemsCountChanged(int)),
+            this, SIGNAL(itemsCountChanged(int)));
 }
 
 PlayListProviderDelegate::~PlayListProviderDelegate()
 {
     disconnect(m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
                this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
+    disconnect(m_provider, SIGNAL(itemsCountChanged(int)),
+               this, SIGNAL(itemsCountChanged(int)));
     m_plugin->destroy(m_provider);
 }
 

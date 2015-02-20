@@ -61,6 +61,10 @@ PlayList *PlayListRecord::playList()
             m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
             this, SLOT(gotItems(QList<QUrl>,QList<QVariantHash>)),
             static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
+        QObject::connect(
+            m_provider, SIGNAL(itemsCountChanged(int)),
+            this, SLOT(providerItemsCountChanged(int)),
+            static_cast<Qt::ConnectionType>(Qt::AutoConnection | Qt::UniqueConnection));
 
         m_provider->request(m_name, providerExtra());
     }
@@ -164,6 +168,12 @@ void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
     m_playList->append(&pl);
 }
 
+void PlayListRecord::providerItemsCountChanged(int count)
+{
+    m_count = count;
+    save();
+}
+
 QList<PlayListRecord *> PlayListRecord::all()
 {
     return LocalDatabase::instance()->queryPlayListRecords();
@@ -214,11 +224,13 @@ PlayListRecordBuilder &PlayListRecordBuilder::setType(int type)
     return *this;
 }
 
-//PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *provider)
-//{
-//    m_record->m_provider = provider;
-//    return *this;
-//}
+/*
+PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *provider)
+{
+    m_record->m_provider = provider;
+    return *this;
+}
+*/
 
 PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(PlayList *playlist)
 {

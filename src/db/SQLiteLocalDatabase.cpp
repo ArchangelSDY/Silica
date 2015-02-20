@@ -18,16 +18,22 @@ const char *SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH = "delete from playlist_images "
         "(select id from images where hash = ?)";
 
 const char *SQL_QUERY_PLAYLISTS =
-    "select playlists.id, playlists.name, playlists.cover_path, playlists.type, "
-    "count(playlist_images.id) from playlists left outer join playlist_images "
-    "on playlist_images.playlist_id = playlists.id "
+    "select "
+        "playlists.id, playlists.name, playlists.cover_path, playlists.type, "
+        "count(playlist_images.id), playlists.count "
+    "from playlists "
+    "left outer join playlist_images on "
+        "playlist_images.playlist_id = playlists.id "
     "group by playlists.id order by playlists.name";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
 const char *SQL_REMOVE_PLAYLIST_BY_ID = "delete from playlists where id = ?";
 
-const char *SQL_UPDATE_PLAYLIST_BY_ID = "update playlists set name = ?, cover_path = ? where id = ?";
+const char *SQL_UPDATE_PLAYLIST_BY_ID =
+    "update playlists "
+    "set name = ?, cover_path = ?, count = ? "
+    "where id = ?";
 
 const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.name from images "
         "left join playlist_images on images.id = playlist_images.image_id "
@@ -93,7 +99,9 @@ QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
         QString name = q.value(1).toString();
         QString coverPath = q.value(2).toString();
         int type = q.value(3).toInt();
-        int count = q.value(4).toInt();
+        int dbImagesCount = q.value(4).toInt();
+        int recordImagesCount = q.value(5).toInt();
+        int count = dbImagesCount > 0 ? dbImagesCount : recordImagesCount;
 
         PlayListRecordBuilder recordBuilder;
         recordBuilder
@@ -174,6 +182,7 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
     q.prepare(SQL_UPDATE_PLAYLIST_BY_ID);
     q.addBindValue(playListRecord->name());
     q.addBindValue(playListRecord->coverPath());
+    q.addBindValue(playListRecord->count());
     q.addBindValue(playListRecord->id());
     return q.exec();
 }

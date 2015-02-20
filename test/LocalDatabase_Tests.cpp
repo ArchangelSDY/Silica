@@ -288,4 +288,4 @@ void TestLocalDatabase::pluginPlayListProvider()
 }
 
 QTEST_MAIN(TestLocalDatabase)
- #include "LocalDatabase_Tests.moc"
+#include "LocalDatabase_Tests.moc"
