@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(SET CMP0042 NEW)   # Set MACOSX_RPATH default to ON
 cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
 
-project (silica VERSION 0.1.0)
+project (silica VERSION 0.2.0)
 
 find_package(Threads)
 find_package(ZLIB REQUIRED)
