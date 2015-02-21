@@ -18,6 +18,7 @@
 
 #include "image/ImageSourceManager.h"
 #include "playlist/LocalPlayListProviderFactory.h"
+#include "sapi/LoadingIndicatorDelegate.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageSourceManagerClientImpl.h"
@@ -204,6 +205,7 @@ void MainWindow::setupExtraUi()
 
     // Loading indicator
     LoadingIndicator *loadInd = new LoadingIndicator(QSize(25, 25), m_toolBar);
+    sapi::initPluginLoadingIndicator(loadInd);
     QWidget *loadIndWrapper = new QWidget(m_toolBar);
     loadIndWrapper->setMinimumSize(loadInd->minimumSize());
     loadIndWrapper->setLayout(new QGridLayout(loadIndWrapper));
