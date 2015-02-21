@@ -103,6 +103,9 @@ file(GLOB SAPI_SRCS
     "sapi/*.cpp"
 )
 add_definitions(-DSAPI_LIBRARY)
+add_library(sapicore STATIC ${SAPI_SRCS})
+target_link_libraries(sapicore silicacore)
+
 add_library(sapi SHARED ${SAPI_SRCS} ${DEFINITION_SRCS})
 target_link_libraries(sapi silicacore)
 set_target_properties(sapi PROPERTIES
