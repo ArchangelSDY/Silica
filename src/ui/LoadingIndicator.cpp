@@ -4,13 +4,20 @@
 #include <QPainterPath>
 #include <QPropertyAnimation>
 
+#ifdef ENABLE_OPENGL
+#include <QSurfaceFormat>
+#endif
+
 #include "LoadingIndicator.h"
 
 LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
+#ifdef ENABLE_OPENGL
+    QOpenGLWidget(parent) ,
+#else
     QWidget(parent) ,
+#endif
     m_parent(parent) ,
     m_size(size) ,
-    m_aniSpin(new QPropertyAnimation(this, "angle", this)) ,
     m_loadCount(0)
 {
     hide();
@@ -18,20 +25,22 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-    connect(this, SIGNAL(angleChanged(qreal)),
-            this, SLOT(update()));
+#ifdef ENABLE_OPENGL
+    QSurfaceFormat format;
+    format.setSamples(8);
+    setFormat(format);
+#endif
 
-    m_aniSpin->setDuration(500);
-    m_aniSpin->setStartValue(360);
-    m_aniSpin->setEndValue(0);
-    m_aniSpin->setLoopCount(-1);
+    m_timer.setInterval(50);
+    m_timer.setTimerType(Qt::PreciseTimer);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
 void LoadingIndicator::start()
 {
     ++m_loadCount;
-    if (m_loadCount > 0 && m_aniSpin->state() != QAbstractAnimation::Running) {
-        m_aniSpin->start();
+    if (m_loadCount > 0 && !m_timer.isActive()) {
+        m_timer.start();
         show();
     }
 
@@ -51,8 +60,8 @@ void LoadingIndicator::stop()
         --m_loadCount;
     }
 
-    if (m_loadCount == 0 && m_aniSpin->state() == QAbstractAnimation::Running) {
-        m_aniSpin->stop();
+    if (m_loadCount == 0 && m_timer.isActive()) {
+        m_timer.stop();
         hide();
     }
 
@@ -67,29 +76,23 @@ void LoadingIndicator::stop()
 //    connect(aniScale, SIGNAL(finished()), this, SLOT(hide()));
 }
 
-qreal LoadingIndicator::angle() const
-{
-    return m_angle;
-}
-
-void LoadingIndicator::setAngle(qreal angle)
-{
-    m_angle = angle;
-    emit angleChanged(angle);
-}
-
 void LoadingIndicator::paintEvent(QPaintEvent *)
 {
-    QPainter painter(this);
+    m_angle = (m_angle - 36) % 360;
 
+    QPainter painter(this);
     painter.setRenderHints(
         QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
+
+#ifdef ENABLE_OPENGL
+    painter.fillRect(rect(), QColor("#3C414C"));
+#endif
 
     qreal circleWidth = width();
     qreal circleHeight = height();
     qreal circleBorder = 2;
 
-    QConicalGradient circleGradient(circleWidth / 2, circleHeight / 2, angle());
+    QConicalGradient circleGradient(circleWidth / 2, circleHeight / 2, m_angle);
     circleGradient.setColorAt(0, QColor("#07A9CB"));
     circleGradient.setColorAt(0.5, QColor("#23B3AD"));
     circleGradient.setColorAt(0.75, QColor("#40C07E"));
