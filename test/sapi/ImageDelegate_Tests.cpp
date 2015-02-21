@@ -22,9 +22,10 @@ void TestImageDelegate::fields()
     image.extraInfo().insert("SPECIAL", 1);
     sapi::ImageDelegate delegate(&image);
 
-    QSignalSpy spy(&image, SIGNAL(loaded()));
+    QSignalSpy loadSpy(&image, SIGNAL(loaded()));
+    QSignalSpy makeThumbnailSpy(&image, SIGNAL(thumbnailLoaded()));
     image.load();
-    QVERIFY(spy.wait());
+    QVERIFY(loadSpy.wait());
 
     QCOMPARE(delegate.name(), image.name());
     QCOMPARE(delegate.size(), image.size());
@@ -35,6 +36,10 @@ void TestImageDelegate::fields()
     QCOMPARE(delegate.durations(), image.durations());
     for (int i = 0; i < delegate.frameCount(); ++i) {
         QCOMPARE(*(delegate.frames()[i]), *(image.frames()[i]));
+    }
+
+    if (makeThumbnailSpy.count() == 0) {
+        QVERIFY(makeThumbnailSpy.wait());
     }
     QCOMPARE(delegate.thumbnail(), image.thumbnail());
     QVERIFY(!delegate.readRaw().isNull());
