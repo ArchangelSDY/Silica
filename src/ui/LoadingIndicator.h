@@ -29,6 +29,7 @@ private:
     QWidget *m_parent;
     QSize m_size;
     qreal m_angle;
+    int m_loadCount;
 
     QPropertyAnimation *m_aniSpin;
 };

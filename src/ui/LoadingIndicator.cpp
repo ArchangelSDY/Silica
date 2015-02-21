@@ -10,7 +10,8 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     QWidget(parent) ,
     m_parent(parent) ,
     m_size(size) ,
-    m_aniSpin(new QPropertyAnimation(this, "angle", this))
+    m_aniSpin(new QPropertyAnimation(this, "angle", this)) ,
+    m_loadCount(0)
 {
     hide();
     setMinimumSize(size);
@@ -28,40 +29,42 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
 
 void LoadingIndicator::start()
 {
-    if (m_aniSpin->state() == QAbstractAnimation::Running) {
-        return;
+    ++m_loadCount;
+    if (m_loadCount > 0 && m_aniSpin->state() != QAbstractAnimation::Running) {
+        m_aniSpin->start();
+        show();
     }
 
-    QPropertyAnimation *aniScale =
-        new QPropertyAnimation(this, "minimumSize", this);
-    aniScale->setDuration(200);
-    aniScale->setStartValue(QSize(0, 0));
-    aniScale->setEndValue(m_size);
-    aniScale->setLoopCount(1);
-    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::OutCubic));
-    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
-
-    m_aniSpin->start();
-    show();
+//    QPropertyAnimation *aniScale =
+//        new QPropertyAnimation(this, "minimumSize", this);
+//    aniScale->setDuration(200);
+//    aniScale->setStartValue(QSize(0, 0));
+//    aniScale->setEndValue(m_size);
+//    aniScale->setLoopCount(1);
+//    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::OutCubic));
+//    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void LoadingIndicator::stop()
 {
-    if (m_aniSpin->state() != QAbstractAnimation::Running) {
-        return;
+    if (m_loadCount > 0) {
+        --m_loadCount;
     }
 
-    QPropertyAnimation *aniScale =
-        new QPropertyAnimation(this, "minimumSize", this);
-    aniScale->setDuration(200);
-    aniScale->setStartValue(minimumSize());
-    aniScale->setEndValue(QSize(0, 0));
-    aniScale->setLoopCount(1);
-    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::InCubic));
-    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
-    connect(aniScale, SIGNAL(finished()), this, SLOT(hide()));
+    if (m_loadCount == 0 && m_aniSpin->state() == QAbstractAnimation::Running) {
+        m_aniSpin->stop();
+        hide();
+    }
 
-    m_aniSpin->stop();
+//    QPropertyAnimation *aniScale =
+//        new QPropertyAnimation(this, "minimumSize", this);
+//    aniScale->setDuration(200);
+//    aniScale->setStartValue(minimumSize());
+//    aniScale->setEndValue(QSize(0, 0));
+//    aniScale->setLoopCount(1);
+//    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::InCubic));
+//    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
+//    connect(aniScale, SIGNAL(finished()), this, SLOT(hide()));
 }
 
 qreal LoadingIndicator::angle() const
