@@ -262,16 +262,22 @@ void GalleryView::disableGrouping()
 
 void GalleryView::itemReadyToShow()
 {
+    Q_ASSERT_X(m_loadingItemsCount > 0, "GalleryView::itemReadyToShow",
+               "No loading item");
+    bool shouldEmit = (m_loadingItemsCount == 1);
     m_loadingItemsCount--;
-    if (m_loadingItemsCount <= 0) {
+    if (shouldEmit) {
         emit loadEnd();
     }
 }
 
 void GalleryView::incrItemsToLoad(int count)
 {
+    Q_ASSERT_X(m_loadingItemsCount >= 0, "GalleryView::itemReadyToShow",
+               "Negative loading items count");
+    bool shouldEmit = (m_loadingItemsCount == 0 && count > 0);
     m_loadingItemsCount += count;
-    if (m_loadingItemsCount > 0) {
+    if (shouldEmit) {
         emit loadStart();
     }
 }
