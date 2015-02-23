@@ -4,18 +4,29 @@
 
 namespace sapi {
 
-LoadingIndicatorDelegate::LoadingIndicatorDelegate(::LoadingIndicator *indicator) :
-    m_indicator(indicator)
+LoadingIndicatorDelegate::LoadingIndicatorDelegate() :
+    m_indicator(0)
 {
+}
+
+void LoadingIndicatorDelegate::setIndicator(::LoadingIndicator *indicator)
+{
+    m_indicator = indicator;
 }
 
 void LoadingIndicatorDelegate::start()
 {
+    if (!m_indicator) {
+        return;
+    }
     m_indicator->start();
 }
 
 void LoadingIndicatorDelegate::stop()
 {
+    if (!m_indicator) {
+        return;
+    }
     m_indicator->stop();
 }
 
@@ -26,15 +37,12 @@ void LoadingIndicatorDelegate::reportProgress(int min, int max, int cur)
     Q_UNUSED(cur);
 }
 
-static sapi::LoadingIndicator *g_pluginLoadingIndicator = 0;
+static sapi::LoadingIndicatorDelegate *g_pluginLoadingIndicator =
+    new sapi::LoadingIndicatorDelegate();
 
 void initPluginLoadingIndicator(::LoadingIndicator *indicator)
 {
-    if (!g_pluginLoadingIndicator) {
-        g_pluginLoadingIndicator = new LoadingIndicatorDelegate(indicator);
-    } else {
-        qWarning("Plugin loading indicator has already been initialized!");
-    }
+    g_pluginLoadingIndicator->setIndicator(indicator);
 }
 
 sapi::LoadingIndicator *loadingIndicator()

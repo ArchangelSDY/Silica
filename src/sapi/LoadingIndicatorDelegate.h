@@ -10,7 +10,9 @@ namespace sapi {
 class LoadingIndicatorDelegate : public sapi::LoadingIndicator
 {
 public:
-    LoadingIndicatorDelegate(::LoadingIndicator *indicator);
+    LoadingIndicatorDelegate();
+
+    void setIndicator(::LoadingIndicator *indicator);
 
     // LoadingIndicator interface
     void start() override;
