@@ -11,24 +11,20 @@ PluginLoggingDelegate *PluginLoggingDelegate::instance()
     return s_instance;
 }
 
-PluginLoggingDelegate::PluginLoggingDelegate()
+PluginLoggingDelegate::PluginLoggingDelegate() :
+    m_device(0)
 {
-    m_buf.open(QIODevice::ReadWrite);
 }
 
 QDebug PluginLoggingDelegate::debug()
 {
-    return QDebug(&m_buf);
+    QDebug dbg = m_device ? QDebug(m_device) : QDebug(QtDebugMsg);
+    return dbg;
 }
 
-const QBuffer &PluginLoggingDelegate::content() const
+void PluginLoggingDelegate::setDevice(QIODevice *device)
 {
-    return m_buf;
-}
-
-void PluginLoggingDelegate::clear()
-{
-    m_buf.buffer().clear();
+    m_device = device;
 }
 
 }

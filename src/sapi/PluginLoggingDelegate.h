@@ -1,8 +1,9 @@
 #ifndef SAPI_PLUGINLOGGINGDELEGATE_H
 #define SAPI_PLUGINLOGGINGDELEGATE_H
 
-#include <QBuffer>
 #include <QDebug>
+
+class QIODevice;
 
 namespace sapi {
 
@@ -12,14 +13,13 @@ public:
     static PluginLoggingDelegate *instance();
 
     QDebug debug();
-    const QBuffer &content() const;
-    void clear();
+    void setDevice(QIODevice* device);
 
 private:
     static PluginLoggingDelegate *s_instance;
 
     PluginLoggingDelegate();
-    QBuffer m_buf;
+    QIODevice *m_device;
 };
 
 }

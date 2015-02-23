@@ -15,9 +15,11 @@ private slots:
 void TestLogging::debug()
 {
     QString text = "Hello!";
+    QBuffer buf;
+    QVERIFY(buf.open(QIODevice::ReadWrite));
+    sapi::PluginLoggingDelegate::instance()->setDevice(&buf);
     sapi::debug() << text;
-    QCOMPARE(QString(sapi::PluginLoggingDelegate::instance()->content().data()),
-             QString("\"%1\" ").arg(text));
+    QCOMPARE(QString(buf.data()), QString("\"%1\" ").arg(text));
 }
 
 QTEST_MAIN(TestLogging)

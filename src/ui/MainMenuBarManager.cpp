@@ -1,11 +1,13 @@
+#include "MainMenuBarManager.h"
+
 #include <QDialog>
 
-#include "ExpandingNavigationPlayer.h"
-#include "FixedRegionNavigationPlayer.h"
-#include "HotspotsNavigationPlayer.h"
-#include "MainMenuBarManager.h"
+#include "navigation/ExpandingNavigationPlayer.h"
+#include "navigation/FixedRegionNavigationPlayer.h"
+#include "navigation/HotspotsNavigationPlayer.h"
+#include "navigation/NormalNavigationPlayer.h"
+#include "ui/PluginLogsDialog.h"
 #include "Navigator.h"
-#include "NormalNavigationPlayer.h"
 
 MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     QObject(parent) ,
@@ -13,9 +15,16 @@ MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     m_navigator(context.navigator) ,
     m_imageView(context.imageView) ,
     m_menuPlayers(0) ,
-    m_actPlayerConf(0)
+    m_actPlayerConf(0) ,
+    m_menuTools(0) ,
+    m_pluginLogsDialog(new PluginLogsDialog())
 {
     init();
+}
+
+MainMenuBarManager::~MainMenuBarManager()
+{
+    delete m_pluginLogsDialog;
 }
 
 void MainMenuBarManager::init()
@@ -60,6 +69,12 @@ void MainMenuBarManager::init()
 
     connect(m_menuPlayers, SIGNAL(aboutToShow()),
             this, SLOT(checkPlayerConfigurable()));
+
+
+    m_menuTools = m_menuBar->addMenu(tr("Tools"));
+
+    m_menuTools->addAction(tr("Plugin Logs"), this,
+                           SLOT(showPluginLogsDialog()));
 }
 
 void MainMenuBarManager::setNormalPlayer()
@@ -93,4 +108,9 @@ void MainMenuBarManager::openPlayerConfDialog()
 {
     QDialog *confDialog = m_navigator->player()->configureDialog();
     confDialog->exec();
+}
+
+void MainMenuBarManager::showPluginLogsDialog()
+{
+    m_pluginLogsDialog->show();
 }

@@ -4,6 +4,7 @@
 #include <QMenuBar>
 #include <QObject>
 
+class QDialog;
 class Navigator;
 
 class MainMenuBarManager : public QObject
@@ -17,6 +18,7 @@ public:
     };
 
     explicit MainMenuBarManager(Context context, QObject *parent = 0);
+    ~MainMenuBarManager();
 
 private slots:
     void setNormalPlayer();
@@ -25,6 +27,7 @@ private slots:
     void setFixedRegionPlayer();
     void checkPlayerConfigurable();
     void openPlayerConfDialog();
+    void showPluginLogsDialog();
 
 private:
     void init();
@@ -36,6 +39,9 @@ private:
 
     QMenu *m_menuPlayers;
     QAction *m_actPlayerConf;
+
+    QMenu *m_menuTools;
+    QDialog *m_pluginLogsDialog;
 };
 
 #endif // MAINMENUBARMANAGER_H
