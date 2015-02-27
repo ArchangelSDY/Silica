@@ -86,6 +86,9 @@ void GalleryView::clear()
         m_scene->removeItem(item);
         item->deleteLater();
     }
+    if (m_loadingItemsCount > 0) {
+        emit loadEnd();
+    }
     m_loadingItemsCount = 0;
 }
 
