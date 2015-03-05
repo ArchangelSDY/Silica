@@ -104,7 +104,7 @@ void FileSystemView::setRootPath(const QString &path)
     if (!m_rootPath.isEmpty()) {
         m_pathWatcher.removePath(m_rootPath);
     }
-    m_pathWatcher.addPath(m_rootPath);
+    // Path watcher will be added after dir listing finished.
 
     refreshView();
 
@@ -167,6 +167,10 @@ void FileSystemView::refreshView()
             this, SLOT(dirIterGotItem(QString, QString)),
             static_cast<Qt::ConnectionType>(
                 Qt::AutoConnection | Qt::UniqueConnection));
+    connect(m_dirIterThread, SIGNAL(finished()),
+            this, SLOT(dirIterFinished()),
+            static_cast<Qt::ConnectionType>(
+                Qt::AutoConnection | Qt::UniqueConnection));
 
     m_dirIterThread->start();
 }
@@ -181,6 +185,13 @@ void FileSystemView::dirIterGotItem(const QString &rootPath,
         addItem(item);
 
         scheduleLayout();
+    }
+}
+
+void FileSystemView::dirIterFinished()
+{
+    if (m_pathWatcher.directories().count() == 0) {
+        m_pathWatcher.addPath(m_rootPath);
     }
 }
 
