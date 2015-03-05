@@ -11,6 +11,7 @@ class FileSystemView : public GalleryView
     Q_OBJECT
 public:
     explicit FileSystemView(QWidget *parent = 0);
+    ~FileSystemView();
 
     QString rootPath() const;
 
@@ -27,6 +28,7 @@ protected slots:
     void sortByModifiedTime();
 
     void refreshView();
+    void dirIterGotItem(const QString &rootPath, const QString &itemAbsPath);
     void removeSelectedOnDisk();
 
 protected:
@@ -37,6 +39,9 @@ private:
     QFileSystemWatcher m_pathWatcher;
     QStringList m_entries;
     QDir::SortFlags m_sortFlags;
+
+    class DirIterThread;
+    DirIterThread *m_dirIterThread;
 };
 
 #endif // FILESYSTEMVIEW_H
