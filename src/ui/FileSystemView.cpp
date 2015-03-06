@@ -123,6 +123,93 @@ void FileSystemView::cdUp()
     setRootPath(dir.absolutePath());
 }
 
+class ItemSortComparator
+{
+public:
+    ItemSortComparator(QDir::SortFlags sortFlags) :
+        m_sortFlags(sortFlags)
+    {
+    }
+
+    bool operator()(const QGraphicsItem *left, const QGraphicsItem *right) const
+    {
+        const FileSystemItem *leftItem =
+            static_cast<const FileSystemItem *>(left);
+        const FileSystemItem *rightItem =
+            static_cast<const FileSystemItem *>(right);
+        QFileInfo leftInfo = leftItem->fileInfo();
+        QFileInfo rightInfo = rightItem->fileInfo();
+
+        int ret = 0;
+        if (leftInfo.isDir() == rightInfo.isDir()) {
+            int sortBy = (m_sortFlags & QDir::SortByMask)
+                | (m_sortFlags & QDir::Type);
+            switch (sortBy) {
+            case QDir::Time: {
+                // Sort by time
+                QDateTime lt = leftInfo.lastModified();
+                QDateTime rt = rightInfo.lastModified();
+
+                lt.setTimeSpec(Qt::UTC);
+                rt.setTimeSpec(Qt::UTC);
+
+                ret = lt.secsTo(rt);
+                break;
+            }
+            default:
+                break;
+            }
+
+            if (ret == 0 && sortBy != QDir::Unsorted) {
+                // Still not sorted, sort by name
+                bool ignoreCase = (m_sortFlags & QDir::IgnoreCase);
+                QString leftName = ignoreCase ?
+                    leftItem->name().toLower() :
+                    leftItem->name();
+                QString rightName = ignoreCase ?
+                    rightItem->name().toLower() :
+                    rightItem->name();
+
+                if (m_sortFlags & QDir::LocaleAware) {
+                    ret = leftName.compare(rightName);
+                } else {
+                    ret = leftName.localeAwareCompare(rightName);
+                }
+            }
+        } else if (leftInfo.isDir()) {
+            // Dir, File
+            ret = true;
+        } else {
+            // File, Dir
+            ret = false;
+        }
+
+        bool isReversed = (m_sortFlags & QDir::Reversed);
+        return !isReversed ? ret < 0 : ret > 0;
+    }
+
+private:
+    QDir::SortFlags m_sortFlags;
+};
+
+void FileSystemView::sortByFlag()
+{
+    QGraphicsScene *s = scene();
+
+    QList<GalleryItem *> items = galleryItems();
+    foreach (QGraphicsItem *item, items) {
+        s->removeItem(item);
+    }
+
+    std::sort(items.begin(), items.end(), ItemSortComparator(m_sortFlags));
+
+    foreach (QGraphicsItem *item, items) {
+        s->addItem(item);
+    }
+
+    scheduleLayout();
+}
+
 void FileSystemView::sortByFlag(QDir::SortFlag flag)
 {
     // Cannot use QFlags::testFlag() here because Qt sets QDir::Name == 0x00
@@ -135,7 +222,7 @@ void FileSystemView::sortByFlag(QDir::SortFlag flag)
         m_sortFlags = flag | QDir::DirsFirst | QDir::Reversed;
     }
 
-    refreshView();
+    sortByFlag();
 }
 
 void FileSystemView::sortByName()
@@ -193,6 +280,8 @@ void FileSystemView::dirIterFinished()
     if (m_pathWatcher.directories().count() == 0) {
         m_pathWatcher.addPath(m_rootPath);
     }
+
+    sortByFlag();
 }
 
 void FileSystemView::removeSelectedOnDisk()

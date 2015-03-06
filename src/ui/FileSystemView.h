@@ -23,6 +23,7 @@ public slots:
     void cdUp();
 
 protected slots:
+    void sortByFlag();
     void sortByFlag(QDir::SortFlag flag);
     void sortByName();
     void sortByModifiedTime();
