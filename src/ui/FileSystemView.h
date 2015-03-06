@@ -41,6 +41,7 @@ private:
     QFileSystemWatcher m_pathWatcher;
     QStringList m_entries;
     QDir::SortFlags m_sortFlags;
+    QHash<QString, QPoint> m_historyScrollPositions;
 
     class DirIterThread;
     DirIterThread *m_dirIterThread;

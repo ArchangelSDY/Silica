@@ -2,6 +2,7 @@
 #include <QFileInfo>
 #include <QMenu>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QThread>
 
 #include "image/ImageSourceManager.h"
@@ -94,6 +95,12 @@ void FileSystemView::setRootPath(const QString &path)
     if (m_rootPath == path) {
         return;
     }
+
+    // Save scroll position
+    int hs = horizontalScrollBar()->value();
+    int vs = verticalScrollBar()->value();
+    m_historyScrollPositions.insert(m_rootPath, QPoint(hs, vs));
+
     m_rootPath = path;
 
     if (m_dirIterThread->isRunning()) {
@@ -107,9 +114,6 @@ void FileSystemView::setRootPath(const QString &path)
     // Path watcher will be added after dir listing finished.
 
     refreshView();
-
-    // Reset scroll position
-    centerOn(0, 0);
 
     leaveSearch();
 
@@ -277,11 +281,17 @@ void FileSystemView::dirIterGotItem(const QString &rootPath,
 
 void FileSystemView::dirIterFinished()
 {
+    // Add to path watcher
     if (m_pathWatcher.directories().count() == 0) {
         m_pathWatcher.addPath(m_rootPath);
     }
 
     sortByFlag();
+
+    // Restore scroll position
+    QPoint lastScrollPos = m_historyScrollPositions.value(m_rootPath);
+    horizontalScrollBar()->setValue(lastScrollPos.x());
+    verticalScrollBar()->setValue(lastScrollPos.y());
 }
 
 void FileSystemView::removeSelectedOnDisk()
