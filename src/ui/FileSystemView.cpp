@@ -5,6 +5,11 @@
 #include <QScrollBar>
 #include <QThread>
 
+#ifdef ENABLE_OPENGL
+#include <QGL>
+#include <QOpenGLWidget>
+#endif
+
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
 #include "ui/FileSystemView.h"
@@ -71,6 +76,10 @@ FileSystemView::FileSystemView(QWidget *parent) :
     m_sortFlags(QDir::Name | QDir::DirsFirst) ,
     m_dirIterThread(new DirIterThread())
 {
+#ifdef ENABLE_OPENGL
+    setViewport(new QOpenGLWidget(this));
+#endif
+
     setRendererFactory(new CompactRendererFactory());
     connect(&m_pathWatcher, SIGNAL(directoryChanged(QString)),
             this, SLOT(refreshView()));
