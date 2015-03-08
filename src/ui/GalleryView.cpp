@@ -1,22 +1,22 @@
+#include "ui/GalleryView.h"
+
 #include <QGraphicsItem>
+#include <QGraphicsProxyWidget>
 #include <QLineEdit>
 
-#include "AbstractGalleryViewRenderer.h"
-#include "CompactRendererFactory.h"
-#include "GalleryItem.h"
-#include "GalleryView.h"
+#include "ui/renderers/AbstractGalleryViewRenderer.h"
+#include "ui/renderers/CompactRendererFactory.h"
+#include "ui/renderers/LooseRendererFactory.h"
+#include "ui/renderers/WaterfallRendererFactory.h"
+#include "ui/GalleryItem.h"
 #include "GlobalConfig.h"
-
-#include "CompactRendererFactory.h"
-#include "LooseRendererFactory.h"
-#include "WaterfallRendererFactory.h"
 
 const int GalleryView::LAYOUT_INTERVAL = 10;
 
 GalleryView::GalleryView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene) ,
-    m_searchBox(new QLineEdit(this)) ,
+    m_searchBox(new QLineEdit()) ,
     m_enableGrouping(false) ,
     m_layoutNeeded(true) ,
     m_loadingItemsCount(0) ,
@@ -32,6 +32,8 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene->setPalette(palette);
     m_scene->setBackgroundBrush(palette.background());
 
+    QGraphicsProxyWidget *searchBoxProxy = m_scene->addWidget(m_searchBox);
+    searchBoxProxy->setZValue(100);
     m_searchBox->setStyleSheet(
         "border: none;"
         "padding: 0 0.5em;"
