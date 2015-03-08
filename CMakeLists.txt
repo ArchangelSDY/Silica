@@ -56,5 +56,9 @@ endif ()
 
 add_subdirectory(src)
 
-enable_testing()
-add_subdirectory(test)
+# Disable testing in production build in order to avoid occasional clearing
+# production database
+if(NOT BUILD_PRODUCTION)
+    enable_testing()
+    add_subdirectory(test)
+endif()
