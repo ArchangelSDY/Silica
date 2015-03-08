@@ -18,6 +18,83 @@
 #include "ui/FileSystemItem.h"
 #include "ui/renderers/CompactRendererFactory.h"
 
+class ItemSortComparator
+{
+public:
+    ItemSortComparator(QDir::SortFlags sortFlags) :
+        m_sortFlags(sortFlags)
+    {
+    }
+
+    bool operator()(const QFileInfo &left, const QFileInfo &right) const
+    {
+        int ret = 0;
+        if (left.isDir() == right.isDir()) {
+            int sortBy = (m_sortFlags & QDir::SortByMask)
+                | (m_sortFlags & QDir::Type);
+            switch (sortBy) {
+            case QDir::Time: {
+                // Sort by time
+                QDateTime lt = left.lastModified();
+                QDateTime rt = right.lastModified();
+
+                lt.setTimeSpec(Qt::UTC);
+                rt.setTimeSpec(Qt::UTC);
+
+                ret = lt.secsTo(rt);
+                break;
+            }
+            default:
+                break;
+            }
+
+            if (ret == 0 && sortBy != QDir::Unsorted) {
+                // Still not sorted, sort by name
+                bool ignoreCase = (m_sortFlags & QDir::IgnoreCase);
+                QString leftName = ignoreCase ?
+                    left.fileName().toLower() :
+                    left.fileName();
+                QString rightName = ignoreCase ?
+                    right.fileName().toLower() :
+                    right.fileName();
+
+                if (m_sortFlags & QDir::LocaleAware) {
+                    ret = leftName.compare(rightName);
+                } else {
+                    ret = leftName.localeAwareCompare(rightName);
+                }
+            }
+        } else if (left.isDir()) {
+            // Dir, File
+            // Always dirs first
+            ret = true;
+        } else {
+            // File, Dir
+            // Always dirs first
+            ret = false;
+        }
+
+        bool isReversed = (m_sortFlags & QDir::Reversed);
+        return !isReversed ? ret < 0 : ret > 0;
+    }
+
+    bool operator()(const QGraphicsItem *left, const QGraphicsItem *right) const
+    {
+        const FileSystemItem *leftItem =
+            static_cast<const FileSystemItem *>(left);
+        const FileSystemItem *rightItem =
+            static_cast<const FileSystemItem *>(right);
+        QFileInfo leftInfo = leftItem->fileInfo();
+        QFileInfo rightInfo = rightItem->fileInfo();
+
+        return operator ()(leftInfo, rightInfo);
+    }
+
+private:
+    QDir::SortFlags m_sortFlags;
+};
+
+
 class FileSystemView::DirIterThread : public QThread
 {
     Q_OBJECT
@@ -41,13 +118,37 @@ public:
         m_filters = filters;
     }
 
+    void setSortFlags(QDir::SortFlags sortFlags)
+    {
+        m_sortFlags = sortFlags;
+    }
+
     void run() override
     {
         QDirIterator iter(m_rootPath, m_nameFilters, m_filters);
+        QList<QFileInfo> itemInfos;
+        bool needSort = ((m_sortFlags & QDir::SortByMask) != QDir::Unsorted);
+
         while (iter.hasNext()) {
-            emit gotItem(m_rootPath, iter.next());
+            // Emit item at once if sorting is not needed, otherwise hold and
+            // sort after all items found
+            if (!needSort) {
+                emit gotItem(m_rootPath, iter.next());
+            } else {
+                iter.next();
+                itemInfos.append(iter.fileInfo());
+            }
+
             if (m_shouldQuit) {
                 break;
+            }
+        }
+
+        if (needSort) {
+            std::sort(itemInfos.begin(), itemInfos.end(),
+                      ItemSortComparator(m_sortFlags));
+            foreach (const QFileInfo &info, itemInfos) {
+                emit gotItem(m_rootPath, info.absoluteFilePath());
             }
         }
     }
@@ -71,12 +172,14 @@ private:
     QString m_rootPath;
     QStringList m_nameFilters;
     QDir::Filters m_filters;
+    QDir::SortFlags m_sortFlags;
     bool m_shouldQuit;
 };
 
+
 FileSystemView::FileSystemView(QWidget *parent) :
     GalleryView(parent) ,
-    m_sortFlags(QDir::Name | QDir::DirsFirst) ,
+    m_sortFlags(QDir::Unsorted) ,
     m_dirIterThread(new DirIterThread())
 {
 #ifdef ENABLE_OPENGL
@@ -139,75 +242,6 @@ void FileSystemView::cdUp()
     setRootPath(dir.absolutePath());
 }
 
-class ItemSortComparator
-{
-public:
-    ItemSortComparator(QDir::SortFlags sortFlags) :
-        m_sortFlags(sortFlags)
-    {
-    }
-
-    bool operator()(const QGraphicsItem *left, const QGraphicsItem *right) const
-    {
-        const FileSystemItem *leftItem =
-            static_cast<const FileSystemItem *>(left);
-        const FileSystemItem *rightItem =
-            static_cast<const FileSystemItem *>(right);
-        QFileInfo leftInfo = leftItem->fileInfo();
-        QFileInfo rightInfo = rightItem->fileInfo();
-
-        int ret = 0;
-        if (leftInfo.isDir() == rightInfo.isDir()) {
-            int sortBy = (m_sortFlags & QDir::SortByMask)
-                | (m_sortFlags & QDir::Type);
-            switch (sortBy) {
-            case QDir::Time: {
-                // Sort by time
-                QDateTime lt = leftInfo.lastModified();
-                QDateTime rt = rightInfo.lastModified();
-
-                lt.setTimeSpec(Qt::UTC);
-                rt.setTimeSpec(Qt::UTC);
-
-                ret = lt.secsTo(rt);
-                break;
-            }
-            default:
-                break;
-            }
-
-            if (ret == 0 && sortBy != QDir::Unsorted) {
-                // Still not sorted, sort by name
-                bool ignoreCase = (m_sortFlags & QDir::IgnoreCase);
-                QString leftName = ignoreCase ?
-                    leftItem->name().toLower() :
-                    leftItem->name();
-                QString rightName = ignoreCase ?
-                    rightItem->name().toLower() :
-                    rightItem->name();
-
-                if (m_sortFlags & QDir::LocaleAware) {
-                    ret = leftName.compare(rightName);
-                } else {
-                    ret = leftName.localeAwareCompare(rightName);
-                }
-            }
-        } else if (leftInfo.isDir()) {
-            // Dir, File
-            ret = true;
-        } else {
-            // File, Dir
-            ret = false;
-        }
-
-        bool isReversed = (m_sortFlags & QDir::Reversed);
-        return !isReversed ? ret < 0 : ret > 0;
-    }
-
-private:
-    QDir::SortFlags m_sortFlags;
-};
-
 void FileSystemView::sortByFlag()
 {
     QGraphicsScene *s = scene();
@@ -241,6 +275,11 @@ void FileSystemView::sortByFlag(QDir::SortFlag flag)
     sortByFlag();
 }
 
+void FileSystemView::sortByNothing()
+{
+    sortByFlag(QDir::NoSort);
+}
+
 void FileSystemView::sortByName()
 {
     sortByFlag(QDir::Name);
@@ -265,6 +304,7 @@ void FileSystemView::refreshView()
         ImageSourceManager::instance()->nameFilters());
     m_dirIterThread->setFilters(
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
+    m_dirIterThread->setSortFlags(m_sortFlags);
 
     connect(m_dirIterThread, SIGNAL(gotItem(QString, QString)),
             this, SLOT(dirIterGotItem(QString, QString)),
@@ -298,9 +338,6 @@ void FileSystemView::dirIterFinished()
         m_pathWatcher.addPath(m_rootPath);
     }
 
-    // FIXME: Sorting takes a lot of time
-    // sortByFlag();
-
     // Restore scroll position
     QPoint lastScrollPos = m_historyScrollPositions.value(m_rootPath);
     scrollToPositionWithAnimation(lastScrollPos);
@@ -328,20 +365,26 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
     QMenu *menu = new QMenu(this);
 
     QMenu *menuSort = menu->addMenu(tr("Sort By"));
+
+    int sortType = m_sortFlags & QDir::SortByMask;
     QActionGroup *grpSorts = new QActionGroup(menu);
+    QAction *actSortByNothing = menuSort->addAction(tr("No Sort"),
+        this, SLOT(sortByNothing()));
+    grpSorts->addAction(actSortByNothing);
+    actSortByNothing->setCheckable(true);
+    actSortByNothing->setChecked(sortType == QDir::Unsorted);
+
     QAction *actSortByName = menuSort->addAction(tr("Name"),
         this, SLOT(sortByName()));
     grpSorts->addAction(actSortByName);
     actSortByName->setCheckable(true);
+    actSortByName->setChecked(sortType == QDir::Name);
+
     QAction *actSortByModified = menuSort->addAction(tr("Last Modified"),
         this, SLOT(sortByModifiedTime()));
     grpSorts->addAction(actSortByModified);
     actSortByModified->setCheckable(true);
-    actSortByModified->setChecked((m_sortFlags & QDir::Time) == QDir::Time);
-    // Hack here because Qt sets QDir::Name == 0x00.....WTF
-    if (grpSorts->checkedAction() == 0) {
-        actSortByName->setChecked(true);
-    }
+    actSortByModified->setChecked(sortType == QDir::Time);
 
     menu->addSeparator();
 
