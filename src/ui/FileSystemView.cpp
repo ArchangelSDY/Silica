@@ -1,7 +1,11 @@
+#include "ui/FileSystemView.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QMenu>
 #include <QMessageBox>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QScrollBar>
 #include <QThread>
 
@@ -12,7 +16,6 @@
 
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
-#include "ui/FileSystemView.h"
 #include "ui/renderers/CompactRendererFactory.h"
 
 class FileSystemView::DirIterThread : public QThread
@@ -295,12 +298,12 @@ void FileSystemView::dirIterFinished()
         m_pathWatcher.addPath(m_rootPath);
     }
 
-    sortByFlag();
+    // FIXME: Sorting takes a lot of time
+    // sortByFlag();
 
     // Restore scroll position
     QPoint lastScrollPos = m_historyScrollPositions.value(m_rootPath);
-    horizontalScrollBar()->setValue(lastScrollPos.x());
-    verticalScrollBar()->setValue(lastScrollPos.y());
+    scrollToPositionWithAnimation(lastScrollPos);
 }
 
 void FileSystemView::removeSelectedOnDisk()
@@ -350,6 +353,27 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 
     menu->exec(event->globalPos());
     connect(menu, SIGNAL(aboutToHide()), menu, SLOT(deleteLater()));
+}
+
+void FileSystemView::scrollToPositionWithAnimation(const QPoint &pos)
+{
+    const int duration = 1000;
+    QPropertyAnimation *aniScrollH = new QPropertyAnimation(
+        horizontalScrollBar(), "value");
+    aniScrollH->setStartValue(horizontalScrollBar()->value());
+    aniScrollH->setEndValue(pos.x());
+    aniScrollH->setDuration(duration);
+    QPropertyAnimation *aniScrollV = new QPropertyAnimation(
+        verticalScrollBar(), "value");
+    aniScrollV->setStartValue(verticalScrollBar()->value());
+    aniScrollV->setEndValue(pos.y());
+    aniScrollV->setDuration(duration);
+
+    QParallelAnimationGroup *aniScroll = new QParallelAnimationGroup(this);
+    aniScroll->addAnimation(aniScrollH);
+    aniScroll->addAnimation(aniScrollV);
+
+    aniScroll->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 

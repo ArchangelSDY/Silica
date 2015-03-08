@@ -36,6 +36,8 @@ protected slots:
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
+    void scrollToPositionWithAnimation(const QPoint &pos);
+
 private:
     QString m_rootPath;
     QFileSystemWatcher m_pathWatcher;
