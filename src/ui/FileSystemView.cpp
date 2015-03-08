@@ -242,37 +242,23 @@ void FileSystemView::cdUp()
     setRootPath(dir.absolutePath());
 }
 
-void FileSystemView::sortByFlag()
-{
-    QGraphicsScene *s = scene();
-
-    QList<GalleryItem *> items = galleryItems();
-    foreach (QGraphicsItem *item, items) {
-        s->removeItem(item);
-    }
-
-    std::sort(items.begin(), items.end(), ItemSortComparator(m_sortFlags));
-
-    foreach (QGraphicsItem *item, items) {
-        s->addItem(item);
-    }
-
-    scheduleLayout();
-}
-
 void FileSystemView::sortByFlag(QDir::SortFlag flag)
 {
-    // Cannot use QFlags::testFlag() here because Qt sets QDir::Name == 0x00
-    // so that testFlag() will fail.
-    bool isReversed = ((m_sortFlags & flag) == flag)
-        && ((m_sortFlags & QDir::Reversed) == QDir::Reversed);
-    if (isReversed) {
-        m_sortFlags = flag | QDir::DirsFirst;
+    int sortTypes = m_sortFlags & QDir::SortByMask;
+    if (sortTypes & flag) {
+        // Flag not change
+        bool isReversed = (m_sortFlags & QDir::Reversed);
+        if (!isReversed) {
+            m_sortFlags = flag | QDir::DirsFirst | QDir::Reversed;
+        } else {
+            m_sortFlags = flag | QDir::DirsFirst;
+        }
     } else {
-        m_sortFlags = flag | QDir::DirsFirst | QDir::Reversed;
+        // Flag change
+        m_sortFlags = flag | QDir::DirsFirst;
     }
 
-    sortByFlag();
+    refreshView();
 }
 
 void FileSystemView::sortByNothing()
@@ -366,25 +352,31 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 
     QMenu *menuSort = menu->addMenu(tr("Sort By"));
 
-    int sortType = m_sortFlags & QDir::SortByMask;
-    QActionGroup *grpSorts = new QActionGroup(menu);
-    QAction *actSortByNothing = menuSort->addAction(tr("No Sort"),
-        this, SLOT(sortByNothing()));
-    grpSorts->addAction(actSortByNothing);
-    actSortByNothing->setCheckable(true);
-    actSortByNothing->setChecked(sortType == QDir::Unsorted);
+    // Disable sort if dir listing or sort is in progress
+    if (m_dirIterThread->isRunning()) {
+        menuSort->setDisabled(true);
+        menuSort->setTitle(tr("Sort By (In progress...)"));
+    } else {
+        int sortType = m_sortFlags & QDir::SortByMask;
+        QActionGroup *grpSorts = new QActionGroup(menu);
+        QAction *actSortByNothing = menuSort->addAction(tr("No Sort"),
+            this, SLOT(sortByNothing()));
+        grpSorts->addAction(actSortByNothing);
+        actSortByNothing->setCheckable(true);
+        actSortByNothing->setChecked(sortType == QDir::Unsorted);
 
-    QAction *actSortByName = menuSort->addAction(tr("Name"),
-        this, SLOT(sortByName()));
-    grpSorts->addAction(actSortByName);
-    actSortByName->setCheckable(true);
-    actSortByName->setChecked(sortType == QDir::Name);
+        QAction *actSortByName = menuSort->addAction(tr("Name"),
+            this, SLOT(sortByName()));
+        grpSorts->addAction(actSortByName);
+        actSortByName->setCheckable(true);
+        actSortByName->setChecked(sortType == QDir::Name);
 
-    QAction *actSortByModified = menuSort->addAction(tr("Last Modified"),
-        this, SLOT(sortByModifiedTime()));
-    grpSorts->addAction(actSortByModified);
-    actSortByModified->setCheckable(true);
-    actSortByModified->setChecked(sortType == QDir::Time);
+        QAction *actSortByModified = menuSort->addAction(tr("Last Modified"),
+            this, SLOT(sortByModifiedTime()));
+        grpSorts->addAction(actSortByModified);
+        actSortByModified->setCheckable(true);
+        actSortByModified->setChecked(sortType == QDir::Time);
+    }
 
     menu->addSeparator();
 

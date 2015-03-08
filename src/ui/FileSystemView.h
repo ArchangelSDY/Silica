@@ -23,7 +23,6 @@ public slots:
     void cdUp();
 
 protected slots:
-    void sortByFlag();
     void sortByFlag(QDir::SortFlag flag);
     void sortByNothing();
     void sortByName();
