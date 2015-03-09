@@ -180,6 +180,7 @@ private:
 FileSystemView::FileSystemView(QWidget *parent) :
     GalleryView(parent) ,
     m_sortFlags(QDir::Unsorted) ,
+    m_isFirstRefreshAfterRootPathChanged(true) ,
     m_dirIterThread(new DirIterThread())
 {
 #ifdef ENABLE_OPENGL
@@ -216,7 +217,12 @@ void FileSystemView::setRootPath(const QString &path)
     int vs = verticalScrollBar()->value();
     m_historyScrollPositions.insert(m_rootPath, QPoint(hs, vs));
 
+    // Reset scroll position
+    horizontalScrollBar()->setValue(0);
+    verticalScrollBar()->setValue(0);
+
     m_rootPath = path;
+    m_isFirstRefreshAfterRootPathChanged = true;
 
     if (m_dirIterThread->isRunning()) {
         m_dirIterThread->stopIter();
@@ -319,14 +325,16 @@ void FileSystemView::dirIterGotItem(const QString &rootPath,
 
 void FileSystemView::dirIterFinished()
 {
-    // Add to path watcher
-    if (m_pathWatcher.directories().count() == 0) {
-        m_pathWatcher.addPath(m_rootPath);
-    }
+    if (m_isFirstRefreshAfterRootPathChanged) {
+        m_isFirstRefreshAfterRootPathChanged = false;
 
-    // Restore scroll position
-    QPoint lastScrollPos = m_historyScrollPositions.value(m_rootPath);
-    scrollToPositionWithAnimation(lastScrollPos);
+        // Add to path watcher
+        m_pathWatcher.addPath(m_rootPath);
+
+        // Restore scroll position
+        QPoint lastScrollPos = m_historyScrollPositions.value(m_rootPath);
+        scrollToPositionWithAnimation(lastScrollPos);
+    }
 }
 
 void FileSystemView::removeSelectedOnDisk()
@@ -392,7 +400,7 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 
 void FileSystemView::scrollToPositionWithAnimation(const QPoint &pos)
 {
-    const int duration = 1000;
+    const int duration = 150;
     QPropertyAnimation *aniScrollH = new QPropertyAnimation(
         horizontalScrollBar(), "value");
     aniScrollH->setStartValue(horizontalScrollBar()->value());

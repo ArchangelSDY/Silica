@@ -43,6 +43,7 @@ private:
     QFileSystemWatcher m_pathWatcher;
     QStringList m_entries;
     QDir::SortFlags m_sortFlags;
+    bool m_isFirstRefreshAfterRootPathChanged;
     QHash<QString, QPoint> m_historyScrollPositions;
 
     class DirIterThread;
