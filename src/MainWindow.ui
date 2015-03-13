@@ -67,9 +67,6 @@
        </item>
        <item>
         <widget class="BasketView" name="basketView">
-         <property name="lineWidth">
-          <number>0</number>
-         </property>
         </widget>
        </item>
       </layout>
@@ -302,7 +299,7 @@ margin: 0.05em;</string>
   </customwidget>
   <customwidget>
    <class>BasketView</class>
-   <extends>QGraphicsView</extends>
+   <extends>GalleryView</extends>
    <header>ui/BasketView.h</header>
   </customwidget>
   <customwidget>
