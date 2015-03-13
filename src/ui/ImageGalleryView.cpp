@@ -22,7 +22,7 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
     m_groupMode(GroupByThumbHist)
 {
 #ifdef ENABLE_OPENGL
-    setViewport(new QOpenGLWidget(this));
+    m_view->setViewport(new QOpenGLWidget(this));
 #endif
 
     setRendererFactory(new LooseRendererFactory());

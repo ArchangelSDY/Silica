@@ -1,3 +1,4 @@
+#include <QGraphicsSceneMouseEvent>
 #include <QPalette>
 #include <QVariant>
 
@@ -64,11 +65,7 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     m_renderer->layout();
     update(boundingRect());
     if (scene()) {
-        QList<QGraphicsView *> views = scene()->views();
-        if (!views.isEmpty()) {
-            GalleryView *view = static_cast<GalleryView *>(views[0]);
-            view->scheduleLayout();
-        }
+        emit requestLayout();
     }
 
     // We always consider it ready no matter whether thumbnail is null
@@ -83,6 +80,22 @@ bool GalleryItem::isReadyToShow()
 void GalleryItem::scheduleSelectedAfterShown()
 {
     m_selectedAfterShownScheduled = true;
+}
+
+void GalleryItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+        event->accept();
+        return;
+    }
+
+    QGraphicsItem::mousePressEvent(event);
+}
+
+void GalleryItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit mouseDoubleClicked();
+    QGraphicsItem::mouseDoubleClickEvent(event);
 }
 
 void GalleryItem::paint(QPainter *painter,

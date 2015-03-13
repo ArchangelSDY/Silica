@@ -11,6 +11,7 @@ BasketView::BasketView(QWidget *parent) :
     pal.setBrush(QPalette::Background, QColor("#3C414C"));
     m_scene->setPalette(pal);
     m_scene->setBackgroundBrush(pal.background());
+    m_view->setLineWidth(0);
 }
 
 QMenu *BasketView::createContextMenu()

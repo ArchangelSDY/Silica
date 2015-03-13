@@ -11,7 +11,7 @@ class QLineEdit;
 
 class GalleryItem;
 
-class GalleryView : public QGraphicsView
+class GalleryView : public QWidget
 {
     Q_OBJECT
     friend class AbstractGalleryViewRenderer;
@@ -19,6 +19,7 @@ public:
     explicit GalleryView(QWidget *parent = 0);
     ~GalleryView();
 
+    QGraphicsScene *scene() const;
     QList<GalleryItem *> galleryItems() const;
     QList<GalleryItem *> selectedGalleryItems() const;
 
@@ -33,6 +34,8 @@ public slots:
     void setNameFilter(const QString &nameFilter);
 
 protected slots:
+    void itemMouseDoubleClicked();
+
     void setLooseRenderer();
     void setCompactRenderer();
     void setWaterfallRenderer();
@@ -51,8 +54,6 @@ private slots:
 protected:
     virtual void resizeEvent(QResizeEvent *);
     virtual void showEvent(QShowEvent *);
-    virtual void mouseDoubleClickEvent(QMouseEvent *);
-    virtual void mousePressEvent(QMouseEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
 
     virtual void clear();
@@ -74,6 +75,7 @@ protected:
 
     virtual void markItemIsFiltered(GalleryItem *item);
 
+    QGraphicsView *m_view;
     QGraphicsScene *m_scene;
     QLineEdit *m_searchBox;
     bool m_enableGrouping;

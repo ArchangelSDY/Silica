@@ -34,11 +34,15 @@ public:
     void scheduleSelectedAfterShown();
 
 signals:
+    void requestLayout();
     void readyToShow();
+    void mouseDoubleClicked();
 
 protected:
     static const QColor SELECTED_COLOR;
 
+    virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget);

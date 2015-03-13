@@ -184,7 +184,7 @@ FileSystemView::FileSystemView(QWidget *parent) :
     m_dirIterThread(new DirIterThread())
 {
 #ifdef ENABLE_OPENGL
-    setViewport(new QOpenGLWidget(this));
+    m_view->setViewport(new QOpenGLWidget(this));
 #endif
 
     setRendererFactory(new CompactRendererFactory());
@@ -213,13 +213,13 @@ void FileSystemView::setRootPath(const QString &path)
     }
 
     // Save scroll position
-    int hs = horizontalScrollBar()->value();
-    int vs = verticalScrollBar()->value();
+    int hs = m_view->horizontalScrollBar()->value();
+    int vs = m_view->verticalScrollBar()->value();
     m_historyScrollPositions.insert(m_rootPath, QPoint(hs, vs));
 
     // Reset scroll position
-    horizontalScrollBar()->setValue(0);
-    verticalScrollBar()->setValue(0);
+    m_view->horizontalScrollBar()->setValue(0);
+    m_view->verticalScrollBar()->setValue(0);
 
     m_rootPath = path;
     m_isFirstRefreshAfterRootPathChanged = true;
@@ -402,13 +402,13 @@ void FileSystemView::scrollToPositionWithAnimation(const QPoint &pos)
 {
     const int duration = 150;
     QPropertyAnimation *aniScrollH = new QPropertyAnimation(
-        horizontalScrollBar(), "value");
-    aniScrollH->setStartValue(horizontalScrollBar()->value());
+        m_view->horizontalScrollBar(), "value");
+    aniScrollH->setStartValue(m_view->horizontalScrollBar()->value());
     aniScrollH->setEndValue(pos.x());
     aniScrollH->setDuration(duration);
     QPropertyAnimation *aniScrollV = new QPropertyAnimation(
-        verticalScrollBar(), "value");
-    aniScrollV->setStartValue(verticalScrollBar()->value());
+        m_view->verticalScrollBar(), "value");
+    aniScrollV->setStartValue(m_view->verticalScrollBar()->value());
     aniScrollV->setEndValue(pos.y());
     aniScrollV->setDuration(duration);
 

@@ -2,6 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
+#include <QHBoxLayout>
 #include <QLineEdit>
 
 #include "ui/renderers/AbstractGalleryViewRenderer.h"
@@ -14,7 +15,8 @@
 const int GalleryView::LAYOUT_INTERVAL = 10;
 
 GalleryView::GalleryView(QWidget *parent) :
-    QGraphicsView(parent) ,
+    QWidget(parent) ,
+    m_view(new QGraphicsView(this)) ,
     m_scene(new QGraphicsScene) ,
     m_searchBox(new QLineEdit()) ,
     m_enableGrouping(false) ,
@@ -22,9 +24,15 @@ GalleryView::GalleryView(QWidget *parent) :
     m_loadingItemsCount(0) ,
     m_rendererFactory(0)
 {
-    setDragMode(QGraphicsView::RubberBandDrag);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    QLayout *layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_view);
+    setLayout(layout);
+
+    m_view->setDragMode(QGraphicsView::RubberBandDrag);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor("#323A44"));
@@ -44,7 +52,7 @@ GalleryView::GalleryView(QWidget *parent) :
     connect(m_searchBox, SIGNAL(textEdited(QString)),
             this, SLOT(setNameFilter(QString)));
 
-    setScene(m_scene);
+    m_view->setScene(m_scene);
 
     m_layoutTimer.setSingleShot(false);
     connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
@@ -53,8 +61,14 @@ GalleryView::GalleryView(QWidget *parent) :
 
 GalleryView::~GalleryView()
 {
-    delete m_scene;
+    m_scene->deleteLater();
+    m_view->deleteLater();
     delete m_rendererFactory;
+}
+
+QGraphicsScene *GalleryView::scene() const
+{
+    return m_view->scene();
 }
 
 QList<GalleryItem *> GalleryView::galleryItems() const
@@ -166,13 +180,6 @@ void GalleryView::showEvent(QShowEvent *)
     scheduleLayout();
 }
 
-void GalleryView::mouseDoubleClickEvent(QMouseEvent *)
-{
-    if (selectedGalleryItems().length() > 0) {
-        emit mouseDoubleClicked();
-    }
-}
-
 void GalleryView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Return) {
@@ -195,24 +202,25 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
         leaveSearch();
         event->accept();
     } else {
-        QGraphicsView::keyPressEvent(event);
+        QWidget::keyPressEvent(event);
     }
 }
 
-void GalleryView::mousePressEvent(QMouseEvent *event)
+void GalleryView::itemMouseDoubleClicked()
 {
-    if (event->button() == Qt::RightButton) {
-        event->accept();
-        return;
+    if (selectedGalleryItems().length() > 0) {
+        emit mouseDoubleClicked();
     }
-
-    QGraphicsView::mousePressEvent(event);
 }
 
 void GalleryView::addItem(GalleryItem *item)
 {
     m_scene->addItem(item);
     markItemIsFiltered(item);
+    connect(item, SIGNAL(requestLayout()), this, SLOT(scheduleLayout()),
+            Qt::UniqueConnection);
+    connect(item, SIGNAL(mouseDoubleClicked()),
+            this, SLOT(itemMouseDoubleClicked()), Qt::UniqueConnection);
     connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
     item->load();
 }
@@ -235,7 +243,7 @@ void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
     }
 
     scheduleLayout();
-    viewport()->update();
+    m_view->viewport()->update();
 }
 
 void GalleryView::setLooseRenderer()
