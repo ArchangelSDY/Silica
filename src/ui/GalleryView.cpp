@@ -2,7 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QLineEdit>
 
 #include "ui/renderers/AbstractGalleryViewRenderer.h"
@@ -24,15 +24,18 @@ GalleryView::GalleryView(QWidget *parent) :
     m_loadingItemsCount(0) ,
     m_rendererFactory(0)
 {
-    QLayout *layout = new QHBoxLayout(this);
+    QLayout *layout = new QVBoxLayout(this);
     layout->setMargin(0);
+    layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_view);
+    layout->addWidget(m_searchBox);
     setLayout(layout);
 
     m_view->setDragMode(QGraphicsView::RubberBandDrag);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_view->setScene(m_scene);
 
     QPalette palette;
     palette.setBrush(QPalette::Background, QColor("#323A44"));
@@ -40,8 +43,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene->setPalette(palette);
     m_scene->setBackgroundBrush(palette.background());
 
-    QGraphicsProxyWidget *searchBoxProxy = m_scene->addWidget(m_searchBox);
-    searchBoxProxy->setZValue(100);
     m_searchBox->setStyleSheet(
         "border: none;"
         "padding: 0 0.5em;"
@@ -51,8 +52,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_searchBox->hide();
     connect(m_searchBox, SIGNAL(textEdited(QString)),
             this, SLOT(setNameFilter(QString)));
-
-    m_view->setScene(m_scene);
 
     m_layoutTimer.setSingleShot(false);
     connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
