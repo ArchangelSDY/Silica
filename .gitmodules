@@ -1,15 +1,15 @@
 [submodule "src/deps/Qt7z"]
 	path = src/deps/Qt7z
-	url = ssh://git@archangelsdy.com:9687/Qt7z
+	url = https://github.com/ArchangelSDY/Qt7z.git
 [submodule "test/deps/QtMockWebServer"]
 	path = test/deps/QtMockWebServer
-	url = git@github.com:ArchangelSDY/QtMockWebServer.git
+	url = https://github.com/ArchangelSDY/QtMockWebServer.git
 [submodule "src/deps/QtDBMigration"]
 	path = src/deps/QtDBMigration
 	url = https://github.com/ArchangelSDY/QtDBMigration.git
 [submodule "src/deps/QtRAR"]
 	path = src/deps/QtRAR
-	url = ssh://git@archangelsdy.com:9687/QtRAR
+	url = https://github.com/ArchangelSDY/QtRAR.git
 [submodule "src/deps/qwebpa"]
 	path = src/deps/qwebpa
 	url = https://github.com/ArchangelSDY/qwebpa.git
