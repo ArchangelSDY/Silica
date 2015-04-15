@@ -9,6 +9,7 @@
 #include "ui/GalleryView.h"
 
 static QCache<QString, QImage> g_coverCache(500);
+static QCache<QString, bool> g_isDefaultFolderCover(500);
 
 class LoadRunnable : public QObject, public QRunnable
 {
@@ -39,6 +40,7 @@ public:
 
             if (!found) {
                 // No suitable image found.
+                emit markIsDefaultFolderCover(true);
                 emit gotThumbnail(":/res/folder.png");
             }
         } else {
@@ -55,15 +57,12 @@ public:
                 emit gotThumbnail(":/res/image.png");
             }
         }
-
-        emit done();
     }
 
 signals:
     void markIsDefaultFolderCover(bool isDefault);
     void gotThumbnail(QString path);
     void loadCover(QString path);
-    void done();
 
 private:
     QFileInfo m_pathInfo;
@@ -126,6 +125,9 @@ void FileSystemItem::load()
 
     QImage *cachedCover = g_coverCache[coverCacheKey()];
     if (cachedCover) {
+        bool *isDefaultFolderCover = g_isDefaultFolderCover[coverCacheKey()];
+        markIsDefaultFolderCover(
+            isDefaultFolderCover ? *isDefaultFolderCover : true);
         setThumbnail(new QImage(*cachedCover));
     } else {
         LoadRunnable *r = new LoadRunnable(m_pathInfo);
@@ -135,15 +137,16 @@ void FileSystemItem::load()
                 this, SLOT(gotThumbnail(QString)));
         connect(r, SIGNAL(loadCover(QString)),
                 this, SLOT(loadCover(QString)));
-        connect(r, SIGNAL(done()),
-                this, SLOT(loaded()));
         threadPool()->start(r);
     }
 }
 
 void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
 {
+    g_isDefaultFolderCover.insert(coverCacheKey(), new bool(isDefault));
     m_useDefaultFolderCover = isDefault;
+    // Re-create render here to refresh "m_useDefaultFolderCover"
+    createRenderer();
 }
 
 void FileSystemItem::gotThumbnail(QString path)
@@ -151,12 +154,6 @@ void FileSystemItem::gotThumbnail(QString path)
     QImage *coverImage = new QImage(path);
     g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
-}
-
-void FileSystemItem::loaded()
-{
-    // Re-create render here to refresh "m_useDefaultFolderCover"
-    createRenderer();
 }
 
 void FileSystemItem::createRenderer()

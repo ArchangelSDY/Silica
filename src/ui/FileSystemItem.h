@@ -32,7 +32,6 @@ private slots:
     void markIsDefaultFolderCover(bool isDefault);
     void gotThumbnail(QString path);
     void loadCover(QString path);
-    void loaded();
     void coverThumbnailLoaded();
     void coverThumbnailLoadFailed();
 
