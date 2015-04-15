@@ -8,6 +8,25 @@
 #include "ui/FileSystemItem.h"
 #include "ui/GalleryView.h"
 
+// Item cover is loaded through following steps:
+//
+// 1. If already in cache, load from cache.
+// 2. Spawn a background worker thread.
+//   a) If item is a directory, iterate its children to find a valid image
+//      source.
+//      i)  If valid image source found, use it as item cover.
+//      ii) If valid image source not found, use default folder icon as cover.
+//   b) If item is a regular file, check if it's a valid image source.
+//      i)  If true, use it as item cover.
+//      ii) If false, use default image icon as cover.
+// Note that image source is always loaded asyncly.
+//
+// When a directory item uses its child image source as cover, a folder icon is
+// shown at top-right corner. However, if a directory item has no valid child
+// image source and uses default folder icon as its cover, the corner icon is no
+// longer needed. This logic is controlled by `m_useDefaultFolderCover` and
+// `markIsDefaultFolderCover()`.
+
 static QCache<QString, QImage> g_coverCache(500);
 static QCache<QString, bool> g_isDefaultFolderCover(500);
 
