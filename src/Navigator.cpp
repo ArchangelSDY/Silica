@@ -253,6 +253,10 @@ void Navigator::goLast()
 
 void Navigator::goPrevGroup()
 {
+    if (!m_playList || m_playList->count() == 0) {
+        return;
+    }
+
     int cmpGroup = m_playList->groupForImage(m_currentImage);
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
@@ -288,6 +292,10 @@ void Navigator::goPrevGroup()
 
 void Navigator::goNextGroup()
 {
+    if (!m_playList || m_playList->count() == 0) {
+        return;
+    }
+
     int initGroup = m_playList->groupForImage(m_currentImage);
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
