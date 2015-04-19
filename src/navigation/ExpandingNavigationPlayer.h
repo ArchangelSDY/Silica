@@ -5,6 +5,8 @@
 
 #include "AbstractNavigationPlayer.h"
 
+class Image;
+
 class ExpandingNavigationPlayer : public AbstractNavigationPlayer
 {
     Q_OBJECT
@@ -19,6 +21,9 @@ public:
 
     Type type() const { return AbstractNavigationPlayer::ExpandingType; }
 
+private slots:
+    void onImageSizeGet(Image *image);
+
 private:
     static const float MOVE_COUNT_FACTOR;
 
@@ -27,6 +32,7 @@ private:
     QWidget *m_view;
     QList<QRectF> m_toBeFocused;
     int m_curIndex;
+    bool m_focusAfterImageSizeGet;
 };
 
 #endif // EXPANDINGNAVIGATIONPLAYER_H

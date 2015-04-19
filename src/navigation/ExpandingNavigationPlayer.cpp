@@ -1,6 +1,8 @@
+#include "ExpandingNavigationPlayer.h"
+
 #include <QWidget>
 
-#include "ExpandingNavigationPlayer.h"
+#include "image/Image.h"
 #include "Navigator.h"
 
 const float ExpandingNavigationPlayer::MOVE_COUNT_FACTOR = 1.5;
@@ -10,8 +12,11 @@ ExpandingNavigationPlayer::ExpandingNavigationPlayer(Navigator *navigator,
                                                      QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
     m_view(view) ,
-    m_curIndex(0)
+    m_curIndex(0) ,
+    m_focusAfterImageSizeGet(false)
 {
+    connect(m_navigator, SIGNAL(paint(Image*)),
+            this, SLOT(onImageSizeGet(Image*)));
 }
 
 void ExpandingNavigationPlayer::goNext()
@@ -46,10 +51,18 @@ void ExpandingNavigationPlayer::goPrev()
 
 void ExpandingNavigationPlayer::reset()
 {
-    calcFocused();
     m_curIndex = 0;
-    QRectF focused = m_toBeFocused.at(m_curIndex);
-    m_navigator->focusOnRect(focused);
+    m_focusAfterImageSizeGet = true;
+}
+
+void ExpandingNavigationPlayer::onImageSizeGet(Image *image)
+{
+    if (image && m_focusAfterImageSizeGet) {
+        calcFocused();
+        QRectF focused = m_toBeFocused.at(m_curIndex);
+        m_navigator->focusOnRect(focused);
+        m_focusAfterImageSizeGet = false;
+    }
 }
 
 void ExpandingNavigationPlayer::calcFocused()
