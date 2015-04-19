@@ -103,6 +103,9 @@ void GlobalConfig::load()
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/../Resources/lib/plugins");
 #endif
     QCoreApplication::addLibraryPath(baseDirPath + "/plugins");
+
+    // For high dpi icons
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 }
 
 const char *GlobalConfig::buildRevision() const
