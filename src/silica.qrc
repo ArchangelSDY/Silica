@@ -15,5 +15,6 @@
         <file>res/playlist.png</file>
         <file>res/toolbar/dir-up-active.png</file>
         <file>res/toolbar/dir-up.png</file>
+        <file>assets/logo.png</file>
     </qresource>
 </RCC>

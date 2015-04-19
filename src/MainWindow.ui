@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>silica</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="silica.qrc">
+    <normaloff>:/assets/logo.png</normaloff>:/assets/logo.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
