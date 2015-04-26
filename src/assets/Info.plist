@@ -6,6 +6,8 @@
 	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
 	<string>silica.icns</string>
+	<key>CFBundleName</key>
+	<string>Silica</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
