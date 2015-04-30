@@ -63,6 +63,7 @@ qt5_wrap_ui(CORE_FORMS_HEADERS ${CORE_FORMS})
 set(CORE_SRCS ${CORE_SRCS} ${CORE_FORMS_HEADERS})
 
 set(CORE_LINK_LIBS
+    sapicore
     ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
     ${OpenCV_LIBS}
@@ -127,7 +128,7 @@ else (WIN32)
     add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
 
-target_link_libraries(silica sapi silicacore)
+target_link_libraries(silica sapicore silicacore)
 
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
