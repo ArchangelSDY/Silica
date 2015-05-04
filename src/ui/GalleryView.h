@@ -3,7 +3,8 @@
 
 #include <QGraphicsView>
 
-#include "AbstractRendererFactory.h"
+#include "ui/renderers/AbstractRendererFactory.h"
+#include "ui/TaskProgress.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -22,6 +23,9 @@ public:
     QGraphicsScene *scene() const;
     QList<GalleryItem *> galleryItems() const;
     QList<GalleryItem *> selectedGalleryItems() const;
+
+    const TaskProgress &loadProgress() const;
+    const TaskProgress &groupingProgress() const;
 
 signals:
     void mouseDoubleClicked();
@@ -81,8 +85,10 @@ protected:
     bool m_enableGrouping;
     bool m_layoutNeeded;
     QTimer m_layoutTimer;
-    int m_loadingItemsCount;
     QString m_nameFilter;
+
+    TaskProgress m_loadProgress;
+    TaskProgress m_groupingProgress;
 
 private:
     static const int LAYOUT_INTERVAL;

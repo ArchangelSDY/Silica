@@ -12,10 +12,6 @@ public:
     explicit ImageGalleryView(QWidget *parent = 0);
     ~ImageGalleryView();
 
-signals:
-    void groupingStart();
-    void groupingEnd();
-
 public slots:
     void setPlayList(PlayList *playList);
 

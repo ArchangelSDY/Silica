@@ -20,7 +20,6 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     m_size(size) ,
     m_loadCount(0)
 {
-    hide();
     setMinimumSize(size);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -34,15 +33,16 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     m_timer.setInterval(50);
     m_timer.setTimerType(Qt::PreciseTimer);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_timer.start();
 }
 
 void LoadingIndicator::start()
 {
-    ++m_loadCount;
-    if (m_loadCount > 0 && !m_timer.isActive()) {
-        m_timer.start();
-        show();
-    }
+//    ++m_loadCount;
+//    if (m_loadCount > 0 && !m_timer.isActive()) {
+//        m_timer.start();
+//        show();
+//    }
 
 //    QPropertyAnimation *aniScale =
 //        new QPropertyAnimation(this, "minimumSize", this);
@@ -56,14 +56,14 @@ void LoadingIndicator::start()
 
 void LoadingIndicator::stop()
 {
-    if (m_loadCount > 0) {
-        --m_loadCount;
-    }
+//    if (m_loadCount > 0) {
+//        --m_loadCount;
+//    }
 
-    if (m_loadCount == 0 && m_timer.isActive()) {
-        m_timer.stop();
-        hide();
-    }
+//    if (m_loadCount == 0 && m_timer.isActive()) {
+//        m_timer.stop();
+//        hide();
+//    }
 
 //    QPropertyAnimation *aniScale =
 //        new QPropertyAnimation(this, "minimumSize", this);
@@ -76,39 +76,94 @@ void LoadingIndicator::stop()
 //    connect(aniScale, SIGNAL(finished()), this, SLOT(hide()));
 }
 
+void LoadingIndicator::addTaskProgress(const TaskProgress &progress)
+{
+    m_entries.append(&progress);
+    connect(&progress, SIGNAL(changed()),
+            this, SLOT(update()));
+    update();
+}
+
+void LoadingIndicator::removeTaskProgress(const TaskProgress &progress)
+{
+    m_entries.removeAll(&progress);
+    disconnect(&progress, SIGNAL(valueChanged(int)),
+               this, SLOT(update()));
+    update();
+}
+
 void LoadingIndicator::paintEvent(QPaintEvent *)
 {
-    m_angle = (m_angle - 36) % 360;
+    bool isInfinite = false;
+    double totalProgress = 0;
+    int validCnt = 0;
+    foreach (const TaskProgress *progress, m_entries) {
+        if (progress->isRunning()) {
+            validCnt++;
+
+            if (progress->minimum() == progress->maximum()) {
+                isInfinite = true;
+                break;
+            }
+
+            totalProgress += ((double)(progress->value() - progress->minimum())) / (progress->maximum() - progress->minimum());
+        }
+    }
+
+    totalProgress /= validCnt;
 
     QPainter painter(this);
     painter.setRenderHints(
         QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
 
-#ifdef ENABLE_OPENGL
-    painter.fillRect(rect(), QColor("#3C414C"));
-#endif
+    #ifdef ENABLE_OPENGL
+        painter.fillRect(rect(), QColor("#3C414C"));
+    #endif
+
+    if (validCnt == 0) {
+        m_timer.stop();
+        return;
+    } else {
+        m_timer.start();
+    }
 
     qreal circleWidth = width();
     qreal circleHeight = height();
     qreal circleBorder = 2;
 
-    QConicalGradient circleGradient(circleWidth / 2, circleHeight / 2, m_angle);
-    circleGradient.setColorAt(0, QColor("#07A9CB"));
-    circleGradient.setColorAt(0.5, QColor("#23B3AD"));
-    circleGradient.setColorAt(0.75, QColor("#40C07E"));
-    circleGradient.setColorAt(1, QColor("#00ACE3D7"));
-    circleGradient.setColorAt(1, Qt::transparent);
-    QBrush circleBrush(circleGradient);
-    painter.setBrush(circleBrush);
-    painter.setPen(Qt::NoPen);
+    if (!isInfinite) {
+        // Draw arc
+        QPen circlePen(QColor("#07A9CB"), circleBorder);
+        painter.setBrush(Qt::NoBrush);
+        painter.setPen(circlePen);
 
-    QPainterPath outerPath;
-    outerPath.addEllipse(0, 0, circleWidth, circleHeight);
-    QPainterPath innerPath;
-    innerPath.addEllipse(circleBorder, circleBorder,
-                         circleWidth - 2 * circleBorder,
-                         circleHeight - 2 * circleBorder);
-    QPainterPath circlePath = outerPath - innerPath;
+        int startAngle = 90 * 16;
+        int spanAngle = - totalProgress * 360 * 16;
+        painter.drawArc(circleBorder, circleBorder,
+                        circleWidth - 2 * circleBorder, circleHeight - 2 * circleBorder,
+                        startAngle, spanAngle);
+    } else {
+        // Draw infinite spin circle
+        m_infiniteSpinAngle = (m_infiniteSpinAngle - 36) % 360;
 
-    painter.drawPath(circlePath);
+        QConicalGradient circleGradient(circleWidth / 2, circleHeight / 2, m_infiniteSpinAngle);
+        circleGradient.setColorAt(0, QColor("#07A9CB"));
+        circleGradient.setColorAt(0.5, QColor("#23B3AD"));
+        circleGradient.setColorAt(0.75, QColor("#40C07E"));
+        circleGradient.setColorAt(1, QColor("#00ACE3D7"));
+        circleGradient.setColorAt(1, Qt::transparent);
+        QBrush circleBrush(circleGradient);
+        painter.setBrush(circleBrush);
+        painter.setPen(Qt::NoPen);
+
+        QPainterPath outerPath;
+        outerPath.addEllipse(0, 0, circleWidth, circleHeight);
+        QPainterPath innerPath;
+        innerPath.addEllipse(circleBorder, circleBorder,
+                             circleWidth - 2 * circleBorder,
+                             circleHeight - 2 * circleBorder);
+        QPainterPath circlePath = outerPath - innerPath;
+
+        painter.drawPath(circlePath);
+    }
 }

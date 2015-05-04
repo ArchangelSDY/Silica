@@ -21,7 +21,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_searchBox(new QLineEdit()) ,
     m_enableGrouping(false) ,
     m_layoutNeeded(true) ,
-    m_loadingItemsCount(0) ,
     m_rendererFactory(0)
 {
     QLayout *layout = new QVBoxLayout(this);
@@ -94,6 +93,16 @@ QList<GalleryItem *> GalleryView::selectedGalleryItems() const
     return items;
 }
 
+const TaskProgress &GalleryView::loadProgress() const
+{
+    return m_loadProgress;
+}
+
+const TaskProgress &GalleryView::groupingProgress() const
+{
+    return m_groupingProgress;
+}
+
 void GalleryView::clear()
 {
     // Clear first
@@ -101,10 +110,7 @@ void GalleryView::clear()
         m_scene->removeItem(item);
         item->deleteLater();
     }
-    if (m_loadingItemsCount > 0) {
-        emit loadEnd();
-    }
-    m_loadingItemsCount = 0;
+    m_loadProgress.reset();
 }
 
 void GalleryView::layout()
@@ -274,23 +280,18 @@ void GalleryView::disableGrouping()
 
 void GalleryView::itemReadyToShow()
 {
-    Q_ASSERT_X(m_loadingItemsCount > 0, "GalleryView::itemReadyToShow",
-               "No loading item");
-    bool shouldEmit = (m_loadingItemsCount == 1);
-    m_loadingItemsCount--;
-    if (shouldEmit) {
-        emit loadEnd();
+    m_loadProgress.setValue(m_loadProgress.value() + 1);
+    if (m_loadProgress.value() == m_loadProgress.maximum()) {
+        m_loadProgress.stop();
     }
 }
 
 void GalleryView::incrItemsToLoad(int count)
 {
-    Q_ASSERT_X(m_loadingItemsCount >= 0, "GalleryView::itemReadyToShow",
-               "Negative loading items count");
-    bool shouldEmit = (m_loadingItemsCount == 0 && count > 0);
-    m_loadingItemsCount += count;
-    if (shouldEmit) {
-        emit loadStart();
+    m_loadProgress.setMaximum(m_loadProgress.maximum() + count);
+    if (!m_loadProgress.isRunning()
+            && m_loadProgress.maximum() > m_loadProgress.minimum()) {
+        m_loadProgress.start();
     }
 }
 

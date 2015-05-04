@@ -67,7 +67,6 @@ private:
     QAction *m_actToolBarFav;
     QAction *m_actToolBarGallery;
     QAction *m_actToolBarImage;
-
 };
 
 #endif // MAINWINDOW_H

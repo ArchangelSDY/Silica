@@ -212,13 +212,9 @@ void MainWindow::setupExtraUi()
     loadIndWrapper->layout()->setContentsMargins(0, 0, 0, 5);
     loadIndWrapper->layout()->addWidget(loadInd);
     m_toolBar->addWidget(loadIndWrapper);
-    connect(ui->gallery, SIGNAL(loadStart()), loadInd, SLOT(start()));
-    connect(ui->gallery, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
-    connect(ui->gallery, SIGNAL(groupingStart()), loadInd, SLOT(start()));
-    connect(ui->gallery, SIGNAL(groupingEnd()), loadInd, SLOT(stop()));
-    connect(ui->fsView, SIGNAL(loadStart()), loadInd, SLOT(start()));
-    connect(ui->fsView, SIGNAL(loadEnd()), loadInd, SLOT(stop()));
-
+    loadInd->addTaskProgress(ui->gallery->loadProgress());
+    loadInd->addTaskProgress(ui->gallery->groupingProgress());
+    loadInd->addTaskProgress(ui->fsView->loadProgress());
 
     // Stacked views
     ui->pageFav->layout()->setMargin(0);

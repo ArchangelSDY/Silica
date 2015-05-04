@@ -214,9 +214,10 @@ void ImageGalleryView::groupByThumbHist()
     if (m_playList) {
         GroupByThumbHistTask *task = new GroupByThumbHistTask(m_playList);
         task->setAutoDelete(true);
-        connect(task, SIGNAL(destroyed()), this, SIGNAL(groupingEnd()));
+        connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
         QThreadPool::globalInstance()->start(task);
-        emit groupingStart();
+        m_groupingProgress.reset();
+        m_groupingProgress.start();
     }
 }
 
