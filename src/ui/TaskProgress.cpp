@@ -3,7 +3,8 @@
 TaskProgress::TaskProgress(QObject *parent) : QObject(parent) ,
     m_minimum(0) ,
     m_maximum(0) ,
-    m_value(0)
+    m_value(0) ,
+    m_isRunning(false)
 {
 }
 
@@ -15,6 +16,7 @@ QString TaskProgress::key() const
 void TaskProgress::setKey(const QString &key)
 {
     m_key = key;
+    emit changed();
 }
 
 bool TaskProgress::isRunning() const
