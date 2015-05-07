@@ -198,7 +198,7 @@ public:
     GroupByThumbHistTask(PlayList *pl) : m_pl(pl) {}
     void run()
     {
-        m_pl->groupByThumbHist();;
+        m_pl->groupByThumbHist();
         m_pl->sortByGroup();
     }
 
@@ -216,6 +216,20 @@ void ImageGalleryView::groupByThumbHist()
         task->setAutoDelete(true);
         connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
         QThreadPool::globalInstance()->start(task);
+
+        PlayListRecord *plr = m_playList->record();
+        if (plr) {
+            QString key =
+                QString("ImageGalleryView::groupByThumbHist_%1").arg(plr->id());
+            m_groupingProgress.setKey(key);
+            m_groupingProgress.setEstimateEnabled(true);
+            m_groupingProgress.setMaximum(36);
+        } else {
+            m_groupingProgress.setKey(QString());
+            m_groupingProgress.setEstimateEnabled(false);
+            m_groupingProgress.setMaximum(0);
+        }
+
         m_groupingProgress.reset();
         m_groupingProgress.start();
     }
