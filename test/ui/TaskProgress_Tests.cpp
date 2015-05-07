@@ -102,12 +102,11 @@ void TestTaskProgress::estimate()
 
     QSignalSpy spy(&progress, SIGNAL(changed()));
 
-    // For the first time it makes no estimation and only records
-    // the total time consumption
+    // For the first time it increases progress by 1% per interval
     progress.start();
     QTest::qWait(timeConsumption);
     progress.stop();
-    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.count(), 2 + timeConsumption / interval);
 
     progress.reset();
     progress.setMaximum(10);
