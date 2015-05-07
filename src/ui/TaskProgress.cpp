@@ -62,8 +62,6 @@ void TaskProgress::stop()
 void TaskProgress::reset()
 {
     m_value = 0;
-    m_minimum = 0;
-    m_maximum = 0;
     m_isRunning = false;
     emit changed();
 }

@@ -111,6 +111,7 @@ void GalleryView::clear()
         item->deleteLater();
     }
     m_loadProgress.reset();
+    m_loadProgress.setMaximum(0);
 }
 
 void GalleryView::layout()

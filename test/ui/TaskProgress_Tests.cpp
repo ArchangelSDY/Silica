@@ -83,8 +83,8 @@ void TestTaskProgress::settersAndReset()
 
     progress.reset();
     QCOMPARE(progress.value(), 0);
-    QCOMPARE(progress.minimum(), 0);
-    QCOMPARE(progress.maximum(), 0);
+    QCOMPARE(progress.minimum(), 2);    // reset won't affect min
+    QCOMPARE(progress.maximum(), 10);   // reset won't affect max
     QCOMPARE(progress.isRunning(), false);
     QCOMPARE(spy.count(), ++sigCnt);
 }
