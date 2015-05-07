@@ -120,13 +120,18 @@ void TaskProgress::setEstimateInterval(int interval)
 
 void TaskProgress::estimateUpdate()
 {
+    double progress;
     if (m_lastTimeConsumption > 0) {
-        qint64 curConsumption = m_startTime.msecsTo(m_startTime);
-        double progress = (double) curConsumption / m_lastTimeConsumption;
-
-        // Stop at 90%
-        progress = progress > 0.9 ? 0.9 : progress;
-
-        setValue((m_maximum - m_minimum) * progress + m_minimum);
+        // Estimate current progress based on last record
+        qint64 curConsumption = m_startTime.msecsTo(QDateTime::currentDateTime());
+        progress = (double) curConsumption / m_lastTimeConsumption;
+    } else {
+        // No last record, add 1% per interval
+        progress += 0.01;
     }
+
+    // Stop at 90%
+    progress = progress > 0.9 ? 0.9 : progress;
+
+    setValue((m_maximum - m_minimum) * progress + m_minimum);
 }
