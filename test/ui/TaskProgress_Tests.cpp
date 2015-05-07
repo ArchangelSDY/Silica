@@ -1,17 +1,32 @@
+#include <QtSql>
 #include <QSignalSpy>
 #include <QTest>
 
 #include "STestCase.h"
+#include "../src/GlobalConfig.h"
 #include "../src/ui/TaskProgress.h"
 
 class TestTaskProgress : public STestCase
 {
     Q_OBJECT
 private slots:
+    void cleanup();
     void constructor();
     void startAndStop();
     void settersAndReset();
+    void estimate();
 };
+
+void TestTaskProgress::cleanup()
+{
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestTaskProgress");
+        db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
+        db.open();
+        db.exec("delete from task_progresses");
+    }
+    QSqlDatabase::removeDatabase("TestTaskProgress");
+}
 
 void TestTaskProgress::constructor()
 {
@@ -72,6 +87,38 @@ void TestTaskProgress::settersAndReset()
     QCOMPARE(progress.maximum(), 0);
     QCOMPARE(progress.isRunning(), false);
     QCOMPARE(spy.count(), ++sigCnt);
+}
+
+void TestTaskProgress::estimate()
+{
+    int timeConsumption = 110;
+    int interval = 30;
+
+    TaskProgress progress;
+    progress.setKey("TEST_TASK_PROGRESS");
+    progress.setEstimateEnabled(true);
+    progress.setEstimateInterval(interval);
+    progress.setMaximum(10);
+
+    QSignalSpy spy(&progress, SIGNAL(changed()));
+
+    // For the first time it makes no estimation and only records
+    // the total time consumption
+    progress.start();
+    QTest::qWait(timeConsumption);
+    progress.stop();
+    QCOMPARE(spy.count(), 2);
+
+    progress.reset();
+    progress.setMaximum(10);
+    spy.clear();
+
+    // For the second time and later we will receive estimated progress
+    // update
+    progress.start();
+    QTest::qWait(timeConsumption);
+    progress.stop();
+    QCOMPARE(spy.count(), 2 + timeConsumption / interval);
 }
 
 QTEST_MAIN(TestTaskProgress)

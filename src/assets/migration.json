@@ -64,6 +64,16 @@
             "version": 12,
             "applySql": "alter table playlists add column count integer not null default 0",
             "revertSql": ""
+        },
+        {
+            "version": 13,
+            "applySql": "create table task_progresses (id integer primary key autoincrement, task_key text unique, last_time_consumption integer)",
+            "revertSql": "drop table task_progresses"
+        },
+        {
+            "version": 14,
+            "applySql": "create index task_progresses_key on task_progresses (task_key)",
+            "revertSql": "drop index task_progresses_key"
         }
     ]
 }

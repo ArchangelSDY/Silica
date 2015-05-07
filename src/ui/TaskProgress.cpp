@@ -1,11 +1,19 @@
 #include "TaskProgress.h"
 
+#include "db/LocalDatabase.h"
+
 TaskProgress::TaskProgress(QObject *parent) : QObject(parent) ,
     m_minimum(0) ,
     m_maximum(0) ,
     m_value(0) ,
-    m_isRunning(false)
+    m_isRunning(false) ,
+    m_lastTimeConsumption(0) ,
+    m_enableEstimate(false)
 {
+    m_estimateTimer.setInterval(100);
+    m_estimateTimer.setSingleShot(false);
+    connect(&m_estimateTimer, SIGNAL(timeout()),
+            this, SLOT(estimateUpdate()));
 }
 
 QString TaskProgress::key() const
@@ -28,11 +36,34 @@ void TaskProgress::start()
 {
     m_isRunning = true;
     m_startTime = QDateTime::currentDateTime();
+    if (m_enableEstimate) {
+        m_lastTimeConsumption =
+            LocalDatabase::instance()->queryTaskProgressTimeConsumption(m_key);
+
+        m_estimateTimer.start();
+    }
     emit changed();
 }
 
 void TaskProgress::stop()
 {
+    m_isRunning = false;
+    m_estimateTimer.stop();
+
+    m_lastTimeConsumption = m_startTime.msecsTo(QDateTime::currentDateTime());
+    if (m_enableEstimate) {
+        LocalDatabase::instance()->saveTaskProgressTimeConsumption(
+            m_key, m_lastTimeConsumption);
+    }
+
+    emit changed();
+}
+
+void TaskProgress::reset()
+{
+    m_value = 0;
+    m_minimum = 0;
+    m_maximum = 0;
     m_isRunning = false;
     emit changed();
 }
@@ -73,11 +104,31 @@ void TaskProgress::setValue(int val)
     emit changed();
 }
 
-void TaskProgress::reset()
+void TaskProgress::setEstimateEnabled(bool enabled)
 {
-    m_maximum = 0;
-    m_minimum = 0;
-    m_value = 0;
-    m_isRunning = false;
-    emit changed();
+    m_enableEstimate = enabled;
+    if (enabled && m_isRunning && !m_estimateTimer.isActive()) {
+        m_estimateTimer.start();
+    }
+    if (!enabled) {
+        m_estimateTimer.stop();
+    }
+}
+
+void TaskProgress::setEstimateInterval(int interval)
+{
+    m_estimateTimer.setInterval(interval);
+}
+
+void TaskProgress::estimateUpdate()
+{
+    if (m_lastTimeConsumption > 0) {
+        qint64 curConsumption = m_startTime.msecsTo(m_startTime);
+        double progress = (double) curConsumption / m_lastTimeConsumption;
+
+        // Stop at 90%
+        progress = progress > 0.9 ? 0.9 : progress;
+
+        setValue((m_maximum - m_minimum) * progress + m_minimum);
+    }
 }

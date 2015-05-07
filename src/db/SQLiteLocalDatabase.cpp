@@ -67,6 +67,13 @@ const char *SQL_INSERT_PLUGIN_PLAYLIST_PROVIDER =
 const char *SQL_QUERY_PLUGIN_PLAYLIST_PROVIDER =
         "select rowid, name from plugin_playlist_providers where name = ?";
 
+const char *SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION =
+        "insert or replace into task_progresses (task_key, last_time_consumption) "
+        "values (?, ?)";
+
+const char *SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION =
+        "select last_time_consumption from task_progresses where task_key = ?";
+
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
@@ -493,4 +500,46 @@ int SQLiteLocalDatabase::queryPluginPlayListProviderType(const QString &name)
     }
 
     return PlayListRecord::UNKNOWN_TYPE;
+}
+
+bool SQLiteLocalDatabase::saveTaskProgressTimeConsumption(const QString &key,
+                                                          qint64 timeConsumption)
+{
+    if (!m_db.isOpen() || key.isEmpty()) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION);
+    q.addBindValue(key);
+    q.addBindValue(timeConsumption);
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
+}
+
+qint64 SQLiteLocalDatabase::queryTaskProgressTimeConsumption(const QString &key)
+{
+    if (!m_db.isOpen() || key.isEmpty()) {
+        return 0;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION);
+    q.addBindValue(key);
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return 0;
+    }
+
+    while (q.next()) {
+        return q.value("last_time_consumption").toInt();
+    }
+
+    return 0;
 }

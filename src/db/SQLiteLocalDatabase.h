@@ -39,6 +39,10 @@ public:
     int insertPluginPlayListProviderType(const QString &name);
     int queryPluginPlayListProviderType(const QString &name);
 
+    bool saveTaskProgressTimeConsumption(const QString &key,
+                                         qint64 timeConsumption);
+    qint64 queryTaskProgressTimeConsumption(const QString &key);
+
 private:
     QSqlDatabase m_db;
 

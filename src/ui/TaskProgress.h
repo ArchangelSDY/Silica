@@ -3,6 +3,7 @@
 
 #include <QDateTime>
 #include <QObject>
+#include <QTimer>
 
 class TaskProgress : public QObject
 {
@@ -25,18 +26,29 @@ signals:
 public slots:
     void start();
     void stop();
+    void reset();
+
     void setMaximum(int max);
     void setMinimum(int min);
     void setValue(int val);
-    void reset();
+
+    void setEstimateEnabled(bool enabled);
+    void setEstimateInterval(int interval);
+
+private slots:
+    void estimateUpdate();
 
 private:
     QString m_key;
     int m_maximum;
     int m_minimum;
     int m_value;
-    QDateTime m_startTime;
     bool m_isRunning;
+
+    QDateTime m_startTime;
+    qint64 m_lastTimeConsumption;
+    bool m_enableEstimate;
+    QTimer m_estimateTimer;
 };
 
 #endif // TASKPROGRESS_H

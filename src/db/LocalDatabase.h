@@ -43,6 +43,10 @@ public:
     virtual int insertPluginPlayListProviderType(const QString &name) = 0;
     virtual int queryPluginPlayListProviderType(const QString &name) = 0;
 
+    virtual bool saveTaskProgressTimeConsumption(const QString &key,
+                                    qint64 timeConsumption) = 0;
+    virtual qint64 queryTaskProgressTimeConsumption(const QString &key) = 0;
+
     static LocalDatabase *instance();
 
 protected:
