@@ -36,46 +36,6 @@ LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
     m_timer.start();
 }
 
-void LoadingIndicator::start()
-{
-//    ++m_loadCount;
-//    if (m_loadCount > 0 && !m_timer.isActive()) {
-//        m_timer.start();
-//        show();
-//    }
-
-//    QPropertyAnimation *aniScale =
-//        new QPropertyAnimation(this, "minimumSize", this);
-//    aniScale->setDuration(200);
-//    aniScale->setStartValue(QSize(0, 0));
-//    aniScale->setEndValue(m_size);
-//    aniScale->setLoopCount(1);
-//    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::OutCubic));
-//    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void LoadingIndicator::stop()
-{
-//    if (m_loadCount > 0) {
-//        --m_loadCount;
-//    }
-
-//    if (m_loadCount == 0 && m_timer.isActive()) {
-//        m_timer.stop();
-//        hide();
-//    }
-
-//    QPropertyAnimation *aniScale =
-//        new QPropertyAnimation(this, "minimumSize", this);
-//    aniScale->setDuration(200);
-//    aniScale->setStartValue(minimumSize());
-//    aniScale->setEndValue(QSize(0, 0));
-//    aniScale->setLoopCount(1);
-//    aniScale->setEasingCurve(QEasingCurve(QEasingCurve::InCubic));
-//    aniScale->start(QAbstractAnimation::DeleteWhenStopped);
-//    connect(aniScale, SIGNAL(finished()), this, SLOT(hide()));
-}
-
 void LoadingIndicator::addTaskProgress(const TaskProgress &progress)
 {
     m_entries.append(&progress);

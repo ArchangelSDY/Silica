@@ -2,6 +2,7 @@
 #define SAPI_LOADINGINDICATORDELEGATE_H
 
 #include "sapi/LoadingIndicator.h"
+#include "ui/TaskProgress.h"
 
 class LoadingIndicator;
 
@@ -21,6 +22,7 @@ public:
 
 private:
     ::LoadingIndicator *m_indicator;
+    TaskProgress m_commonProgress;
 };
 
 extern void initPluginLoadingIndicator(::LoadingIndicator *indicator);

@@ -7,34 +7,38 @@ namespace sapi {
 LoadingIndicatorDelegate::LoadingIndicatorDelegate() :
     m_indicator(0)
 {
+    m_commonProgress.setEstimateEnabled(false);
 }
 
 void LoadingIndicatorDelegate::setIndicator(::LoadingIndicator *indicator)
 {
+    if (m_indicator) {
+        m_indicator->removeTaskProgress(m_commonProgress);
+    }
+
     m_indicator = indicator;
+
+    if (m_indicator) {
+        m_indicator->addTaskProgress(m_commonProgress);
+    }
 }
 
 void LoadingIndicatorDelegate::start()
 {
-    if (!m_indicator) {
-        return;
-    }
-    m_indicator->start();
+    m_commonProgress.reset();
+    m_commonProgress.start();
 }
 
 void LoadingIndicatorDelegate::stop()
 {
-    if (!m_indicator) {
-        return;
-    }
-    m_indicator->stop();
+    m_commonProgress.stop();
 }
 
 void LoadingIndicatorDelegate::reportProgress(int min, int max, int cur)
 {
-    Q_UNUSED(min);
-    Q_UNUSED(max);
-    Q_UNUSED(cur);
+    m_commonProgress.setMinimum(min);
+    m_commonProgress.setMaximum(max);
+    m_commonProgress.setValue(cur);
 }
 
 static sapi::LoadingIndicatorDelegate *g_pluginLoadingIndicator =

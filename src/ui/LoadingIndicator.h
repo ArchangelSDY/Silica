@@ -24,9 +24,6 @@ public:
     explicit LoadingIndicator(const QSize &size, QWidget *parent = 0);
 
 public slots:
-    void start();
-    void stop();
-
     void addTaskProgress(const TaskProgress &progress);
     void removeTaskProgress(const TaskProgress &progress);
 
