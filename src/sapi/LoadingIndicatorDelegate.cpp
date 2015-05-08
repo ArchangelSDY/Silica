@@ -26,6 +26,8 @@ void LoadingIndicatorDelegate::setIndicator(::LoadingIndicator *indicator)
 void LoadingIndicatorDelegate::start()
 {
     m_commonProgress.reset();
+    m_commonProgress.setMinimum(0);
+    m_commonProgress.setMaximum(0);
     m_commonProgress.start();
 }
 
