@@ -63,7 +63,6 @@ qt5_wrap_ui(CORE_FORMS_HEADERS ${CORE_FORMS})
 set(CORE_SRCS ${CORE_SRCS} ${CORE_FORMS_HEADERS})
 
 set(CORE_LINK_LIBS
-    sapicore
     ${CMAKE_THREAD_LIBS_INIT}
     ${ZLIB_LIBRARIES}
     ${OpenCV_LIBS}
@@ -104,9 +103,6 @@ file(GLOB SAPI_SRCS
     "sapi/*.cpp"
 )
 add_definitions(-DSAPI_LIBRARY)
-add_library(sapicore STATIC ${SAPI_SRCS})
-target_link_libraries(sapicore silicacore)
-
 add_library(sapi SHARED ${SAPI_SRCS} ${DEFINITION_SRCS})
 target_link_libraries(sapi silicacore)
 set_target_properties(sapi PROPERTIES
@@ -128,7 +124,7 @@ else (WIN32)
     add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
 
-target_link_libraries(silica sapicore silicacore)
+target_link_libraries(silica sapi silicacore)
 
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
