@@ -55,22 +55,24 @@ void LoadingIndicator::removeTaskProgress(const TaskProgress &progress)
 void LoadingIndicator::paintEvent(QPaintEvent *)
 {
     bool isInfinite = false;
-    double totalProgress = 0;
+    double minProgress;
     int validCnt = 0;
     foreach (const TaskProgress *progress, m_entries) {
         if (progress->isRunning()) {
-            validCnt++;
-
             if (progress->minimum() == progress->maximum()) {
                 isInfinite = true;
                 break;
             }
 
-            totalProgress += ((double)(progress->value() - progress->minimum())) / (progress->maximum() - progress->minimum());
+            validCnt++;
+            double curProgress = ((double)(progress->value() - progress->minimum())) / (progress->maximum() - progress->minimum());
+            if (validCnt == 1) {
+                minProgress = curProgress;
+            } else if (curProgress < minProgress) {
+                minProgress = curProgress;
+            }
         }
     }
-
-    totalProgress /= validCnt;
 
     QPainter painter(this);
     painter.setRenderHints(
@@ -98,7 +100,7 @@ void LoadingIndicator::paintEvent(QPaintEvent *)
         painter.setPen(circlePen);
 
         int startAngle = 90 * 16;
-        int spanAngle = - totalProgress * 360 * 16;
+        int spanAngle = - minProgress * 360 * 16;
         painter.drawArc(circleBorder, circleBorder,
                         circleWidth - 2 * circleBorder, circleHeight - 2 * circleBorder,
                         startAngle, spanAngle);
