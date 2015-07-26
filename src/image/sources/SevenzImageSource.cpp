@@ -1,5 +1,6 @@
 #include <QCryptographicHash>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QThread>
 #include <QUrl>
@@ -69,6 +70,11 @@ bool SevenzImageSource::open()
     m_device.reset(buffer);
 
     return true;
+}
+
+bool SevenzImageSource::exists()
+{
+    return QFileInfo::exists(m_packagePath);
 }
 
 bool SevenzImageSource::copy(const QString &destPath)

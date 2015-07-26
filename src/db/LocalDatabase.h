@@ -32,6 +32,8 @@ public:
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
     virtual bool updateImageSize(Image *image) = 0;
     virtual QSize queryImageSize(Image *image) = 0;
+    virtual bool updateImageUrlByHashStr(const QString &hashStr,
+                                         const QUrl &newUrl) = 0;
 
     virtual bool insertImageHotspot(ImageHotspot *hotspot) = 0;
     virtual bool removeImageHotspot(ImageHotspot *hotspot) = 0;

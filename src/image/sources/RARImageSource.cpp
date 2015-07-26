@@ -1,5 +1,6 @@
 #include <QByteArray>
 #include <QCryptographicHash>
+#include <QFileInfo>
 #include <QTextStream>
 
 #include "deps/QtRAR/src/qtrar.h"
@@ -53,6 +54,11 @@ bool RARImageSource::open()
 
     m_device.reset(file);
     return ok;
+}
+
+bool RARImageSource::exists()
+{
+    return QFileInfo::exists(m_arcPath);
 }
 
 bool RARImageSource::copy(const QString &destPath)

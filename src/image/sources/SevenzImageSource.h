@@ -14,6 +14,7 @@ public:
                       QString packagePath, QString imageName);
 
     virtual bool open();
+    virtual bool exists();
 
     virtual bool copy(const QString &destPath);
 private:

@@ -14,6 +14,7 @@ public:
 
     virtual bool open() = 0;
     virtual void close();
+    virtual bool exists() = 0;
 
     virtual bool copy(const QString &destPath) = 0;
 

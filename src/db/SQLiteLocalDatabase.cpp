@@ -345,6 +345,13 @@ QSize SQLiteLocalDatabase::queryImageSize(Image *image)
     }
 }
 
+bool SQLiteLocalDatabase::updateImageUrlByHashStr(const QString &hashStr,
+                                                  const QUrl &newUrl)
+{
+    qDebug() << "patch" << hashStr << newUrl;
+    return true;
+}
+
 bool SQLiteLocalDatabase::insertImageHotspot(ImageHotspot *hotspot)
 {
     if (!m_db.isOpen()) {

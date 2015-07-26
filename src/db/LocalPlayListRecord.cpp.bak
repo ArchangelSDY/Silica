@@ -1,0 +1,37 @@
+#include "LocalDatabase.h"
+#include "LocalPlayListRecord.h"
+#include "PlayList.h"
+
+LocalPlayListRecord::LocalPlayListRecord(const QString &name,
+                               const QString &coverPath,
+                               PlayList *playList,
+                               QObject *parent) :
+    PlayListRecord(name, coverPath, playList, parent)
+{
+}
+
+int LocalPlayListRecord::type() const
+{
+    return 0;
+}
+
+QString LocalPlayListRecord::typeName() const
+{
+    return "Local";
+}
+
+PlayList *LocalPlayListRecord::playList()
+{
+    if (!m_playList) {
+        m_playList = new PlayList();
+        m_playList->setRecord(this);
+
+        QStringList imageUrls =
+            LocalDatabase::instance()->queryImageUrlsForLocalPlayListRecord(m_id);
+        foreach (const QString &imageUrl, imageUrls) {
+            m_playList->addMultiplePath(QUrl(imageUrl));
+        }
+    }
+
+    return m_playList;
+}

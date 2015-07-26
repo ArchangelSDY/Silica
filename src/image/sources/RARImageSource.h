@@ -11,6 +11,7 @@ public:
                    const QByteArray &password = QByteArray());
 
     virtual bool open();
+    virtual bool exists();
     virtual bool copy(const QString &destPath);
 
 private:

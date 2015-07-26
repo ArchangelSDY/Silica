@@ -28,6 +28,8 @@ public:
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageSize(Image *image);
     QSize queryImageSize(Image *image);
+    bool updateImageUrlByHashStr(const QString &hashStr,
+                                 const QUrl &newUrl);
 
     bool insertImageHotspot(ImageHotspot *hotspot);
     bool removeImageHotspot(ImageHotspot *hotspot);

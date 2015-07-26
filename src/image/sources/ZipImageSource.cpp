@@ -2,6 +2,7 @@
 
 #include <QBuffer>
 #include <QCryptographicHash>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QUrl>
 
@@ -42,6 +43,11 @@ bool ZipImageSource::open()
     } else {
         return false;
     }
+}
+
+bool ZipImageSource::exists()
+{
+    return QFileInfo::exists(m_zipPath);
 }
 
 bool ZipImageSource::copy(const QString &destPath)

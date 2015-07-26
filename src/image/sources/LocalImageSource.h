@@ -9,6 +9,7 @@ public:
     LocalImageSource(ImageSourceFactory *factory, QString path);
 
     virtual bool open();
+    virtual bool exists();
 
     virtual bool copy(const QString &destPath);
 private:
