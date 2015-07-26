@@ -23,6 +23,7 @@ public:
     }
 
     bool open() { return true; }
+    bool exists() { return true; }
     bool copy(const QString &) { return true; }
 };
 

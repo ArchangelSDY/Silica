@@ -20,6 +20,8 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/image
     ${CMAKE_CURRENT_SOURCE_DIR}/image/caches
     ${CMAKE_CURRENT_SOURCE_DIR}/image/sources
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/listeners
     ${CMAKE_CURRENT_SOURCE_DIR}/navigation
     ${CMAKE_CURRENT_SOURCE_DIR}/playlist
     ${CMAKE_CURRENT_SOURCE_DIR}/ui
@@ -44,6 +46,8 @@ file(GLOB CORE_SRCS
     "image/*.cpp"
     "image/caches/*.cpp"
     "image/sources/*.cpp"
+    "logger/*.cpp"
+    "logger/listeners/*.cpp"
     "navigation/*.cpp"
     "playlist/*.cpp"
     "playlist/PlayListProvider.h"
