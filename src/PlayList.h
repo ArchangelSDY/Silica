@@ -48,7 +48,7 @@ public:
 
     void append(const QSharedPointer<Image> &image);
     void append(const ImageList &images);
-    void append(PlayList *playList, bool watching = false);
+    void append(PlayList *playList);
 
     QList<QSharedPointer<Image> > &operator<<(
             const QSharedPointer<Image> &image);
@@ -93,9 +93,6 @@ public:
 signals:
     void itemsChanged();
     void itemsAppended(int start);
-
-private slots:
-    void watchedPlayListAppended(int start);
 
 private:
     bool groupLessThan(const ImagePtr &left, const ImagePtr &right);

@@ -54,17 +54,12 @@ void PlayList::append(const ImageList &images)
     emit itemsAppended(start);
 }
 
-void PlayList::append(PlayList *playList, bool watching)
+void PlayList::append(PlayList *playList)
 {
     int start = count();
     m_allImages.append(playList->m_allImages);
     m_filteredImages.append(playList->m_filteredImages);
     emit itemsAppended(start);
-
-    if (watching) {
-        connect(playList, SIGNAL(itemsAppended(int)),
-                this, SLOT(watchedPlayListAppended(int)));
-    }
 }
 
 QList<QSharedPointer<Image> > &PlayList::operator<<(
@@ -160,22 +155,6 @@ void PlayList::removeAt(int index)
     m_filteredImages.removeOne(removed);
 
     emit itemsChanged();
-}
-
-void PlayList::watchedPlayListAppended(int start)
-{
-    int oldCount = count();
-    PlayList *watched = static_cast<PlayList *>(sender());
-    for (int i = start; i < watched->count(); ++i) {
-        const ImagePtr &image = watched->at(i);
-
-        ImageList l;
-        l << image;
-
-        m_allImages << l;
-        m_filteredImages << m_filter->filtered(l);
-    }
-    emit itemsAppended(oldCount);
 }
 
 static bool imageNameLessThan(const QSharedPointer<Image> &left,

@@ -56,6 +56,7 @@ PlayList *PlayListRecord::playList()
 {
     if (!m_playList && m_provider) {
         m_playList = new PlayList();
+        m_playList->setRecord(this);
 
         QObject::connect(
             m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
@@ -70,6 +71,14 @@ PlayList *PlayListRecord::playList()
     }
 
     return m_playList;
+}
+
+void PlayListRecord::reload()
+{
+    if (m_playList) {
+        m_playList->clear();
+        m_provider->request(m_name, providerExtra());
+    }
 }
 
 QVariantHash PlayListRecord::providerExtra() const

@@ -34,6 +34,8 @@ public:
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
     PlayList *playList();
+    void reload();
+
     QVariantHash providerExtra() const;
     bool save();
     bool remove();
