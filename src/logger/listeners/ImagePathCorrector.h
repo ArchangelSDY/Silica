@@ -33,6 +33,7 @@ public:
     {
     public:
         virtual void prompt(QList<ImagePathCorrector::PathPatch> &patches) = 0;
+        virtual ~PromptClient() {}
     };
 
 
@@ -48,6 +49,7 @@ public:
 private:
     void promptPatches();
     void applyPatches();
+    void reloadPlayList();
 
     QList<QString> m_searchDirs;
     Navigator *m_navigator;

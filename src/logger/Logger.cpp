@@ -27,6 +27,16 @@ void Logger::addListener(int type, LogListener *listener)
     m_listeners.insertMulti(type, listener);
 }
 
+void Logger::removeListener(LogListener *listener)
+{
+    for (auto it = m_listeners.begin(); it != m_listeners.end(); ++it) {
+        if (*it == listener) {
+            m_listeners.erase(it);
+            return;
+        }
+    }
+}
+
 LogBuilder Logger::log(int type)
 {
     return LogBuilder(this, type);

@@ -16,6 +16,7 @@
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
+#include "logger/Logger.h"
 #include "util/ConcurrentHash.h"
 #include "GlobalConfig.h"
 
@@ -258,6 +259,10 @@ Image::Image(const QUrl &url, QObject *parent) :
 
     connect(this, SIGNAL(thumbnailLoaded()),
             this, SLOT(initThumbHist()));
+    connect(this, SIGNAL(loaded()),
+            this, SLOT(onLoad()));
+    connect(this, SIGNAL(thumbnailLoadFailed()),
+            this, SLOT(onThumbnailLoadFailed()));
 }
 
 Image::Image(ImageSource *imageSource, QObject *parent) :
@@ -284,6 +289,10 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
 
     connect(this, SIGNAL(thumbnailLoaded()),
             this, SLOT(initThumbHist()));
+    connect(this, SIGNAL(loaded()),
+            this, SLOT(onLoad()));
+    connect(this, SIGNAL(thumbnailLoadFailed()),
+            this, SLOT(onThumbnailLoadFailed()));
 }
 
 Image::~Image()
@@ -432,6 +441,12 @@ void Image::loadThumbnail(bool makeImmediately)
     }
 
     if (m_isLoadingThumbnail) {
+        return;
+    }
+
+    // Do not load thumbnail for image source that doesn't exist
+    if (!m_imageSource->exists()) {
+        emit thumbnailLoadFailed();
         return;
     }
 
@@ -596,6 +611,24 @@ void Image::initThumbHist()
     if (!m_thumbHist) {
         m_thumbHist = new ImageHistogram(*m_thumbnail);
     }
+}
+
+void Image::onLoad()
+{
+    if (m_status == Image::LoadError) {
+        Logger::instance()->log(Logger::IMAGE_LOAD_ERROR)
+            .describe("ImageHashStr", m_imageSource->hashStr())
+            .describe("ImageURL", m_imageSource->url())
+            .save();
+    }
+}
+
+void Image::onThumbnailLoadFailed()
+{
+    Logger::instance()->log(Logger::IMAGE_THUMBNAIL_LOAD_ERROR)
+        .describe("ImageHashStr", m_imageSource->hashStr())
+        .describe("ImageURL", m_imageSource->url())
+        .save();
 }
 
 #include "Image.moc"

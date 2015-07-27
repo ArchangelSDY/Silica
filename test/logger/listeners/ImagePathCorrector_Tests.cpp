@@ -74,8 +74,8 @@ void TestImagePathCorrector::correct()
     QList<QString> searchDirs;
     searchDirs << QString("%1/new").arg(testDir.path());
 
-    MockPromptClient promptClient;
-    ImagePathCorrector corrector(searchDirs, 0, &promptClient);
+    MockPromptClient *promptClient = new MockPromptClient();
+    ImagePathCorrector corrector(searchDirs, 0, promptClient);
     corrector.setTestMode(true);
 
     LogRecord record;
@@ -84,11 +84,11 @@ void TestImagePathCorrector::correct()
 
     corrector.dispatch(record);
 
-    QSignalSpy spy(&promptClient, SIGNAL(onPrompt()));
+    QSignalSpy spy(promptClient, SIGNAL(onPrompt()));
     QVERIFY(spy.wait());
 
-    QCOMPARE(promptClient.patches.count(), 1);
-    QCOMPARE(promptClient.patches[0].newImageUrl, newUrl);
+    QCOMPARE(promptClient->patches.count(), 1);
+    QCOMPARE(promptClient->patches[0].newImageUrl, newUrl);
 
     newFile.remove();
 }

@@ -12,6 +12,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class ImagePathCorrector;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -67,6 +69,8 @@ private:
     QAction *m_actToolBarFav;
     QAction *m_actToolBarGallery;
     QAction *m_actToolBarImage;
+
+    ImagePathCorrector *m_imagePathCorrector;
 };
 
 #endif // MAINWINDOW_H

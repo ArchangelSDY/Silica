@@ -94,6 +94,9 @@ private slots:
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
     void initThumbHist();
 
+    void onLoad();
+    void onThumbnailLoadFailed();
+
 private:
     static QThreadPool *s_threadPool;
 

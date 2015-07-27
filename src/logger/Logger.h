@@ -13,14 +13,18 @@ public:
     class LogListener {
     public:
         virtual void dispatch(const LogRecord &record) = 0;
+        virtual ~LogListener() {}
     };
 
     static const int IMAGE_LOAD_ERROR = 1;
+    static const int IMAGE_THUMBNAIL_LOAD_ERROR = 2;
 
     static Logger *instance();
 
     void addListener(int type, LogListener *listener);
+    void removeListener(LogListener *listener);
     LogBuilder log(int type);
+
 
 private:
     Logger();

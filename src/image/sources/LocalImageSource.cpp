@@ -9,12 +9,13 @@ LocalImageSource::LocalImageSource(ImageSourceFactory *factory, QString path) :
     ImageSource(factory)
 {
     m_path = path;
-
     QString realPath = searchRealPath(path);
     if (!realPath.isEmpty()) {
-        QFileInfo info(realPath);
-        m_name = info.fileName();
+        m_path = realPath;
     }
+
+    QFileInfo info(m_path);
+    m_name = info.fileName();
 
     // Compute hash
     QString hashStr;

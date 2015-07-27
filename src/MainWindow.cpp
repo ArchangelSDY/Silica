@@ -17,10 +17,13 @@
 #include <QToolBar>
 
 #include "image/ImageSourceManager.h"
+#include "logger/listeners/ImagePathCorrector.h"
+#include "logger/Logger.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
+#include "ui/ImagePathCorrectorClientImpl.h"
 #include "ui/ImageSourceManagerClientImpl.h"
 #include "ui/LoadingIndicator.h"
 #include "ui/PlayListGalleryItem.h"
@@ -104,6 +107,9 @@ MainWindow::~MainWindow()
 {
     QSettings setting;
     setting.setValue("LAST_FILE_SYSTEM_PATH", ui->fsView->rootPath());
+
+    Logger::instance()->removeListener(m_imagePathCorrector);
+    delete m_imagePathCorrector;
 
     delete ui;
 }
@@ -280,6 +286,18 @@ void MainWindow::setupExtraUi()
     ImageSourceManager::instance()->setClient(
         new ImageSourceManagerClientImpl(this));
 
+
+    // Init image path corrector client
+    ImagePathCorrector::PromptClient *imagePathCorrectorClientImpl =
+        new ImagePathCorrectorClientImpl(this);
+    m_imagePathCorrector =
+        new ImagePathCorrector(GlobalConfig::instance()->searchDirs(),
+                               m_navigator, imagePathCorrectorClientImpl);
+    Logger::instance()->addListener(Logger::IMAGE_LOAD_ERROR,
+                                    m_imagePathCorrector);
+    Logger::instance()->addListener(Logger::IMAGE_THUMBNAIL_LOAD_ERROR,
+                                    m_imagePathCorrector);
+
     // TODO: Lazy load here
     loadSavedPlayLists();
 }
@@ -295,25 +313,19 @@ void MainWindow::loadSelectedPlayList()
     QList<GalleryItem *> selectedItems =
         ui->playListGallery->selectedGalleryItems();
     if (selectedItems.count() > 0) {
-        PlayList *pl = new PlayList();
-        foreach (GalleryItem *item, selectedItems) {
-            PlayListGalleryItem *playListItem =
-                static_cast<PlayListGalleryItem *>(item);
-
-            // Should watch sub playlists changes
-            PlayList *recordPlayList = playListItem->record()->playList();
-            pl->append(recordPlayList, true);
-        }
-
-        // If only one item is selected, use its PlayListRecord
-        if (selectedItems.count() == 1) {
-            PlayListGalleryItem *firstPlayListItem =
-                static_cast<PlayListGalleryItem *>(selectedItems[0]);
-            pl->setRecord(firstPlayListItem->record());
-        }
+        // TODO(sdy): Support multiple playlists
+        //
+        // Watching option for PlayList::append() brought too many hidden
+        // bugs. Need to figure out new way to support viewing multiple
+        // playlists. One PlayListRecord with a list of providers may be
+        // a choice?
+        PlayListGalleryItem *playListItem =
+            static_cast<PlayListGalleryItem *>(selectedItems[0]);
+        PlayList *pl = playListItem->record()->playList();
+        m_navigator->setPlayList(pl);
 
         // Navigator should take ownership of PlayList in this case
-        m_navigator->setPlayList(pl, true);
+        // m_navigator->setPlayList(pl, true);
 
         // Make cover image of first playlist item selected
         PlayListGalleryItem *firstItem =

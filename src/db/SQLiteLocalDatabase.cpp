@@ -52,6 +52,8 @@ const char *SQL_QUERY_IMAGE_SIZE = "select width, height from images where hash 
 
 const char *SQL_UPDATE_IMAGE_URL_BY_HASH = "update images set url = ? where hash = ?";
 
+const char *SQL_UPDATE_IMAGE_URL = "update images set url = ? where url = ?";
+
 const char *SQL_INSERT_IMAGE_HOTSPOT = "insert into image_hotspots(image_hash, left, top, width, height) "
         "values (?, ?, ?, ?, ?)";
 
@@ -358,6 +360,25 @@ bool SQLiteLocalDatabase::updateImageUrlByHashStr(const QString &hashStr,
     q.prepare(SQL_UPDATE_IMAGE_URL_BY_HASH);
     q.addBindValue(newUrl.toString());
     q.addBindValue(hashStr);
+
+    if (!q.exec()) {
+        qWarning() << q.lastError() << q.lastQuery();
+        return false;
+    }
+
+    return true;
+}
+
+bool SQLiteLocalDatabase::updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl)
+{
+    if (!m_db.isOpen()) {
+        return false;
+    }
+
+    QSqlQuery q;
+    q.prepare(SQL_UPDATE_IMAGE_URL);
+    q.addBindValue(newUrl.toString());
+    q.addBindValue(oldUrl.toString());
 
     if (!q.exec()) {
         qWarning() << q.lastError() << q.lastQuery();

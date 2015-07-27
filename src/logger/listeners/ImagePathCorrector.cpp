@@ -9,6 +9,7 @@
 
 #include "db/LocalDatabase.h"
 #include "image/ImageSourceManager.h"
+#include "Navigator.h"
 
 ImagePathCorrector::PathPatch::PathPatch() : shouldApply(true)
 {
@@ -30,11 +31,12 @@ private:
     QUrl searchNewUrl(const QUrl &oldUrl);
 
     static const int SLEEP_MSECS = 100;
-    static const int MAX_IDLE_LOOP_BEFORE_PROMPT_FIX = 10;
+    static const int MAX_IDLE_LOOP_BEFORE_PROMPT_FIX = 30;
 
     ImagePathCorrector &m_corrector;
     bool m_shouldExit;
     int m_curIdleLoop = 0;
+    QHash<QUrl, bool> m_handledUrls;
 };
 
 ImagePathCorrector::WorkerThread::WorkerThread(ImagePathCorrector &corrector)
@@ -64,7 +66,7 @@ void ImagePathCorrector::WorkerThread::run()
                     m_corrector.applyPatches();
 
                     // Reload playlist
-                    // TODO
+                    m_corrector.reloadPlayList();
                 }
 
                 m_curIdleLoop = 0;
@@ -89,6 +91,12 @@ void ImagePathCorrector::WorkerThread::correctPath(const LogRecord &record)
 {
     QString imageHashStr = record.extra.value("ImageHashStr").toString();
     QUrl imageUrl = record.extra.value("ImageURL").toUrl();
+
+    if (m_handledUrls.contains(imageUrl)) {
+        return;
+    } else {
+        m_handledUrls.insert(imageUrl, true);
+    }
 
     ImageSource *source = ImageSourceManager::instance()->createSingle(imageUrl);
     if (source && !source->exists()) {
@@ -150,6 +158,10 @@ ImagePathCorrector::~ImagePathCorrector()
     m_worker->notifyExit();
     m_worker->wait();
     delete m_worker;
+
+    if (m_promptClient) {
+        delete m_promptClient;
+    }
 }
 
 void ImagePathCorrector::dispatch(const LogRecord &record)
@@ -171,11 +183,24 @@ void ImagePathCorrector::applyPatches()
 {
     foreach (const ImagePathCorrector::PathPatch &patch, m_pathPatches) {
         if (patch.shouldApply) {
-            LocalDatabase::instance()->updateImageUrlByHashStr(
-                patch.imageHashStr, patch.newImageUrl);
+            LocalDatabase::instance()->updateImageUrl(patch.oldImageUrl,
+                                                      patch.newImageUrl);
         }
     }
     m_pathPatches.clear();
+}
+
+void ImagePathCorrector::reloadPlayList()
+{
+    if (m_navigator) {
+        PlayList *pl = m_navigator->playList();
+        if (pl) {
+            PlayListRecord *plr = pl->record();
+            if (plr) {
+                plr->reload();
+            }
+        }
+    }
 }
 
 void ImagePathCorrector::setTestMode(bool isTestMode)

@@ -30,6 +30,7 @@ public:
     QSize queryImageSize(Image *image);
     bool updateImageUrlByHashStr(const QString &hashStr,
                                  const QUrl &newUrl);
+    bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 
     bool insertImageHotspot(ImageHotspot *hotspot);
     bool removeImageHotspot(ImageHotspot *hotspot);
