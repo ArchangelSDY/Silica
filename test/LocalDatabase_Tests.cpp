@@ -26,7 +26,7 @@ private slots:
 
     void insertImage();
     void insertImage_data();
-    void updateImageUrlByHashStr();
+    void updateImageUrl();
 
     void pluginPlayListProvider();
 };
@@ -277,7 +277,7 @@ void TestLocalDatabase::insertImage_data()
     QTest::newRow("Basic") << ":/assets/insert_image.jpg";
 }
 
-void TestLocalDatabase::updateImageUrlByHashStr()
+void TestLocalDatabase::updateImageUrl()
 {
     QUrl oldUrl("file:///root/old/image.jpg");
     QUrl newUrl("file:///root/new/image.jpg");
@@ -285,8 +285,7 @@ void TestLocalDatabase::updateImageUrlByHashStr()
 
     QVERIFY(LocalDatabase::instance()->insertImage(&image));
 
-    QVERIFY(LocalDatabase::instance()->updateImageUrlByHashStr(
-        image.source()->hashStr(), newUrl));
+    QVERIFY(LocalDatabase::instance()->updateImageUrl(oldUrl, newUrl));
 
     Image *newImage = LocalDatabase::instance()->queryImageByHashStr(
         image.source()->hashStr());
