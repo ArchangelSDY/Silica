@@ -22,6 +22,8 @@ public:
     public:
         PathPatch();
 
+        QString toString() const;
+
         QString imageHashStr;
         QUrl oldImageUrl;
         QUrl newImageUrl;

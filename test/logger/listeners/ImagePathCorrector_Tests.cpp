@@ -16,6 +16,9 @@ private slots:
     void correct();
     void correct_data();
 
+    void patch_toString();
+    void patch_toString_data();
+
 private:
     QTemporaryDir testDir;
 };
@@ -114,6 +117,43 @@ void TestImagePathCorrector::correct_data()
     QTest::newRow("Local Image Deeper")
         << QUrl(QString("file://%1/old/deep/1.jpg").arg(testDir.path()))
         << QUrl(QString("file://%1/new/deep/1.jpg").arg(testDir.path()));
+}
+
+void TestImagePathCorrector::patch_toString()
+{
+    QFETCH(QUrl, oldUrl);
+    QFETCH(QUrl, newUrl);
+    QFETCH(QString, showText);
+
+    ImagePathCorrector::PathPatch patch;
+    patch.oldImageUrl = oldUrl;
+    patch.newImageUrl = newUrl;
+
+    QCOMPARE(patch.toString(), showText);
+}
+
+void TestImagePathCorrector::patch_toString_data()
+{
+    QTest::addColumn<QUrl>("oldUrl");
+    QTest::addColumn<QUrl>("newUrl");
+    QTest::addColumn<QString>("showText");
+
+    QTest::newRow("Common Prefix and Suffix")
+        << QUrl("file:///a1/b/c.jpg")
+        << QUrl("file:///a2/b/c.jpg")
+        << QString("file:///{ a1 => a2 }/b/c.jpg");
+    QTest::newRow("No Common Prefix")
+        << QUrl("file:///a/b/c.jpg")
+        << QUrl("zip:///a/b/c.jpg")
+        << QString("{ file: => zip: }///a/b/c.jpg");
+    QTest::newRow("No Common Suffix")
+        << QUrl("file:///a/b/c1.jpg")
+        << QUrl("file:///a/b/c2.jpg")
+        << QString("file:///a/b/{ c1.jpg => c2.jpg }");
+    QTest::newRow("Deeper")
+        << QUrl("file:///a/b/e.jpg")
+        << QUrl("file:///a/b/c/d/e.jpg")
+        << QString("file:///a/b/{  => c/d }/e.jpg");
 }
 
 

@@ -14,16 +14,13 @@ ImagePathCorrectorDialog::ImagePathCorrectorDialog(
 
     for (int i = 0; i < m_patches.count(); ++i) {
         const ImagePathCorrector::PathPatch &patch = m_patches[i];
+        QString showText= patch.toString();
 
-        QString text = QString("%1 => %2")
-            .arg(patch.oldImageUrl.toString())
-            .arg(patch.newImageUrl.toString());
-
-        QListWidgetItem *item = new QListWidgetItem(text, ui->lstPatches);
+        QListWidgetItem *item = new QListWidgetItem(showText, ui->lstPatches);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
         item->setCheckState(Qt::Checked);
         item->setData(Qt::EditRole, i);
-        item->setData(Qt::DisplayRole, text);
+        item->setData(Qt::DisplayRole, showText);
         ui->lstPatches->addItem(item);
     }
 

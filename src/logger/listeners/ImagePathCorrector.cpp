@@ -15,6 +15,49 @@ ImagePathCorrector::PathPatch::PathPatch() : shouldApply(true)
 {
 }
 
+QString ImagePathCorrector::PathPatch::toString() const
+{
+    QString oldUrl = oldImageUrl.toString();
+    QString newUrl = newImageUrl.toString();
+
+    QStringList oldUrlParts = oldUrl.split(QDir::separator());
+    QStringList newUrlParts = newUrl.split(QDir::separator());
+
+    int commonPrefixCnt = 0;
+    int minLength = qMin(oldUrlParts.length(), newUrlParts.length());
+    for (; commonPrefixCnt < minLength; ++commonPrefixCnt ) {
+        if (oldUrlParts[commonPrefixCnt] != newUrlParts[commonPrefixCnt]) {
+            break;
+        }
+    }
+
+    int commonSuffixCnt = 0;
+    for (; commonSuffixCnt < minLength; ++commonSuffixCnt) {
+        int oldIdx = oldUrlParts.length() - commonSuffixCnt;
+        int newIdx = newUrlParts.length() - commonSuffixCnt;
+        if (oldUrlParts[oldIdx - 1] != newUrlParts[newIdx - 1]) {
+            break;
+        }
+    }
+
+    QList<QString> commonPrefixParts = oldUrlParts.mid(0, commonPrefixCnt);
+    QList<QString> commonSuffixParts = oldUrlParts.mid(oldUrlParts.length() - commonSuffixCnt);
+
+    QString oldDiff = QStringList(oldUrlParts.mid(commonPrefixCnt, oldUrlParts.length() - commonPrefixCnt - commonSuffixCnt))
+        .join(QDir::separator());
+    QString newDiff = QStringList(newUrlParts.mid(commonPrefixCnt, newUrlParts.length() - commonPrefixCnt - commonSuffixCnt))
+        .join(QDir::separator());
+
+    QString diff = QString("{ %1 => %2 }")
+        .arg(oldDiff, newDiff);
+
+    QStringList showTextParts;
+    showTextParts << commonPrefixParts << diff << commonSuffixParts;
+    QString showText = showTextParts.join(QDir::separator());
+
+    return showText;
+}
+
 
 class ImagePathCorrector::WorkerThread : public QThread
 {
