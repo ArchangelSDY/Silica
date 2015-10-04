@@ -93,6 +93,8 @@ void LoadImageTask::run()
                 images << QSharedPointer<QImage>::create(image);
                 durations << reader.nextImageDelay();
             } else {
+                qWarning() << "Failed to read image due to error:"
+                           << reader.errorString();
                 break;
             }
         }
