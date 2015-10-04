@@ -4,7 +4,7 @@
 
 #include "STestCase.h"
 #include "../src/GlobalConfig.h"
-#include "../src/ui/TaskProgress.h"
+#include "../src/ui/models/TaskProgress.h"
 
 class TestTaskProgress : public STestCase
 {

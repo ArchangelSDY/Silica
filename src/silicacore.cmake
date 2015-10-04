@@ -22,7 +22,6 @@ include_directories(
 
 file(GLOB CORE_SRCS
     "GlobalConfig.cpp"
-    "MainWindow.cpp"
     "PlayList.cpp"
     "Navigator.cpp"
     "db/*.cpp"
@@ -41,19 +40,9 @@ file(GLOB CORE_SRCS
     "sapi/PlayListProviderDelegate.cpp"
     "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"
-    "ui/*.cpp"
-    "ui/hotspots/*.cpp"
-    "ui/renderers/*.cpp"
+    "ui/models/TaskProgress.cpp"
     "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
 )
-file(GLOB CORE_FORMS
-    "*.ui"
-    "navigation/*.ui"
-    "ui/*.ui"
-)
-
-qt5_wrap_ui(CORE_FORMS_HEADERS ${CORE_FORMS})
-set(CORE_SRCS ${CORE_SRCS} ${CORE_FORMS_HEADERS})
 
 set(CORE_LINK_LIBS
     sapi

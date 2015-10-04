@@ -30,8 +30,8 @@ add_subdirectory(deps/QtDBMigration)
 
 include("sapi.cmake")
 include("silicacore.cmake")
+include("silicaui.cmake")
 include("silica.cmake")
-
 
 set(CPACK_GENERATOR "TGZ;ZIP")
 set(CPACK_PACKAGE_EXECUTABLES "silica;Silica")

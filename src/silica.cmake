@@ -1,9 +1,10 @@
-set(SILICA_SRCS
-    "main.cpp"
-)
 file(GLOB SILICA_RESOURCES "*.qrc")
 qt5_add_resources(SILICA_RESOURCES_RCC ${SILICA_RESOURCES})
-set(SILICA_SRCS ${SILICA_SRCS} ${SILICA_RESOURCES_RCC} ${DEFINITION_SRCS})
+
+set(SILICA_SRCS
+    ${SILICA_RESOURCES_RCC}
+    "main.cpp"
+)
 
 if (WIN32)
     add_executable(silica WIN32 ${SILICA_SRCS})
@@ -11,7 +12,7 @@ else (WIN32)
     add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
 
-target_link_libraries(silica sapi silicacore)
+target_link_libraries(silica sapi silicacore silicaui)
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executable_path/../Resources/lib;$ORIGIN/../lib")
 
 # WebP Animation Plugin

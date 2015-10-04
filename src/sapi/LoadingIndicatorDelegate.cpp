@@ -1,7 +1,5 @@
 #include "LoadingIndicatorDelegate.h"
 
-#include "ui/LoadingIndicator.h"
-
 namespace sapi {
 
 LoadingIndicatorDelegate::LoadingIndicatorDelegate() :
@@ -10,7 +8,7 @@ LoadingIndicatorDelegate::LoadingIndicatorDelegate() :
     m_commonProgress.setEstimateEnabled(false);
 }
 
-void LoadingIndicatorDelegate::setIndicator(::LoadingIndicator *indicator)
+void LoadingIndicatorDelegate::setIndicator(Indicator *indicator)
 {
     if (m_indicator) {
         m_indicator->removeTaskProgress(m_commonProgress);
@@ -45,7 +43,7 @@ void LoadingIndicatorDelegate::reportProgress(int min, int max, int cur)
 
 void setLoadingIndicatorImpl(LoadingIndicator *indicator);
 
-void initPluginLoadingIndicator(::LoadingIndicator *indicator)
+void initPluginLoadingIndicator(LoadingIndicatorDelegate::Indicator *indicator)
 {
     sapi::LoadingIndicatorDelegate *delegate = new sapi::LoadingIndicatorDelegate();
     delegate->setIndicator(indicator);

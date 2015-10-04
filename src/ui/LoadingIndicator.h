@@ -9,23 +9,26 @@
 #include <QOpenGLWidget>
 #endif
 
+#include "sapi/LoadingIndicatorDelegate.h"
+
 class QPropertyAnimation;
+class TaskProgress;
 
-#include "ui/TaskProgress.h"
-
+class LoadingIndicator
 #ifdef ENABLE_OPENGL
-class LoadingIndicator : public QOpenGLWidget
+    : public QOpenGLWidget
 #else
-class LoadingIndicator : public QWidget
+    : public QWidget
 #endif
+    , public sapi::LoadingIndicatorDelegate::Indicator
 {
     Q_OBJECT
 public:
     explicit LoadingIndicator(const QSize &size, QWidget *parent = 0);
 
 public slots:
-    void addTaskProgress(const TaskProgress &progress);
-    void removeTaskProgress(const TaskProgress &progress);
+    virtual void addTaskProgress(const TaskProgress &progress);
+    virtual void removeTaskProgress(const TaskProgress &progress);
 
 protected:
     virtual void paintEvent(QPaintEvent *);

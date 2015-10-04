@@ -3,8 +3,8 @@
 
 #include <QGraphicsView>
 
+#include "ui/models/TaskProgress.h"
 #include "ui/renderers/AbstractRendererFactory.h"
-#include "ui/TaskProgress.h"
 #include "Navigator.h"
 #include "PlayList.h"
 

@@ -1,3 +1,5 @@
+#include "LoadingIndicator.h"
+
 #include <QAbstractAnimation>
 #include <QConicalGradient>
 #include <QPainter>
@@ -8,7 +10,7 @@
 #include <QSurfaceFormat>
 #endif
 
-#include "LoadingIndicator.h"
+#include "ui/models/TaskProgress.h"
 
 LoadingIndicator::LoadingIndicator(const QSize &size, QWidget *parent) :
 #ifdef ENABLE_OPENGL

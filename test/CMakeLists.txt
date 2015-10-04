@@ -39,6 +39,7 @@ set(PER_TEST_EXTRA_SRCS
 set(SILICA_TEST_COMMON_LINK_LIBRARIES
     sapi
     silicacore
+    silicaui
     qtmockwebserver
     Qt5::Test
 )

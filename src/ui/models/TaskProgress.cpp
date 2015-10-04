@@ -1,4 +1,4 @@
-#include "TaskProgress.h"
+#include "ui/models/TaskProgress.h"
 
 #include "db/LocalDatabase.h"
 
