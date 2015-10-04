@@ -11,9 +11,17 @@ include_directories(
 
 set(CMAKE_AUTOMOC ON)
 
+set(BUILD_ENV "Silica-Test")
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/../src/Definitions.cpp.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+    @ONLY
+)
+
 file(GLOB TEST_COMMON_SRCS
     "utils/*.cpp"
     "STestCase.cpp"
+    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
 )
 
 file(GLOB TEST_COMMON_RESOURCES
@@ -25,20 +33,10 @@ qt5_wrap_ui(TEST_COMMON_FORMS_HEADERS ${TEST_COMMON_FORMS})
 qt5_add_resources(TEST_COMMON_RESOURCES_RCC ${TEST_COMMON_RESOURCES})
 set(TEST_COMMON_SRCS ${TEST_COMMON_SRCS} ${TEST_COMMON_FORMS_HEADERS} ${TEST_COMMON_RESOURCES_RCC})
 
-set(BUILD_ENV "Silica-Test")
-
-configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/../src/Definitions.cpp.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-    @ONLY
-)
-set(PER_TEST_EXTRA_SRCS
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
-)
 
 set(SILICA_TEST_COMMON_LINK_LIBRARIES
     sapi
-    silicacore
+    silicacoreobjs
     silicaui
     qtmockwebserver
     Qt5::Test
@@ -64,7 +62,7 @@ foreach(TEST_FILE ${TEST_FILES})
 
     get_filename_component(TEST_TARGET ${TEST_FILE} NAME_WE)
 
-    add_executable(${TEST_TARGET} ${TEST_FILE} ${PER_TEST_EXTRA_SRCS})
+    add_executable(${TEST_TARGET} ${TEST_FILE})
     set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
     target_link_libraries(${TEST_TARGET} silicatestcommon)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

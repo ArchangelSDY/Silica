@@ -41,7 +41,10 @@ file(GLOB CORE_SRCS
     "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"
     "ui/models/TaskProgress.cpp"
-    "${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp"
+)
+
+qt5_wrap_ui(CORE_UI_HEADERS
+    "navigation/FixedRegionConfDialog.ui"
 )
 
 set(CORE_LINK_LIBS
@@ -63,5 +66,14 @@ if(ENABLE_OPENGL)
     set(CORE_LINK_LIBS ${CORE_LINK_LIBS} Qt5::OpenGL)
 endif(ENABLE_OPENGL)
 
-add_library(silicacore SHARED ${CORE_SRCS})
-target_link_libraries(silicacore ${CORE_LINK_LIBS})
+add_library(silicacoreobjs STATIC
+    ${CORE_SRCS}
+    ${CORE_UI_HEADERS}
+)
+target_link_libraries(silicacoreobjs ${CORE_LINK_LIBS})
+
+add_library(silicacore SHARED
+    ${CORE_SRCS}
+    ${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp
+)
+target_link_libraries(silicacore silicacoreobjs)
