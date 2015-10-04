@@ -91,8 +91,8 @@ void TestTaskProgress::settersAndReset()
 
 void TestTaskProgress::estimate()
 {
-    int timeConsumption = 110;
-    int interval = 30;
+    int timeConsumption = 500;
+    int interval = 200;
 
     TaskProgress progress;
     progress.setKey("TEST_TASK_PROGRESS");
