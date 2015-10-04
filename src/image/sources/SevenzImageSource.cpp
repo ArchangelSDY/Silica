@@ -13,7 +13,7 @@ SevenzImageSource::SevenzImageSource(ImageSourceFactory *factory,
                                      QString packagePath, QString imageName) :
     ImageSource(factory)
 {
-    m_packagePath = searchRealPath(packagePath);
+    m_packagePath = findRealPath(packagePath);
     m_name = imageName;
 
     // Compute hash

@@ -20,13 +20,15 @@ ImageSource::~ImageSource()
     m_device.clear();
 }
 
-QString ImageSource::searchRealPath(QString path)
+QString ImageSource::findRealPath(QString path)
 {
+    // Given path exists, should be exact real path
     QFileInfo file(path);
     if (file.exists()) {
         return path;
     }
 
+    // Try all search directories
     foreach (const QString &dir, GlobalConfig::instance()->searchDirs()) {
         QString realPath = dir + path;
         file = QFileInfo(realPath);
@@ -35,7 +37,8 @@ QString ImageSource::searchRealPath(QString path)
         }
     }
 
-    return QString();
+    // Not found in search directories, leave path unchanged
+    return path;
 }
 
 void ImageSource::close()
