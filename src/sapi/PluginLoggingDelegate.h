@@ -12,13 +12,16 @@ class PluginLoggingDelegate
 public:
     static PluginLoggingDelegate *instance();
 
-    QDebug debug();
+    ~PluginLoggingDelegate();
+
+    QDebug *debug();
     void setDevice(QIODevice* device);
 
 private:
     static PluginLoggingDelegate *s_instance;
 
     PluginLoggingDelegate();
+    QDebug *m_dbg;
     QIODevice *m_device;
 };
 

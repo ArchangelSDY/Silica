@@ -12,7 +12,7 @@ public:
     virtual void reportProgress(int min, int max, int cur) = 0;
 };
 
-extern LoadingIndicator *loadingIndicator();
+LoadingIndicator *loadingIndicator();
 
 }
 

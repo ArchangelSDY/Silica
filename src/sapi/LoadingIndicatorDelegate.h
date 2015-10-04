@@ -25,7 +25,7 @@ private:
     TaskProgress m_commonProgress;
 };
 
-extern void initPluginLoadingIndicator(::LoadingIndicator *indicator);
+void initPluginLoadingIndicator(::LoadingIndicator *indicator);
 
 }
 

@@ -2,29 +2,38 @@
 
 namespace sapi {
 
-PluginLoggingDelegate *PluginLoggingDelegate::s_instance = 0;
+void setLoggingDebugImpl(QDebug *debug);
+
+PluginLoggingDelegate *PluginLoggingDelegate::s_instance =
+    new PluginLoggingDelegate();
 PluginLoggingDelegate *PluginLoggingDelegate::instance()
 {
-    if (!s_instance) {
-        s_instance = new PluginLoggingDelegate();
-    }
     return s_instance;
 }
 
 PluginLoggingDelegate::PluginLoggingDelegate() :
-    m_device(0)
+    m_device(0) ,
+    m_dbg(new QDebug(QtDebugMsg))
 {
+    setLoggingDebugImpl(debug());
 }
 
-QDebug PluginLoggingDelegate::debug()
+PluginLoggingDelegate::~PluginLoggingDelegate()
 {
-    QDebug dbg = m_device ? QDebug(m_device) : QDebug(QtDebugMsg);
-    return dbg;
+    delete m_dbg;
+}
+
+QDebug *PluginLoggingDelegate::debug()
+{
+    return m_dbg;
 }
 
 void PluginLoggingDelegate::setDevice(QIODevice *device)
 {
     m_device = device;
+    delete m_dbg;
+    m_dbg = new QDebug(m_device);
+    setLoggingDebugImpl(debug());
 }
 
 }

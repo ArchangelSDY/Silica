@@ -1,12 +1,21 @@
 #include "Logging.h"
 
-#include "sapi/PluginLoggingDelegate.h"
+#include <QtGlobal>
 
 namespace sapi {
 
+static QDebug *g_pluginDebug = 0;
+
 QDebug debug()
 {
-    return PluginLoggingDelegate::instance()->debug();
+    Q_ASSERT(g_pluginDebug);
+    return *g_pluginDebug;
+}
+
+void setLoggingDebugImpl(QDebug *debug)
+{
+    Q_ASSERT(!g_pluginDebug);
+    g_pluginDebug = debug;
 }
 
 }

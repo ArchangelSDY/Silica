@@ -43,17 +43,13 @@ void LoadingIndicatorDelegate::reportProgress(int min, int max, int cur)
     m_commonProgress.setValue(cur);
 }
 
-static sapi::LoadingIndicatorDelegate *g_pluginLoadingIndicator =
-    new sapi::LoadingIndicatorDelegate();
+void setLoadingIndicatorImpl(LoadingIndicator *indicator);
 
 void initPluginLoadingIndicator(::LoadingIndicator *indicator)
 {
-    g_pluginLoadingIndicator->setIndicator(indicator);
-}
-
-sapi::LoadingIndicator *loadingIndicator()
-{
-    return g_pluginLoadingIndicator;
+    sapi::LoadingIndicatorDelegate *delegate = new sapi::LoadingIndicatorDelegate();
+    delegate->setIndicator(indicator);
+    setLoadingIndicatorImpl(delegate);
 }
 
 }
