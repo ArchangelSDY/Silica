@@ -74,6 +74,11 @@
             "version": 14,
             "applySql": "create index task_progresses_key on task_progresses (task_key)",
             "revertSql": "drop index task_progresses_key"
+        },
+        {
+            "version": 15,
+            "applySql": "create index images_index_url on images(url)",
+            "revertSql": "drop index images_index_url"
         }
     ]
 }
