@@ -72,8 +72,7 @@ add_library(silicacoreobjs STATIC
 )
 target_link_libraries(silicacoreobjs ${CORE_LINK_LIBS})
 
-add_library(silicacore SHARED
-    ${CORE_SRCS}
+add_library(silicacore STATIC
     ${CMAKE_CURRENT_BINARY_DIR}/Definitions.cpp
 )
 target_link_libraries(silicacore silicacoreobjs)

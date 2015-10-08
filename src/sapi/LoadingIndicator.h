@@ -1,9 +1,11 @@
 #ifndef SAPI_LOADINGINDICATOR
 #define SAPI_LOADINGINDICATOR
 
+#include "sapi_global.h"
+
 namespace sapi {
 
-class LoadingIndicator
+class SAPI_EXPORT LoadingIndicator
 {
 public:
     virtual ~LoadingIndicator() {}

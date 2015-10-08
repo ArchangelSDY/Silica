@@ -1,5 +1,7 @@
 #include "LoadingIndicatorDelegate.h"
 
+#include "LoadingIndicatorPrivate.h"
+
 namespace sapi {
 
 LoadingIndicatorDelegate::LoadingIndicatorDelegate() :
@@ -41,13 +43,11 @@ void LoadingIndicatorDelegate::reportProgress(int min, int max, int cur)
     m_commonProgress.setValue(cur);
 }
 
-void setLoadingIndicatorImpl(LoadingIndicator *indicator);
-
 void initPluginLoadingIndicator(LoadingIndicatorDelegate::Indicator *indicator)
 {
     sapi::LoadingIndicatorDelegate *delegate = new sapi::LoadingIndicatorDelegate();
     delegate->setIndicator(indicator);
-    setLoadingIndicatorImpl(delegate);
+    sapi::setLoadingIndicatorImpl(delegate);
 }
 
 }

@@ -3,9 +3,11 @@
 
 #include <QDebug>
 
+#include "sapi_global.h"
+
 namespace sapi {
 
-QDebug debug();
+QDebug SAPI_EXPORT debug();
 
 }
 

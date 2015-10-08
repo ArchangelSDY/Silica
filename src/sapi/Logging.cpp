@@ -1,4 +1,5 @@
 #include "Logging.h"
+#include "LoggingPrivate.h"
 
 #include <QtGlobal>
 
@@ -14,7 +15,6 @@ QDebug debug()
 
 void setLoggingDebugImpl(QDebug *debug)
 {
-    Q_ASSERT(!g_pluginDebug);
     g_pluginDebug = debug;
 }
 

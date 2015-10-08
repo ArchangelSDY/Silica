@@ -1,8 +1,8 @@
 #include "PluginLoggingDelegate.h"
 
-namespace sapi {
+#include "LoggingPrivate.h"
 
-void setLoggingDebugImpl(QDebug *debug);
+namespace sapi {
 
 PluginLoggingDelegate *PluginLoggingDelegate::s_instance =
     new PluginLoggingDelegate();

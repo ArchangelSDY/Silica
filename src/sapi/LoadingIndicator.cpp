@@ -1,4 +1,5 @@
 #include "sapi/LoadingIndicator.h"
+#include "sapi/LoadingIndicatorPrivate.h"
 
 #include <QtGlobal>
 

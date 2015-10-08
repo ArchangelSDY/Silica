@@ -1,5 +1,5 @@
 # Silica API library
-file(GLOB SAPI_SRCS
+set(SAPI_SRCS
     "sapi/IPlayListProvider.cpp"
     "sapi/IPlayListProviderPlugin.cpp"
     "sapi/ISharerPlugin.cpp"
@@ -7,10 +7,12 @@ file(GLOB SAPI_SRCS
     "sapi/Logging.cpp"
 )
 
-add_definitions(-DSAPI_LIBRARY)
 add_library(sapi SHARED ${SAPI_SRCS})
 
+target_compile_definitions(sapi PRIVATE -DSAPI_LIBRARY)
+
 target_link_libraries(sapi
+    ${ZLIB_LIBRARIES}
     Qt5::Core
 )
 
@@ -29,4 +31,5 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
 install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT applications)
-install(TARGETS sapi LIBRARY DESTINATION "lib" COMPONENT applications)
+# FIXME: Fix Windows Support
+# install(TARGETS sapi LIBRARY DESTINATION "lib" COMPONENT applications)
