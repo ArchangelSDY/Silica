@@ -115,9 +115,10 @@ class LoadThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadThumbnailTask(QString thumbnailPath, bool makeImmediately) :
+    LoadThumbnailTask(QString thumbnailPath, const QSize &size, bool makeImmediately) :
         QRunnable() ,
         m_thumbnailPath(thumbnailPath) ,
+        m_size(size) ,
         m_makeImmediately(makeImmediately) {}
 
     void run();
@@ -127,6 +128,7 @@ signals:
 
 private:
     QString m_thumbnailPath;
+    QSize m_size;
     bool m_makeImmediately;
 };
 
@@ -145,7 +147,13 @@ void LoadThumbnailTask::run()
         QSharedPointer<QImage> image =
             QSharedPointer<QImage>::create(m_thumbnailPath);
         if (!image->isNull()) {
-            emit loaded(image, m_makeImmediately);
+            if (m_size.isNull()) {
+                emit loaded(image, m_makeImmediately);
+            } else {
+                QSharedPointer<QImage> scaledImage = QSharedPointer<QImage>::create(
+                    image->scaled(m_size.width(), m_size.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                emit loaded(scaledImage, m_makeImmediately);
+            }
         } else {
             // Broken thumbnail, delete it
             image.clear();
@@ -435,7 +443,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     }
 }
 
-void Image::loadThumbnail(bool makeImmediately)
+void Image::loadThumbnail(const QSize &size, bool makeImmediately)
 {
     if (!m_thumbnail->isNull()) {
         emit thumbnailLoaded();
@@ -457,7 +465,7 @@ void Image::loadThumbnail(bool makeImmediately)
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         QDir::separator() + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
-        new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
+        new LoadThumbnailTask(thumbnailFullPath, size, makeImmediately);
     connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
             this, SLOT(thumbnailReaderFinished(QSharedPointer<QImage>, bool)));
     // Thumbnail loading should be low priority

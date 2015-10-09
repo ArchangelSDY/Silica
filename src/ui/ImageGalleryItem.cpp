@@ -22,7 +22,7 @@ ImageGalleryItem::ImageGalleryItem(ImagePtr image,
 
 void ImageGalleryItem::load()
 {
-    m_image->loadThumbnail(true);
+    m_image->loadThumbnail(boundingRect().size().toSize(), true);
 }
 
 void ImageGalleryItem::createRenderer()

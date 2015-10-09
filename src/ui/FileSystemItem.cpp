@@ -213,7 +213,7 @@ void FileSystemItem::loadCover(QString path)
             this, SLOT(coverThumbnailLoaded()));
     connect(m_coverImage, SIGNAL(thumbnailLoadFailed()),
             this, SLOT(coverThumbnailLoadFailed()));
-    m_coverImage->loadThumbnail(true);
+    m_coverImage->loadThumbnail(boundingRect().size().toSize(), true);
 }
 
 void FileSystemItem::removeOnDisk()
