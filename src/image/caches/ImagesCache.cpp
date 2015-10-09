@@ -13,6 +13,7 @@ ImagesCache::ImagesCache(int capacity, QObject *parent) :
 
 ImagesCache::~ImagesCache()
 {
+    clear();
     delete m_strategy;
 }
 

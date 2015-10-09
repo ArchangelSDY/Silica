@@ -423,6 +423,11 @@ void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
     }
 
     emit loaded();
+
+    // If unload scheduled during loading, there will be no further chance to unload,
+    // leading to a memory leak. So we check here right after loaded to see if we
+    // are no longer requested.
+    checkUnload();
 }
 
 void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
