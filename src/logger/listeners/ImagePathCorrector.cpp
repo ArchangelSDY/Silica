@@ -120,13 +120,12 @@ void ImagePathCorrector::WorkerThread::run()
             if (!m_corrector.m_isTestMode) {
                 QThread::msleep(SLEEP_MSECS);
             }
-            continue;
+        } else {
+            LogRecord record = m_corrector.m_incomingRecords.dequeue();
+            m_corrector.m_recordsMutex.unlock();
+
+            correctPath(record);
         }
-
-        LogRecord record = m_corrector.m_incomingRecords.dequeue();
-        m_corrector.m_recordsMutex.unlock();
-
-        correctPath(record);
     }
 }
 
@@ -191,6 +190,7 @@ ImagePathCorrector::ImagePathCorrector(const QList<QString> &searchDirs,
     : m_searchDirs(searchDirs)
     , m_navigator(navigator)
     , m_promptClient(promptClient)
+    , m_isTestMode(false)
 {
     m_worker = new ImagePathCorrector::WorkerThread(*this);
     m_worker->start();
