@@ -174,7 +174,7 @@ void TestPlayList::sortByThumbHist()
     for (int i = 0; i < pl.size(); ++i) {
         ImagePtr image = pl[i];
         QSignalSpy spy(image.data(), SIGNAL(thumbnailLoaded()));
-        image->loadThumbnail(true);
+        image->loadThumbnail(QSize(), true);
         spy.wait();
     }
 
