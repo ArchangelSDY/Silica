@@ -44,10 +44,34 @@ set(SILICA_TEST_COMMON_LINK_LIBRARIES
 add_library(silicatestcommon ${TEST_COMMON_SRCS})
 target_link_libraries(silicatestcommon ${SILICA_TEST_COMMON_LINK_LIBRARIES})
 
-file(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/
+# Copy test assets
+add_custom_command(TARGET silicatestcommon POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:silicatestcommon>/assets
 )
+
+if (WIN32)
+    file(GLOB QT_LIB_FILES ${QT_ROOT}/bin/*.dll)
+    file(GLOB OPENCV_LIB_FILES ${OpenCV_LIB_DIR_OPT}/../bin/*.dll)
+    file(GLOB ZLIB_FILES ${ZLIB_INCLUDE_DIR}/../bin/*.dll)
+
+    set(LIB_FILES ${QT_LIB_FILES} ${OPENCV_LIB_FILES} ${ZLIB_FILES})
+
+    foreach(LIB_FILE ${LIB_FILES})
+        add_custom_command(TARGET silicatestcommon POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${LIB_FILE}
+            $<TARGET_FILE_DIR:silicatestcommon>/
+        )
+    endforeach()
+
+    add_custom_command(TARGET silicatestcommon POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        $<TARGET_FILE:sapi>
+        $<TARGET_FILE_DIR:silicatestcommon>/
+    )
+endif()
 
 set(TEST_ROOT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 string(LENGTH ${TEST_ROOT_DIRECTORY} TEST_ROOT_DIRECTORY_LENGTH)
