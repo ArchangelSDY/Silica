@@ -46,6 +46,8 @@ if (APPLE)
     set(CPACK_BUNDLE_NAME "silica")
     set(CPACK_BUNDLE_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/assets/Info.plist)
     set(CPACK_BUNDLE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/logo.icns)
+elseif(WIN32)
+	set(CPACK_GENERATOR "NSIS64")
 endif()
 
 include(CPack)

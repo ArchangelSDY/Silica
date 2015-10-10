@@ -17,11 +17,25 @@ set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executa
 
 # WebP Animation Plugin
 add_custom_command(TARGET silica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_BINARY_DIR}/deps/qwebpa/src/imageformats
-    $<TARGET_FILE_DIR:silica>/plugins/imageformats
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:qwebpa>
+    $<TARGET_FILE_DIR:silica>/plugins/imageformats/
 )
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION "lib" COMPONENT applications)
+add_custom_command(TARGET silica POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+    ${CMAKE_CURRENT_BINARY_DIR}/plugins/imageformats/
+)
+add_custom_command(TARGET silica POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:qwebpa>
+    ${CMAKE_CURRENT_BINARY_DIR}/plugins/imageformats/
+)
+
+if (WIN32)
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION . COMPONENT applications)
+else()
+    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION "lib" COMPONENT applications)
+endif()
 
 if (APPLE)
 
@@ -39,6 +53,26 @@ if (APPLE)
             RUNTIME DESTINATION .
             COMPONENT applications
         )
+    endif()
+
+elseif (WIN32)
+
+    install(TARGETS silica RUNTIME DESTINATION . COMPONENT applications)
+    install(TARGETS sapi RUNTIME DESTINATION . COMPONENT applications)
+
+    install(FILES "${ZLIB_INCLUDE_DIR}/../bin/zlib.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt5Core.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt5Gui.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt5Network.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt5Sql.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt5Widgets.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/libEGL.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/libGLESv2.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${OpenCV_LIB_DIR_OPT}/../bin/opencv_core300.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${OpenCV_LIB_DIR_OPT}/../bin/opencv_imgproc300.dll" DESTINATION . COMPONENT applications)
+
+    if (ENABLE_OPENGL)
+        install(FILES "${QT_ROOT}/bin/Qt5OpenGL.dll" DESTINATION . COMPONENT applications)
     endif()
 
 else ()
