@@ -36,6 +36,7 @@ void TaskProgress::start()
 {
     m_isRunning = true;
     m_startTime = QDateTime::currentDateTime();
+    m_value = m_minimum;
     if (m_enableEstimate) {
         m_lastTimeConsumption =
             LocalDatabase::instance()->queryTaskProgressTimeConsumption(m_key);
@@ -120,14 +121,15 @@ void TaskProgress::setEstimateInterval(int interval)
 
 void TaskProgress::estimateUpdate()
 {
-    double progress;
+    double progress = 0;
     if (m_lastTimeConsumption > 0) {
         // Estimate current progress based on last record
         qint64 curConsumption = m_startTime.msecsTo(QDateTime::currentDateTime());
         progress = (double) curConsumption / m_lastTimeConsumption;
     } else {
-        // No last record, add 1% per interval
-        progress += 0.01;
+        // No last record, add 10% per interval
+        progress = double(m_value - m_minimum) / (m_maximum - m_minimum);
+        progress += 0.1;
     }
 
     // Stop at 90%
