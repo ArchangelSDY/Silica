@@ -40,7 +40,9 @@ void TestImageSource::openAndClose_data()
     QTest::addColumn<QUrl>("srcUrl");
 
     const QString &currentDir = qApp->applicationDirPath();
-    QTest::newRow("Zip Source")
+    QTest::newRow("Zip Source: Latin Name")
+        << QUrl("zip:///" + currentDir + "/assets/pack.zip#me.jpg");
+    QTest::newRow("Zip Source: UTF-8 Name")
         << QUrl("zip:///" + currentDir + "/assets/pack.zip#silicå.png");
     QTest::newRow("Local Source")
         << QUrl("file:///" + currentDir + "/assets/me.jpg");

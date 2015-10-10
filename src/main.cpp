@@ -16,9 +16,6 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    QTextCodec *codec = QTextCodec::codecForName("utf8");
-    QTextCodec::setCodecForLocale(codec);
-
     QThreadPool::globalInstance()->setMaxThreadCount(
         QThread::idealThreadCount() - 1);
 

@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QSettings>
 #include <QSharedPointer>
+#include <QTextCodec>
 #include <QUrl>
 #include <QVariantHash>
 
@@ -82,6 +83,10 @@ void GlobalConfig::load()
                               .toString();
     qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
+    // Set default codec
+    // This affects codec for zip files
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForLocale(codec);
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
