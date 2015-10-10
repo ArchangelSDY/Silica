@@ -15,7 +15,7 @@ public:
     double compare(const ImageHistogramPrivate &other) const;
 
 private:
-    cv::Mat imageToCvMat(const QImage &image);
+    cv::Mat imageToCvMat();
 
     ImageHistogram *m_q;
     QImage m_image;
@@ -29,41 +29,44 @@ ImageHistogramPrivate::ImageHistogramPrivate(ImageHistogram *q,
 {
 }
 
-cv::Mat ImageHistogramPrivate::imageToCvMat(const QImage &image)
+cv::Mat ImageHistogramPrivate::imageToCvMat()
 {
-    switch (image.format())
+    switch (m_image.format())
     {
     case QImage::Format_RGB32:
     case QImage::Format_ARGB32:
     {
-        cv::Mat mat(image.height(), image.width(), CV_8UC4,
-                    const_cast<uchar *>(image.bits()), image.bytesPerLine());
+        cv::Mat mat(m_image.height(), m_image.width(), CV_8UC4,
+                    const_cast<uchar *>(m_image.bits()), m_image.bytesPerLine());
         return mat;
     }
     case QImage::Format_ARGB32_Premultiplied:
     {
-        QImage npImage = image.convertToFormat(QImage::Format_ARGB32);
-        cv::Mat mat(npImage.height(), npImage.width(), CV_8UC4,
-                    const_cast<uchar *>(npImage.bits()),
-                    npImage.bytesPerLine());
-        return mat;
+        QImage npImage = m_image.convertToFormat(QImage::Format_ARGB32);
+        // IMPORTANT: We MUST return a cloned one because the Mat is a `borrowed` pointer
+        // from `npImage` while `npImage` will be destroyed when function returns
+        return cv::Mat(npImage.height(), npImage.width(), CV_8UC4,
+                       const_cast<uchar *>(npImage.bits()),
+                       npImage.bytesPerLine()).clone();
     }
     case QImage::Format_RGB888:
     {
-        QImage swapped = image.rgbSwapped();
+        QImage swapped = m_image.rgbSwapped();
+        // IMPORTANT: We MUST return a cloned one because the Mat is a `borrowed` pointer
+        // from `swapped` while `swapped` will be destroyed when function returns
         return cv::Mat(swapped.height(), swapped.width(), CV_8UC3,
                        const_cast<uchar *>(swapped.bits()),
                        swapped.bytesPerLine()).clone();
     }
     case QImage::Format_Indexed8:
     {
-        cv::Mat mat(image.height(), image.width(), CV_8UC1,
-                    const_cast<uchar *>(image.bits()), image.bytesPerLine());
+        cv::Mat mat(m_image.height(), m_image.width(), CV_8UC1,
+                    const_cast<uchar *>(m_image.bits()), m_image.bytesPerLine());
         return mat;
     }
     default:
         qWarning() << "ImageHistogramPrivate: unknown image format"
-                   << image.format();
+                   << m_image.format();
         break;
     }
 
@@ -76,7 +79,7 @@ void ImageHistogramPrivate::calc()
         return;
     }
 
-    cv::Mat cvImage = imageToCvMat(m_image);
+    cv::Mat cvImage = imageToCvMat();
     if (cvImage.data == NULL) {
         return;
     }
