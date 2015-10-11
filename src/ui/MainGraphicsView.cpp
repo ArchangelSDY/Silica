@@ -201,6 +201,9 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *event)
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    // Reject event by default
+    event->setAccepted(false);
+
     m_hotspotsEditor->mouseMoveEvent(event);
 
     if (!event->isAccepted()) {
@@ -210,6 +213,9 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 void MainGraphicsView::mousePressEvent(QMouseEvent *event)
 {
+    // Reject event by default
+    event->setAccepted(false);
+
     m_hotspotsEditor->mousePressEvent(event);
 
     if (!event->isAccepted()) {
