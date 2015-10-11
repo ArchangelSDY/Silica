@@ -64,6 +64,7 @@ private slots:
 
 private:
     QImage *m_thumbnail;
+    QImage *m_thumbnailScaled;
     QFutureWatcher<QSharedPointer<QImage> > m_thumbnailResizeWatcher;
 };
 

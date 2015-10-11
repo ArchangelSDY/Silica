@@ -26,6 +26,7 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     m_rendererFactory(rendererFactory) ,
     m_renderer(0) ,
     m_thumbnail(0) ,
+    m_thumbnailScaled(0) ,
     m_selectedAfterShownScheduled(false)
 {
     connect(&m_thumbnailResizeWatcher, SIGNAL(finished()), this, SLOT(onThumbnailResized()));
@@ -46,6 +47,9 @@ GalleryItem::~GalleryItem()
     if (m_thumbnail) {
         delete m_thumbnail;
     }
+    if (m_thumbnailScaled) {
+        delete m_thumbnailScaled;
+    }
 }
 
 QString GalleryItem::name() const
@@ -57,10 +61,11 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 {
     delete m_renderer;
     m_renderer = renderer;
-    m_renderer->setImage(m_thumbnail);
 
-    prepareGeometryChange();
-    m_renderer->layout();
+    // Hide until thumbnail scaled and ready to paint.
+    hide();
+
+    setThumbnail(m_thumbnail);
 }
 
 void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
@@ -71,27 +76,43 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 
 static QSharedPointer<QImage> resizeThumbnailAtBackground(QSharedPointer<QImage> thumbnail, const QSize &size)
 {
-    return QSharedPointer<QImage>::create(thumbnail->scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    return QSharedPointer<QImage>::create(thumbnail->scaled(size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 }
 
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
-    QFuture<QSharedPointer<QImage> > resizeFuture = QtConcurrent::run(gResizeThumbnailThreads(), resizeThumbnailAtBackground,
-        QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize());
-    m_thumbnailResizeWatcher.setFuture(resizeFuture);
+    if (m_thumbnail && m_thumbnail != thumbnail) {
+        delete m_thumbnail;
+    }
+    m_thumbnail = thumbnail;
+
+    // Some renderer depends on thumbnail aspect ratio to determine bounding rect.
+    // So before making resized thumbnail image, we layout once using original image.
+    m_renderer->setImage(m_thumbnail);
+    m_renderer->layout();
+
+    if (thumbnail) {
+        QFuture<QSharedPointer<QImage> > resizeFuture = QtConcurrent::run(
+            gResizeThumbnailThreads(), resizeThumbnailAtBackground,
+            QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize());
+        m_thumbnailResizeWatcher.setFuture(resizeFuture);
+    }
 }
 
 void GalleryItem::onThumbnailResized()
 {
     QSharedPointer<QImage> resized = m_thumbnailResizeWatcher.result();
 
-    if (m_thumbnail) {
-        delete m_thumbnail;
+    if (m_thumbnailScaled) {
+        delete m_thumbnailScaled;
     }
-    m_thumbnail = new QImage(*resized);
-    m_renderer->setImage(m_thumbnail);
+    m_thumbnailScaled = new QImage(*resized);
+
+    // Re-layout using scaled image
+    m_renderer->setImage(m_thumbnailScaled);
     prepareGeometryChange();
     m_renderer->layout();
+
     update(boundingRect());
     if (scene()) {
         emit requestLayout();
