@@ -2,6 +2,7 @@
 #define GALLERYITEM_H
 
 #include <QColor>
+#include <QFutureWatcher>
 #include <QGraphicsItem>
 
 #include "ui/renderers/AbstractGalleryItemRenderer.h"
@@ -58,8 +59,12 @@ protected:
     bool m_isReadyToShow;
     bool m_selectedAfterShownScheduled;
 
+private slots:
+    void onThumbnailResized();
+
 private:
     QImage *m_thumbnail;
+    QFutureWatcher<QSharedPointer<QImage> > m_thumbnailResizeWatcher;
 };
 
 #endif // GALLERYITEM_H

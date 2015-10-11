@@ -115,10 +115,9 @@ class LoadThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadThumbnailTask(QString thumbnailPath, const QSize &size, bool makeImmediately) :
+    LoadThumbnailTask(QString thumbnailPath, bool makeImmediately) :
         QRunnable() ,
         m_thumbnailPath(thumbnailPath) ,
-        m_size(size) ,
         m_makeImmediately(makeImmediately) {}
 
     void run();
@@ -128,7 +127,6 @@ signals:
 
 private:
     QString m_thumbnailPath;
-    QSize m_size;
     bool m_makeImmediately;
 };
 
@@ -147,13 +145,7 @@ void LoadThumbnailTask::run()
         QSharedPointer<QImage> image =
             QSharedPointer<QImage>::create(m_thumbnailPath);
         if (!image->isNull()) {
-            if (m_size.isNull()) {
-                emit loaded(image, m_makeImmediately);
-            } else {
-                QSharedPointer<QImage> scaledImage = QSharedPointer<QImage>::create(
-                    image->scaled(m_size.width(), m_size.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-                emit loaded(scaledImage, m_makeImmediately);
-            }
+            emit loaded(image, m_makeImmediately);
         } else {
             // Broken thumbnail, delete it
             image.clear();
@@ -215,6 +207,7 @@ QThreadPool *Image::threadPool()
 {
     if (!s_threadPool) {
         s_threadPool = new QThreadPool();
+        s_threadPool->setMaxThreadCount(QThread::idealThreadCount() - 1);
     }
     return s_threadPool;
 }
@@ -448,7 +441,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     }
 }
 
-void Image::loadThumbnail(const QSize &size, bool makeImmediately)
+void Image::loadThumbnail(bool makeImmediately)
 {
     if (!m_thumbnail->isNull()) {
         emit thumbnailLoaded();
@@ -470,7 +463,7 @@ void Image::loadThumbnail(const QSize &size, bool makeImmediately)
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
-        new LoadThumbnailTask(thumbnailFullPath, size, makeImmediately);
+        new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
     connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
             this, SLOT(thumbnailReaderFinished(QSharedPointer<QImage>, bool)));
     // Thumbnail loading should be low priority

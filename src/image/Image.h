@@ -53,7 +53,7 @@ public:
     const ImageSource *source() const { return m_imageSource.data(); }
 
     void load(int priority = NormalPriority);
-    void loadThumbnail(const QSize &size = QSize(), bool makeImmediately = false);
+    void loadThumbnail(bool makeImmediately = false);
     void scheduleUnload();
 
     QList<ImageHotspot *> hotspots() { return m_hotspots; }

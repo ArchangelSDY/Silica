@@ -1,11 +1,24 @@
+#include <QtConcurrent>
 #include <QGraphicsSceneMouseEvent>
 #include <QPalette>
+#include <QThreadPool>
 #include <QVariant>
 
 #include "ui/GalleryItem.h"
 #include "ui/GalleryView.h"
 
 const QColor GalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
+
+static QThreadPool *g_resizeThumbnailThreads = 0;
+static QThreadPool *gResizeThumbnailThreads()
+{
+    if (!g_resizeThumbnailThreads) {
+        g_resizeThumbnailThreads = new QThreadPool();
+        g_resizeThumbnailThreads->setMaxThreadCount(QThread::idealThreadCount() - 1);
+    }
+
+    return g_resizeThumbnailThreads;
+}
 
 GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent) :
@@ -15,6 +28,8 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     m_thumbnail(0) ,
     m_selectedAfterShownScheduled(false)
 {
+    connect(&m_thumbnailResizeWatcher, SIGNAL(finished()), this, SLOT(onThumbnailResized()));
+
     // Hide until thumbnail is ready.
     // It will show during next view layout after thumbnail is loaded
     //
@@ -54,12 +69,26 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
     createRenderer();
 }
 
+static QSharedPointer<QImage> resizeThumbnailAtBackground(QSharedPointer<QImage> thumbnail, const QSize &size)
+{
+    return QSharedPointer<QImage>::create(thumbnail->scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
+    QFuture<QSharedPointer<QImage> > resizeFuture = QtConcurrent::run(gResizeThumbnailThreads(), resizeThumbnailAtBackground,
+        QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize());
+    m_thumbnailResizeWatcher.setFuture(resizeFuture);
+}
+
+void GalleryItem::onThumbnailResized()
+{
+    QSharedPointer<QImage> resized = m_thumbnailResizeWatcher.result();
+
     if (m_thumbnail) {
         delete m_thumbnail;
     }
-    m_thumbnail = thumbnail;
+    m_thumbnail = new QImage(*resized);
     m_renderer->setImage(m_thumbnail);
     prepareGeometryChange();
     m_renderer->layout();

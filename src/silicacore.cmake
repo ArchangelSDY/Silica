@@ -56,6 +56,7 @@ set(CORE_LINK_LIBS
     qtrar
     qtdbmigration
     quazip
+    Qt5::Concurrent
     Qt5::Core
     Qt5::Network
     Qt5::Sql
