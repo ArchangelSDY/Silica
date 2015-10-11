@@ -59,15 +59,15 @@ void TestPlayList::initTestCase()
 
     QImage imgLisbeth(100, 100, QImage::Format_ARGB32);
     imgLisbeth.fill(Qt::white);
-    imgLisbeth.save(tmpDirPath + QDir::separator() + "lisbeth.png");
+    imgLisbeth.save(tmpDirPath + "/" + "lisbeth.png");
 
     QImage imgSilica(100, 200, QImage::Format_ARGB32);
     imgSilica.fill(Qt::blue);
-    imgSilica.save(tmpDirPath + QDir::separator() + "silica.png");
+    imgSilica.save(tmpDirPath + "/" + "silica.png");
 
     QImage imgAsuna(200, 100, QImage::Format_ARGB32);
     imgAsuna.fill(Qt::red);
-    imgAsuna.save(tmpDirPath + QDir::separator() + "asuna.png");
+    imgAsuna.save(tmpDirPath + "/" + "asuna.png");
 }
 
 void TestPlayList::sortByName()
@@ -144,9 +144,9 @@ void TestPlayList::sortByAspectRatio_data()
 {
     const QString &tmpDirPath = m_tmpDir.path();
     QUrl silicaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "silica.png");
+        tmpDirPath + "/" + "silica.png");
     QUrl asunaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "asuna.png");
+        tmpDirPath + "/" + "asuna.png");
 
     QTest::addColumn<QList<QUrl> >("srcUrls");
     QTest::addColumn<QString>("firstItemName");
@@ -192,9 +192,9 @@ void TestPlayList::sortByThumbHist_data()
 {
     const QString &tmpDirPath = m_tmpDir.path();
     QUrl silicaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "silica.png");
+        tmpDirPath + "/" + "silica.png");
     QUrl asunaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "asuna.png");
+        tmpDirPath + "/" + "asuna.png");
 
     QTest::addColumn<QList<QUrl> >("srcUrls");
     QTest::addColumn<QStringList>("sortedImageNames");
@@ -253,17 +253,17 @@ void TestPlayList::setFilter_data()
     const QString &tmpDirPath = m_tmpDir.path();
 
     QUrl silicaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "silica.png");
+        tmpDirPath + "/" + "silica.png");
     ImagePtr imgSilica(new Image(silicaUrl));
     imgSilica->rank()->setValue(3);
 
     QUrl lisbethUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "lisbeth.png");
+        tmpDirPath + "/" + "lisbeth.png");
     ImagePtr imgLisbeth(new Image(lisbethUrl));
     imgLisbeth->rank()->setValue(2);
 
     QUrl asunaUrl = QUrl::fromLocalFile(
-        tmpDirPath + QDir::separator() + "asuna.png");
+        tmpDirPath + "/" + "asuna.png");
     ImagePtr imgAsuna(new Image(asunaUrl));
     imgAsuna->rank()->setValue(5);
 

@@ -38,7 +38,7 @@ void PlayListGalleryItem::loadThumbnail()
     }
 
     QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
-        QDir::separator() + m_record->coverPath();
+        "/" + m_record->coverPath();
     QImage *thumbnail = new QImage(coverFullPath);
     if (thumbnail->isNull()) {
         thumbnail->load(":/res/playlist.png");

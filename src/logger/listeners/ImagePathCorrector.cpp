@@ -1,6 +1,5 @@
 #include "ImagePathCorrector.h"
 
-#include <QDir>
 #include <QFileInfo>
 #include <QMutexLocker>
 #include <QString>
@@ -20,8 +19,8 @@ QString ImagePathCorrector::PathPatch::toString() const
     QString oldUrl = oldImageUrl.toString();
     QString newUrl = newImageUrl.toString();
 
-    QStringList oldUrlParts = oldUrl.split(QDir::separator());
-    QStringList newUrlParts = newUrl.split(QDir::separator());
+    QStringList oldUrlParts = oldUrl.split('/');
+    QStringList newUrlParts = newUrl.split('/');
 
     int commonPrefixCnt = 0;
     int minLength = qMin(oldUrlParts.length(), newUrlParts.length());
@@ -44,16 +43,16 @@ QString ImagePathCorrector::PathPatch::toString() const
     QList<QString> commonSuffixParts = oldUrlParts.mid(oldUrlParts.length() - commonSuffixCnt);
 
     QString oldDiff = QStringList(oldUrlParts.mid(commonPrefixCnt, oldUrlParts.length() - commonPrefixCnt - commonSuffixCnt))
-        .join(QDir::separator());
+        .join('/');
     QString newDiff = QStringList(newUrlParts.mid(commonPrefixCnt, newUrlParts.length() - commonPrefixCnt - commonSuffixCnt))
-        .join(QDir::separator());
+        .join('/');
 
     QString diff = QString("{ %1 => %2 }")
         .arg(oldDiff, newDiff);
 
     QStringList showTextParts;
     showTextParts << commonPrefixParts << diff << commonSuffixParts;
-    QString showText = showTextParts.join(QDir::separator());
+    QString showText = showTextParts.join('/');
 
     return showText;
 }
@@ -158,18 +157,22 @@ void ImagePathCorrector::WorkerThread::correctPath(const LogRecord &record)
 
 QUrl ImagePathCorrector::WorkerThread::searchNewUrl(const QUrl &oldUrl)
 {
-    QString oldPath = oldUrl.path();
-    QStringList oldPathParts = oldPath.split(QDir::separator());
+    QUrl fileUrl = oldUrl;
+    fileUrl.setScheme("file");
+    QString oldPath = fileUrl.toLocalFile();
+    QStringList oldPathParts = oldPath.split('/');
 
     // Try until the deepest path
     for (int i = oldPathParts.length() - 1; i >= 0; --i) {
         QStringList matchOldPathParts = oldPathParts.mid(i);
-        QString matchOldPath = matchOldPathParts.join(QDir::separator());
+        QString matchOldPath = matchOldPathParts.join('/');
 
         foreach (const QString &dir, m_corrector.m_searchDirs) {
-            QString fixedSourcePath = dir + QDir::separator() + matchOldPath;
-            QUrl newUrl(oldUrl);
-            newUrl.setPath(fixedSourcePath);
+            QString fixedSourcePath = dir + '/' + matchOldPath;
+
+            QUrl newUrl = QUrl::fromLocalFile(fixedSourcePath);
+            newUrl.setScheme(oldUrl.scheme());
+            newUrl.setFragment(oldUrl.fragment());
 
             ImageSource *source = ImageSourceManager::instance()->createSingle(newUrl);
             if (source && source->exists()) {

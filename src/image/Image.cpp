@@ -468,7 +468,7 @@ void Image::loadThumbnail(const QSize &size, bool makeImmediately)
     m_isLoadingThumbnail = true;
 
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
-        QDir::separator() + m_thumbnailPath;
+        "/" + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
         new LoadThumbnailTask(thumbnailFullPath, size, makeImmediately);
     connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
@@ -495,7 +495,7 @@ void Image::makeThumbnail()
     m_isMakingThumbnail = true;
 
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
-        QDir::separator() + m_thumbnailPath;
+        "/" + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
         new MakeThumbnailTask(new QImage(*defaultFrame()), thumbnailFullPath);
     connect(makeThumbnailTask, SIGNAL(thumbnailMade(QSharedPointer<QImage>)),
@@ -531,11 +531,11 @@ void Image::computeThumbnailPath()
         QString name = hash.mid(2);
 
         QStringList pathParts = QStringList() << sub << name;
-        m_thumbnailPath = pathParts.join(QDir::separator());
+        m_thumbnailPath = pathParts.join("/");
 
         QDir dir;
         dir.mkpath(GlobalConfig::instance()->thumbnailPath() +
-                   QDir::separator() + sub);
+                   "/" + sub);
     }
 }
 

@@ -532,7 +532,7 @@ void MainWindow::promptToSaveImage()
             ImagePtr image = imageGalleryItem->image();
             if (!image.isNull()) {
                 QFileInfo imageFile(image->name()); // Remove dir in image name
-                QString destPath = destDir + QDir::separator() +
+                QString destPath = destDir + "/" +
                     imageFile.fileName();
                 bool success = image->copy(destPath);
                 QString msg;

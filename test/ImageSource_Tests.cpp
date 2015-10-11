@@ -41,9 +41,9 @@ void TestImageSource::openAndClose_data()
 
     const QString &currentDir = qApp->applicationDirPath();
     QTest::newRow("Zip Source: Latin Name")
-        << QUrl("zip:///" + currentDir + "/assets/pack.zip#me.jpg");
+        << QUrl("zip:/" + currentDir + "/assets/pack.zip#me.jpg");
     QTest::newRow("Zip Source: UTF-8 Name")
-        << QUrl("zip:///" + currentDir + "/assets/pack.zip#silicå.png");
+        << QUrl("zip:/" + currentDir + "/assets/pack.zip#silicå.png");
     QTest::newRow("Local Source")
         << QUrl("file:///" + currentDir + "/assets/me.jpg");
 }
@@ -70,7 +70,7 @@ void TestImageSource::properties_data()
 
     const QString &currentDir = qApp->applicationDirPath();
     QTest::newRow("Zip Source")
-        << QUrl("zip:///" + currentDir + "/assets/pack.zip#silicå.png")
+        << QUrl("zip:/" + currentDir + "/assets/pack.zip#silicå.png")
         << "silicå.png";
     QTest::newRow("Local Source")
         << QUrl("file:///" + currentDir + "/assets/me.jpg")
@@ -86,7 +86,7 @@ void TestImageSource::copy()
         ImageSourceManager::instance()->createSingle(srcUrl);
     imageSource->open();
 
-    QString destPath = tmpDir.path() + QDir::separator() + imageSource->name();
+    QString destPath = tmpDir.path() + "/" + imageSource->name();
     QVERIFY(imageSource->copy(destPath));
     QFileInfo destInfo(destPath);
     QVERIFY(destInfo.exists());
@@ -100,7 +100,7 @@ void TestImageSource::copy_data()
 
     const QString &currentDir = qApp->applicationDirPath();
     QTest::newRow("Zip Source")
-        << QUrl("zip:///" + currentDir + "/assets/pack.zip#silicå.png");
+        << QUrl("zip:/" + currentDir + "/assets/pack.zip#silicå.png");
     QTest::newRow("Local Source")
         << QUrl("file:///" + currentDir + "/assets/me.jpg");
 }

@@ -63,10 +63,13 @@ void TestImagePathCorrector::correct()
     QFETCH(QUrl, newUrl);
 
     // Ensure new url exists
-    QFileInfo newFileInfo(newUrl.path());
+    QUrl url = newUrl;
+    url.setScheme("file");
+
+    QFileInfo newFileInfo(url.toLocalFile());
     QDir dir;
     dir.mkpath(newFileInfo.dir().absolutePath());
-    QFile newFile(newUrl.path());
+    QFile newFile(newFileInfo.absoluteFilePath());
     if (newFile.open(QIODevice::WriteOnly)) {
         newFile.write("42");
         newFile.close();
@@ -102,21 +105,21 @@ void TestImagePathCorrector::correct_data()
     QTest::addColumn<QUrl>("newUrl");
 
     QTest::newRow("Local Image")
-        << QUrl(QString("file://%1/old/1.jpg").arg(testDir.path()))
-        << QUrl(QString("file://%1/new/1.jpg").arg(testDir.path()));
+        << QUrl(QString("file:///%1/old/1.jpg").arg(testDir.path()))
+        << QUrl(QString("file:///%1/new/1.jpg").arg(testDir.path()));
     QTest::newRow("Zip Image")
-        << QUrl(QString("zip://%1/old/a.zip#1.jpg").arg(testDir.path()))
-        << QUrl(QString("zip://%1/new/a.zip#1.jpg").arg(testDir.path()));
+        << QUrl(QString("zip:/%1/old/a.zip#1.jpg").arg(testDir.path()))
+        << QUrl(QString("zip:/%1/new/a.zip#1.jpg").arg(testDir.path()));
     QTest::newRow("RAR Image")
-        << QUrl(QString("rar://%1/old/a.rar#1.jpg").arg(testDir.path()))
-        << QUrl(QString("rar://%1/new/a.rar#1.jpg").arg(testDir.path()));
+        << QUrl(QString("rar:/%1/old/a.rar#1.jpg").arg(testDir.path()))
+        << QUrl(QString("rar:/%1/new/a.rar#1.jpg").arg(testDir.path()));
     QTest::newRow("7z Image")
-        << QUrl(QString("sevenz://%1/old/a.7z#1.jpg").arg(testDir.path()))
-        << QUrl(QString("sevenz://%1/new/a.7z#1.jpg").arg(testDir.path()));
+        << QUrl(QString("sevenz:/%1/old/a.7z#1.jpg").arg(testDir.path()))
+        << QUrl(QString("sevenz:/%1/new/a.7z#1.jpg").arg(testDir.path()));
 
     QTest::newRow("Local Image Deeper")
-        << QUrl(QString("file://%1/old/deep/1.jpg").arg(testDir.path()))
-        << QUrl(QString("file://%1/new/deep/1.jpg").arg(testDir.path()));
+        << QUrl(QString("file:///%1/old/deep/1.jpg").arg(testDir.path()))
+        << QUrl(QString("file:///%1/new/deep/1.jpg").arg(testDir.path()));
 }
 
 void TestImagePathCorrector::patch_toString()
