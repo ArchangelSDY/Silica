@@ -48,6 +48,7 @@ if (APPLE)
     set(CPACK_BUNDLE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/assets/logo.icns)
 elseif(WIN32)
 	set(CPACK_GENERATOR "NSIS64")
+    set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 endif()
 
 include(CPack)
