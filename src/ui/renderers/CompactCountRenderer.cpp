@@ -12,9 +12,9 @@ CompactCountRenderer::CompactCountRenderer(
 
 void CompactCountRenderer::paint(QPainter *painter)
 {
-    if (m_parentRenderer) {
-        m_parentRenderer->paint(painter);
-    }
+    Q_ASSERT(m_parentRenderer);
+
+    m_parentRenderer->paint(painter);
 
     if (m_count < 0) {
         return;

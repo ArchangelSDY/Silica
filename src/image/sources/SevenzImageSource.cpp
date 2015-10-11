@@ -39,7 +39,7 @@ bool SevenzImageSource::open()
     // threads.
     QString hash;
     QTextStream hashBuilder(&hash);
-    long threadId = reinterpret_cast<long>(QThread::currentThreadId());
+    long long threadId = reinterpret_cast<long long>(QThread::currentThreadId());
     hashBuilder << QString::number(threadId, 16)
                 << "#" << m_packagePath;
 
