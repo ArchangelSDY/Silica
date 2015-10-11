@@ -7,7 +7,20 @@ set(SILICA_SRCS
 )
 
 if (WIN32)
-    add_executable(silica WIN32 ${SILICA_SRCS})
+    # Windows application icon
+    set(WINDOWS_RES_SRC ${CMAKE_CURRENT_SOURCE_DIR}/assets/winresources.rc)
+    set(WINDOWS_RES_FILE ${CMAKE_CURRENT_BINARY_DIR}/winresources.obj)
+    if (MSVC)
+        add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
+          COMMAND rc.exe /fo ${WINDOWS_RES_FILE} ${WINDOWS_RES_SRC}
+        )
+    else()
+        add_custom_command(OUTPUT ${WINDOWS_RES_FILE}
+          COMMAND windres.exe ${WINDOWS_RES_SRC} ${WINDOWS_RES_FILE}
+        )
+    endif()
+
+    add_executable(silica WIN32 ${SILICA_SRCS} ${WINDOWS_RES_FILE})
 else (WIN32)
     add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
