@@ -75,8 +75,9 @@ void LoadImageTask::run()
 {
     QList<QSharedPointer<QImage> > images;
     QList<int> durations;
+    QImageReader reader;
     if (!m_imageSource.isNull() && m_imageSource->open()) {
-        QImageReader reader(m_imageSource->device());
+        reader.setDevice(m_imageSource->device());
 
         forever {
             QImage image = reader.read();
@@ -93,8 +94,6 @@ void LoadImageTask::run()
                 images << QSharedPointer<QImage>::create(image);
                 durations << reader.nextImageDelay();
             } else {
-                qWarning() << "Failed to read image" << m_imageSource->url().toString() << "due to error:"
-                           << reader.errorString();
                 break;
             }
         }
@@ -103,6 +102,9 @@ void LoadImageTask::run()
     }
 
     if (images.isEmpty()) {
+        qWarning() << "Failed to read image" << m_imageSource->url().toString() << "due to error:"
+            << reader.errorString();
+
         images << QSharedPointer<QImage>::create();
         durations << 0;
     }
