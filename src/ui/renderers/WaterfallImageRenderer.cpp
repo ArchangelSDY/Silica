@@ -9,6 +9,11 @@ WaterfallImageRenderer::WaterfallImageRenderer() :
 {
 }
 
+Qt::AspectRatioMode WaterfallImageRenderer::aspectRatioMode() const
+{
+    return Qt::KeepAspectRatioByExpanding;
+}
+
 void WaterfallImageRenderer::layout()
 {
     if (!m_image || m_image->size().isEmpty()) {

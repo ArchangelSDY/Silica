@@ -9,6 +9,11 @@ LooseImageRenderer::LooseImageRenderer() :
 {
 }
 
+Qt::AspectRatioMode LooseImageRenderer::aspectRatioMode() const
+{
+    return Qt::KeepAspectRatio;
+}
+
 void LooseImageRenderer::layout()
 {
     if (!m_image) {

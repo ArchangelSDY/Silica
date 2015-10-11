@@ -8,6 +8,7 @@ class WaterfallImageRenderer : public AbstractGalleryItemRenderer
 public:
     WaterfallImageRenderer();
 
+    virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual void layout();
     virtual void paint(QPainter *painter);
 

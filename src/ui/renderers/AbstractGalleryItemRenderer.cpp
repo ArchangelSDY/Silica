@@ -33,6 +33,11 @@ void AbstractGalleryItemRenderer::setImage(const QImage *image,
     }
 }
 
+Qt::AspectRatioMode AbstractGalleryItemRenderer::aspectRatioMode() const
+{
+    return m_parentRenderer ? m_parentRenderer->aspectRatioMode() : Qt::KeepAspectRatio;
+}
+
 QRect AbstractGalleryItemRenderer::boundingRect() const
 {
     if (m_parentRenderer) {

@@ -13,6 +13,7 @@ public:
         const QRect &boundingRect = QRect(
             QPoint(0, 0), GlobalConfig::instance()->galleryItemSize()));
 
+    virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual void layout();
     virtual void paint(QPainter *painter);
 

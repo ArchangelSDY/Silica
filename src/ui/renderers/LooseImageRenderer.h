@@ -9,6 +9,7 @@ class LooseImageRenderer : public AbstractGalleryItemRenderer
 public:
     LooseImageRenderer();
 
+    virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual void layout();
     virtual void paint(QPainter *painter);
 

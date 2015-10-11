@@ -17,6 +17,11 @@ CompactImageRenderer::CompactImageRenderer(
     m_boundingRect = boundingRect;
 }
 
+Qt::AspectRatioMode CompactImageRenderer::aspectRatioMode() const
+{
+    return Qt::KeepAspectRatioByExpanding;
+}
+
 void CompactImageRenderer::layout()
 {
     AbstractGalleryItemRenderer::layout();

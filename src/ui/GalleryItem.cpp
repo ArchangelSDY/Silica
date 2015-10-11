@@ -74,9 +74,11 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
     createRenderer();
 }
 
-static QSharedPointer<QImage> resizeThumbnailAtBackground(QSharedPointer<QImage> thumbnail, const QSize &size)
+static QSharedPointer<QImage> resizeThumbnailAtBackground(QSharedPointer<QImage> thumbnail,
+                                                          const QSize &size,
+                                                          Qt::AspectRatioMode aspectRatioMode)
 {
-    return QSharedPointer<QImage>::create(thumbnail->scaled(size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
 }
 
 void GalleryItem::setThumbnail(QImage *thumbnail)
@@ -94,7 +96,8 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     if (thumbnail) {
         QFuture<QSharedPointer<QImage> > resizeFuture = QtConcurrent::run(
             gResizeThumbnailThreads(), resizeThumbnailAtBackground,
-            QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize());
+            QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize(),
+            m_renderer->aspectRatioMode());
         m_thumbnailResizeWatcher.setFuture(resizeFuture);
     }
 }

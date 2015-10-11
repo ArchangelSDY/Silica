@@ -11,6 +11,7 @@ public:
 
     void setImage(const QImage *image, bool isOwnImage = false);
 
+    virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual QRect boundingRect() const;
     virtual void layout();
     virtual void paint(QPainter *painter);
