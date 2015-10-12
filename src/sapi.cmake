@@ -30,6 +30,11 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Logging.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
-install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT applications)
+install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT sdk)
 # FIXME: Fix Windows Support
 # install(TARGETS sapi LIBRARY DESTINATION "lib" COMPONENT applications)
+
+install(TARGETS sapi
+    RUNTIME DESTINATION . COMPONENT applications
+    ARCHIVE DESTINATION "lib" COMPONENT sdk
+)

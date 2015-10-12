@@ -71,7 +71,6 @@ if (APPLE)
 elseif (WIN32)
 
     install(TARGETS silica RUNTIME DESTINATION . COMPONENT applications)
-    install(TARGETS sapi RUNTIME DESTINATION . COMPONENT applications)
 
     install(FILES "${ZLIB_INCLUDE_DIR}/../bin/zlib.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/bin/Qt5Concurrent.dll" DESTINATION . COMPONENT applications)
