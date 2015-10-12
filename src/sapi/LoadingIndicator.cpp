@@ -5,7 +5,19 @@
 
 namespace sapi {
 
-static LoadingIndicator *g_pluginLoadingIndicator = 0;
+// Dummy loading indicator used before a meaningful one set
+class DummyLoadingIndicator : public LoadingIndicator
+{
+public:
+    DummyLoadingIndicator() {}
+
+    virtual void start() override {}
+    virtual void stop() override {}
+    virtual void reportProgress(int min, int max, int cur) override {}
+};
+
+
+static LoadingIndicator *g_pluginLoadingIndicator = new DummyLoadingIndicator();
 
 LoadingIndicator *loadingIndicator()
 {
@@ -14,7 +26,10 @@ LoadingIndicator *loadingIndicator()
 
 void setLoadingIndicatorImpl(LoadingIndicator *loadingIndicator)
 {
-    Q_ASSERT(!g_pluginLoadingIndicator);
+    if (g_pluginLoadingIndicator) {
+        delete g_pluginLoadingIndicator;
+    }
+
     g_pluginLoadingIndicator = loadingIndicator;
 }
 

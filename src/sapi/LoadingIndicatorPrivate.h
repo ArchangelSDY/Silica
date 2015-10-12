@@ -6,6 +6,8 @@
 
 namespace sapi {
 
+// Set plugin loading indicator implemention.
+// This function is NOT thread safe.
 void SAPI_EXPORT setLoadingIndicatorImpl(LoadingIndicator *loadingIndicator);
 
 }

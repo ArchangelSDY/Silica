@@ -14,7 +14,7 @@ public:
     virtual void reportProgress(int min, int max, int cur) = 0;
 };
 
-LoadingIndicator *loadingIndicator();
+LoadingIndicator SAPI_EXPORT *loadingIndicator();
 
 }
 

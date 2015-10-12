@@ -9,8 +9,11 @@ static QDebug *g_pluginDebug = 0;
 
 QDebug debug()
 {
-    Q_ASSERT(g_pluginDebug);
-    return *g_pluginDebug;
+    if (g_pluginDebug) {
+        return *g_pluginDebug;
+    } else {
+        return QDebug(QtMsgType::QtDebugMsg);
+    }
 }
 
 void setLoggingDebugImpl(QDebug *debug)
