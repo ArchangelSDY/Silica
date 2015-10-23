@@ -40,6 +40,7 @@ file(GLOB CORE_SRCS
     "sapi/PlayListProviderDelegate.cpp"
     "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"
+    "ui/models/MainGraphicsViewModel.cpp"
     "ui/models/TaskProgress.cpp"
 )
 

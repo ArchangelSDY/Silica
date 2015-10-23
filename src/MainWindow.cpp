@@ -21,6 +21,7 @@
 #include "logger/Logger.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
+#include "ui/models/MainGraphicsViewModel.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImagePathCorrectorClientImpl.h"
@@ -51,7 +52,19 @@ MainWindow::MainWindow(QWidget *parent) :
     setupExtraUi();
 
     ui->gallery->setPlayList(m_navigator->playList());
-    ui->graphicsView->setNavigator(m_navigator);
+
+    // Main graphics view
+    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
+    m_mainGraphicsViewModel->setView(ui->graphicsView);
+    m_mainGraphicsViewModel->setNavigator(m_navigator);
+    ui->graphicsView->setModel(m_mainGraphicsViewModel.data());
+
+    // Side view
+    m_sideViewModel.reset(new MainGraphicsViewModel());
+    m_sideViewModel->setView(ui->sideView);
+    m_sideViewModel->setNavigator(m_navigator);
+    ui->sideView->setModel(m_sideViewModel.data());
+
     ui->sidebar->hide();
     statusBar()->hide();
 
@@ -65,13 +78,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_navigator, SIGNAL(paint(Image *)),
             this, SLOT(imageLoaded(Image *)));
     connect(m_navigator, SIGNAL(paint(Image *)),
-            ui->graphicsView, SLOT(paint(Image *)));
+            m_mainGraphicsViewModel.data(), SLOT(paint(Image *)));
     connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
-            ui->graphicsView, SLOT(paintThumbnail(Image *)));
+            m_mainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
     connect(m_navigator, SIGNAL(paint(Image *)),
-            ui->sideView, SLOT(paint(Image *)));
+            m_sideViewModel.data(), SLOT(paint(Image *)));
     connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
-            ui->sideView, SLOT(paintThumbnail(Image *)));
+            m_sideViewModel.data(), SLOT(paintThumbnail(Image *)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -262,7 +275,7 @@ void MainWindow::setupExtraUi()
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->gallery, SIGNAL(keyEnterPressed()),
             m_actToolBarImage, SLOT(trigger()));
-    connect(ui->graphicsView, SIGNAL(mouseDoubleClicked()),
+    connect(m_mainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
             m_actToolBarGallery, SLOT(trigger()));
 
     ui->pageImageView->layout()->setMargin(0);
@@ -759,8 +772,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 m_navigator->goPrevGroup();
                 break;
             case Qt::Key_F:
-                ui->graphicsView->toggleFitInView();
-                ui->graphicsView->fitInViewIfNecessary();
+                m_mainGraphicsViewModel->toggleFitInView();
+                m_mainGraphicsViewModel->fitInViewIfNecessary();
                 break;
             case Qt::Key_O: {
                 promptToOpenImage();
@@ -786,7 +799,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             }
             case Qt::Key_R:
-                ui->graphicsView->rotate(90);
+                m_mainGraphicsViewModel->rotate(90);
                 break;
             case Qt::Key_B:
                 ui->basketPane->setVisible(!ui->basketPane->isVisible());
@@ -829,7 +842,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             case Qt::Key_7:
             case Qt::Key_8:
             case Qt::Key_9:
-                ui->graphicsView->fitGridInView(ev->text().toInt());
+                m_mainGraphicsViewModel->fitGridInView(ev->text().toInt());
                 break;
         }
 
@@ -856,7 +869,7 @@ void MainWindow::switchViews()
 
 void MainWindow::resizeEvent(QResizeEvent *)
 {
-    ui->graphicsView->fitInViewIfNecessary();
+    m_mainGraphicsViewModel->fitInViewIfNecessary();
 }
 
 void MainWindow::changeEvent(QEvent *ev)

@@ -4,6 +4,7 @@
 #include <QActionGroup>
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QScopedPointer>
 
 #include "Navigator.h"
 #include "PlayList.h"
@@ -13,6 +14,7 @@ class MainWindow;
 }
 
 class ImagePathCorrector;
+class MainGraphicsViewModel;
 
 class MainWindow : public QMainWindow
 {
@@ -61,6 +63,8 @@ private:
 
     Ui::MainWindow *ui;
     Navigator *m_navigator;
+    QScopedPointer<MainGraphicsViewModel> m_mainGraphicsViewModel;
+    QScopedPointer<MainGraphicsViewModel> m_sideViewModel;
 
     // TODO: Separate toolbar logic out
     QToolBar *m_toolBar;

@@ -5,43 +5,21 @@
 #include <QTimer>
 #include <QWheelEvent>
 
+#include "ui/models/MainGraphicsViewModel.h"
 #include "HotspotsEditor.h"
-#include "Image.h"
-#include "Navigator.h"
 
-class Image;
-class RankVoteView;
-class RemoteWallpapersManager;
-
-class MainGraphicsView : public QGraphicsView
+class MainGraphicsView : public QGraphicsView, public MainGraphicsViewModel::View
 {
     Q_OBJECT
 public:
-    enum FitMode {
-        Fit = 0,
-        FitExpand = 1,
-        Actual = 2,
-    };
-
     explicit MainGraphicsView(QWidget *parent = 0);
     virtual ~MainGraphicsView();
 
-    void setNavigator(Navigator *navigator);
+    void setModel(MainGraphicsViewModel *model);
 
-    void fitGridInView(int grid);
-    void fitInViewIfNecessary();
-    void toggleFitInView();
+    //HotspotsEditor *hotspotsEditor() { return m_hotspotsEditor; }
 
-    HotspotsEditor *hotspotsEditor() { return m_hotspotsEditor; }
-
-signals:
-    void mouseDoubleClicked();
-
-private slots:
-    void paint();
-    void paint(Image *image, bool shouldFitInView = true);
-    void paintThumbnail(Image *image);
-    void focusOnRect(QRectF rect);
+    virtual bool isVisible() const;
 
 protected:
     virtual void showEvent(QShowEvent *event);
@@ -54,25 +32,18 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
 private:
-    void scheduleAnimation();
-    void resetImage(Image *image);
+    virtual void setImage(const QImage &image) ;
+    virtual void setViewportRect(const QRect &rect);
+    virtual void setTransform(const QTransform &transform);
+    virtual void setFitInView(const QRectF & rect, Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio);
+    virtual QSize viewSize() const;
+    virtual QRectF viewportRect() const;
+    virtual QTransform transform() const;
+    virtual QWidget *widget();
 
-    Navigator *m_navigator;
+    MainGraphicsViewModel *m_model;
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
-    Image *m_image;
-    bool m_shouldRepaintThumbnailOnShown;
-
-    FitMode m_fitInView;
-
-    HotspotsEditor *m_hotspotsEditor;
-    QRectF m_focusedRect;
-
-    RankVoteView *m_rankVoteView;
-    RemoteWallpapersManager *m_remoteWallpapersMgr;
-
-    QTimer m_animationTimer;
-    int m_curFrameNumber;
 };
 
 #endif // MAINGRAPHICSVIEW_H
