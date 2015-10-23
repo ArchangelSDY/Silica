@@ -5,6 +5,7 @@ cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
 project (silica VERSION 0.2.0)
 
 find_package(Threads)
+find_package(OPENSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Core REQUIRED)
