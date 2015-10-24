@@ -3,7 +3,7 @@
 #include "db/LocalDatabase.h"
 #include "playlist/PlayListProvider.h"
 #include "playlist/PlayListProviderManager.h"
-#include "PlayList.h"
+#include "../PlayList.h"
 
 PlayListRecord::PlayListRecord() :
     QObject(0) ,

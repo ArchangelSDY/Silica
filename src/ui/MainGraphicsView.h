@@ -15,8 +15,6 @@ public:
     explicit MainGraphicsView(QWidget *parent = 0);
     virtual ~MainGraphicsView();
 
-    void setModel(MainGraphicsViewModel *model);
-
     //HotspotsEditor *hotspotsEditor() { return m_hotspotsEditor; }
 
     virtual bool isVisible() const;
@@ -41,7 +39,6 @@ private:
     virtual QTransform transform() const;
     virtual QWidget *widget();
 
-    MainGraphicsViewModel *m_model;
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
 };

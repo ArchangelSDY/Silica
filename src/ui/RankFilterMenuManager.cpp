@@ -1,6 +1,6 @@
 #include "ImageRank.h"
 #include "NotEqualRankFilter.h"
-#include "PlayList.h"
+#include "../PlayList.h"
 #include "RankFilterMenuManager.h"
 
 RankFilterMenuManager::RankFilterMenuManager(PlayList **playList,

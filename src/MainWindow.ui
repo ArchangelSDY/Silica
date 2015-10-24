@@ -164,19 +164,9 @@ margin: 0.05em;</string>
        </layout>
       </widget>
       <widget class="QWidget" name="pageImageView">
-       <layout class="QGridLayout" name="gridLayout_3">
+       <layout class="QGridLayout" name="pageImageViewLayout">
         <item row="0" column="0">
-         <widget class="MainGraphicsView" name="graphicsView">
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="dragMode">
-           <enum>QGraphicsView::ScrollHandDrag</enum>
-          </property>
-         </widget>
+         <widget class="QWidget" name="graphicsView"></widget>
         </item>
        </layout>
       </widget>

@@ -68,6 +68,7 @@ void MainGraphicsViewModel::paint(Image *image, bool shouldFitInView)
         }
 
         QImage *frame = image->frames()[m_curFrameNumber];
+        m_view->setViewportRect(frame->rect());
         m_view->setImage(*frame);
 
         if (shouldFitInView) {
