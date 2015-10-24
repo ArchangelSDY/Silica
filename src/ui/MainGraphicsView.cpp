@@ -11,8 +11,7 @@
 MainGraphicsView::MainGraphicsView(QWidget *parent) :
     QGraphicsView(parent) ,
     m_scene(new QGraphicsScene(this)) ,
-    m_imageItem(new QGraphicsPixmapItem()) ,
-    m_model(0)
+    m_imageItem(new QGraphicsPixmapItem())
 {
     m_scene->setBackgroundBrush(QColor("#323A44"));
     m_scene->addItem(m_imageItem);
@@ -30,11 +29,6 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
 MainGraphicsView::~MainGraphicsView()
 {
     // delete m_hotspotsEditor;
-}
-
-void MainGraphicsView::setModel(MainGraphicsViewModel *model)
-{
-    m_model = model;
 }
 
 void MainGraphicsView::setImage(const QImage &image)

@@ -42,6 +42,11 @@ public:
         virtual QRectF viewportRect() const = 0;
         virtual QTransform transform() const = 0;
         virtual QWidget *widget() = 0;
+
+        void setModel(MainGraphicsViewModel *model) { m_model = model; }
+
+    protected:
+        MainGraphicsViewModel *m_model;
     };
 
     explicit MainGraphicsViewModel();
@@ -90,7 +95,6 @@ private:
 
     QScopedPointer<RankVoteView> m_rankVoteView;
     QScopedPointer<RemoteWallpapersManager> m_remoteWallpapersManager;
-
     QTimer m_animationTimer;
     int m_curFrameNumber;
 };

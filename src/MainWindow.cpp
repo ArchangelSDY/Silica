@@ -35,6 +35,10 @@
 
 #include "ui_MainWindow.h"
 
+#ifdef Q_OS_WIN32
+#include "ui/platform/win/D2DMainGraphicsWidget.h"
+#endif
+
 static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -52,12 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setupExtraUi();
 
     ui->gallery->setPlayList(m_navigator->playList());
-
-    // Main graphics view
-    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
-    m_mainGraphicsViewModel->setView(ui->graphicsView);
-    m_mainGraphicsViewModel->setNavigator(m_navigator);
-    ui->graphicsView->setModel(m_mainGraphicsViewModel.data());
 
     // Side view
     m_sideViewModel.reset(new MainGraphicsViewModel());
@@ -138,11 +136,27 @@ void MainWindow::setupExtraUi()
         "}"
     );
 
+    // Main graphics view
+    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
+    m_mainGraphicsViewModel->setNavigator(m_navigator);
+
+    ui->graphicsView->deleteLater();
+#ifdef Q_OS_WIN32
+    D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(ui->pageImageView);
+#else
+    MainGraphicsView *mainGraphicsView = new MainGraphicsView(ui->pageImageView);
+#endif
+    ui->pageImageView->layout()->addWidget(mainGraphicsView);
+    mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
+    m_mainGraphicsViewModel->setView(mainGraphicsView);
+    ui->graphicsView = mainGraphicsView;
+
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
     menuBarCtx.navigator = m_navigator;
     menuBarCtx.imageView = ui->graphicsView;
+
     new MainMenuBarManager(menuBarCtx, this);
 
     // Main toolbar

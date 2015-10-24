@@ -4,6 +4,8 @@ cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
 
 project (silica VERSION 0.2.0)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 find_package(Threads)
 find_package(OPENSSL REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -39,10 +41,24 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # OpenGL support
 option(ENABLE_OPENGL "Enable OpenGL" OFF)
 if(ENABLE_OPENGL)
-    add_definitions(-DENABLE_OPENGL)
-    find_package(Qt5OpenGL REQUIRED)
-    include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+    if (NOT WIN32)
+        add_definitions(-DENABLE_OPENGL)
+        find_package(Qt5OpenGL REQUIRED)
+        include_directories(${Qt5OpenGL_INCLUDE_DIRS})
+	else()
+        message(WARNING "OpenGL cannot be enabled on Windows because we use DirectX for hardware acceleration.")
+        set(ENABLE_OPENGL OFF)
+    endif()
 endif(ENABLE_OPENGL)
+
+# DirectX support
+if (WIN32)
+    find_package(WindowsSDK REQUIRED)
+    get_windowssdk_include_dirs(${WINDOWSSDK_LATEST_DIR} WINDOWSSDK_INCLUDE_DIRS)
+    get_windowssdk_library_dirs(${WINDOWSSDK_LATEST_DIR} WINDOWSSDK_LIB_DIRS)
+
+    include_directories(${WINDOWSSDK_INCLUDE_DIRS})
+endif()
 
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
@@ -54,7 +70,7 @@ if (BUILD_PRODUCTION)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif(BUILD_PRODUCTION)
 
-if (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang"))
+if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang"))
 	set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 endif ()
 
