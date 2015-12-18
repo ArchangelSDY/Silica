@@ -91,7 +91,8 @@ void LoadImageTask::run()
             }
 
             if (!image.isNull()) {
-                images << QSharedPointer<QImage>::create(image);
+                images << QSharedPointer<QImage>::create(
+                    image.convertToFormat(QImage::Format_ARGB32_Premultiplied));
                 durations << reader.nextImageDelay();
             } else {
                 break;

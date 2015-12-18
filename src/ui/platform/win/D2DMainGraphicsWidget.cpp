@@ -32,7 +32,7 @@ void D2DMainGraphicsWidget::setImage(const QImage &image)
     D2D1_SIZE_U size = D2D1::SizeU(image.width(), image.height());
 
     D2D1_BITMAP_PROPERTIES1 props{
-        D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),
+        D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
         FLOAT(96.0f * image.devicePixelRatio()),
         FLOAT(96.0f * image.devicePixelRatio())
     };
