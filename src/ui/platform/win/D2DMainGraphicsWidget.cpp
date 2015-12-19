@@ -39,10 +39,14 @@ void D2DMainGraphicsWidget::setImage(const QImage &image)
 
     m_imageBitmap.Reset();
 
+    // Most images are already converted during loading.
+    // This is a guard mostly for internal asset images, which should be fast enough.
+    QImage d2dImage = image.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+
     if (FAILED(d2dContext->CreateBitmap(
         size,
-        image.bits(),
-        image.bytesPerLine(),
+        d2dImage.bits(),
+        d2dImage.bytesPerLine(),
         &props,
         &m_imageBitmap
         ))) {
