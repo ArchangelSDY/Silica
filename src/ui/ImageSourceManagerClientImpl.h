@@ -8,7 +8,7 @@ class ImageSourceManagerClientImpl : public ImageSourceManagerClient
 public:
     ImageSourceManagerClientImpl(QWidget *parent);
 
-    virtual bool requestPassword(QByteArray &password);
+    virtual bool requestPassword(QString &password);
 
 private:
     QWidget *m_parent;

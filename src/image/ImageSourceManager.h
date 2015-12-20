@@ -50,7 +50,7 @@ class ImageSourceManagerClient
 public:
     virtual ~ImageSourceManagerClient() {}
 
-    virtual bool requestPassword(QByteArray &password) = 0;
+    virtual bool requestPassword(QString &password) = 0;
 };
 
 #endif // IMAGESOURCEMANAGER_H

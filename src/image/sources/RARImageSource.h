@@ -8,7 +8,7 @@ class RARImageSource : public ImageSource
 public:
     RARImageSource(ImageSourceFactory *factory,
                    const QString &arcPath, const QString &imageName,
-                   const QByteArray &password = QByteArray());
+                   const QString &password = QString());
 
     virtual bool open();
     virtual bool exists();
@@ -16,7 +16,7 @@ public:
 
 private:
     QString m_arcPath;
-    QByteArray m_password;
+    QString m_password;
 };
 
 #endif // RARIMAGESOURCE_H

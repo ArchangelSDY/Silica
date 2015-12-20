@@ -33,7 +33,7 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url)
 }
 
 ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
-                                                 const QByteArray &password)
+                                                 const QString &password)
 {
     if (url.scheme() == urlScheme()) {
         QString imageName = url.fragment();
@@ -83,7 +83,7 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
         bool success = rar.open(QtRAR::OpenModeList);
 
         if (success) {
-            QByteArray password;
+            QString password;
             if (rar.isHeadersEncrypted() || rar.isFilesEncrypted()) {
                 rar.close();
 

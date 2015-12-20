@@ -12,7 +12,7 @@
 RARImageSource::RARImageSource(ImageSourceFactory *factory,
                                const QString &arcPath,
                                const QString &imageName,
-                               const QByteArray &password) :
+                               const QString &password) :
     ImageSource(factory) ,
     m_password(password)
 {
@@ -49,7 +49,7 @@ bool RARImageSource::open()
             file->close();
         }
 
-        ok = file->open(QIODevice::ReadOnly, m_password.data());
+        ok = file->open(QIODevice::ReadOnly, m_password);
     }
 
     m_device.reset(file);

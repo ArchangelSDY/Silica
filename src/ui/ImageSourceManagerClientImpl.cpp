@@ -44,7 +44,7 @@ ImageSourceManagerClientImpl::ImageSourceManagerClientImpl(QWidget *parent) :
 {
 }
 
-bool ImageSourceManagerClientImpl::requestPassword(QByteArray &password)
+bool ImageSourceManagerClientImpl::requestPassword(QString &password)
 {
     PasswordInputer inputer(m_parent);
     inputer.moveToThread(QApplication::instance()->thread());
@@ -58,7 +58,7 @@ bool ImageSourceManagerClientImpl::requestPassword(QByteArray &password)
 
     if (inputer.isAccepted()) {
         QString passStr = inputer.password();
-        passStr.toUtf8().swap(password);
+        passStr.swap(password);
         return true;
     } else {
         return false;

@@ -11,7 +11,7 @@ ImageSourceFactory::ImageSourceFactory(ImageSourceManager *mgr,
 {
 }
 
-bool ImageSourceFactory::requestPassword(QByteArray &password)
+bool ImageSourceFactory::requestPassword(QString &password)
 {
     if (m_mgr->m_client) {
         return m_mgr->m_client->requestPassword(password);

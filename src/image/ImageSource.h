@@ -33,7 +33,7 @@ protected:
     ImageSource(ImageSourceFactory *factory);
 
     QString findRealPath(QString path);
-    inline bool requestPassword(QByteArray &password)
+    inline bool requestPassword(QString &password)
     {
         return m_factory->requestPassword(password);
     }

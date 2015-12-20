@@ -25,7 +25,7 @@ public:
     virtual void clearCache() {}
 
 protected:
-    bool requestPassword(QByteArray &password);
+    bool requestPassword(QString &password);
     bool isValidFileName(const QString &name);
 
     ImageSourceManager *m_mgr;
