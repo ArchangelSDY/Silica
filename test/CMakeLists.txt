@@ -55,7 +55,7 @@ if (WIN32)
     file(GLOB QT_LIB_FILES ${QT_ROOT}/bin/*.dll)
     file(GLOB OPENCV_LIB_FILES ${OpenCV_LIB_DIR_OPT}/../bin/*.dll)
     file(GLOB ZLIB_FILES ${ZLIB_INCLUDE_DIR}/../bin/*.dll)
-    set(OPENSSL_LIB_FILES ${OPENSSL_ROOT_DIR}/lib/libeay32.dll ${OPENSSL_ROOT_DIR}/lib/ssleay32.dll)
+    set(OPENSSL_LIB_FILES ${OPENSSL_INCLUDE_DIR}/../lib/libeay32.dll ${OPENSSL_INCLUDE_DIR}/../lib/ssleay32.dll)
 
     set(LIB_FILES ${QT_LIB_FILES} ${OPENCV_LIB_FILES} ${ZLIB_FILES} ${OPENSSL_LIB_FILES})
 
