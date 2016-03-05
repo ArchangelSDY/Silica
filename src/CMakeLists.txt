@@ -21,6 +21,7 @@ set(DEFINITION_SRCS
 
 add_definitions(-DQTRAR_STATIC)
 add_definitions(-DQUAZIP_STATIC)
+add_definitions(-DQT7Z_STATIC)
 
 add_subdirectory(deps/qwebpa)
 add_subdirectory(deps/quazip)
