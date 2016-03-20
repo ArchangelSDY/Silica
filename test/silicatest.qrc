@@ -3,5 +3,6 @@
         <file>assets/me.jpg</file>
         <file>assets/pack.zip</file>
         <file>assets/silica.png</file>
+        <file>assets/pack.cgc</file>
     </qresource>
 </RCC>
