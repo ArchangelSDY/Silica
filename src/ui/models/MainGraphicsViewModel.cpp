@@ -25,6 +25,10 @@ MainGraphicsViewModel::MainGraphicsViewModel() :
             this, SLOT(paint()));
 }
 
+MainGraphicsViewModel::~MainGraphicsViewModel()
+{
+}
+
 void MainGraphicsViewModel::setNavigator(Navigator *navigator)
 {
     m_navigator = navigator;

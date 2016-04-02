@@ -7,7 +7,6 @@ project (silica VERSION 0.3.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Threads)
-find_package(OPENSSL REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Core REQUIRED)
@@ -16,6 +15,10 @@ find_package(Qt5Sql REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(OpenCV REQUIRED)
+
+if (WIN32)
+    find_package(OPENSSL REQUIRED)
+endif (WIN32)
 
 set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 # if there is no QT_ROOT, try to deduce it from Qt QtCore include

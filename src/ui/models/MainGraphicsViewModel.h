@@ -50,6 +50,7 @@ public:
     };
 
     explicit MainGraphicsViewModel();
+    ~MainGraphicsViewModel();
 
     void setNavigator(Navigator *navigator);
     void setView(View *view);
