@@ -91,8 +91,6 @@ elseif (WIN32)
     install(FILES "${QT_ROOT}/plugins/imageformats/qsvg.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/imageformats/qtiff.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/sqldrivers/qsqlite.dll" DESTINATION "plugins/sqldrivers" COMPONENT applications)
-    install(FILES "${OpenCV_LIB_DIR_OPT}/../bin/opencv_core300.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${OpenCV_LIB_DIR_OPT}/../bin/opencv_imgproc300.dll" DESTINATION . COMPONENT applications)
 
     if (ENABLE_OPENGL)
         install(FILES "${QT_ROOT}/bin/Qt5OpenGL.dll" DESTINATION . COMPONENT applications)
