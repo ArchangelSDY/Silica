@@ -28,6 +28,7 @@ public:
 
     void sortByName();
     void sortByAspectRatio();
+    void sortBySize();
     void sortByGroup();
 
     int groupForImage(Image * const image);

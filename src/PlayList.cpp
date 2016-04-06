@@ -218,6 +218,30 @@ void PlayList::sortByAspectRatio()
     emit itemsChanged();
 }
 
+static bool imageSizeLessThan(const QSharedPointer<Image> &left,
+                              const QSharedPointer<Image> &right)
+{
+    const QSize leftSize = left->size();
+    const QSize rightSize = right->size();
+
+    if (leftSize.width() != rightSize.width()) {
+        return leftSize.width() < rightSize.width();
+    }
+
+    if (leftSize.height() != rightSize.height()) {
+        return leftSize.height() < rightSize.height();
+    }
+
+    return imageNameLessThan(left, right);
+}
+
+void PlayList::sortBySize()
+{
+    qSort(m_filteredImages.begin(), m_filteredImages.end(),
+          imageSizeLessThan);
+    emit itemsChanged();
+}
+
 static bool isHistSame(ImageHistogram* const &left,
                         ImageHistogram* const &right)
 {

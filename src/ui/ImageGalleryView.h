@@ -21,6 +21,7 @@ public slots:
 protected slots:
     void sortByName();
     void sortByAspectRatio();
+    void sortBySize();
 
     void setAsCover();
     void addToBasket();

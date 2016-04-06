@@ -83,6 +83,7 @@ QMenu *ImageGalleryView::createContextMenu()
     QMenu *sorts = menu->addMenu(tr("Sort By"));
     sorts->addAction(tr("Name"), this, SLOT(sortByName()));
     sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
+    sorts->addAction(tr("Size"), this, SLOT(sortBySize()));
 
     QMenu *groups = menu->addMenu(tr("Group By"));
     groups->addAction(tr("None"), this, SLOT(disableGrouping()));
@@ -127,6 +128,15 @@ void ImageGalleryView::sortByAspectRatio()
     }
 
     m_playList->sortByAspectRatio();
+}
+
+void ImageGalleryView::sortBySize()
+{
+    if (!m_playList) {
+        return;
+    }
+
+    m_playList->sortBySize();
 }
 
 void ImageGalleryView::setAsCover()
