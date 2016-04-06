@@ -2,6 +2,7 @@
 
 #include <QDialog>
 
+#include "navigation/CascadeClassifierNavigationPlayer.h"
 #include "navigation/ExpandingNavigationPlayer.h"
 #include "navigation/FixedRegionNavigationPlayer.h"
 #include "navigation/HotspotsNavigationPlayer.h"
@@ -62,6 +63,13 @@ void MainMenuBarManager::init()
     actSetFixedRegionPlayer->setChecked(
         m_navigator->player()->type() == AbstractNavigationPlayer::FixedRegionType);
 
+    QAction *actSetCascadeClassifierPlayer = m_menuPlayers->addAction(
+        tr("Cascade Classifier Player"), this, SLOT(setCascadeClassifierPlayer()));
+    playersGrp->addAction(actSetCascadeClassifierPlayer);
+    actSetCascadeClassifierPlayer->setCheckable(true);
+    actSetCascadeClassifierPlayer->setChecked(
+        m_navigator->player()->type() == AbstractNavigationPlayer::CascadeClassifierType);
+
     m_menuPlayers->addSeparator();
 
     m_actPlayerConf = m_menuPlayers->addAction(
@@ -97,6 +105,12 @@ void MainMenuBarManager::setFixedRegionPlayer()
 {
     m_navigator->setPlayer(
         new FixedRegionNavigationPlayer(m_navigator, m_imageView));
+}
+
+void MainMenuBarManager::setCascadeClassifierPlayer()
+{
+    m_navigator->setPlayer(
+        new CascadeClassifierNavigationPlayer(m_navigator, m_imageView));
 }
 
 void MainMenuBarManager::checkPlayerConfigurable()

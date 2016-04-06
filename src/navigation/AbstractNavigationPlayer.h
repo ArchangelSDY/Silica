@@ -22,6 +22,7 @@ public:
         HotspotsType,
         ExpandingType,
         FixedRegionType,
+        CascadeClassifierType,
     };
 
     virtual Type type() const = 0;

@@ -16,5 +16,6 @@
         <file>res/toolbar/dir-up-active.png</file>
         <file>res/toolbar/dir-up.png</file>
         <file>assets/logo.png</file>
+        <file>assets/lbpcascade_animeface.xml</file>
     </qresource>
 </RCC>

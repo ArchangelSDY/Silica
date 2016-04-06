@@ -42,6 +42,7 @@ file(GLOB CORE_SRCS
     "sapi/PluginLoggingDelegate.cpp"
     "ui/models/MainGraphicsViewModel.cpp"
     "ui/models/TaskProgress.cpp"
+    "util/CvUtils.cpp"
 )
 
 qt5_wrap_ui(CORE_UI_HEADERS

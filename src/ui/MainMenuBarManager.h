@@ -25,6 +25,7 @@ private slots:
     void setHotspotsPlayer();
     void setExpandingPlayer();
     void setFixedRegionPlayer();
+    void setCascadeClassifierPlayer();
     void checkPlayerConfigurable();
     void openPlayerConfDialog();
     void showPluginLogsDialog();
