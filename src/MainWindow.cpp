@@ -15,6 +15,7 @@
 #include <QStackedLayout>
 #include <QStatusBar>
 #include <QToolBar>
+#include <QtConcurrent>
 
 #include "image/ImageSourceManager.h"
 #include "logger/listeners/ImagePathCorrector.h"
@@ -394,6 +395,7 @@ void MainWindow::loadOrEnterSelectedPath()
 void MainWindow::loadSelectedPath()
 {
     QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
+
     if (selectedItems.count() > 0) {
         PlayList *pl = new PlayList();
 
@@ -401,6 +403,8 @@ void MainWindow::loadSelectedPath()
             FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
             pl->addMultiplePath(fsItem->path());
         }
+
+        bool shouldSortByName = false;
 
         // If only one item selected and only one image in playlist,
         // add siblings too
@@ -418,17 +422,16 @@ void MainWindow::loadSelectedPath()
                     pl->addSinglePath(info.absoluteFilePath());
                 }
             }
+
+            shouldSortByName = false;
         } else {
-            pl->sortByName();
+            shouldSortByName = true;
         }
 
         // Empty playlist will not be loaded
         if (pl->count() == 0) {
             return;
         }
-
-        // Navigator should take ownership of PlayList in this case
-        m_navigator->setPlayList(pl, true);
 
         if (selectedItems.count() > 1) {
             // Show gallery view
@@ -437,6 +440,16 @@ void MainWindow::loadSelectedPath()
             // Show image view
             m_actToolBarImage->trigger();
         }
+
+        // Sort can be slow so put it into background
+        QtConcurrent::run([=]() {
+            if (shouldSortByName) {
+                pl->sortByName();
+            }
+
+            // Navigator should take ownership of PlayList in this case
+            this->m_navigator->setPlayList(pl, true);
+        });
     }
 }
 
