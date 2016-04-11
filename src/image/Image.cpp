@@ -192,6 +192,12 @@ void MakeThumbnailTask::run()
         return;
     }
 
+    // Create thumbnail dir
+    QFileInfo pathInfo(m_path);
+    QString dirPath = pathInfo.absolutePath();
+    QDir dir;
+    dir.mkpath(dirPath);
+
     int height = qMax<int>(
         THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
 
@@ -235,7 +241,9 @@ Image::Image(const QString &path, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-    loadMetaFromDatabase();
+
+    // TODO: This leads to a performance issue 
+    // loadMetaFromDatabase();
 
     connect(this, SIGNAL(thumbnailLoaded()),
             this, SLOT(initThumbHist()));
@@ -261,7 +269,9 @@ Image::Image(const QUrl &url, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-    loadMetaFromDatabase();
+
+    // TODO: This leads to a performance issue 
+    // loadMetaFromDatabase();
 
     connect(this, SIGNAL(thumbnailLoaded()),
             this, SLOT(initThumbHist()));
@@ -291,7 +301,9 @@ Image::Image(ImageSource *imageSource, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-    loadMetaFromDatabase();
+
+    // TODO: This leads to a performance issue
+    // loadMetaFromDatabase();
 
     connect(this, SIGNAL(thumbnailLoaded()),
             this, SLOT(initThumbHist()));
@@ -528,10 +540,6 @@ void Image::computeThumbnailPath()
 
         QStringList pathParts = QStringList() << sub << name;
         m_thumbnailPath = pathParts.join("/");
-
-        QDir dir;
-        dir.mkpath(GlobalConfig::instance()->thumbnailPath() +
-                   "/" + sub);
     }
 }
 
