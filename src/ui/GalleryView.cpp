@@ -42,6 +42,9 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene->setPalette(palette);
     m_scene->setBackgroundBrush(palette.background());
 
+    // Disable index to speed up adding items
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+
     m_searchBox->setStyleSheet(
         "border: none;"
         "padding: 0 0.5em;"
