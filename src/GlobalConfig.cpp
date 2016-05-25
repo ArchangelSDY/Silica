@@ -83,6 +83,11 @@ void GlobalConfig::load()
                               .toString();
     qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
+    // Crash dump path
+    m_crashDumpPath = baseDirPath + "/crash_dump";
+    qDebug() << "Crash dump path:" << m_crashDumpPath;
+    d.mkpath(m_crashDumpPath);
+
     // Set default codec
     // This affects codec for zip files
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");

@@ -6,6 +6,12 @@ set(SILICA_SRCS
     "main.cpp"
 )
 
+set(SILICA_LINK_LIBS
+    sapi
+    silicacore
+    silicaui
+)
+
 if (WIN32)
     # Windows application icon
     set(WINDOWS_RES_SRC ${CMAKE_CURRENT_SOURCE_DIR}/assets/winresources.rc)
@@ -20,15 +26,24 @@ if (WIN32)
         )
     endif()
 
+    # Enable breakpad for Windows
+    set(SILICA_LINK_LIBS ${SILICA_LINK_LIBS} breakpad)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/breakpad)
+
     add_executable(silica WIN32 ${SILICA_SRCS} ${WINDOWS_RES_FILE})
+
 else (WIN32)
     add_executable(silica ${SILICA_SRCS})
 endif (WIN32)
 
-target_link_libraries(silica sapi silicacore silicaui)
+target_link_libraries(silica ${SILICA_LINK_LIBS})
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executable_path/../Resources/lib;$ORIGIN/../lib")
 
 # WebP Animation Plugin
+add_custom_command(TARGET silica POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+    $<TARGET_FILE_DIR:silica>/plugins/imageformats/
+)
 add_custom_command(TARGET silica POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
     $<TARGET_FILE:qwebpa>

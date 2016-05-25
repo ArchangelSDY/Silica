@@ -17,6 +17,7 @@ public:
     const QString &migrationConfigPath() const { return m_migrationConfigPath; }
     const QString &thumbnailPath() const { return m_thumbnailPath; }
     const QSize &galleryItemSize() const { return m_galleryItemSize; }
+    const QString &crashDumpPath() const { return m_crashDumpPath; }
 
     const char *buildRevision() const;
     const char *buildTimestamp() const;
@@ -33,6 +34,7 @@ private:
     QString m_migrationConfigPath;
     QString m_thumbnailPath;
     QSize m_galleryItemSize;
+    QString m_crashDumpPath;
 };
 
 #endif // GLOBALCONFIG_H

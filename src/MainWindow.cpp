@@ -38,6 +38,7 @@
 
 #ifdef Q_OS_WIN32
 #include "ui/platform/win/D2DMainGraphicsWidget.h"
+#include "ui/platform/win/DirectXHelper.h"
 #endif
 
 static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
@@ -142,15 +143,31 @@ void MainWindow::setupExtraUi()
     m_mainGraphicsViewModel->setNavigator(m_navigator);
 
     ui->graphicsView->deleteLater();
+    QWidget *mainGraphicsViewWidget = nullptr;
 #ifdef Q_OS_WIN32
-    D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(ui->pageImageView);
+    try {
+        D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(ui->pageImageView);
+        mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
+        m_mainGraphicsViewModel->setView(mainGraphicsView);
+        mainGraphicsViewWidget = mainGraphicsView;
+    }
+    catch (const DX::Exception &ex) {
+        qDebug() << "Fail to create D2DMainGraphicsWidget due to" << ex.result;
+
+        // Fall back if fail to initialize D2D
+        MainGraphicsView *mainGraphicsView = new MainGraphicsView(ui->pageImageView);
+        mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
+        m_mainGraphicsViewModel->setView(mainGraphicsView);
+        mainGraphicsViewWidget = mainGraphicsView;
+    }
 #else
-    MainGraphicsView *mainGraphicsView = new MainGraphicsView(ui->pageImageView);
-#endif
-    ui->pageImageView->layout()->addWidget(mainGraphicsView);
+    MainGraphicsView *mainGraphicsViewRaw = new MainGraphicsView(ui->pageImageView);
     mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
     m_mainGraphicsViewModel->setView(mainGraphicsView);
-    ui->graphicsView = mainGraphicsView;
+    mainGraphicsViewWidget = mainGraphicsView;
+#endif
+    ui->pageImageView->layout()->addWidget(mainGraphicsViewWidget);
+    ui->graphicsView = mainGraphicsViewWidget;
 
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
