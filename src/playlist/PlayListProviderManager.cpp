@@ -1,9 +1,5 @@
 #include "PlayListProviderManager.h"
 
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QPluginLoader>
-
 #include "db/LocalDatabase.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "playlist/PlayListProvider.h"
@@ -11,6 +7,7 @@
 #include "playlist/PlayListRecord.h"
 #include "sapi/IPlayListProviderPlugin.h"
 #include "sapi/PlayListProviderFactoryDelegate.h"
+#include "sapi/PluginLoader.h"
 #include "GlobalConfig.h"
 
 PlayListProviderManager *PlayListProviderManager::s_instance = 0;
@@ -25,35 +22,16 @@ PlayListProviderManager *PlayListProviderManager::instance()
 
 PlayListProviderManager::PlayListProviderManager()
 {
-    // Load plugins
-    foreach (const QString &libPath, qApp->libraryPaths()) {
-        QDir libDir(libPath);
-        if (!libDir.cd("playlistproviders")) {
-            continue;
-        }
+    // Register plugin providers
+    sapi::PluginLoadCallback<sapi::IPlayListProviderPlugin> callback = [this](sapi::IPlayListProviderPlugin *plugin, const QJsonObject &meta) {
+        QString name = meta["name"].toString();
 
-        foreach (const QString &filename, libDir.entryList(QDir::Files)) {
-            QPluginLoader loader(libDir.absoluteFilePath(filename));
-            QObject *instance = loader.instance();
-            if (instance) {
-                sapi::IPlayListProviderPlugin *plugin =
-                    qobject_cast<sapi::IPlayListProviderPlugin *>(instance);
-                if (plugin) {
-                    QJsonObject meta = loader.metaData();
-                    QJsonObject customMeta = meta["MetaData"].toObject();
-                    QString name = customMeta["name"].toString();
+        PlayListProviderFactory *factory =
+            new sapi::PlayListProviderFactoryDelegate(plugin, meta);
+        this->registerPluginProvider(name, factory);
+    };
 
-                    PlayListProviderFactory *factory =
-                        new sapi::PlayListProviderFactoryDelegate(plugin,
-                                                                  customMeta);
-                    registerPluginProvider(name, factory);
-                }
-            } else {
-                qWarning() << "[Plugin]" << loader.fileName()
-                    << loader.errorString();
-            }
-        }
-    }
+    sapi::loadPlugins("playlistproviders", callback);
 
     // Register internal providers
     registerProvider(LocalPlayListProviderFactory::TYPE,
