@@ -2,7 +2,7 @@
 #define IMAGESOURCE_H
 
 #include <QIODevice>
-#include <QSharedPointer>
+#include <QScopedPointer>
 #include <QUrl>
 
 #include "ImageSourceFactory.h"
@@ -42,7 +42,7 @@ protected:
     QString m_name;
     QByteArray m_hash;
     QUrl m_url;
-    QSharedPointer<QIODevice> m_device;
+    QScopedPointer<QIODevice> m_device;
 };
 
 #endif // IMAGESOURCE_H

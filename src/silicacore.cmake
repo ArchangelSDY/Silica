@@ -36,6 +36,8 @@ file(GLOB CORE_SRCS
     "share/*.cpp"
     "share/Sharer.h"
     "sapi/ImageDelegate.cpp"
+    "sapi/ImageSourceDelegate.cpp"
+    "sapi/ImageSourceFactoryDelegate.cpp"
     "sapi/LoadingIndicatorDelegate.cpp"
     "sapi/PlayListProviderDelegate.cpp"
     "sapi/PlayListProviderFactoryDelegate.cpp"

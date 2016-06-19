@@ -1,5 +1,8 @@
 # Silica API library
 set(SAPI_SRCS
+    "sapi/IImageSource.cpp"
+    "sapi/IImageSourceFactory.cpp"
+    "sapi/IImageSourcePlugin.cpp"
     "sapi/IPlayListProvider.cpp"
     "sapi/IPlayListProviderPlugin.cpp"
     "sapi/ISharerPlugin.cpp"
@@ -23,6 +26,8 @@ set_target_properties(sapi PROPERTIES
 
 set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ImageResource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSourceFactory.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ISharerPlugin.h"

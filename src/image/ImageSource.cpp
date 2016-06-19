@@ -17,7 +17,6 @@ ImageSource::ImageSource(ImageSourceFactory *factory) :
 
 ImageSource::~ImageSource()
 {
-    m_device.clear();
 }
 
 QString ImageSource::findRealPath(QString path)
@@ -45,6 +44,6 @@ void ImageSource::close()
 {
     if (!m_device.isNull()) {
         m_device->close();
-        m_device.clear();
+        m_device.reset();
     }
 }

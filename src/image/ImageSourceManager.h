@@ -1,6 +1,7 @@
 #ifndef IMAGESOURCEMANAGER_H
 #define IMAGESOURCEMANAGER_H
 
+#include <QHash>
 #include <QObject>
 
 #include "ImageSource.h"

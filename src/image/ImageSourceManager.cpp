@@ -10,6 +10,9 @@
 #include "image/sources/SevenzImageSourceFactory.h"
 #include "image/sources/ZipImageSourceFactory.h"
 #include "image/Image.h"
+#include "sapi/ImageSourceFactoryDelegate.h"
+#include "sapi/IImageSourcePlugin.h"
+#include "sapi/PluginLoader.h"
 
 ImageSourceManager *ImageSourceManager::m_instance = 0;
 
@@ -22,6 +25,15 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
     registerFactory(new RARImageSourceFactory(this));
     registerFactory(new SevenzImageSourceFactory(this));
     registerFactory(new ZipImageSourceFactory(this));
+
+    // Register plugins
+    sapi::PluginLoadCallback<sapi::IImageSourcePlugin> callback = [this](sapi::IImageSourcePlugin *plugin, const QJsonObject &meta) {
+        ImageSourceFactory *factory =
+            new sapi::ImageSourceFactoryDelegate(plugin, this, plugin->createFactory());
+        this->registerFactory(factory);
+    };
+
+    sapi::loadPlugins("imagesources", callback);
 }
 
 ImageSourceManager *ImageSourceManager::instance()

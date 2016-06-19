@@ -523,6 +523,8 @@ void MainWindow::promptToOpenImage()
             (*i).setScheme("sevenz");
         } else if ((*i).path().endsWith(".rar")) {
             (*i).setScheme("rar");
+        }  else if ((*i).path().endsWith(".mp4")) {
+            (*i).setScheme("video");
         }
     }
 

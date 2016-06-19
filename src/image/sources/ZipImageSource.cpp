@@ -33,7 +33,7 @@ bool ZipImageSource::open()
     if (zipFile.open(QIODevice::ReadOnly)) {
         m_device.reset(new QBuffer());
         if (!m_device->open(QIODevice::ReadWrite)) {
-            m_device.clear();
+            m_device.reset();
             return false;
         }
 

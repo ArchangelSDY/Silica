@@ -1,6 +1,7 @@
 #include <QCryptographicHash>
 #include <QFile>
 #include <QFileInfo>
+#include <QSharedPointer>
 #include <QTextStream>
 #include <QThread>
 #include <QUrl>

@@ -25,13 +25,15 @@ void loadPlugins(const QString &dir, PluginLoadCallback<T> cb)
 
         foreach(const QString &filename, libDir.entryList(QDir::Files)) {
             QPluginLoader loader(libDir.absoluteFilePath(filename));
+
+            // Check meta
+            QJsonObject meta = loader.metaData();
+            QJsonObject customMeta = meta["MetaData"].toObject();
+
             QObject *instance = loader.instance();
             if (instance) {
                 T *plugin = qobject_cast<T *>(instance);
                 if (plugin) {
-                    QJsonObject meta = loader.metaData();
-                    QJsonObject customMeta = meta["MetaData"].toObject();
-
                     cb(plugin, customMeta);
                 }
             } else {
