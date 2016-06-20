@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QLibrary>
 #include <QList>
 #include <QPluginLoader>
 
@@ -29,6 +30,20 @@ void loadPlugins(const QString &dir, PluginLoadCallback<T> cb)
             // Check meta
             QJsonObject meta = loader.metaData();
             QJsonObject customMeta = meta["MetaData"].toObject();
+
+            // Load plugin libraries if any
+            QJsonArray libraries = customMeta["libraries"].toArray();
+            for (auto it = libraries.constBegin(); it != libraries.constEnd(); ++it) {
+                QJsonObject libCfg = (*it).toObject();
+                QString libName = libCfg["name"].toString();
+                if (!libName.isEmpty()) {
+                    QLibrary lib(libDir.absoluteFilePath(libName));
+                    if (!lib.load()) {
+                        qWarning() << "[Plugin]" << loader.fileName() << "fail to load library"
+                            << libName << "due to" << lib.errorString();
+                    }
+                }
+            }
 
             QObject *instance = loader.instance();
             if (instance) {
