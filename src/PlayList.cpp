@@ -26,6 +26,15 @@ PlayList::PlayList(const QList<QUrl> &imageUrls) :
     }
 }
 
+PlayList::PlayList(const QStringList &imagePaths) :
+    m_record(0) ,
+    m_filter(AbstractPlayListFilter::defaultFilter())
+{
+    foreach(const QString &imagePath, imagePaths) {
+        addMultiplePath(imagePath);
+    }
+}
+
 PlayList::PlayList(const PlayList &playList) :
     m_allImages(playList.m_allImages) ,
     m_filteredImages(playList.m_filteredImages) ,

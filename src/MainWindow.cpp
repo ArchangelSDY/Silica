@@ -502,8 +502,8 @@ void MainWindow::promptToOpenImage()
         }
     }
 
-    QList<QUrl> images = QFileDialog::getOpenFileUrls(
-        this, tr("Open"), QUrl::fromLocalFile(defaultDir),
+    QStringList images = QFileDialog::getOpenFileNames(
+        this, tr("Open"), defaultDir,
         ImageSourceManager::instance()->fileDialogFilters());
 
     if (images.count() == 0) {
@@ -511,22 +511,8 @@ void MainWindow::promptToOpenImage()
     }
 
     // Record dir for next open
-    QFileInfo firstFileInfo(images[0].toLocalFile());
+    QFileInfo firstFileInfo(images[0]);
     defaultDir = firstFileInfo.absoluteDir().path();
-
-    // Hack for zip and 7z
-    // FIXME: Better way to handle this?
-    for (QList<QUrl>::iterator i = images.begin(); i != images.end(); ++i) {
-        if ((*i).path().endsWith(".zip")) {
-            (*i).setScheme("zip");
-        } else if ((*i).path().endsWith(".7z")) {
-            (*i).setScheme("sevenz");
-        } else if ((*i).path().endsWith(".rar")) {
-            (*i).setScheme("rar");
-        }  else if ((*i).path().endsWith(".mp4")) {
-            (*i).setScheme("video");
-        }
-    }
 
     PlayList *playList = new PlayList(images);
     // Navigator takes ownership of PlayList in this case
@@ -548,24 +534,11 @@ void MainWindow::promptToOpenDir()
     lastDir.cdUp();
     lastParentDir = lastDir.absolutePath();
 
-    QList<QUrl> images;
+    QStringList images;
     QDirIterator iter(dir, ImageSourceManager::instance()->nameFilters(),
                    QDir::Files, QDirIterator::Subdirectories);
     while (iter.hasNext()) {
-        QString path = iter.next();
-        QUrl url = QUrl::fromLocalFile(path);
-
-        // Hack for zip and 7z
-        // FIXME: Better way to handle this?
-        if (url.path().endsWith(".zip")) {
-         url.setScheme("zip");
-        } else if (url.path().endsWith(".7z")) {
-         url.setScheme("sevenz");
-        } else if (url.path().endsWith(".rar")) {
-         url.setScheme("rar");
-        }
-
-        images << url;
+        images << iter.next();
     }
 
     PlayList *playList = new PlayList(images);

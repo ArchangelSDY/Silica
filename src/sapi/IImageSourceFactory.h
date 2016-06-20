@@ -23,6 +23,9 @@ public:
     virtual IImageSource *createSingle(const QString &path) = 0;
     virtual QList<IImageSource *> createMultiple(const QUrl &url) = 0;
     virtual QList<IImageSource *> createMultiple(const QString &path) = 0;
+
+protected:
+    bool isValidFileName(const QString &name);
 };
 
 }

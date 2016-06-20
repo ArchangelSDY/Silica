@@ -1,5 +1,6 @@
 #include "CGColleImageSourceFactory.h"
 
+#include <QRegExp>
 #include <QUrl>
 
 #include "CGColleImageSource.h"
