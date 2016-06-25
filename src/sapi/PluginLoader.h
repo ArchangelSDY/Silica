@@ -2,7 +2,10 @@
 
 #include <functional>
 
+#include <QApplication>
+#include <QDebug>
 #include <QDir>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QLibrary>

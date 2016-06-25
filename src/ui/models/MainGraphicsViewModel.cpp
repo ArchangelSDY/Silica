@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QScopedPointer>
 
+#include "share/SharerManager.h"
 #include "ui/RankVoteView.h"
 #include "ui/RemoteWallpapersManager.h"
 #include "Navigator.h"
@@ -255,6 +256,22 @@ void MainGraphicsViewModel::contextMenuEvent(QContextMenuEvent *event)
     QAction *loop = menu->addAction("Loop", m_navigator, SLOT(setLoop(bool)));
     loop->setCheckable(true);
     loop->setChecked(m_navigator->isLooping());
+
+    menu->addSeparator();
+
+    // Share
+    QMenu *shareMenu = menu->addMenu("Share");
+    QStringList sharerNames = SharerManager::instance()->sharerNames();
+    QSignalMapper *shareSigMap = new QSignalMapper(shareMenu);
+    connect(shareSigMap, static_cast<void (QSignalMapper::*)(int)>(&QSignalMapper::mapped),
+            [this](int index) {
+        SharerManager::instance()->share(index, this->m_navigator->currentImage());
+    });
+
+    for (int i = 0; i < sharerNames.count(); ++i) {
+        QAction *shareAct = shareMenu->addAction(sharerNames[i], shareSigMap, SLOT(map()));
+        shareSigMap->setMapping(shareAct, i);
+    }
 
     menu->exec(event->globalPos());
 
