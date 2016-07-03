@@ -75,6 +75,12 @@ private:
     QAction *m_actToolBarImage;
 
     ImagePathCorrector *m_imagePathCorrector;
+
+    enum KeyState {
+        KEY_STATE_NORMAL,
+        KEY_STATE_SHARE,
+    };
+    KeyState m_keyState;
 };
 
 #endif // MAINWINDOW_H

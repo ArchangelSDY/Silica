@@ -22,6 +22,7 @@
 #include "logger/Logger.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
+#include "share/SharerManager.h"
 #include "ui/models/MainGraphicsViewModel.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
@@ -52,7 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_actToolBarFS(0) ,
     m_actToolBarFav(0) ,
     m_actToolBarGallery(0) ,
-    m_actToolBarImage(0)
+    m_actToolBarImage(0) ,
+    m_keyState(KEY_STATE_NORMAL)
 {
     ui->setupUi(this);
     setupExtraUi();
@@ -767,6 +769,17 @@ void MainWindow::gallerySelectionChanged()
 
 void MainWindow::keyPressEvent(QKeyEvent *ev)
 {
+    if (m_keyState == KEY_STATE_SHARE) {
+        if (ev->key() >= Qt::Key_1 && ev->key() <= Qt::Key_9) {
+            int sharerIdx = ev->key() - Qt::Key_1;
+            SharerManager::instance()->share(sharerIdx, m_navigator->currentImage());
+            m_keyState = KEY_STATE_NORMAL;
+            return;
+        } else {
+            m_keyState = KEY_STATE_NORMAL;
+        }
+    }
+
     if (ev->modifiers() == Qt::NoModifier) {
         switch (ev->key()) {
             case Qt::Key_J:
@@ -799,7 +812,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                 break;
             }
             case Qt::Key_S:
-                promptToSaveImage();
+                m_keyState = KEY_STATE_SHARE;
                 break;
             case Qt::Key_P:
                 promptToSaveLocalPlayList();
@@ -868,6 +881,9 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         ev->accept();
     } else if (ev->modifiers() == Qt::ShiftModifier) {
         switch (ev->key()) {
+        case Qt::Key_S:
+            promptToSaveImage();
+            break;
         case Qt::Key_O:
             promptToOpenDir();
             break;
