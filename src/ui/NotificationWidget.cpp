@@ -6,14 +6,17 @@
 
 const int NotificationWidget::STICKY_MARGIN = 15;
 
-NotificationWidget::NotificationWidget(QWidget *parent) :
-    QWidget(parent),
+NotificationWidget::NotificationWidget(QWidget *relativeWidget) :
+    QWidget(nullptr),
     ui(new Ui::NotificationWidget) ,
+    m_relativeWidget(relativeWidget) ,
     m_stickyMode(NotificationWidget::StickyCenter) ,
     m_transparency(255)
 {
     ui->setupUi(this);
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::SplashScreen | Qt::WindowStaysOnTopHint);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_ShowWithoutActivating);
 
     QPalette pal = palette();
     pal.setColor(QPalette::Background, QColor("#58B6BF"));
@@ -49,9 +52,8 @@ void NotificationWidget::showOnce(int duration, bool autoDelete)
     QPropertyAnimation *animation =
         new QPropertyAnimation(this, "transparency");
     animation->setDuration(duration);
-    animation->setEasingCurve(QEasingCurve::OutInCubic);
-    animation->setStartValue(0);
-    animation->setKeyValueAt(0.5, 255);
+    animation->setEasingCurve(QEasingCurve::InCubic);
+    animation->setStartValue(255);
     animation->setEndValue(0);
 
     animation->start(QAbstractAnimation::DeleteWhenStopped);
@@ -112,40 +114,38 @@ void NotificationWidget::paintEvent(QPaintEvent *)
 
 void NotificationWidget::moveToStickyPosition()
 {
-    if (m_stickyMode == NoSticky || parentWidget() == 0) {
+    if (m_stickyMode == NoSticky || m_relativeWidget == nullptr) {
         return;
     }
 
-    const QRect &parentRect = parentWidget()->rect();
+    const QRect &parentRect = m_relativeWidget->rect();
     QPoint targetPos;
 
     switch (m_stickyMode) {
     case StickyTopLeft:
-        targetPos = parentRect.topLeft()
+        targetPos = m_relativeWidget->mapToGlobal(parentRect.topLeft())
             + QPoint(STICKY_MARGIN, STICKY_MARGIN);
         break;
     case StickyTopRight:
-        targetPos = parentRect.topRight()
+        targetPos = m_relativeWidget->mapToGlobal(parentRect.topRight())
             + QPoint(- STICKY_MARGIN - rect().width(), STICKY_MARGIN);
         break;
     case StickyBottomLeft:
-        targetPos = parentRect.bottomLeft()
+        targetPos = m_relativeWidget->mapToGlobal(parentRect.bottomLeft())
             + QPoint(STICKY_MARGIN, - STICKY_MARGIN - rect().height());
         break;
     case StickyBottomRight:
-        targetPos = parentRect.bottomRight()
+        targetPos = m_relativeWidget->mapToGlobal(parentRect.bottomRight())
             - QPoint(STICKY_MARGIN + rect().width(),
                      STICKY_MARGIN + rect().height());
         break;
     case StickyCenter:
-        targetPos = parentRect.center() - QPoint(rect().width() / 2,
-                                                 rect().height() / 2);
+        targetPos = m_relativeWidget->mapToGlobal(parentRect.center()) - QPoint(rect().width() / 2,
+                                                  rect().height() / 2);
         break;
     default:
-        targetPos = pos();
+        return;
     }
 
-    if (targetPos != pos()) {
-        move(targetPos);
-    }
+    move(targetPos);
 }

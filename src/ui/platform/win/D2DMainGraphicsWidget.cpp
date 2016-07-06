@@ -10,6 +10,8 @@ D2DMainGraphicsWidget::D2DMainGraphicsWidget(QWidget *parent) : QWidget(parent) 
     m_deviceResources(new DX::DeviceResources()) ,
     m_isViewDirty(false)
 {
+    setFocusPolicy(Qt::StrongFocus);
+
     // TODO: Device lost
     m_deviceResources->SetSwapWidget(this);
 

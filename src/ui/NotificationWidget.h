@@ -29,7 +29,7 @@ public:
         ThemeMessage,
     };
 
-    explicit NotificationWidget(QWidget *parent = 0);
+    explicit NotificationWidget(QWidget *relativeWidget);
     ~NotificationWidget();
 
     /**
@@ -37,7 +37,7 @@ public:
      * @param duration Animation duration.
      * @param autoDelete Delete self after finished if true.
      */
-    void showOnce(int duration = 2000, bool autoDelete = true);
+    void showOnce(int duration = 1000, bool autoDelete = true);
 
     void setTheme(Theme theme);
     void setStickyMode(StickyMode mode);
@@ -58,6 +58,7 @@ private:
     void moveToStickyPosition();
 
     Ui::NotificationWidget *ui;
+    QWidget *m_relativeWidget;
     StickyMode m_stickyMode;
     int m_transparency;
 };
