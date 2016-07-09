@@ -39,26 +39,6 @@ endif (WIN32)
 target_link_libraries(silica ${SILICA_LINK_LIBS})
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executable_path/../Resources/lib;$ORIGIN/../lib")
 
-# WebP Animation Plugin
-add_custom_command(TARGET silica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-    $<TARGET_FILE_DIR:silica>/plugins/imageformats/
-)
-add_custom_command(TARGET silica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:qwebpa>
-    $<TARGET_FILE_DIR:silica>/plugins/imageformats/
-)
-add_custom_command(TARGET silica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-    ${CMAKE_CURRENT_BINARY_DIR}/plugins/imageformats/
-)
-add_custom_command(TARGET silica POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:qwebpa>
-    ${CMAKE_CURRENT_BINARY_DIR}/plugins/imageformats/
-)
-
 if (WIN32)
     install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION . COMPONENT applications)
 else()
@@ -105,6 +85,7 @@ elseif (WIN32)
     install(FILES "${QT_ROOT}/plugins/imageformats/qjpeg.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/imageformats/qsvg.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/imageformats/qtiff.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
+    install(FILES "${QT_ROOT}/plugins/imageformats/qwebp.dll" DESTINATION "plugins/imageformats" COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/sqldrivers/qsqlite.dll" DESTINATION "plugins/sqldrivers" COMPONENT applications)
 
     if (ENABLE_OPENGL)

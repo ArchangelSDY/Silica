@@ -10,6 +10,3 @@
 [submodule "src/deps/QtRAR"]
 	path = src/deps/QtRAR
 	url = https://github.com/ArchangelSDY/QtRAR.git
-[submodule "src/deps/qwebpa"]
-	path = src/deps/qwebpa
-	url = https://github.com/ArchangelSDY/qwebpa.git

@@ -24,7 +24,6 @@ add_definitions(-DQUAZIP_STATIC)
 add_definitions(-DQT7Z_STATIC)
 
 add_subdirectory(deps/breakpad)
-add_subdirectory(deps/qwebpa)
 add_subdirectory(deps/quazip)
 add_subdirectory(deps/Qt7z)
 add_subdirectory(deps/QtRAR)
