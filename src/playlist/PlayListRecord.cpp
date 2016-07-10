@@ -12,16 +12,12 @@ PlayListRecord::PlayListRecord() :
     m_coverIndex(PlayListRecord::EMPTY_COVER_INDEX) ,
     m_type(PlayListRecord::UNKNOWN_TYPE) ,
     m_provider(0) ,
-    m_playList(0) ,
-    m_ownPlayList(true) // PlayList not given and will be created by our self
+    m_playList(0)
 {
 }
 
 PlayListRecord::~PlayListRecord()
 {
-    if (m_ownPlayList && m_playList) {
-        m_playList->deleteLater();
-    }
     if (m_provider) {
         m_provider->deleteLater();
     }
@@ -30,7 +26,7 @@ PlayListRecord::~PlayListRecord()
 int PlayListRecord::coverIndex()
 {
     if (m_coverIndex == PlayListRecord::EMPTY_COVER_INDEX) {
-        PlayList *pl = playList();
+        QSharedPointer<PlayList> pl = playList();
         for (int i = 0; i < pl->count(); ++i) {
             if (pl->at(i)->thumbnailPath() == m_coverPath) {
                 m_coverIndex = i;
@@ -52,10 +48,10 @@ QString PlayListRecord::typeName() const
     return m_provider ? m_provider->typeName() : QString();
 }
 
-PlayList *PlayListRecord::playList()
+QSharedPointer<PlayList> PlayListRecord::playList()
 {
     if (!m_playList && m_provider) {
-        m_playList = new PlayList();
+        m_playList.reset(new PlayList());
         m_playList->setRecord(this);
 
         QObject::connect(
@@ -113,10 +109,7 @@ bool PlayListRecord::remove()
 
 void PlayListRecord::flushPlayList()
 {
-    if (m_playList && m_ownPlayList) {
-        delete m_playList;
-        m_playList = 0;
-    }
+    m_playList.reset();
 }
 
 bool PlayListRecord::removeImage(ImagePtr image)
@@ -167,14 +160,14 @@ void PlayListRecord::continueProvide()
 void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
                               const QList<QVariantHash> &extraInfos)
 {
-    PlayList pl;
+    QSharedPointer<PlayList> pl = QSharedPointer<PlayList>::create();
     for (int i = 0; i < imageUrls.count(); ++i) {
-        ImagePtr image = pl.addSinglePath(imageUrls[i]);
+        ImagePtr image = pl->addSinglePath(imageUrls[i]);
         if (!image.isNull() && extraInfos.count() > i) {
             image->extraInfo() = extraInfos[i];
         }
     }
-    m_playList->append(&pl);
+    m_playList->append(pl);
 }
 
 void PlayListRecord::providerItemsCountChanged(int count)
@@ -241,10 +234,9 @@ PlayListRecordBuilder &PlayListRecordBuilder::setProvider(PlayListProvider *prov
 }
 */
 
-PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(PlayList *playlist)
+PlayListRecordBuilder &PlayListRecordBuilder::setPlayList(QSharedPointer<PlayList> playlist)
 {
     m_record->m_playList = playlist;
-    m_record->m_ownPlayList = false;
     return *this;
 }
 

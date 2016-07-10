@@ -16,7 +16,6 @@ public:
     PlayList();
     PlayList(const QList<QUrl> &imageUrls);
     PlayList(const QStringList &imagePaths);
-    PlayList(const PlayList &playList);
     ~PlayList();
 
     PlayListRecord *record() { return m_record; }
@@ -50,7 +49,7 @@ public:
 
     void append(const QSharedPointer<Image> &image);
     void append(const ImageList &images);
-    void append(PlayList *playList);
+    void append(QSharedPointer<PlayList> playList);
 
     QList<QSharedPointer<Image> > &operator<<(
             const QSharedPointer<Image> &image);
@@ -97,6 +96,8 @@ signals:
     void itemsAppended(int start);
 
 private:
+    PlayList(const PlayList &playList);
+
     bool groupLessThan(const ImagePtr &left, const ImagePtr &right);
 
     ImageList m_allImages;

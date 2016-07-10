@@ -239,7 +239,7 @@ void ImagePathCorrector::applyPatches()
 void ImagePathCorrector::reloadPlayList()
 {
     if (m_navigator) {
-        PlayList *pl = m_navigator->playList();
+        QSharedPointer<PlayList> pl = m_navigator->playList();
         if (pl) {
             PlayListRecord *plr = pl->record();
             if (plr) {

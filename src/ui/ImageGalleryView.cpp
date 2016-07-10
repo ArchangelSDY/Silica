@@ -35,17 +35,17 @@ ImageGalleryView::~ImageGalleryView()
     }
 }
 
-void ImageGalleryView::setPlayList(PlayList *playList)
+void ImageGalleryView::setPlayList(QSharedPointer<PlayList> playList)
 {
     m_playList = playList;
 
     if (m_rankFilterMenuManager) {
         delete m_rankFilterMenuManager;
     }
-    m_rankFilterMenuManager = new RankFilterMenuManager(&m_playList, this);
+    m_rankFilterMenuManager = new RankFilterMenuManager(m_playList, this);
 }
 
-void ImageGalleryView::playListChange(PlayList *playList)
+void ImageGalleryView::playListChange(QSharedPointer<PlayList> playList)
 {
     if (playList && playList != m_playList) {
         setPlayList(playList);
@@ -205,7 +205,7 @@ class GroupByThumbHistTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    GroupByThumbHistTask(PlayList *pl) : m_pl(pl) {}
+    GroupByThumbHistTask(QSharedPointer<PlayList> pl) : m_pl(pl) {}
     void run()
     {
         m_pl->groupByThumbHist();
@@ -213,7 +213,7 @@ public:
     }
 
 private:
-    PlayList *m_pl;
+    QSharedPointer<PlayList> m_pl;
 };
 
 void ImageGalleryView::groupByThumbHist()

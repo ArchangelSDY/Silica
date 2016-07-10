@@ -35,14 +35,15 @@ QMenu *BasketView::createContextMenu()
 
 void BasketView::exportToNavigator()
 {
-    PlayList *dupPl = new PlayList(*m_playList);
-    Navigator::instance()->setPlayList(dupPl, true);
+    QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
+    dupPl->append(m_playList);
+    Navigator::instance()->setPlayList(dupPl);
     m_playList->clear();
 }
 
 void BasketView::appendToNavigator()
 {
-    PlayList *navPl = Navigator::instance()->playList();
+    QSharedPointer<PlayList> navPl = Navigator::instance()->playList();
     if (navPl && m_playList) {
         navPl->append(m_playList);
 

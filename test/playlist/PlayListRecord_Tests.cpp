@@ -83,7 +83,7 @@ void TestPlayListRecord::onProviderItemsCountChanged()
     QVERIFY(recordToSave->save());
 
     // Check update count from provider
-    PlayList *pl = recordToSave->playList();
+    QSharedPointer<PlayList> pl = recordToSave->playList();
     QCOMPARE(pl->count(), providerFactory.provider.itemsCount);
     QCOMPARE(recordToSave->count(), providerFactory.provider.itemsCount);
 

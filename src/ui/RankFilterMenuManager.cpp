@@ -3,7 +3,7 @@
 #include "../PlayList.h"
 #include "RankFilterMenuManager.h"
 
-RankFilterMenuManager::RankFilterMenuManager(PlayList **playList,
+RankFilterMenuManager::RankFilterMenuManager(QSharedPointer<PlayList> playList,
                                              QObject *parent) :
     QObject(parent) ,
     m_playList(playList) ,
@@ -45,11 +45,11 @@ void RankFilterMenuManager::selectionChanged(bool selected)
         m_unselectedRanks.remove(rank);
     }
 
-    if (m_playList && *m_playList) {
+    if (m_playList) {
         AbstractPlayListFilter *filter = 0;
         foreach (const int &rank, m_unselectedRanks) {
             filter = new NotEqualRankFilter(rank, filter);
         }
-        (*m_playList)->setFilter(filter);
+        m_playList->setFilter(filter);
     }
 }

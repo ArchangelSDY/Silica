@@ -31,7 +31,6 @@ Navigator::Navigator(QObject *parent) :
     m_isLooping(true) ,
     m_cachedImages(MAX_CACHE) ,
     m_playList(0) ,
-    m_ownPlayList(false) ,
     m_player(new NormalNavigationPlayer(this)) ,
     m_basket(new PlayList())
 {
@@ -44,11 +43,7 @@ Navigator::Navigator(QObject *parent) :
 
 Navigator::~Navigator()
 {
-    if (m_playList) {
-        delete m_playList;
-    }
     delete m_player;
-    delete m_basket;
 }
 
 void Navigator::reset()
@@ -58,12 +53,7 @@ void Navigator::reset()
     m_currentIndex = -1;
     m_currentUuid = QUuid();
     m_reverseNavigation = false;
-    if (m_playList) {
-        if (m_ownPlayList) {
-            delete m_playList;
-        }
-        m_playList = 0;
-    }
+    m_playList.reset();
 
     // Notify to clear image source cache
     ImageSourceManager::instance()->clearCache();
@@ -78,7 +68,7 @@ void Navigator::preload()
     }
 }
 
-void Navigator::setPlayList(PlayList *playList, bool takeOwnership)
+void Navigator::setPlayList(QSharedPointer<PlayList> playList)
 {
     if (!playList) {
         return;
@@ -87,9 +77,8 @@ void Navigator::setPlayList(PlayList *playList, bool takeOwnership)
     reset();
 
     m_playList = playList;
-    m_ownPlayList = takeOwnership;
-    connect(m_playList, SIGNAL(itemsChanged()), this, SLOT(reloadPlayList()));
-    connect(m_playList, SIGNAL(itemsAppended(int)),
+    connect(m_playList.data(), SIGNAL(itemsChanged()), this, SLOT(reloadPlayList()));
+    connect(m_playList.data(), SIGNAL(itemsAppended(int)),
             this, SLOT(playListAppended(int)));
     emit playListChange(m_playList);
 

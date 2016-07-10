@@ -2,6 +2,7 @@
 #define NAVIGATOR_H
 
 #include <QObject>
+#include <QSharedPointer>
 #include <QUuid>
 
 #include "Image.h"
@@ -26,7 +27,7 @@ public:
     static Navigator *instance();
     ~Navigator();
 
-    PlayList *playList() { return m_playList; }
+    QSharedPointer<PlayList> playList() { return m_playList; }
 
     void goPrev();
     void goNext();
@@ -50,19 +51,19 @@ public:
     void setPlayer(AbstractNavigationPlayer *player);
     AbstractNavigationPlayer *player() { return m_player; }
 
-    PlayList *basket() { return m_basket; }
+    QSharedPointer<PlayList> basket() { return m_basket; }
 
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
-    void playListChange(PlayList *);
+    void playListChange(QSharedPointer<PlayList>);
     void playListAppend(int start);
     void navigationChange(int index);
     void focusOnRect(QRectF rect);
 
 public slots:
     // TODO(sdy): separate `setOwnedPlayList()` out
-    void setPlayList(PlayList *, bool takeOwnership = false);
+    void setPlayList(QSharedPointer<PlayList> playlist);
     void reloadPlayList();
 
     /**
@@ -110,13 +111,12 @@ private:
     bool m_reverseNavigation;
     bool m_isLooping;
     ImagesCache m_cachedImages;
-    PlayList *m_playList;
-    bool m_ownPlayList;
+    QSharedPointer<PlayList> m_playList;
     QTimer m_autoNavigationTimer;
 
     AbstractNavigationPlayer *m_player;
 
-    PlayList *m_basket;
+    QSharedPointer<PlayList> m_basket;
 };
 
 #endif // NAVIGATOR_H

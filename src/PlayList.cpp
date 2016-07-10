@@ -35,14 +35,6 @@ PlayList::PlayList(const QStringList &imagePaths) :
     }
 }
 
-PlayList::PlayList(const PlayList &playList) :
-    m_allImages(playList.m_allImages) ,
-    m_filteredImages(playList.m_filteredImages) ,
-    m_record(playList.m_record) ,
-    m_filter(playList.m_filter)
-{
-}
-
 PlayList::~PlayList()
 {
     delete m_filter;
@@ -63,7 +55,7 @@ void PlayList::append(const ImageList &images)
     emit itemsAppended(start);
 }
 
-void PlayList::append(PlayList *playList)
+void PlayList::append(QSharedPointer<PlayList> playList)
 {
     int start = count();
     m_allImages.append(playList->m_allImages);

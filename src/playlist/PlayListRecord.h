@@ -2,6 +2,7 @@
 #define PLAYLISTRECORD_H
 
 #include <QObject>
+#include <QSharedPointer>
 #include <QString>
 
 #include "image/Image.h"
@@ -33,7 +34,7 @@ public:
 
     bool isSaved() const { return m_id != PlayListRecord::EMPTY_ID; }
 
-    PlayList *playList();
+    QSharedPointer<PlayList> playList();
     void reload();
 
     QVariantHash providerExtra() const;
@@ -70,8 +71,7 @@ private:
     int m_coverIndex;
     int m_type;
     PlayListProvider *m_provider;
-    PlayList *m_playList;
-    bool m_ownPlayList;
+    QSharedPointer<PlayList> m_playList;
 };
 
 
@@ -86,7 +86,7 @@ public:
     PlayListRecordBuilder &setCoverPath(const QString &coverPath);
     PlayListRecordBuilder &setCount(int count);
     PlayListRecordBuilder &setType(int type);
-    PlayListRecordBuilder &setPlayList(PlayList *playlist);
+    PlayListRecordBuilder &setPlayList(QSharedPointer<PlayList> playlist);
 
     // PlayListRecordBuilder &setProvider(PlayListProvider *provider);
 

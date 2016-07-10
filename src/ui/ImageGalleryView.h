@@ -13,9 +13,9 @@ public:
     ~ImageGalleryView();
 
 public slots:
-    void setPlayList(PlayList *playList);
+    void setPlayList(QSharedPointer<PlayList> playList);
 
-    void playListChange(PlayList *playList = 0);
+    void playListChange(QSharedPointer<PlayList>);
     void playListAppend(int start);
 
 protected slots:
@@ -34,7 +34,7 @@ protected:
 
     virtual QMenu *createContextMenu();
 
-    PlayList *m_playList;
+    QSharedPointer<PlayList> m_playList;
     RankFilterMenuManager *m_rankFilterMenuManager;
 
     enum GroupMode {

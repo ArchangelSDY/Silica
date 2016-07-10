@@ -93,14 +93,14 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(statusBarMessageChanged(const QString &)));
 
     // Update sidebar
-    connect(m_navigator, SIGNAL(playListChange(PlayList *)),
+    connect(m_navigator, SIGNAL(playListChange(QSharedPointer<PlayList>)),
             this, SLOT(playListChange()));
     connect(m_navigator, SIGNAL(playListAppend(int)),
             this, SLOT(playListAppend(int)));
 
     // Update gallery
-    connect(m_navigator, SIGNAL(playListChange(PlayList *)),
-            ui->gallery, SLOT(playListChange(PlayList *)));
+    connect(m_navigator, SIGNAL(playListChange(QSharedPointer<PlayList>)),
+            ui->gallery, SLOT(playListChange(QSharedPointer<PlayList>)));
     connect(m_navigator, SIGNAL(playListAppend(int)),
             ui->gallery, SLOT(playListAppend(int)));
 
@@ -324,9 +324,9 @@ void MainWindow::setupExtraUi()
     ui->basketPane->layout()->setSpacing(0);
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
     ui->basketView->setPlayList(m_navigator->basket());
-    connect(m_navigator->basket(), SIGNAL(itemsAppended(int)),
+    connect(m_navigator->basket().data(), SIGNAL(itemsAppended(int)),
             ui->basketView, SLOT(playListAppend(int)));
-    connect(m_navigator->basket(), SIGNAL(itemsChanged()),
+    connect(m_navigator->basket().data(), SIGNAL(itemsChanged()),
             ui->basketView, SLOT(playListChange()));
 
     // Init image source manager client
@@ -368,7 +368,7 @@ void MainWindow::loadSelectedPlayList()
         // a choice?
         PlayListGalleryItem *playListItem =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        PlayList *pl = playListItem->record()->playList();
+        QSharedPointer<PlayList> pl = playListItem->record()->playList();
         m_navigator->setPlayList(pl);
 
         // Navigator should take ownership of PlayList in this case
@@ -416,7 +416,7 @@ void MainWindow::loadSelectedPath()
     QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
 
     if (selectedItems.count() > 0) {
-        PlayList *pl = new PlayList();
+        QSharedPointer<PlayList> pl = QSharedPointer<PlayList>::create();
 
         foreach (GalleryItem *item, selectedItems) {
             FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
@@ -467,7 +467,7 @@ void MainWindow::loadSelectedPath()
             }
 
             // Navigator should take ownership of PlayList in this case
-            this->m_navigator->setPlayList(pl, true);
+            this->m_navigator->setPlayList(pl);
         });
     }
 }
@@ -480,7 +480,7 @@ void MainWindow::processCommandLineOptions()
     parser.process(*QCoreApplication::instance());
     const QStringList imagePaths = parser.positionalArguments();
 
-    PlayList *playList = new PlayList();
+    QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create();
     QStringList urlPatterns = ImageSourceManager::instance()->urlPatterns();
     foreach (const QString& imagePath, imagePaths) {
         QString pattern = imagePath.left(imagePath.indexOf("://"));
@@ -491,7 +491,7 @@ void MainWindow::processCommandLineOptions()
         }
     }
 
-    m_navigator->setPlayList(playList, true);
+    m_navigator->setPlayList(playList);
 }
 
 void MainWindow::promptToOpenImage()
@@ -516,9 +516,9 @@ void MainWindow::promptToOpenImage()
     QFileInfo firstFileInfo(images[0]);
     defaultDir = firstFileInfo.absoluteDir().path();
 
-    PlayList *playList = new PlayList(images);
+    QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
     // Navigator takes ownership of PlayList in this case
-    m_navigator->setPlayList(playList, true);
+    m_navigator->setPlayList(playList);
 }
 
 void MainWindow::promptToOpenDir()
@@ -543,9 +543,9 @@ void MainWindow::promptToOpenDir()
         images << iter.next();
     }
 
-    PlayList *playList = new PlayList(images);
+    QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
     // Navigator takes ownership of PlayList in this case
-    m_navigator->setPlayList(playList, true);
+    m_navigator->setPlayList(playList);
 }
 
 void MainWindow::promptToSaveImage()
@@ -707,7 +707,7 @@ void MainWindow::playListChange()
 
 void MainWindow::playListAppend(int start)
 {
-    PlayList *pl = m_navigator->playList();
+    QSharedPointer<PlayList> pl = m_navigator->playList();
 
     QListWidget *list = ui->playListWidget;
     for (int i = start; i < pl->count(); ++i) {

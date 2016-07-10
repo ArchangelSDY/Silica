@@ -51,9 +51,9 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
     QFETCH(QList<QString>, imagePaths);
     QFETCH(QString, name);
 
-    PlayList pl;
+    auto pl = QSharedPointer<PlayList>::create();
     foreach (const QString &path, imagePaths) {
-        pl.addSinglePath(path);
+        pl->addSinglePath(path);
     }
 
     LocalPlayListProvider provider;
@@ -61,7 +61,7 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
     plrBuilder
         .setName(name)
         .setCoverPath("/cover/path.png")
-        .setPlayList(&pl)
+        .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
 
@@ -76,7 +76,7 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
     PlayListRecord *savedRecord = records[0];
     QCOMPARE(savedRecord->name(), name);
     QCOMPARE(savedRecord->coverPath(), QString("/cover/path.png"));
-    QCOMPARE(savedRecord->playList()->count(), pl.count());
+    QCOMPARE(savedRecord->playList()->count(), pl->count());
 
     qDeleteAll(records.begin(), records.end());
     delete record;
@@ -94,14 +94,14 @@ void TestLocalDatabase::localPlayListsSaveAndLoad_data()
 
 void TestLocalDatabase::playListRemove()
 {
-    PlayList pl;
-    pl.addSinglePath(":/assents/me.jpg");
+    auto pl = QSharedPointer<PlayList>::create();
+    pl->addSinglePath(":/assents/me.jpg");
 
     PlayListRecordBuilder plrBuilder;
     plrBuilder
         .setName("test_remove")
         .setCoverPath("cover.jpg")
-        .setPlayList(&pl)
+        .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
     record->save();
@@ -133,14 +133,14 @@ void TestLocalDatabase::playListRemove()
 
 void TestLocalDatabase::playListUpdate()
 {
-    PlayList pl;
-    pl.addSinglePath(":/assets/me.jpg");
+    auto pl = QSharedPointer<PlayList>::create();
+    pl->addSinglePath(":/assets/me.jpg");
 
     PlayListRecordBuilder plrBuilder;
     plrBuilder
         .setName("test_update")
         .setCoverPath("cover.jpg")
-        .setPlayList(&pl)
+        .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
     record->save();
@@ -181,14 +181,14 @@ void TestLocalDatabase::insertImagesToPlayList()
     ImagePtr imageB(new Image(
         ImageSourceManager::instance()->createSingle(":/assets/silica.png")));
 
-    PlayList pl;
-    pl.append(imageA);
+    auto pl = QSharedPointer<PlayList>::create();
+    pl->append(imageA);
 
     PlayListRecordBuilder plrBuilder;
     plrBuilder
         .setName("test_insert_images_to_playlist")
         .setCoverPath("")
-        .setPlayList(&pl)
+        .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
     record->save();
@@ -210,7 +210,7 @@ void TestLocalDatabase::insertImagesToPlayList()
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record2 = plrBuilder2.obtain();
 
-    PlayList *spl = record2->playList();
+    QSharedPointer<PlayList> spl = record2->playList();
     QCOMPARE(spl->count(), 2);
 
     delete record2;
@@ -218,15 +218,15 @@ void TestLocalDatabase::insertImagesToPlayList()
 
 void TestLocalDatabase::removeImagesFromPlayList()
 {
-    PlayList pl;
-    ImagePtr imageA = pl.addSinglePath(":/assets/me.jpg");
-    ImagePtr imageB = pl.addSinglePath(":/assets/silica.png");
+    auto pl = QSharedPointer<PlayList>::create();
+    ImagePtr imageA = pl->addSinglePath(":/assets/me.jpg");
+    ImagePtr imageB = pl->addSinglePath(":/assets/silica.png");
 
     PlayListRecordBuilder plrBuilder;
     plrBuilder
         .setName("test_remove_images_from_playlist")
         .setCoverPath("")
-        .setPlayList(&pl)
+        .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record = plrBuilder.obtain();
     record->save();
@@ -246,7 +246,7 @@ void TestLocalDatabase::removeImagesFromPlayList()
         .setType(LocalPlayListProviderFactory::TYPE);
     PlayListRecord *record2 = plrBuilder2.obtain();
 
-    PlayList *spl = record2->playList();
+    QSharedPointer<PlayList> spl = record2->playList();
     QCOMPARE(spl->count(), 1);
     QCOMPARE(spl->at(0)->source()->hashStr(), imageA->source()->hashStr());
 
