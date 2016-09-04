@@ -328,8 +328,9 @@ void MainWindow::setupExtraUi()
     ui->basketView->setPlayList(m_navigator->basket());
     connect(m_navigator->basket().data(), SIGNAL(itemsAppended(int)),
             ui->basketView, SLOT(playListAppend(int)));
-    connect(m_navigator->basket().data(), SIGNAL(itemsChanged()),
-            ui->basketView, SLOT(playListChange()));
+    connect(m_navigator->basket().data(), &PlayList::itemsChanged, [basketView = ui->basketView, basket = m_navigator->basket()]() {
+        basketView->playListChange(basket);
+    });
 
     // Init image source manager client
     ImageSourceManager::instance()->setClient(
