@@ -47,7 +47,7 @@ static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
-    m_navigator(Navigator::instance()) ,
+    m_navigator(new Navigator()),
     m_toolBar(0) ,
     m_toolBarActs(0) ,
     m_actToolBarFS(0) ,
@@ -305,6 +305,7 @@ void MainWindow::setupExtraUi()
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
     ui->sideView->hide();
+    ui->gallery->setNavigator(m_navigator);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->gallery, SIGNAL(keyEnterPressed()),
@@ -323,6 +324,7 @@ void MainWindow::setupExtraUi()
     ui->basketPane->hide();
     ui->basketPane->layout()->setSpacing(0);
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
+    ui->basketView->setNavigator(m_navigator);
     ui->basketView->setPlayList(m_navigator->basket());
     connect(m_navigator->basket().data(), SIGNAL(itemsAppended(int)),
             ui->basketView, SLOT(playListAppend(int)));

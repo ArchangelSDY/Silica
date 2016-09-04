@@ -17,6 +17,7 @@
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
+    m_navigator(0) ,
     m_playList(0) ,
     m_rankFilterMenuManager(0) ,
     m_groupMode(GroupByThumbHist)
@@ -33,6 +34,11 @@ ImageGalleryView::~ImageGalleryView()
     if (m_rankFilterMenuManager) {
         delete m_rankFilterMenuManager;
     }
+}
+
+void ImageGalleryView::setNavigator(Navigator *navigator)
+{
+    m_navigator = navigator;
 }
 
 void ImageGalleryView::setPlayList(QSharedPointer<PlayList> playList)
@@ -162,7 +168,7 @@ void ImageGalleryView::addToBasket()
             static_cast<ImageGalleryItem *>(selectedItems[i]);
 
         ImagePtr image = item->image();
-        *(Navigator::instance()->basket()) << image;
+        *(m_navigator->basket()) << image;
     }
 }
 

@@ -24,7 +24,7 @@ public:
     static const int MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
     static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
-    static Navigator *instance();
+    explicit Navigator(QObject *parent = 0);
     ~Navigator();
 
     QSharedPointer<PlayList> playList() { return m_playList; }
@@ -94,9 +94,6 @@ private slots:
     void goAutoNavigation();
 
 private:
-    explicit Navigator(QObject *parent = 0);
-    static Navigator *s_instance;
-
     Image* loadIndex(int index, bool shouldPaint);
 
     void preload();

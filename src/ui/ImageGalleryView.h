@@ -12,6 +12,8 @@ public:
     explicit ImageGalleryView(QWidget *parent = 0);
     ~ImageGalleryView();
 
+    void setNavigator(Navigator *navigator);
+
 public slots:
     void setPlayList(QSharedPointer<PlayList> playList);
 
@@ -34,6 +36,7 @@ protected:
 
     virtual QMenu *createContextMenu();
 
+    Navigator *m_navigator;
     QSharedPointer<PlayList> m_playList;
     RankFilterMenuManager *m_rankFilterMenuManager;
 

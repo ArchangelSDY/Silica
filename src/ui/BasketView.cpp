@@ -37,13 +37,13 @@ void BasketView::exportToNavigator()
 {
     QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
     dupPl->append(m_playList);
-    Navigator::instance()->setPlayList(dupPl);
+    m_navigator->setPlayList(dupPl);
     m_playList->clear();
 }
 
 void BasketView::appendToNavigator()
 {
-    QSharedPointer<PlayList> navPl = Navigator::instance()->playList();
+    QSharedPointer<PlayList> navPl = m_navigator->playList();
     if (navPl && m_playList) {
         navPl->append(m_playList);
 
