@@ -80,12 +80,9 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
             QStringList fileNameList = zip.getFileNameList();
 
             foreach(const QString &name, fileNameList) {
-                QUrl imageUrl = url;
-                imageUrl.setFragment(name);
-
-                ImageSource *source = createSingle(imageUrl);
-                if (source) {
-                    imageSources << source;
+                QFileInfo nameInfo(name);
+                if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+                    imageSources << new ZipImageSource(this, packagePath, name);
                 }
             }
 
