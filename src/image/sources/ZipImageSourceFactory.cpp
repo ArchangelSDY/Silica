@@ -30,7 +30,7 @@ QString ZipImageSourceFactory::urlScheme() const
 ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
-        QString imageName = url.fragment();
+        QString imageName = url.fragment(QUrl::FullyDecoded);
         QFileInfo imageFile(imageName);
         if (QImageReader::supportedImageFormats().contains(
                 imageFile.suffix().toUtf8())) {
