@@ -20,7 +20,7 @@ Navigator::Navigator(QObject *parent) :
     m_isLooping(true) ,
     m_cachedImages(MAX_CACHE) ,
     m_playList(0) ,
-    m_player(new NormalNavigationPlayer(this)) ,
+    m_player(nullptr) ,
     m_basket(new PlayList())
 {
     setCacheStragegy();   // To set corresponding cache strategy
@@ -32,7 +32,6 @@ Navigator::Navigator(QObject *parent) :
 
 Navigator::~Navigator()
 {
-    delete m_player;
 }
 
 void Navigator::reset()
@@ -72,6 +71,7 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
     emit playListChange(m_playList);
 
     goIndex(0);
+
     m_player->reset();
 }
 
@@ -369,8 +369,13 @@ void Navigator::setLoop(bool shouldLoop)
 
 void Navigator::setPlayer(AbstractNavigationPlayer *player)
 {
-    delete m_player;
+    if (m_player) {
+        m_player->onLeave();
+    }
+
     m_player = player;
+
+    m_player->onEnter();
 }
 
 void Navigator::setCacheStragegy()

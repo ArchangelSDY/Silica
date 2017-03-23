@@ -20,6 +20,7 @@
 #include "image/ImageSourceManager.h"
 #include "logger/listeners/ImagePathCorrector.h"
 #include "logger/Logger.h"
+#include "navigation/NavigationPlayerManager.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
@@ -170,6 +171,10 @@ void MainWindow::setupExtraUi()
 #endif
     ui->pageImageView->layout()->addWidget(mainGraphicsViewWidget);
     ui->graphicsView = mainGraphicsViewWidget;
+
+    // Init navigation player manager
+    NavigationPlayerManager::instance()->init(m_navigator, ui->graphicsView);
+    m_navigator->setPlayer(NavigationPlayerManager::instance()->get(0));
 
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
@@ -335,7 +340,6 @@ void MainWindow::setupExtraUi()
     // Init image source manager client
     ImageSourceManager::instance()->setClient(
         new ImageSourceManagerClientImpl(this));
-
 
     // Init image path corrector client
     ImagePathCorrector::PromptClient *imagePathCorrectorClientImpl =

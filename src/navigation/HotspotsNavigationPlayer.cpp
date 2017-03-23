@@ -10,6 +10,11 @@ HotspotsNavigationPlayer::HotspotsNavigationPlayer(Navigator *navigator,
 {
 }
 
+QString HotspotsNavigationPlayer::name() const
+{
+    return "Hotspots Player";
+}
+
 void HotspotsNavigationPlayer::goNext()
 {
     Image *image = m_navigator->currentImage();

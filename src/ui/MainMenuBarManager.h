@@ -21,11 +21,6 @@ public:
     ~MainMenuBarManager();
 
 private slots:
-    void setNormalPlayer();
-    void setHotspotsPlayer();
-    void setExpandingPlayer();
-    void setFixedRegionPlayer();
-    void setCascadeClassifierPlayer();
     void checkPlayerConfigurable();
     void openPlayerConfDialog();
     void showPluginLogsDialog();

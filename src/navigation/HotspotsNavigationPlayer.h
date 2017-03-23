@@ -13,10 +13,9 @@ public:
     explicit HotspotsNavigationPlayer(Navigator *navigator,
                                       QObject *parent = 0);
 
-    void goNext();
-    void goPrev();
-
-    Type type() const { return AbstractNavigationPlayer::HotspotsType; }
+    QString name() const override;
+    void goNext() override;
+    void goPrev() override;
 
 private:
     void goToHotspot(const QList<ImageHotspot *> &hotspots, int index);

@@ -13,21 +13,14 @@ public:
     explicit AbstractNavigationPlayer(Navigator *navigator, QObject *parent = 0);
     virtual ~AbstractNavigationPlayer();
 
+    virtual QString name() const = 0;
     virtual void goNext() = 0;
     virtual void goPrev() = 0;
+    virtual void onEnter();
+    virtual void onLeave();
     virtual void reset();
 
-    enum Type {
-        NormalType,
-        HotspotsType,
-        ExpandingType,
-        FixedRegionType,
-        CascadeClassifierType,
-    };
-
-    virtual Type type() const = 0;
-
-    virtual QDialog *configureDialog() const;
+    virtual QDialog *createConfigureDialog();
     virtual bool isConfigurable() const;
 
 protected:

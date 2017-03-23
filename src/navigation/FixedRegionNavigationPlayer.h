@@ -5,8 +5,6 @@
 
 #include "AbstractNavigationPlayer.h"
 
-class FixedRegionConfDialog;
-
 class FixedRegionNavigationPlayer : public AbstractNavigationPlayer
 {
     Q_OBJECT
@@ -14,14 +12,14 @@ public:
     explicit FixedRegionNavigationPlayer(Navigator *navigator,
                                          QWidget *view,
                                          QObject *parent = 0);
-    ~FixedRegionNavigationPlayer();
 
-    void goNext();
-    void goPrev();
+    QString name() const override;
+    void goNext() override;
+    void goPrev() override;
+    void onEnter() override;
 
-    Type type() const { return AbstractNavigationPlayer::FixedRegionType; }
-
-    QDialog *configureDialog() const;
+    QDialog *createConfigureDialog() override;
+    bool isConfigurable() const override;
 
 private:
     QRectF calcFocusedRect() const;
@@ -29,7 +27,6 @@ private:
     QWidget *m_view;
     QList<qreal> m_centers;
     int m_curCenterIndex;
-    FixedRegionConfDialog *m_confDialog;
 };
 
 #endif // FIXEDREGIONNAVIGATIONPLAYER_H

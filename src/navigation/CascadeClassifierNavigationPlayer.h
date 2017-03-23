@@ -17,10 +17,9 @@ public:
                                       QWidget *view,
                                       QObject *parent = 0);
 
-    virtual void goPrev();
-    virtual void goNext();
-
-    Type type() const { return AbstractNavigationPlayer::CascadeClassifierType; }
+    QString name() const override;
+    void goPrev() override;
+    void goNext() override;
 
 private:
     void detectRegions();

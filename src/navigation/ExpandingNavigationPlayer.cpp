@@ -15,8 +15,11 @@ ExpandingNavigationPlayer::ExpandingNavigationPlayer(Navigator *navigator,
     m_curIndex(0) ,
     m_focusAfterImageSizeGet(false)
 {
-    connect(m_navigator, SIGNAL(paint(Image*)),
-            this, SLOT(onImageSizeGet(Image*)));
+}
+
+QString ExpandingNavigationPlayer::name() const
+{
+    return "Expanding Player";
 }
 
 void ExpandingNavigationPlayer::goNext()
@@ -47,6 +50,18 @@ void ExpandingNavigationPlayer::goPrev()
 
     QRectF focused = m_toBeFocused.at(m_curIndex);
     m_navigator->focusOnRect(focused);
+}
+
+void ExpandingNavigationPlayer::onEnter()
+{
+    connect(m_navigator, SIGNAL(paint(Image*)),
+            this, SLOT(onImageSizeGet(Image*)));
+}
+
+void ExpandingNavigationPlayer::onLeave()
+{
+    disconnect(m_navigator, SIGNAL(paint(Image*)),
+            this, SLOT(onImageSizeGet(Image*)));
 }
 
 void ExpandingNavigationPlayer::reset()

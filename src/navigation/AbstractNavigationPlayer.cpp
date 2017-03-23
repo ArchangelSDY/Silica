@@ -11,16 +11,24 @@ AbstractNavigationPlayer::~AbstractNavigationPlayer()
 {
 }
 
+void AbstractNavigationPlayer::onEnter()
+{
+}
+
+void AbstractNavigationPlayer::onLeave()
+{
+}
+
 void AbstractNavigationPlayer::reset()
 {
 }
 
-QDialog *AbstractNavigationPlayer::configureDialog() const
+QDialog *AbstractNavigationPlayer::createConfigureDialog()
 {
-    return 0;
+    return nullptr;
 }
 
 bool AbstractNavigationPlayer::isConfigurable() const
 {
-    return configureDialog() != 0;
+    return false;
 }

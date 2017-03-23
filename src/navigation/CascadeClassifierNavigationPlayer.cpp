@@ -40,6 +40,11 @@ CascadeClassifierNavigationPlayer::CascadeClassifierNavigationPlayer(
     m_classifier.reset(classifier);
 }
 
+QString CascadeClassifierNavigationPlayer::name() const
+{
+    return "Cascade Classifier Player";
+}
+
 void CascadeClassifierNavigationPlayer::goNext()
 {
     if (m_curRegionIndex >= m_regions.size() - 1) {

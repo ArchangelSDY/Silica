@@ -9,10 +9,10 @@ class NormalNavigationPlayer : public AbstractNavigationPlayer
 public:
     explicit NormalNavigationPlayer(Navigator *navigator, QObject *parent = 0);
 
-    void goNext();
-    void goPrev();
-
-    Type type() const { return AbstractNavigationPlayer::NormalType; }
+    QString name() const override;
+    void goNext() override;
+    void goPrev() override;
+    void onEnter() override;
 
 };
 

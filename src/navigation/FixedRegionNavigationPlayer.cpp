@@ -9,20 +9,22 @@ FixedRegionNavigationPlayer::FixedRegionNavigationPlayer(Navigator *navigator,
                                                          QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
     m_view(view) ,
-    m_curCenterIndex(0) ,
-    m_confDialog(new FixedRegionConfDialog(m_centers, view))
+    m_curCenterIndex(0)
+{
+}
+
+QString FixedRegionNavigationPlayer::name() const
+{
+    return "Fixed Region Player";
+}
+
+void FixedRegionNavigationPlayer::onEnter()
 {
     // Set focused rect to null to disable focusing
     m_navigator->focusOnRect(QRectF());
 
     // Predefined center positions
     m_centers << 0.2 << 0.5;
-
-}
-
-FixedRegionNavigationPlayer::~FixedRegionNavigationPlayer()
-{
-    m_confDialog->deleteLater();
 }
 
 void FixedRegionNavigationPlayer::goNext()
@@ -90,8 +92,13 @@ QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
     }
 }
 
-QDialog *FixedRegionNavigationPlayer::configureDialog() const
+QDialog *FixedRegionNavigationPlayer::createConfigureDialog()
 {
-    return m_confDialog;
+    return new FixedRegionConfDialog(m_centers, m_view);
+}
+
+bool FixedRegionNavigationPlayer::isConfigurable() const
+{
+    return true;
 }
 

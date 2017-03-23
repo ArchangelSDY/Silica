@@ -15,11 +15,12 @@ public:
                                        QWidget *view,
                                        QObject *parent = 0);
 
-    void goNext();
-    void goPrev();
-    void reset();
-
-    Type type() const { return AbstractNavigationPlayer::ExpandingType; }
+    QString name() const override;
+    void goNext() override;
+    void goPrev() override;
+    void onEnter() override;
+    void onLeave() override;
+    void reset() override;
 
 private slots:
     void onImageSizeGet(Image *image);

@@ -1,12 +1,9 @@
 #include "MainMenuBarManager.h"
 
 #include <QDialog>
+#include <QScopedPointer>
 
-#include "navigation/CascadeClassifierNavigationPlayer.h"
-#include "navigation/ExpandingNavigationPlayer.h"
-#include "navigation/FixedRegionNavigationPlayer.h"
-#include "navigation/HotspotsNavigationPlayer.h"
-#include "navigation/NormalNavigationPlayer.h"
+#include "navigation/NavigationPlayerManager.h"
 #include "ui/PluginLogsDialog.h"
 #include "Navigator.h"
 
@@ -35,40 +32,16 @@ void MainMenuBarManager::init()
     QActionGroup *playersGrp = new QActionGroup(m_menuPlayers);
     playersGrp->setExclusive(true);
 
-    QAction *actSetNormalPlayer = m_menuPlayers->addAction(
-        tr("Normal Player"), this, SLOT(setNormalPlayer()));
-    playersGrp->addAction(actSetNormalPlayer);
-    actSetNormalPlayer->setCheckable(true);
-    actSetNormalPlayer->setChecked(
-        m_navigator->player()->type() == AbstractNavigationPlayer::NormalType);
-
-    QAction *actSetHotspotsPlayer = m_menuPlayers->addAction(
-        tr("Hotspots Player"), this, SLOT(setHotspotsPlayer()));
-    playersGrp->addAction(actSetHotspotsPlayer);
-    actSetHotspotsPlayer->setCheckable(true);
-    actSetHotspotsPlayer->setChecked(
-        m_navigator->player()->type() == AbstractNavigationPlayer::HotspotsType);
-
-    QAction *actSetExpandingPlayer = m_menuPlayers->addAction(
-        tr("Expanding Player"), this, SLOT(setExpandingPlayer()));
-    playersGrp->addAction(actSetExpandingPlayer);
-    actSetExpandingPlayer->setCheckable(true);
-    actSetExpandingPlayer->setChecked(
-        m_navigator->player()->type() == AbstractNavigationPlayer::ExpandingType);
-
-    QAction *actSetFixedRegionPlayer = m_menuPlayers->addAction(
-        tr("Fixed Region Player"), this, SLOT(setFixedRegionPlayer()));
-    playersGrp->addAction(actSetFixedRegionPlayer);
-    actSetFixedRegionPlayer->setCheckable(true);
-    actSetFixedRegionPlayer->setChecked(
-        m_navigator->player()->type() == AbstractNavigationPlayer::FixedRegionType);
-
-    QAction *actSetCascadeClassifierPlayer = m_menuPlayers->addAction(
-        tr("Cascade Classifier Player"), this, SLOT(setCascadeClassifierPlayer()));
-    playersGrp->addAction(actSetCascadeClassifierPlayer);
-    actSetCascadeClassifierPlayer->setCheckable(true);
-    actSetCascadeClassifierPlayer->setChecked(
-        m_navigator->player()->type() == AbstractNavigationPlayer::CascadeClassifierType);
+    QList<AbstractNavigationPlayer *> players = NavigationPlayerManager::instance()->all();
+    Navigator *navigator = m_navigator;
+    for (AbstractNavigationPlayer *player : players) {
+        QAction *actPlayer = m_menuPlayers->addAction(player->name(), [navigator, player]() {
+            navigator->setPlayer(player);
+        });
+        actPlayer->setCheckable(true);
+        actPlayer->setChecked(navigator->player() == player);
+        playersGrp->addAction(actPlayer);
+    }
 
     m_menuPlayers->addSeparator();
 
@@ -85,34 +58,6 @@ void MainMenuBarManager::init()
                            SLOT(showPluginLogsDialog()));
 }
 
-void MainMenuBarManager::setNormalPlayer()
-{
-    m_navigator->setPlayer(new NormalNavigationPlayer(m_navigator));
-}
-
-void MainMenuBarManager::setHotspotsPlayer()
-{
-    m_navigator->setPlayer(new HotspotsNavigationPlayer(m_navigator));
-}
-
-void MainMenuBarManager::setExpandingPlayer()
-{
-    m_navigator->setPlayer(
-        new ExpandingNavigationPlayer(m_navigator, m_imageView));
-}
-
-void MainMenuBarManager::setFixedRegionPlayer()
-{
-    m_navigator->setPlayer(
-        new FixedRegionNavigationPlayer(m_navigator, m_imageView));
-}
-
-void MainMenuBarManager::setCascadeClassifierPlayer()
-{
-    m_navigator->setPlayer(
-        new CascadeClassifierNavigationPlayer(m_navigator, m_imageView));
-}
-
 void MainMenuBarManager::checkPlayerConfigurable()
 {
     m_actPlayerConf->setEnabled(m_navigator->player()->isConfigurable());
@@ -120,7 +65,7 @@ void MainMenuBarManager::checkPlayerConfigurable()
 
 void MainMenuBarManager::openPlayerConfDialog()
 {
-    QDialog *confDialog = m_navigator->player()->configureDialog();
+    QScopedPointer<QDialog> confDialog(m_navigator->player()->createConfigureDialog());
     confDialog->exec();
 }
 
