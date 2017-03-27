@@ -39,6 +39,8 @@ file(GLOB CORE_SRCS
     "sapi/ImageSourceDelegate.cpp"
     "sapi/ImageSourceFactoryDelegate.cpp"
     "sapi/LoadingIndicatorDelegate.cpp"
+    "sapi/NavigatorDelegate.cpp"
+    "sapi/NavigationPlayerDelegate.cpp"
     "sapi/PlayListProviderDelegate.cpp"
     "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"

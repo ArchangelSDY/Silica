@@ -3,11 +3,13 @@ set(SAPI_SRCS
     "sapi/IImageSource.cpp"
     "sapi/IImageSourceFactory.cpp"
     "sapi/IImageSourcePlugin.cpp"
+    "sapi/INavigationPlayerPlugin.cpp"
     "sapi/IPlayListProvider.cpp"
     "sapi/IPlayListProviderPlugin.cpp"
     "sapi/ISharerPlugin.cpp"
     "sapi/LoadingIndicator.cpp"
     "sapi/Logging.cpp"
+    "sapi/NavigatorResource.cpp"
 )
 
 add_library(sapi SHARED ${SAPI_SRCS})
@@ -29,11 +31,13 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSource.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSourceFactory.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSourcePlugin.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/INavigationPlayerPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ISharerPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/LoadingIndicator.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Logging.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/NavigatorResource.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
 install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT sdk)

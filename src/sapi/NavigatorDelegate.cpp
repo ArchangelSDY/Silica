@@ -1,0 +1,33 @@
+#include "NavigatorDelegate.h"
+
+#include "sapi/ImageDelegate.h"
+#include "Navigator.h"
+
+namespace sapi {
+
+NavigatorDelegate::NavigatorDelegate(Navigator *navigator) :
+    m_navigator(navigator)
+{
+}
+
+int NavigatorDelegate::currentIndex() const
+{
+    return m_navigator->currentIndex();
+}
+
+QSharedPointer<sapi::ImageResource> NavigatorDelegate::currentImage()
+{
+    return QSharedPointer<sapi::ImageResource>(new sapi::ImageDelegate(m_navigator->currentImage()));
+}
+
+void NavigatorDelegate::goIndexUntilSuccess(int index, int delta)
+{
+    m_navigator->goIndexUntilSuccess(index, delta);
+}
+
+void NavigatorDelegate::focusOnRect(const QRectF &rect)
+{
+    m_navigator->focusOnRect(rect);
+}
+
+}

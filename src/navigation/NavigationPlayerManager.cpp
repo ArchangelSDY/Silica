@@ -1,5 +1,8 @@
 #include "NavigationPlayerManager.h"
 
+#include "sapi/INavigationPlayerPlugin.h"
+#include "sapi/NavigationPlayerDelegate.h"
+#include "sapi/PluginLoader.h"
 #include "CascadeClassifierNavigationPlayer.h"
 #include "ExpandingNavigationPlayer.h"
 #include "FixedRegionNavigationPlayer.h"
@@ -53,4 +56,12 @@ void NavigationPlayerManager::init(Navigator *navigator, QWidget *view)
     registerPlayer(new ExpandingNavigationPlayer(navigator, view));
     registerPlayer(new FixedRegionNavigationPlayer(navigator, view));
     registerPlayer(new CascadeClassifierNavigationPlayer(navigator, view));
+
+    // Register plugins
+    sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this, navigator, view](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
+        sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(plugin, navigator, view);
+        this->registerPlayer(player);
+    };
+
+    sapi::loadPlugins("navigationplayers", callback);
 }
