@@ -34,4 +34,3 @@ set(BREAKPAD_SRCS
 add_library(breakpad STATIC ${BREAKPAD_SRCS})
 
 endif()
-
