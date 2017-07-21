@@ -18,6 +18,8 @@ public:
     const QString &thumbnailPath() const { return m_thumbnailPath; }
     const QSize &galleryItemSize() const { return m_galleryItemSize; }
     const QString &crashDumpPath() const { return m_crashDumpPath; }
+    const QString &crashUploadHost() const { return m_crashUploadHost; }
+    QString crashHandlerPipe() const;
 
     const char *buildRevision() const;
     const char *buildTimestamp() const;
@@ -35,6 +37,7 @@ private:
     QString m_thumbnailPath;
     QSize m_galleryItemSize;
     QString m_crashDumpPath;
+    QString m_crashUploadHost;
 };
 
 #endif // GLOBALCONFIG_H

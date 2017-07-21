@@ -33,6 +33,7 @@ include("sapi.cmake")
 include("silicacore.cmake")
 include("silicaui.cmake")
 include("silica.cmake")
+include("crashhandler.cmake")
 
 set(CPACK_GENERATOR "TGZ;ZIP")
 # TODO: This causes components packaging failure

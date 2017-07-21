@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QProcess>
 #include <QScopedPointer>
 #include <QtGlobal>
 
@@ -10,18 +11,6 @@
 #include "LocalDatabase.h"
 #include "MainWindow.h"
 
-#ifdef Q_OS_WIN
-static bool handleException(const wchar_t *dumpPath,
-                            const wchar_t *minidumpId,
-                            void *context,
-                            EXCEPTION_POINTERS *exinfo,
-                            MDRawAssertionInfo *assertion,
-                            bool succeeded)
-{
-    return true;
-}
-#endif
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -30,12 +19,35 @@ int main(int argc, char *argv[])
 
     // Set crash handler
 #ifdef Q_OS_WIN
+    QString crashHandlerPipe = GlobalConfig::instance()->crashHandlerPipe();
+    QString crashDumpPath = GlobalConfig::instance()->crashDumpPath();
+    QStringList crashHandlerArgs = QStringList()
+        << crashHandlerPipe
+        << crashDumpPath
+        << GlobalConfig::instance()->crashUploadHost()
+        << a.arguments();
+
+    QProcess crashHandlerProc;
+    crashHandlerProc.setProgram("crashhandler.exe");
+    crashHandlerProc.setArguments(crashHandlerArgs);
+    crashHandlerProc.start(QIODevice::ReadOnly);
+    crashHandlerProc.waitForReadyRead();
+    if (crashHandlerProc.read(1) != QByteArray("0")) {
+        qWarning() << "Fail to initiate crash handler";
+    }
+    crashHandlerProc.closeReadChannel(QProcess::StandardOutput);
+    crashHandlerProc.closeReadChannel(QProcess::StandardError);
+    crashHandlerProc.closeWriteChannel();
+
     QScopedPointer<google_breakpad::ExceptionHandler> exHandler(new google_breakpad::ExceptionHandler(
-        GlobalConfig::instance()->crashDumpPath().toStdWString(),
+        crashDumpPath.toStdWString(),
         nullptr,
-        handleException,
         nullptr,
-        google_breakpad::ExceptionHandler::HANDLER_ALL
+        nullptr,
+        google_breakpad::ExceptionHandler::HANDLER_ALL,
+        MiniDumpNormal,
+        crashHandlerPipe.toStdWString().data(),
+        nullptr
     ));
 #endif
 

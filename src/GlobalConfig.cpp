@@ -89,6 +89,10 @@ void GlobalConfig::load()
     qDebug() << "Crash dump path:" << m_crashDumpPath;
     d.mkpath(m_crashDumpPath);
 
+    // Crash upload host
+    m_crashUploadHost = settings.value("CrashUploadHost").toString();
+    qDebug() << "Crash upload host:" << m_crashUploadHost;
+
     // Set default codec
     // This affects codec for zip files
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
@@ -122,6 +126,11 @@ void GlobalConfig::load()
 
     // For high dpi icons
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+}
+
+QString GlobalConfig::crashHandlerPipe() const
+{
+    return QString("\\\\.\\pipe\\%1-Crash").arg(g_BUILD_ENV);
 }
 
 const char *GlobalConfig::buildRevision() const
