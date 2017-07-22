@@ -18,26 +18,6 @@ CascadeClassifierNavigationPlayer::CascadeClassifierNavigationPlayer(
     m_view(view) ,
     m_curRegionIndex(0)
 {
-    QFile f(":/assets/lbpcascade_animeface.xml");
-    if (!f.open(QIODevice::ReadOnly)) {
-        qWarning("Fail to load cascade classifier");
-        return;
-    }
-
-    QByteArray content = f.readAll();
-    cv::FileStorage cvFile(content.toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
-    if (!cvFile.isOpened()) {
-        qWarning("Fail to load cascade classifier as cv::FileStorage");
-        return;
-    }
-
-    cv::CascadeClassifier *classifier = new cv::CascadeClassifier();
-    if (!classifier->read(cvFile.getFirstTopLevelNode())) {
-        qWarning("Fail to decode cascade classifer");
-        delete classifier;
-    }
-
-    m_classifier.reset(classifier);
 }
 
 QString CascadeClassifierNavigationPlayer::name() const
@@ -71,6 +51,34 @@ void CascadeClassifierNavigationPlayer::goPrev()
     }
 
     focusOnCurrentRegion();
+}
+
+void CascadeClassifierNavigationPlayer::onEnter()
+{
+    if (m_classifier) {
+        return;
+    }
+
+    QFile f(":/assets/lbpcascade_animeface.xml");
+    if (!f.open(QIODevice::ReadOnly)) {
+        qWarning("Fail to load cascade classifier");
+        return;
+    }
+
+    QByteArray content = f.readAll();
+    cv::FileStorage cvFile(content.toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+    if (!cvFile.isOpened()) {
+        qWarning("Fail to load cascade classifier as cv::FileStorage");
+        return;
+    }
+
+    cv::CascadeClassifier *classifier = new cv::CascadeClassifier();
+    if (!classifier->read(cvFile.getFirstTopLevelNode())) {
+        qWarning("Fail to decode cascade classifer");
+        delete classifier;
+    }
+
+    m_classifier.reset(classifier);
 }
 
 void CascadeClassifierNavigationPlayer::detectRegions()

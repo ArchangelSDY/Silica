@@ -20,6 +20,7 @@ public:
     QString name() const override;
     void goPrev() override;
     void goNext() override;
+    void onEnter() override;
 
 private:
     void detectRegions();
