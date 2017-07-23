@@ -36,7 +36,6 @@ void TaskProgress::start()
 {
     m_isRunning = true;
     m_startTime = QDateTime::currentDateTime();
-    m_value = m_minimum;
     if (m_enableEstimate) {
         m_lastTimeConsumption =
             LocalDatabase::instance()->queryTaskProgressTimeConsumption(m_key);
