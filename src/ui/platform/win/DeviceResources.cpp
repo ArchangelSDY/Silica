@@ -622,6 +622,7 @@ DXGI_MODE_ROTATION DX::DeviceResources::ComputeDisplayRotation()
     // the DisplayOrientations enum has other values.
     switch (m_nativeOrientation)
     {
+    case Qt::PrimaryOrientation:
     case Qt::LandscapeOrientation:
         switch (m_currentOrientation)
         {

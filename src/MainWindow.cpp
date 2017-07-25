@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) ,
     m_navigator(new Navigator()),
+    m_secondaryNavigator(new Navigator()) ,
+    m_navigatorSynchronizer(m_navigator, m_secondaryNavigator.data()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
     m_actToolBarFS(0) ,
@@ -88,6 +90,11 @@ MainWindow::MainWindow(QWidget *parent) :
             m_sideViewModel.data(), SLOT(paint(Image *)));
     connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
             m_sideViewModel.data(), SLOT(paintThumbnail(Image *)));
+
+    connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
+            m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
+    connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
+            m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -144,37 +151,20 @@ void MainWindow::setupExtraUi()
     // Main graphics view
     m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
     m_mainGraphicsViewModel->setNavigator(m_navigator);
+    createMainImageView(&ui->graphicsView, ui->pageImageView, m_mainGraphicsViewModel.data());
 
-    ui->graphicsView->deleteLater();
-    QWidget *mainGraphicsViewWidget = nullptr;
-#ifdef Q_OS_WIN32
-    try {
-        D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(ui->pageImageView);
-        mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
-        m_mainGraphicsViewModel->setView(mainGraphicsView);
-        mainGraphicsViewWidget = mainGraphicsView;
-    }
-    catch (const DX::Exception &ex) {
-        qDebug() << "Fail to create D2DMainGraphicsWidget due to" << ex.result;
+    // Secondary main graphics view
+    m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
+    m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
+    createMainImageView(&ui->secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
 
-        // Fall back if fail to initialize D2D
-        MainGraphicsView *mainGraphicsView = new MainGraphicsView(ui->pageImageView);
-        mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
-        m_mainGraphicsViewModel->setView(mainGraphicsView);
-        mainGraphicsViewWidget = mainGraphicsView;
-    }
-#else
-    MainGraphicsView *mainGraphicsViewRaw = new MainGraphicsView(ui->pageImageView);
-    mainGraphicsView->setModel(m_mainGraphicsViewModel.data());
-    m_mainGraphicsViewModel->setView(mainGraphicsView);
-    mainGraphicsViewWidget = mainGraphicsView;
-#endif
-    ui->pageImageView->layout()->addWidget(mainGraphicsViewWidget);
-    ui->graphicsView = mainGraphicsViewWidget;
+    ui->pageImageViewLayout->setSpacing(0);
 
     // Init navigation player manager
     NavigationPlayerManager::instance()->init(m_navigator, ui->graphicsView);
     m_navigator->setPlayer(NavigationPlayerManager::instance()->get(0));
+    // TODO: For secondary navigator, player is unchangable at the moment
+    m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->get(0));
 
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
@@ -354,6 +344,36 @@ void MainWindow::setupExtraUi()
 
     // TODO: Lazy load here
     loadSavedPlayLists();
+}
+
+void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel)
+{
+    (*pWidget)->deleteLater();
+    QWidget *mainGraphicsViewWidget = nullptr;
+#ifdef Q_OS_WIN32
+    try {
+        D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(parent);
+        mainGraphicsView->setModel(viewModel);
+        viewModel->setView(mainGraphicsView);
+        mainGraphicsViewWidget = mainGraphicsView;
+    }
+    catch (const DX::Exception &ex) {
+        qDebug() << "Fail to create D2DMainGraphicsWidget due to" << ex.result;
+
+        // Fall back if fail to initialize D2D
+        MainGraphicsView *mainGraphicsView = new MainGraphicsView(parent);
+        mainGraphicsView->setModel(viewModel);
+        viewModel->setView(mainGraphicsView);
+        mainGraphicsViewWidget = mainGraphicsView;
+    }
+#else
+    MainGraphicsView *mainGraphicsViewRaw = new MainGraphicsView(parent);
+    mainGraphicsView->setModel(viewModel);
+    viewModel->setView(mainGraphicsView);
+    mainGraphicsViewWidget = mainGraphicsView;
+#endif
+    parent->layout()->addWidget(mainGraphicsViewWidget);
+    *pWidget = mainGraphicsViewWidget;
 }
 
 void MainWindow::loadSavedPlayLists()

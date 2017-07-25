@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QScopedPointer>
 
+#include "navigation/NavigatorSynchronizer.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -51,6 +52,7 @@ protected:
 
 private:
     void setupExtraUi();
+    void createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel);
     void processCommandLineOptions();
     void promptToOpenImage();
     void promptToOpenDir();
@@ -62,8 +64,14 @@ private:
     void switchViews();
 
     Ui::MainWindow *ui;
+
     Navigator *m_navigator;
     QScopedPointer<MainGraphicsViewModel> m_mainGraphicsViewModel;
+
+    QScopedPointer<Navigator> m_secondaryNavigator;
+    QScopedPointer<MainGraphicsViewModel> m_secondaryMainGraphicsViewModel;
+    NavigatorSynchronizer m_navigatorSynchronizer;
+
     QScopedPointer<MainGraphicsViewModel> m_sideViewModel;
 
     // TODO: Separate toolbar logic out
