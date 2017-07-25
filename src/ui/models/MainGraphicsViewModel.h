@@ -53,6 +53,7 @@ public:
     ~MainGraphicsViewModel();
 
     void setNavigator(Navigator *navigator);
+    View *view() const;
     void setView(View *view);
 
     void fitGridInView(int grid);

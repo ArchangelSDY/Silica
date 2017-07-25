@@ -168,9 +168,6 @@ margin: 0.05em;</string>
         <item>
          <widget class="QWidget" name="graphicsView"></widget>
         </item>
-        <item>
-         <widget class="QWidget" name="secondaryGraphicsView"></widget>
-        </item>
        </layout>
       </widget>
      </widget>

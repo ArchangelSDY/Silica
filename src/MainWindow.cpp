@@ -55,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_imagesCache(new ImagesCache(MAX_CACHE)) ,
     m_navigator(new Navigator(m_imagesCache)),
     m_secondaryNavigator(new Navigator(m_imagesCache)) ,
+    m_secondaryMainGraphicsViewModel(nullptr) ,
     m_navigatorSynchronizer(m_navigator, m_secondaryNavigator.data()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
@@ -95,11 +96,6 @@ MainWindow::MainWindow(QWidget *parent) :
             m_sideViewModel.data(), SLOT(paint(Image *)));
     connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
             m_sideViewModel.data(), SLOT(paintThumbnail(Image *)));
-
-    connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
-            m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
-    connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
-            m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -154,14 +150,10 @@ void MainWindow::setupExtraUi()
     );
 
     // Main graphics view
+    ui->graphicsView->deleteLater();
     m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
     m_mainGraphicsViewModel->setNavigator(m_navigator);
     createMainImageView(&ui->graphicsView, ui->pageImageView, m_mainGraphicsViewModel.data());
-
-    // Secondary main graphics view
-    m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
-    m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
-    createMainImageView(&ui->secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
 
     ui->pageImageViewLayout->setSpacing(0);
 
@@ -353,7 +345,6 @@ void MainWindow::setupExtraUi()
 
 void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel)
 {
-    (*pWidget)->deleteLater();
     QWidget *mainGraphicsViewWidget = nullptr;
 #ifdef Q_OS_WIN32
     try {
@@ -852,11 +843,17 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             case Qt::Key_G:
                 switchViews();
                 break;
-            case Qt::Key_Backslash:
-                ui->sideView->isVisible() ?
-                    ui->sideView->hide() :
-                    ui->sideView->show();
+            case Qt::Key_Backslash: {
+                QWidget *currentPage = ui->stackedViews->currentWidget();
+                if (currentPage == ui->pageGallery) {
+                    ui->sideView->isVisible() ?
+                        ui->sideView->hide() :
+                        ui->sideView->show();
+                } else if (currentPage == ui->pageImageView) {
+                    toggleSecondaryNavigator();
+                }
                 break;
+            }
             case Qt::Key_T: {
                 QDockWidget *sidebar = ui->sidebar;
                 sidebar->setVisible(!sidebar->isVisible());
@@ -932,6 +929,33 @@ void MainWindow::switchViews()
     int nextIndex = (currentIndex + 1) % m_toolBarActs->actions().count();
     QAction *nextAct = m_toolBarActs->actions()[nextIndex];
     nextAct->trigger();
+}
+
+void MainWindow::toggleSecondaryNavigator()
+{
+    if (m_secondaryMainGraphicsViewModel.isNull()) {
+        m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
+        m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
+
+        connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
+                m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
+        connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
+                m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
+
+        QWidget *secondaryGraphicsView = nullptr;
+        createMainImageView(&secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
+        ui->pageImageViewLayout->addWidget(secondaryGraphicsView);
+
+        // Trigger a force reload to do an initial paint
+        m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);
+    } else {
+        QWidget *secondaryGraphicsView = m_secondaryMainGraphicsViewModel->view()->widget();
+        if (secondaryGraphicsView->isVisible()) {
+            secondaryGraphicsView->hide();
+        } else {
+            secondaryGraphicsView->show();
+        }
+    }
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)

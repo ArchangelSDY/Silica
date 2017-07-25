@@ -63,6 +63,7 @@ private:
 
     void updateSidebarTitle();
     void switchViews();
+    void toggleSecondaryNavigator();
 
     Ui::MainWindow *ui;
 

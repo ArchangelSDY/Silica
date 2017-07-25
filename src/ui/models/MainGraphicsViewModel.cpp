@@ -39,6 +39,11 @@ void MainGraphicsViewModel::setNavigator(Navigator *navigator)
             this, SLOT(focusOnRect(QRectF)));
 }
 
+MainGraphicsViewModel::View *MainGraphicsViewModel::view() const
+{
+    return m_view;
+}
+
 void MainGraphicsViewModel::setView(View *view)
 {
     m_view = view;
