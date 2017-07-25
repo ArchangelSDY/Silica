@@ -14,6 +14,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class ImagesCache;
 class ImagePathCorrector;
 class MainGraphicsViewModel;
 
@@ -64,6 +65,8 @@ private:
     void switchViews();
 
     Ui::MainWindow *ui;
+
+    QSharedPointer<ImagesCache> m_imagesCache;
 
     Navigator *m_navigator;
     QScopedPointer<MainGraphicsViewModel> m_mainGraphicsViewModel;

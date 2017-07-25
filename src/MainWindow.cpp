@@ -17,6 +17,7 @@
 #include <QToolBar>
 #include <QtConcurrent>
 
+#include "image/caches/ImagesCache.h"
 #include "image/ImageSourceManager.h"
 #include "logger/listeners/ImagePathCorrector.h"
 #include "logger/Logger.h"
@@ -45,11 +46,15 @@
 
 static const char* PLAYLIST_TITLE_PREFIX = "PlayList";
 
+// Cache both backward/forward preloaded images and the current one
+static const int MAX_CACHE = 2 * Navigator::MAX_PRELOAD + 1;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow) ,
-    m_navigator(new Navigator()),
-    m_secondaryNavigator(new Navigator()) ,
+    ui(new Ui::MainWindow),
+    m_imagesCache(new ImagesCache(MAX_CACHE)) ,
+    m_navigator(new Navigator(m_imagesCache)),
+    m_secondaryNavigator(new Navigator(m_imagesCache)) ,
     m_navigatorSynchronizer(m_navigator, m_secondaryNavigator.data()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,

@@ -6,10 +6,10 @@
 #include <QUuid>
 
 #include "Image.h"
-#include "ImagesCache.h"
 #include "PlayList.h"
 
 class AbstractNavigationPlayer;
+class ImagesCache;
 
 class Navigator : public QObject
 {
@@ -20,11 +20,12 @@ public:
         ReverseDirection = 1,
     };
 
+    static const int MAX_PRELOAD = 5;
     static const int FAST_AUTO_NAVIGATION_INTERVAL = 200;
     static const int MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
     static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
-    explicit Navigator(QObject *parent = 0);
+    explicit Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent = 0);
     ~Navigator();
 
     QSharedPointer<PlayList> playList() { return m_playList; }
@@ -107,7 +108,7 @@ private:
     Image* m_currentImage;
     bool m_reverseNavigation;
     bool m_isLooping;
-    ImagesCache m_cachedImages;
+    QSharedPointer<ImagesCache> m_cachedImages;
     QSharedPointer<PlayList> m_playList;
     QTimer m_autoNavigationTimer;
 

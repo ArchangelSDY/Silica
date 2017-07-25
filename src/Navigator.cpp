@@ -1,5 +1,6 @@
 #include "Navigator.h"
 
+#include "image/caches/ImagesCache.h"
 #include "image/caches/LoopImagesCacheStrategy.h"
 #include "image/caches/NormalImagesCacheStrategy.h"
 #include "image/ImageSourceManager.h"
@@ -7,18 +8,13 @@
 #include "navigation/NormalNavigationPlayer.h"
 #include "playlist/PlayListRecord.h"
 
-static const int MAX_PRELOAD = 5;
-
-// Cache both backward/forward preloaded images and the current one
-static const int MAX_CACHE = 2 * MAX_PRELOAD + 1;
-
-Navigator::Navigator(QObject *parent) :
+Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
     m_currentUuid(QUuid()) ,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
-    m_cachedImages(MAX_CACHE) ,
+    m_cachedImages(imagesCache) ,
     m_playList(0) ,
     m_player(nullptr) ,
     m_basket(new PlayList())
@@ -36,7 +32,7 @@ Navigator::~Navigator()
 
 void Navigator::reset()
 {
-    m_cachedImages.clear();
+    m_cachedImages->clear();
     m_currentImage = 0;
     m_currentIndex = -1;
     m_currentUuid = QUuid();
@@ -92,7 +88,7 @@ void Navigator::reloadPlayList()
     emit playListChange(m_playList);
 
     // Cached index may be incorrect after filtering, clear cache.
-    m_cachedImages.clear();
+    m_cachedImages->clear();
 
     // Try to find new index of current image and reload it.
     goUuid(m_currentUuid, true);
@@ -113,11 +109,11 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
         return 0;
     }
 
-    Image *image = m_cachedImages.at(index);
+    Image *image = m_cachedImages->at(index);
 
     if (!image) {
         image = (*m_playList)[index].data();
-        m_cachedImages.insert(index, image);
+        m_cachedImages->insert(index, image);
     }
 
     if (shouldPaint) {
@@ -381,11 +377,11 @@ void Navigator::setPlayer(AbstractNavigationPlayer *player)
 void Navigator::setCacheStragegy()
 {
     if (m_isLooping) {
-        m_cachedImages.setStrategy(
-            new LoopImagesCacheStrategy(&m_cachedImages, this));
+        m_cachedImages->setStrategy(
+            new LoopImagesCacheStrategy(m_cachedImages.data(), this));
     } else {
-        m_cachedImages.setStrategy(
-            new NormalImagesCacheStrategy(&m_cachedImages));
+        m_cachedImages->setStrategy(
+            new NormalImagesCacheStrategy(m_cachedImages.data()));
     }
 }
 
