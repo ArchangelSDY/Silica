@@ -14,6 +14,11 @@ public:
 
     int offset() const;
     void setOffset(int offset);
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
+signals:
+    void toggled(bool enabled);
 
 private slots:
     void onPlayListChange(QSharedPointer<PlayList>);
@@ -23,4 +28,5 @@ private:
     Navigator *m_primary;
     Navigator *m_secondary;
     int m_offset;
+    bool m_enabled;
 };

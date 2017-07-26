@@ -4,6 +4,7 @@
 #include <QScopedPointer>
 
 #include "navigation/NavigationPlayerManager.h"
+#include "navigation/NavigatorSynchronizer.h"
 #include "ui/PluginLogsDialog.h"
 #include "Navigator.h"
 
@@ -11,6 +12,7 @@ MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     QObject(parent) ,
     m_menuBar(context.menuBar) ,
     m_navigator(context.navigator) ,
+    m_navigatorSynchronizer(context.navigatorSynchronizer) ,
     m_imageView(context.imageView) ,
     m_menuPlayers(0) ,
     m_actPlayerConf(0) ,
@@ -27,7 +29,11 @@ MainMenuBarManager::~MainMenuBarManager()
 
 void MainMenuBarManager::init()
 {
-    m_menuPlayers = m_menuBar->addMenu(tr("Players"));
+    // Navigation
+    m_menuNavigation = m_menuBar->addMenu(tr("Navigation"));
+
+    // Navigation - Players
+    m_menuPlayers = m_menuNavigation->addMenu(tr("Players"));
 
     QActionGroup *playersGrp = new QActionGroup(m_menuPlayers);
     playersGrp->setExclusive(true);
@@ -51,7 +57,25 @@ void MainMenuBarManager::init()
     connect(m_menuPlayers, SIGNAL(aboutToShow()),
             this, SLOT(checkPlayerConfigurable()));
 
+    // Navigation - Two columns
+    QMenu *menuNavigation = m_menuNavigation->addMenu(tr("Two Columns"));
 
+    QAction *actTwoColumnsLTR = menuNavigation->addAction(tr("Left To Right"), [this]() {
+        this->m_navigatorSynchronizer->setOffset(1);
+    });
+    actTwoColumnsLTR->setCheckable(true);
+    QAction *actTwoColumnsRTL = menuNavigation->addAction(tr("Right To Left"), [this]() {
+        this->m_navigatorSynchronizer->setOffset(-1);
+    });
+    actTwoColumnsRTL->setCheckable(true);
+    actTwoColumnsRTL->setChecked(true);
+
+    QActionGroup *actTwoColumnsDirection = new QActionGroup(menuNavigation);
+    actTwoColumnsDirection->addAction(actTwoColumnsLTR);
+    actTwoColumnsDirection->addAction(actTwoColumnsRTL);
+
+
+    // Tools
     m_menuTools = m_menuBar->addMenu(tr("Tools"));
 
     m_menuTools->addAction(tr("Plugin Logs"), this,

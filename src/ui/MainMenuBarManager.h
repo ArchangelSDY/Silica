@@ -6,6 +6,7 @@
 
 class QDialog;
 class Navigator;
+class NavigatorSynchronizer;
 
 class MainMenuBarManager : public QObject
 {
@@ -13,6 +14,7 @@ class MainMenuBarManager : public QObject
 public:
     struct Context {
         Navigator *navigator;
+        NavigatorSynchronizer *navigatorSynchronizer;
         QMenuBar *menuBar;
         QWidget *imageView;
     };
@@ -31,8 +33,10 @@ private:
 
     QMenuBar *m_menuBar;
     Navigator *m_navigator;
+    NavigatorSynchronizer *m_navigatorSynchronizer;
     QWidget *m_imageView;
 
+    QMenu *m_menuNavigation;
     QMenu *m_menuPlayers;
     QAction *m_actPlayerConf;
 

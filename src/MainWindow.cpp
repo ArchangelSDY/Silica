@@ -163,10 +163,14 @@ void MainWindow::setupExtraUi()
     // TODO: For secondary navigator, player is unchangable at the moment
     m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->get(0));
 
+    // Init navigator synchronizer
+    connect(&m_navigatorSynchronizer, &NavigatorSynchronizer::toggled, this, &MainWindow::secondaryNavigatorToggled);
+
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
     menuBarCtx.navigator = m_navigator;
+    menuBarCtx.navigatorSynchronizer = &m_navigatorSynchronizer;
     menuBarCtx.imageView = ui->graphicsView;
 
     new MainMenuBarManager(menuBarCtx, this);
@@ -852,7 +856,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                         ui->sideView->hide() :
                         ui->sideView->show();
                 } else if (currentPage == ui->pageImageView) {
-                    toggleSecondaryNavigator();
+                    m_navigatorSynchronizer.setEnabled(!m_navigatorSynchronizer.isEnabled());
                 }
                 break;
             }
@@ -935,9 +939,11 @@ void MainWindow::switchViews()
     nextAct->trigger();
 }
 
-void MainWindow::toggleSecondaryNavigator()
+void MainWindow::secondaryNavigatorToggled(bool enabled)
 {
     if (m_secondaryMainGraphicsViewModel.isNull()) {
+        Q_ASSERT(enabled);
+
         m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
         m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
 
@@ -954,11 +960,7 @@ void MainWindow::toggleSecondaryNavigator()
         m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);
     } else {
         QWidget *secondaryGraphicsView = m_secondaryMainGraphicsViewModel->view()->widget();
-        if (secondaryGraphicsView->isVisible()) {
-            secondaryGraphicsView->hide();
-        } else {
-            secondaryGraphicsView->show();
-        }
+        secondaryGraphicsView->setVisible(enabled);
     }
 }
 

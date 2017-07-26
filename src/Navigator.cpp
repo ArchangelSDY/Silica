@@ -132,7 +132,7 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
 
 bool Navigator::goIndex(int index, bool forceReloadCurrent)
 {
-    if (index < 0 || index >= m_playList->count()) {
+    if (m_playList.isNull() || index < 0 || index >= m_playList->count()) {
         return false;
     }
 
