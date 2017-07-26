@@ -829,6 +829,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             case Qt::Key_F:
                 m_mainGraphicsViewModel->toggleFitInView();
                 m_mainGraphicsViewModel->fitInViewIfNecessary();
+                m_secondaryMainGraphicsViewModel->toggleFitInView();
+                m_secondaryMainGraphicsViewModel->fitInViewIfNecessary();
                 break;
             case Qt::Key_O: {
                 promptToOpenImage();
@@ -861,6 +863,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             }
             case Qt::Key_R:
                 m_mainGraphicsViewModel->rotate(90);
+                m_secondaryMainGraphicsViewModel->rotate(90);
                 break;
             case Qt::Key_B:
                 ui->basketPane->setVisible(!ui->basketPane->isVisible());
@@ -904,6 +907,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
             case Qt::Key_8:
             case Qt::Key_9:
                 m_mainGraphicsViewModel->fitGridInView(ev->text().toInt());
+                m_secondaryMainGraphicsViewModel->fitGridInView(ev->text().toInt());
                 break;
         }
 
