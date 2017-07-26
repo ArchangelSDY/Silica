@@ -16,6 +16,7 @@ public:
     void setOffset(int offset);
     bool isEnabled() const;
     void setEnabled(bool enabled);
+    void setLoop(bool loop);
 
 signals:
     void toggled(bool enabled);

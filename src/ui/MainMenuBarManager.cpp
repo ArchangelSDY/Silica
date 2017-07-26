@@ -58,21 +58,28 @@ void MainMenuBarManager::init()
             this, SLOT(checkPlayerConfigurable()));
 
     // Navigation - Two columns
-    QMenu *menuNavigation = m_menuNavigation->addMenu(tr("Two Columns"));
+    QMenu *menuTwoColumns = m_menuNavigation->addMenu(tr("Two Columns"));
 
-    QAction *actTwoColumnsLTR = menuNavigation->addAction(tr("Left To Right"), [this]() {
+    QAction *actTwoColumnsLTR = menuTwoColumns->addAction(tr("Left To Right"), [this]() {
         this->m_navigatorSynchronizer->setOffset(1);
     });
     actTwoColumnsLTR->setCheckable(true);
-    QAction *actTwoColumnsRTL = menuNavigation->addAction(tr("Right To Left"), [this]() {
+    QAction *actTwoColumnsRTL = menuTwoColumns->addAction(tr("Right To Left"), [this]() {
         this->m_navigatorSynchronizer->setOffset(-1);
     });
     actTwoColumnsRTL->setCheckable(true);
     actTwoColumnsRTL->setChecked(true);
 
-    QActionGroup *actTwoColumnsDirection = new QActionGroup(menuNavigation);
+    QActionGroup *actTwoColumnsDirection = new QActionGroup(menuTwoColumns);
     actTwoColumnsDirection->addAction(actTwoColumnsLTR);
     actTwoColumnsDirection->addAction(actTwoColumnsRTL);
+
+    // Navigation - Loop
+    QAction *loop = m_menuNavigation->addAction(tr("Loop"), this->m_navigatorSynchronizer, &NavigatorSynchronizer::setLoop);
+    loop->setCheckable(true);
+    connect(m_menuNavigation, &QMenu::aboutToShow, [this, loop]() {
+        loop->setChecked(this->m_navigator->isLooping());
+    });
 
 
     // Tools

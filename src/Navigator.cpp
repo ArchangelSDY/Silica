@@ -187,9 +187,13 @@ void Navigator::goIndexUntilSuccess(int index, int delta)
 {
     int failedCount = 0;
     while (failedCount < m_playList->count()) {
-        // Normalize index
+        // Normalize index in loop mode
         if (index < 0 || index >= m_playList->count()) {
-            index = (index + m_playList->count()) % m_playList->count();
+            if (m_isLooping) {
+                index = (index + m_playList->count()) % m_playList->count();
+            } else {
+                return;
+            }
         }
 
         bool success = goIndex(index);

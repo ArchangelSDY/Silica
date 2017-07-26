@@ -47,6 +47,12 @@ void NavigatorSynchronizer::setEnabled(bool enabled)
     emit toggled(enabled);
 }
 
+void NavigatorSynchronizer::setLoop(bool loop)
+{
+    m_primary->setLoop(loop);
+    m_secondary->setLoop(loop);
+}
+
 void NavigatorSynchronizer::onPlayListChange(QSharedPointer<PlayList> playlist)
 {
     m_secondary->setPlayList(playlist);
@@ -54,5 +60,6 @@ void NavigatorSynchronizer::onPlayListChange(QSharedPointer<PlayList> playlist)
 
 void NavigatorSynchronizer::onNavigationChange(int index)
 {
-    m_secondary->goIndex(index + m_offset);
+    int delta = m_offset > 0 ? 1 : -1;
+    m_secondary->goIndexUntilSuccess(index + m_offset, delta);
 }

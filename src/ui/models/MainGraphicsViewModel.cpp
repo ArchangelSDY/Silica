@@ -257,11 +257,6 @@ void MainGraphicsViewModel::contextMenuEvent(QContextMenuEvent *event)
     autoNavSigMap->setMapping(
         slowAutoNavi, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
 
-    // Loop
-    QAction *loop = menu->addAction("Loop", m_navigator, SLOT(setLoop(bool)));
-    loop->setCheckable(true);
-    loop->setChecked(m_navigator->isLooping());
-
     menu->addSeparator();
 
     // Share
