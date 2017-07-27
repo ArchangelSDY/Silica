@@ -18,9 +18,6 @@ public:
     void setEnabled(bool enabled);
     void setLoop(bool loop);
 
-signals:
-    void toggled(bool enabled);
-
 private slots:
     void onPlayListChange(QSharedPointer<PlayList>);
     void onNavigationChange(int index);

@@ -45,7 +45,6 @@ private slots:
     void promptToCreatePlayListRecord(int type);
 
     void fsRootPathChanged();
-    void secondaryNavigatorToggled(bool enabled);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);
@@ -64,6 +63,7 @@ private:
 
     void updateSidebarTitle();
     void switchViews();
+    void toggleSecondaryNavigator();
 
     Ui::MainWindow *ui;
 

@@ -14,6 +14,10 @@ public:
     void goPrev() override;
     void onEnter() override;
 
+    void setStepSize(int stepSize);
+
+private:
+    int m_stepSize;
 };
 
 #endif // NORMALNAVIGATIONPLAYER_H

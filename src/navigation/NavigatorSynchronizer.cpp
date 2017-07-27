@@ -43,8 +43,6 @@ void NavigatorSynchronizer::setEnabled(bool enabled)
         disconnect(m_primary, &Navigator::playListChange, this, &NavigatorSynchronizer::onPlayListChange);
         disconnect(m_primary, &Navigator::navigationChange, this, &NavigatorSynchronizer::onNavigationChange);
     }
-
-    emit toggled(enabled);
 }
 
 void NavigatorSynchronizer::setLoop(bool loop)

@@ -22,6 +22,7 @@
 #include "logger/listeners/ImagePathCorrector.h"
 #include "logger/Logger.h"
 #include "navigation/NavigationPlayerManager.h"
+#include "navigation/NormalNavigationPlayer.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
@@ -162,9 +163,6 @@ void MainWindow::setupExtraUi()
     m_navigator->setPlayer(NavigationPlayerManager::instance()->get(0));
     // TODO: For secondary navigator, player is unchangable at the moment
     m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->get(0));
-
-    // Init navigator synchronizer
-    connect(&m_navigatorSynchronizer, &NavigatorSynchronizer::toggled, this, &MainWindow::secondaryNavigatorToggled);
 
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
@@ -856,7 +854,7 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
                         ui->sideView->hide() :
                         ui->sideView->show();
                 } else if (currentPage == ui->pageImageView) {
-                    m_navigatorSynchronizer.setEnabled(!m_navigatorSynchronizer.isEnabled());
+                    toggleSecondaryNavigator();
                 }
                 break;
             }
@@ -939,10 +937,18 @@ void MainWindow::switchViews()
     nextAct->trigger();
 }
 
-void MainWindow::secondaryNavigatorToggled(bool enabled)
+void MainWindow::toggleSecondaryNavigator()
 {
+    bool willEnable = !m_navigatorSynchronizer.isEnabled();
+    m_navigatorSynchronizer.setEnabled(willEnable);
+
+    NormalNavigationPlayer *normalPlayer = static_cast<NormalNavigationPlayer *>(NavigationPlayerManager::instance()->get(0));
+    int stepSize = willEnable ? 2 : 1;
+    normalPlayer->setStepSize(stepSize);
+
     if (m_secondaryMainGraphicsViewModel.isNull()) {
-        Q_ASSERT(enabled);
+        // Create view at the first time
+        Q_ASSERT(willEnable);
 
         m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
         m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
@@ -959,8 +965,9 @@ void MainWindow::secondaryNavigatorToggled(bool enabled)
         // Trigger a force reload to do an initial paint
         m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);
     } else {
+        // Toggle view
         QWidget *secondaryGraphicsView = m_secondaryMainGraphicsViewModel->view()->widget();
-        secondaryGraphicsView->setVisible(enabled);
+        secondaryGraphicsView->setVisible(willEnable);
     }
 }
 
