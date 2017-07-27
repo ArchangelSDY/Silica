@@ -222,43 +222,6 @@ void MainGraphicsViewModel::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu();
 
-    // Auto navigation speed
-    int currentNavInterval = m_navigator->autoNavigationInterval();
-    QMenu *autoNavMenu = menu->addMenu("Auto Speed");
-    QActionGroup *autoNavGrp = new QActionGroup(menu);
-    QSignalMapper *autoNavSigMap = new QSignalMapper(menu);
-    connect(autoNavSigMap, SIGNAL(mapped(int)),
-            m_navigator, SLOT(setAutoNavigationInterval(int)));
-
-    QAction *fastAutoNav = autoNavMenu->addAction(
-        "Fast", autoNavSigMap, SLOT(map()));
-    fastAutoNav->setCheckable(true);
-    fastAutoNav->setChecked(
-        currentNavInterval == Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
-    autoNavGrp->addAction(fastAutoNav);
-    autoNavSigMap->setMapping(
-        fastAutoNav, Navigator::FAST_AUTO_NAVIGATION_INTERVAL);
-
-    QAction *mediumAutoNav = autoNavMenu->addAction(
-        "Medium", autoNavSigMap, SLOT(map()));
-    mediumAutoNav->setCheckable(true);
-    mediumAutoNav->setChecked(
-        currentNavInterval == Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
-    autoNavGrp->addAction(mediumAutoNav);
-    autoNavSigMap->setMapping(
-        mediumAutoNav, Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
-
-    QAction *slowAutoNavi = autoNavMenu->addAction(
-        "Slow", autoNavSigMap, SLOT(map()));
-    slowAutoNavi->setCheckable(true);
-    slowAutoNavi->setChecked(
-        currentNavInterval == Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
-    autoNavGrp->addAction(slowAutoNavi);
-    autoNavSigMap->setMapping(
-        slowAutoNavi, Navigator::SLOW_AUTO_NAVIGATION_INTERVAL);
-
-    menu->addSeparator();
-
     // Share
     QMenu *shareMenu = menu->addMenu("Share");
     QStringList sharerNames = SharerManager::instance()->sharerNames();

@@ -1,8 +1,6 @@
 #include "Navigator.h"
 
 #include "image/caches/ImagesCache.h"
-#include "image/caches/LoopImagesCacheStrategy.h"
-#include "image/caches/NormalImagesCacheStrategy.h"
 #include "image/ImageSourceManager.h"
 #include "navigation/AbstractNavigationPlayer.h"
 #include "navigation/NormalNavigationPlayer.h"
@@ -19,8 +17,6 @@ Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
     m_player(nullptr) ,
     m_basket(new PlayList())
 {
-    setCacheStragegy();   // To set corresponding cache strategy
-
     m_autoNavigationTimer.setInterval(Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
     connect(&m_autoNavigationTimer, SIGNAL(timeout()),
             this, SLOT(goAutoNavigation()));
@@ -363,8 +359,6 @@ void Navigator::goAutoNavigation()
 void Navigator::setLoop(bool shouldLoop)
 {
     m_isLooping = shouldLoop;
-
-    setCacheStragegy();
 }
 
 void Navigator::setPlayer(AbstractNavigationPlayer *player)
@@ -376,17 +370,6 @@ void Navigator::setPlayer(AbstractNavigationPlayer *player)
     m_player = player;
 
     m_player->onEnter();
-}
-
-void Navigator::setCacheStragegy()
-{
-    if (m_isLooping) {
-        m_cachedImages->setStrategy(
-            new LoopImagesCacheStrategy(m_cachedImages.data(), this));
-    } else {
-        m_cachedImages->setStrategy(
-            new NormalImagesCacheStrategy(m_cachedImages.data()));
-    }
 }
 
 void Navigator::checkContinueProvide()

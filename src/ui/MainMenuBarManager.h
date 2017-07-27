@@ -5,6 +5,7 @@
 #include <QObject>
 
 class QDialog;
+class ImagesCache;
 class Navigator;
 class NavigatorSynchronizer;
 
@@ -15,6 +16,7 @@ public:
     struct Context {
         Navigator *navigator;
         NavigatorSynchronizer *navigatorSynchronizer;
+        QSharedPointer<ImagesCache> imagesCache;
         QMenuBar *menuBar;
         QWidget *imageView;
     };
@@ -23,24 +25,22 @@ public:
     ~MainMenuBarManager();
 
 private slots:
-    void checkPlayerConfigurable();
     void openPlayerConfDialog();
     void showPluginLogsDialog();
 
 private:
     void init();
-
+    void createMenuNavigationPlayers(QMenu *parentMenu);
+    void createMenuNavigationTwoColumns(QMenu *parentMenu);
+    void createMenuNavigationLoop(QMenu *parentMenu);
+    void createMenuNavigationAutoSpeed(QMenu *parentMenu);
 
     QMenuBar *m_menuBar;
     Navigator *m_navigator;
     NavigatorSynchronizer *m_navigatorSynchronizer;
+    QSharedPointer<ImagesCache> m_imagesCache;
     QWidget *m_imageView;
 
-    QMenu *m_menuNavigation;
-    QMenu *m_menuPlayers;
-    QAction *m_actPlayerConf;
-
-    QMenu *m_menuTools;
     QDialog *m_pluginLogsDialog;
 };
 

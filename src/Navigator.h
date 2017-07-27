@@ -100,7 +100,6 @@ private:
     void preload();
     void reset();
 
-    void setCacheStragegy();
     void checkContinueProvide();
 
     int m_currentIndex;

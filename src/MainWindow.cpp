@@ -18,6 +18,7 @@
 #include <QtConcurrent>
 
 #include "image/caches/ImagesCache.h"
+#include "image/caches/LoopImagesCacheStrategy.h"
 #include "image/ImageSourceManager.h"
 #include "logger/listeners/ImagePathCorrector.h"
 #include "logger/Logger.h"
@@ -164,11 +165,15 @@ void MainWindow::setupExtraUi()
     // TODO: For secondary navigator, player is unchangable at the moment
     m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->get(0));
 
+    // Init images cache
+    m_imagesCache->setStrategy(new LoopImagesCacheStrategy(m_imagesCache.data(), m_navigator));
+
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
     menuBarCtx.navigator = m_navigator;
     menuBarCtx.navigatorSynchronizer = &m_navigatorSynchronizer;
+    menuBarCtx.imagesCache = m_imagesCache;
     menuBarCtx.imageView = ui->graphicsView;
 
     new MainMenuBarManager(menuBarCtx, this);
