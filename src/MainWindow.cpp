@@ -969,11 +969,14 @@ void MainWindow::toggleSecondaryNavigator()
 
         m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
         m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
+        connect(m_secondaryMainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
+                m_actToolBarGallery, SLOT(trigger()));
 
         connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
                 m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
         connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
                 m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
+
 
         QWidget *secondaryGraphicsView = nullptr;
         createMainImageView(&secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
@@ -991,6 +994,10 @@ void MainWindow::toggleSecondaryNavigator()
 void MainWindow::resizeEvent(QResizeEvent *)
 {
     m_mainGraphicsViewModel->fitInViewIfNecessary();
+
+    if (!m_secondaryMainGraphicsViewModel.isNull()) {
+        m_secondaryMainGraphicsViewModel->fitInViewIfNecessary();
+    }
 }
 
 void MainWindow::changeEvent(QEvent *ev)
