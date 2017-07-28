@@ -39,12 +39,6 @@ endif (WIN32)
 target_link_libraries(silica ${SILICA_LINK_LIBS})
 set_target_properties(silica PROPERTIES INSTALL_RPATH "@executable_path;@executable_path/../Resources/lib;$ORIGIN/../lib")
 
-if (WIN32)
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION . COMPONENT applications)
-else()
-    install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/plugins" DESTINATION "lib" COMPONENT applications)
-endif()
-
 if (APPLE)
 
     # We have to use our own Info.plist template to support Retina display.
