@@ -174,7 +174,7 @@ void MainWindow::setupExtraUi()
     menuBarCtx.navigator = m_navigator;
     menuBarCtx.navigatorSynchronizer = &m_navigatorSynchronizer;
     menuBarCtx.imagesCache = m_imagesCache;
-    menuBarCtx.imageView = ui->graphicsView;
+    menuBarCtx.imageViewsParentLayout = ui->pageImageViewLayout;
 
     new MainMenuBarManager(menuBarCtx, this);
 

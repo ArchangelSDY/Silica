@@ -5,6 +5,7 @@
 #include <QObject>
 
 class QDialog;
+class QHBoxLayout;
 class ImagesCache;
 class Navigator;
 class NavigatorSynchronizer;
@@ -18,7 +19,7 @@ public:
         NavigatorSynchronizer *navigatorSynchronizer;
         QSharedPointer<ImagesCache> imagesCache;
         QMenuBar *menuBar;
-        QWidget *imageView;
+        QHBoxLayout *imageViewsParentLayout;
     };
 
     explicit MainMenuBarManager(Context context, QObject *parent = 0);
@@ -39,7 +40,7 @@ private:
     Navigator *m_navigator;
     NavigatorSynchronizer *m_navigatorSynchronizer;
     QSharedPointer<ImagesCache> m_imagesCache;
-    QWidget *m_imageView;
+    QHBoxLayout *m_imageViewsParentLayout;
 
     QDialog *m_pluginLogsDialog;
 };

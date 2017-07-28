@@ -2,26 +2,13 @@
 
 #include "Navigator.h"
 
+int NavigatorSynchronizer::OFFSET = 1;
+
 NavigatorSynchronizer::NavigatorSynchronizer(Navigator *primary, Navigator *secondary) :
     m_primary(primary) ,
     m_secondary(secondary) ,
-    m_offset(-1) ,
     m_enabled(false)
 {
-}
-
-int NavigatorSynchronizer::offset() const
-{
-    return m_offset;
-}
-
-void NavigatorSynchronizer::setOffset(int offset)
-{
-    m_offset = offset;
-
-    if (m_enabled) {
-        onNavigationChange(m_primary->currentIndex());
-    }
 }
 
 bool NavigatorSynchronizer::isEnabled() const
@@ -58,6 +45,6 @@ void NavigatorSynchronizer::onPlayListChange(QSharedPointer<PlayList> playlist)
 
 void NavigatorSynchronizer::onNavigationChange(int index)
 {
-    int delta = m_offset > 0 ? 1 : -1;
-    m_secondary->goIndexUntilSuccess(index + m_offset, delta);
+    int delta = OFFSET > 0 ? 1 : -1;
+    m_secondary->goIndexUntilSuccess(index + OFFSET, delta);
 }

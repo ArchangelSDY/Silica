@@ -1,6 +1,7 @@
 #include "MainMenuBarManager.h"
 
 #include <QDialog>
+#include <QHBoxLayout>
 #include <QScopedPointer>
 
 #include "image/caches/ImagesCache.h"
@@ -17,8 +18,8 @@ MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     m_navigator(context.navigator) ,
     m_navigatorSynchronizer(context.navigatorSynchronizer) ,
     m_imagesCache(context.imagesCache) ,
-    m_imageView(context.imageView) ,
-    m_pluginLogsDialog(new PluginLogsDialog())
+    m_pluginLogsDialog(new PluginLogsDialog()) ,
+    m_imageViewsParentLayout(context.imageViewsParentLayout)
 {
     init();
 }
@@ -75,19 +76,16 @@ void MainMenuBarManager::createMenuNavigationTwoColumns(QMenu *parentMenu)
 {
     QMenu *menuTwoColumns = parentMenu->addMenu(tr("Two Columns"));
 
-    QAction *actTwoColumnsLTR = menuTwoColumns->addAction(tr("Left To Right"), [this]() {
-        this->m_navigatorSynchronizer->setOffset(1);
-    });
-    actTwoColumnsLTR->setCheckable(true);
-    QAction *actTwoColumnsRTL = menuTwoColumns->addAction(tr("Right To Left"), [this]() {
-        this->m_navigatorSynchronizer->setOffset(-1);
-    });
-    actTwoColumnsRTL->setCheckable(true);
-    actTwoColumnsRTL->setChecked(true);
+    QHBoxLayout *columnsLayout = m_imageViewsParentLayout;
+    menuTwoColumns->addAction(tr("Swap Columns"), [columnsLayout]() {
+        if (columnsLayout->count() == 1) {
+            return;
+        }
 
-    QActionGroup *actTwoColumnsDirection = new QActionGroup(menuTwoColumns);
-    actTwoColumnsDirection->addAction(actTwoColumnsLTR);
-    actTwoColumnsDirection->addAction(actTwoColumnsRTL);
+        // Swap
+        QLayoutItem *first = columnsLayout->takeAt(0);
+        columnsLayout->addItem(first);
+    });
 }
 
 void MainMenuBarManager::createMenuNavigationLoop(QMenu *parentMenu)

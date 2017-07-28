@@ -12,8 +12,6 @@ class NavigatorSynchronizer : public QObject
 public:
     NavigatorSynchronizer(Navigator *primary, Navigator *secondary);
 
-    int offset() const;
-    void setOffset(int offset);
     bool isEnabled() const;
     void setEnabled(bool enabled);
     void setLoop(bool loop);
@@ -23,8 +21,9 @@ private slots:
     void onNavigationChange(int index);
 
 private:
+    static int OFFSET;
+
     Navigator *m_primary;
     Navigator *m_secondary;
-    int m_offset;
     bool m_enabled;
 };
