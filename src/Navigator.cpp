@@ -133,7 +133,7 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     }
 
     if (!forceReloadCurrent && index == m_currentIndex) {
-        return false;
+        return true;
     }
 
     // Load and paint
