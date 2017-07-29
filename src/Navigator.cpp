@@ -52,7 +52,7 @@ void Navigator::preload()
 
 void Navigator::setPlayList(QSharedPointer<PlayList> playList)
 {
-    if (!playList) {
+    if (!playList || m_playList == playList) {
         return;
     }
 
