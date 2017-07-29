@@ -77,7 +77,14 @@ void MainMenuBarManager::createMenuNavigationTwoColumns(QMenu *parentMenu)
     QMenu *menuTwoColumns = parentMenu->addMenu(tr("Two Columns"));
 
     QHBoxLayout *columnsLayout = m_imageViewsParentLayout;
-    menuTwoColumns->addAction(tr("Swap Columns"), [columnsLayout]() {
+    QAction *actLTR = menuTwoColumns->addAction(tr("Left to Right"));
+    actLTR->setCheckable(true);
+    QAction *actRTL = menuTwoColumns->addAction(tr("Right to Left"));
+    actRTL->setCheckable(true);
+    actRTL->setChecked(true);
+
+    // One slot is enough as toggled() signal will be emitted twice for both actions
+    connect(actLTR, &QAction::toggled, [columnsLayout]() {
         if (columnsLayout->count() == 1) {
             return;
         }
@@ -86,6 +93,10 @@ void MainMenuBarManager::createMenuNavigationTwoColumns(QMenu *parentMenu)
         QLayoutItem *first = columnsLayout->takeAt(0);
         columnsLayout->addItem(first);
     });
+
+    QActionGroup *grp = new QActionGroup(menuTwoColumns);
+    grp->addAction(actLTR);
+    grp->addAction(actRTL);
 }
 
 void MainMenuBarManager::createMenuNavigationLoop(QMenu *parentMenu)

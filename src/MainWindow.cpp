@@ -980,7 +980,7 @@ void MainWindow::toggleSecondaryNavigator()
 
         QWidget *secondaryGraphicsView = nullptr;
         createMainImageView(&secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
-        ui->pageImageViewLayout->addWidget(secondaryGraphicsView);
+        ui->pageImageViewLayout->insertWidget(0, secondaryGraphicsView);
 
         // Trigger a force reload to do an initial paint
         m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);
