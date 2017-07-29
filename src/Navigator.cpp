@@ -1,10 +1,15 @@
 #include "Navigator.h"
 
 #include "image/caches/ImagesCache.h"
-#include "image/ImageSourceManager.h"
 #include "navigation/AbstractNavigationPlayer.h"
 #include "navigation/NormalNavigationPlayer.h"
 #include "playlist/PlayListRecord.h"
+
+
+const int Navigator::MAX_PRELOAD = 5;
+const int Navigator::FAST_AUTO_NAVIGATION_INTERVAL = 200;
+const int Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
+const int Navigator::SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
 Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
     QObject(parent) ,
@@ -34,9 +39,6 @@ void Navigator::reset()
     m_currentUuid = QUuid();
     m_reverseNavigation = false;
     m_playList.reset();
-
-    // Notify to clear image source cache
-    ImageSourceManager::instance()->clearCache();
 }
 
 void Navigator::preload()

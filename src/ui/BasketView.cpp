@@ -37,6 +37,7 @@ void BasketView::exportToNavigator()
 {
     QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
     dupPl->append(m_playList);
+    // TODO: Propagate to Main Window?
     m_navigator->setPlayList(dupPl);
     m_playList->clear();
 }

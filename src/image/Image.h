@@ -17,8 +17,6 @@ class Image : public QObject
 
     friend class ImageHotspot;
 public:
-    static QThreadPool *threadPool();
-
     explicit Image(const QString &path, QObject *parent = 0);
     explicit Image(const QUrl &url, QObject *parent = 0);
     explicit Image(ImageSource *, QObject *parent = 0);

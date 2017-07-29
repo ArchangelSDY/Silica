@@ -399,7 +399,7 @@ void MainWindow::loadSelectedPlayList()
         PlayListGalleryItem *playListItem =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
         QSharedPointer<PlayList> pl = playListItem->record()->playList();
-        m_navigator->setPlayList(pl);
+        setPrimaryNavigatorPlayList(pl);
 
         // Navigator should take ownership of PlayList in this case
         // m_navigator->setPlayList(pl, true);
@@ -521,7 +521,7 @@ void MainWindow::processCommandLineOptions()
         }
     }
 
-    m_navigator->setPlayList(playList);
+    setPrimaryNavigatorPlayList(playList);
 }
 
 void MainWindow::promptToOpenImage()
@@ -547,8 +547,7 @@ void MainWindow::promptToOpenImage()
     defaultDir = firstFileInfo.absoluteDir().path();
 
     QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
-    // Navigator takes ownership of PlayList in this case
-    m_navigator->setPlayList(playList);
+    setPrimaryNavigatorPlayList(playList);
 }
 
 void MainWindow::promptToOpenDir()
@@ -574,8 +573,7 @@ void MainWindow::promptToOpenDir()
     }
 
     QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
-    // Navigator takes ownership of PlayList in this case
-    m_navigator->setPlayList(playList);
+    setPrimaryNavigatorPlayList(playList);
 }
 
 void MainWindow::promptToSaveImage()
@@ -989,6 +987,14 @@ void MainWindow::toggleSecondaryNavigator()
         QWidget *secondaryGraphicsView = m_secondaryMainGraphicsViewModel->view()->widget();
         secondaryGraphicsView->setVisible(willEnable);
     }
+}
+
+void MainWindow::setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist)
+{
+    m_navigator->setPlayList(playlist);
+
+    // Notify to clear image source cache
+    ImageSourceManager::instance()->clearCache();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *)

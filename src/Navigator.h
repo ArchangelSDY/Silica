@@ -20,10 +20,10 @@ public:
         ReverseDirection = 1,
     };
 
-    static const int MAX_PRELOAD = 5;
-    static const int FAST_AUTO_NAVIGATION_INTERVAL = 200;
-    static const int MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
-    static const int SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
+    static const int MAX_PRELOAD;
+    static const int FAST_AUTO_NAVIGATION_INTERVAL;
+    static const int MEDIUM_AUTO_NAVIGATION_INTERVAL;
+    static const int SLOW_AUTO_NAVIGATION_INTERVAL;
 
     explicit Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent = 0);
     ~Navigator();

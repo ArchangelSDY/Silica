@@ -9,7 +9,6 @@
 #include "image/sources/RARImageSourceFactory.h"
 #include "image/sources/SevenzImageSourceFactory.h"
 #include "image/sources/ZipImageSourceFactory.h"
-#include "image/Image.h"
 #include "sapi/ImageSourceFactoryDelegate.h"
 #include "sapi/IImageSourcePlugin.h"
 #include "sapi/PluginLoader.h"
@@ -149,8 +148,6 @@ void ImageSourceManager::clearCache()
             it != m_factories.end(); ++it) {
         it.value()->clearCache();
     }
-
-    Image::threadPool()->clear();
 }
 
 void ImageSourceManager::registerFactory(ImageSourceFactory *factory)

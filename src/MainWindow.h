@@ -64,6 +64,7 @@ private:
     void updateSidebarTitle();
     void switchViews();
     void toggleSecondaryNavigator();
+    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist);
 
     Ui::MainWindow *ui;
 
