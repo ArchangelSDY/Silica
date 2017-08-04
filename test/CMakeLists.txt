@@ -52,20 +52,6 @@ add_custom_command(TARGET silicatestcommon POST_BUILD
 )
 
 if (WIN32)
-    file(GLOB QT_LIB_FILES ${QT_ROOT}/bin/*.dll)
-    file(GLOB ZLIB_FILES ${ZLIB_INCLUDE_DIR}/../bin/*.dll)
-    set(OPENSSL_LIB_FILES ${OPENSSL_INCLUDE_DIR}/../lib/libeay32.dll ${OPENSSL_INCLUDE_DIR}/../lib/ssleay32.dll)
-
-    set(LIB_FILES ${QT_LIB_FILES} ${ZLIB_FILES} ${OPENSSL_LIB_FILES})
-
-    foreach(LIB_FILE ${LIB_FILES})
-        add_custom_command(TARGET silicatestcommon POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${LIB_FILE}
-            $<TARGET_FILE_DIR:silicatestcommon>/
-        )
-    endforeach()
-
     add_custom_command(TARGET silicatestcommon POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         $<TARGET_FILE:sapi>
@@ -90,4 +76,8 @@ foreach(TEST_FILE ${TEST_FILES})
     set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
     target_link_libraries(${TEST_TARGET} silicatestcommon)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+    if(WIN32)
+        set_property(TEST ${TEST_NAME} PROPERTY ENVIRONMENT "PATH=%PATH%\;${QT_ROOT}bin;${ZLIB_INCLUDE_DIR}/../bin;${OPENSSL_INCLUDE_DIR}/../lib")
+    endif(WIN32)
 endforeach(TEST_FILE)
