@@ -3,9 +3,38 @@
 #include <QThread>
 #include <QUrl>
 
+#include "deps/Qt7z/Qt7z/Qt7zFileInfo.h"
 #include "deps/Qt7z/Qt7z/Qt7zPackage.h"
 #include "SevenzImageSource.h"
 #include "SevenzImageSourceFactory.h"
+
+class SevenzImageSourceFactory::Client : public Qt7zPackage::Client
+{
+public:
+    Client(SevenzImageSourceFactory *factory) : m_factory(factory)
+    {
+    }
+
+    virtual void openPasswordRequired(QString & password) override
+    {
+        m_factory->requestPassword(password);
+        m_password = password;
+    }
+
+    virtual void extractPasswordRequired(QString & password) override
+    {
+        Q_UNREACHABLE();
+    }
+
+    QString password() const
+    {
+        return m_password;
+    }
+
+private:
+    SevenzImageSourceFactory *m_factory;
+    QString m_password;
+};
 
 FrequencyCache<QString, QSharedPointer<Qt7zPackage> >
     SevenzImageSourceFactory::m_packageCache(QThread::idealThreadCount());
@@ -34,6 +63,11 @@ QString SevenzImageSourceFactory::urlScheme() const
 
 ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
 {
+    return createSingle(url, QString());
+}
+
+ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url, const QString &password)
+{
     if (url.scheme() == urlScheme()) {
         QString imageName = url.fragment();
         QFileInfo imageFile(imageName);
@@ -44,7 +78,7 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url)
             sevenzUrl.setFragment("");
             QString sevenzPath = sevenzUrl.toLocalFile();
 
-            return new SevenzImageSource(this, sevenzPath, imageName);
+            return new SevenzImageSource(this, sevenzPath, imageName, password);
         } else {
             // Unsupported image format
             return 0;
@@ -79,16 +113,28 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         QString packagePath = fileUrl.toLocalFile();
 
         Qt7zPackage pkg(packagePath);
+        Client client(this);
+        pkg.setClient(&client);
         bool success = pkg.open();
 
         if (success) {
             QStringList fileNameList = pkg.getFileNameList();
+            QString password = client.password();
+
+            if (password.isEmpty() && !fileNameList.isEmpty()) {
+                Qt7zFileInfo firstFileInfo = pkg.fileInfoList().first();
+                if (firstFileInfo.isEncrypted) {
+                    if (!requestPassword(password)) {
+                        return imageSources;
+                    }
+                }
+            }
 
             foreach(const QString &name, fileNameList) {
                 QUrl imageUrl = url;
                 imageUrl.setFragment(name);
 
-                ImageSource *source = createSingle(imageUrl);
+                ImageSource *source = createSingle(imageUrl, password);
                 if (source) {
                     imageSources << source;
                 }

@@ -20,6 +20,7 @@ public:
     QString fileNamePattern() const;
     QString urlScheme() const;
     ImageSource *createSingle(const QUrl &url);
+    ImageSource *createSingle(const QUrl &url, const QString &password);
     ImageSource *createSingle(const QString &path);
     QList<ImageSource *> createMultiple(const QUrl &url);
     QList<ImageSource *> createMultiple(const QString &path);
@@ -27,6 +28,7 @@ public:
     void clearCache();
 
 private:
+    class Client;
     static FrequencyCache<QString, QSharedPointer<Qt7zPackage> > m_packageCache;
     static QMutex m_mutex;
 };

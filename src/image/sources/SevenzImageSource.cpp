@@ -1,6 +1,7 @@
 #include <QCryptographicHash>
 #include <QFile>
 #include <QFileInfo>
+#include <QMutexLocker>
 #include <QSharedPointer>
 #include <QTextStream>
 #include <QThread>
@@ -10,9 +11,34 @@
 #include "SevenzImageSource.h"
 #include "SevenzImageSourceFactory.h"
 
+class SevenzImageSourceClient : public Qt7zPackage::Client
+{
+public:
+    SevenzImageSourceClient(const QString &password) :
+        m_password(password)
+    {
+    }
+
+    virtual void openPasswordRequired(QString & password) override
+    {
+        password = m_password;
+    }
+
+    virtual void extractPasswordRequired(QString & password) override
+    {
+        password = m_password;
+    }
+
+private:
+    QString m_password;
+};
+
 SevenzImageSource::SevenzImageSource(ImageSourceFactory *factory,
-                                     QString packagePath, QString imageName) :
-    ImageSource(factory)
+                                     QString packagePath,
+                                     QString imageName,
+                                     QString password) :
+    ImageSource(factory) ,
+    m_password(password)
 {
     m_packagePath = findRealPath(packagePath);
     m_name = imageName;
@@ -46,16 +72,22 @@ bool SevenzImageSource::open()
 
     SevenzImageSourceFactory *factory =
         static_cast<SevenzImageSourceFactory *>(m_factory);
-    factory->m_mutex.lock();
-    QSharedPointer<Qt7zPackage> pkg = factory->m_packageCache.find(hash);
-    if (pkg.isNull()) {
-        pkg = QSharedPointer<Qt7zPackage>(new Qt7zPackage(m_packagePath));
-        pkg->open();
-        if (pkg->isOpen()) {
-           factory->m_packageCache.insert(hash, pkg);
+    QSharedPointer<Qt7zPackage> pkg;
+    {
+        QMutexLocker(&factory->m_mutex);
+        pkg = factory->m_packageCache.find(hash);
+        if (pkg.isNull()) {
+            pkg = QSharedPointer<Qt7zPackage>(new Qt7zPackage(m_packagePath), [](Qt7zPackage *pkg) {
+                delete pkg->client();
+                delete pkg;
+            });
+            pkg->setClient(new SevenzImageSourceClient(m_password));
+            pkg->open();
+            if (pkg->isOpen()) {
+               factory->m_packageCache.insert(hash, pkg);
+            }
         }
     }
-    factory->m_mutex.unlock();
 
     if (!pkg->isOpen()) {
         delete buffer;

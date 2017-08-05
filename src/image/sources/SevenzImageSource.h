@@ -11,7 +11,9 @@ class SevenzImageSource : public ImageSource
 {
 public:
     SevenzImageSource(ImageSourceFactory *factory,
-                      QString packagePath, QString imageName);
+                      QString packagePath,
+                      QString imageName,
+                      QString password);
 
     virtual bool open();
     virtual bool exists();
@@ -19,6 +21,7 @@ public:
     virtual bool copy(const QString &destPath);
 private:
     QString m_packagePath;
+    QString m_password;
 };
 
 #endif // SEVENZIMAGESOURCE_H
