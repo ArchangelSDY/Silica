@@ -32,7 +32,7 @@ void TestImageGalleryItem::load()
     QSignalSpy spy(&item, SIGNAL(readyToShow()));
     QCOMPARE(item.isReadyToShow(), false);
     item.load();
-    QVERIFY(spy.wait());
+    QVERIFY(spy.wait(60000));
     QCOMPARE(item.isReadyToShow(), true);
 }
 
