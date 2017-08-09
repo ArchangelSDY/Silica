@@ -40,6 +40,16 @@ QString ImageSource::findRealPath(QString path)
     return path;
 }
 
+bool ImageSource::requestPassword(const QString &archivePath, QString &password)
+{
+    return m_factory->requestPassword(archivePath, password);
+}
+
+void ImageSource::passwordAccepted(const QString &archivePath, const QString &password)
+{
+    m_factory->passwordAccepted(archivePath, password);
+}
+
 void ImageSource::close()
 {
     if (!m_device.isNull()) {

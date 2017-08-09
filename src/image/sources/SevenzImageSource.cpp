@@ -60,6 +60,8 @@ bool SevenzImageSource::open()
     QBuffer *buffer = new QBuffer();
     buffer->open(QIODevice::ReadWrite);
 
+    // TODO: Request password if required
+
     // Compute hash
     // Thread id should be taken into account because we internally take
     // advantage of `outBuffer` as cache and it SHOULD NOT be shared among

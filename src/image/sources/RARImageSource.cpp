@@ -40,7 +40,7 @@ bool RARImageSource::open()
         QtRARFileInfo info;
         file->fileInfo(&info);
         if (info.isEncrypted()) {
-            ImageSource::requestPassword(m_password);
+            ImageSource::requestPassword(m_arcPath, m_password);
         }
     }
 
@@ -53,6 +53,11 @@ bool RARImageSource::open()
     }
 
     m_device.reset(file);
+
+    if (ok && !m_password.isEmpty()) {
+        ImageSource::passwordAccepted(m_arcPath, m_password);
+    }
+
     return ok;
 }
 

@@ -50,6 +50,16 @@ file(GLOB CORE_SRCS
     "util/CvUtils.cpp"
 )
 
+if(WIN32)
+    set(CORE_SRCS ${CORE_SRCS}
+        "keychain/KeyChain_Win.cpp"
+    )
+else()
+    set(CORE_SRCS ${CORE_SRCS}
+        "keychain/KeyChain.cpp"
+    )
+endif()
+
 qt5_wrap_ui(CORE_UI_HEADERS
     "navigation/FixedRegionConfDialog.ui"
 )

@@ -11,13 +11,15 @@
 class SevenzImageSourceFactory::Client : public Qt7zPackage::Client
 {
 public:
-    Client(SevenzImageSourceFactory *factory) : m_factory(factory)
+    Client(SevenzImageSourceFactory *factory, const QString &packagePath) :
+        m_factory(factory),
+        m_packagePath(packagePath)
     {
     }
 
     virtual void openPasswordRequired(QString & password) override
     {
-        m_factory->requestPassword(password);
+        m_factory->requestPassword(m_packagePath, password);
         m_password = password;
     }
 
@@ -33,6 +35,7 @@ public:
 
 private:
     SevenzImageSourceFactory *m_factory;
+    QString m_packagePath;
     QString m_password;
 };
 
@@ -113,7 +116,7 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         QString packagePath = fileUrl.toLocalFile();
 
         Qt7zPackage pkg(packagePath);
-        Client client(this);
+        Client client(this, packagePath);
         pkg.setClient(&client);
         bool success = pkg.open();
 
@@ -124,10 +127,14 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
             if (password.isEmpty() && !fileNameList.isEmpty()) {
                 Qt7zFileInfo firstFileInfo = pkg.fileInfoList().first();
                 if (firstFileInfo.isEncrypted) {
-                    if (!requestPassword(password)) {
+                    if (!requestPassword(packagePath, password)) {
                         return imageSources;
                     }
                 }
+            }
+
+            if (!password.isEmpty()) {
+                passwordAccepted(packagePath, password);
             }
 
             foreach(const QString &name, fileNameList) {

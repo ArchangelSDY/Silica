@@ -1,8 +1,12 @@
 #include <QApplication>
+#include <QCryptographicHash>
+#include <QDebug>
 #include <QEventLoop>
 #include <QInputDialog>
 
+#include "Definitions.h"
 #include "ImageSourceManagerClientImpl.h"
+#include "keychain/KeyChain.h"
 
 class PasswordInputer : public QObject
 {
@@ -40,12 +44,19 @@ private:
 };
 
 ImageSourceManagerClientImpl::ImageSourceManagerClientImpl(QWidget *parent) :
-    m_parent(parent)
+    m_parent(parent) ,
+    m_keyChain(new KeyChain())
 {
 }
 
-bool ImageSourceManagerClientImpl::requestPassword(QString &password)
+bool ImageSourceManagerClientImpl::requestPassword(const QString &archivePath, QString &password)
 {
+    QByteArray savedPassword = m_keyChain->read(credentialKey(archivePath));
+    if (!savedPassword.isEmpty()) {
+        password.swap(QString::fromUtf8(savedPassword));
+        return true;
+    }
+
     PasswordInputer inputer(m_parent);
     inputer.moveToThread(QApplication::instance()->thread());
 
@@ -65,5 +76,19 @@ bool ImageSourceManagerClientImpl::requestPassword(QString &password)
     }
 }
 
+void ImageSourceManagerClientImpl::passwordAccepted(const QString &archivePath, const QString &password)
+{
+    QString key = credentialKey(archivePath);
+    if (!m_keyChain->write(key, password.toUtf8(), QString("%1: Archive Password").arg(g_BUILD_ENV))) {
+        qWarning() << m_keyChain->errorMessage();
+    }
+}
+
+QString ImageSourceManagerClientImpl::credentialKey(const QString &raw)
+{
+    QString hashContent = g_BUILD_ENV + raw;
+    QString hash = QString::fromUtf8(QCryptographicHash::hash(hashContent.toUtf8(), QCryptographicHash::Sha1).toBase64());
+    return QString("%1:archive=%2").arg(g_BUILD_ENV).arg(hash);
+}
 
 #include "ImageSourceManagerClientImpl.moc"

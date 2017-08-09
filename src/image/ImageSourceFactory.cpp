@@ -11,12 +11,19 @@ ImageSourceFactory::ImageSourceFactory(ImageSourceManager *mgr,
 {
 }
 
-bool ImageSourceFactory::requestPassword(QString &password)
+bool ImageSourceFactory::requestPassword(const QString &archivePath, QString &password)
 {
     if (m_mgr->m_client) {
-        return m_mgr->m_client->requestPassword(password);
+        return m_mgr->m_client->requestPassword(archivePath, password);
     } else {
         return false;
+    }
+}
+
+void ImageSourceFactory::passwordAccepted(const QString &archivePath, const QString &password)
+{
+    if (m_mgr->m_client) {
+        return m_mgr->m_client->passwordAccepted(archivePath, password);
     }
 }
 
