@@ -8,5 +8,6 @@ class KeyChain
 public:
     bool write(const QString &key, const QByteArray &data, const QString &comment);
     QByteArray read(const QString &key);
+    bool remove(const QString &key);
     QString errorMessage() const;
 };

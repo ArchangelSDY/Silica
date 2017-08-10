@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <QCryptographicHash>
 #include <QDebug>
 #include <QEventLoop>
 #include <QInputDialog>
@@ -84,11 +83,15 @@ void ImageSourceManagerClientImpl::passwordAccepted(const QString &archivePath, 
     }
 }
 
-QString ImageSourceManagerClientImpl::credentialKey(const QString &raw)
+void ImageSourceManagerClientImpl::passwordRejected(const QString &archivePath)
 {
-    QString hashContent = g_BUILD_ENV + raw;
-    QString hash = QString::fromUtf8(QCryptographicHash::hash(hashContent.toUtf8(), QCryptographicHash::Sha1).toBase64());
-    return QString("%1:archive=%2").arg(g_BUILD_ENV).arg(hash);
+    QString key = credentialKey(archivePath);
+    m_keyChain->remove(key);
+}
+
+QString ImageSourceManagerClientImpl::credentialKey(const QString &archivePath)
+{
+    return QString("%1:archive=%2").arg(g_BUILD_ENV).arg(archivePath);
 }
 
 #include "ImageSourceManagerClientImpl.moc"

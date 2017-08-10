@@ -50,13 +50,17 @@ bool RARImageSource::open()
         }
 
         ok = file->open(QIODevice::ReadOnly, m_password);
+
+        if (ok) {
+            ImageSource::passwordAccepted(m_arcPath, m_password);
+        } else {
+            // Though an open failure may not always due to wrong password, remove saved password aggressively
+            // won't harm too much
+            ImageSource::passwordRejected(m_arcPath);
+        }
     }
 
     m_device.reset(file);
-
-    if (ok && !m_password.isEmpty()) {
-        ImageSource::passwordAccepted(m_arcPath, m_password);
-    }
 
     return ok;
 }

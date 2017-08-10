@@ -27,6 +27,13 @@ void ImageSourceFactory::passwordAccepted(const QString &archivePath, const QStr
     }
 }
 
+void ImageSourceFactory::passwordRejected(const QString &archivePath)
+{
+    if (m_mgr->m_client) {
+        return m_mgr->m_client->passwordRejected(archivePath);
+    }
+}
+
 bool ImageSourceFactory::isValidFileName(const QString &name)
 {
     QStringList patterns = fileNamePattern().split(' ');

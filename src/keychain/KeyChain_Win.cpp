@@ -24,7 +24,7 @@ QByteArray KeyChain::read(const QString &key)
 {
     PCREDENTIALW cred;
 
-    if (!CredReadW((LPCWSTR)key.utf16(), CRED_TYPE_GENERIC, 9, &cred)) {
+    if (!CredReadW((LPCWSTR)key.utf16(), CRED_TYPE_GENERIC, 0, &cred)) {
         return QByteArray();
     }
 
@@ -32,6 +32,11 @@ QByteArray KeyChain::read(const QString &key)
     CredFree(cred);
 
     return result;
+}
+
+bool KeyChain::remove(const QString &key)
+{
+    return CredDeleteW((LPCWSTR)key.utf16(), CRED_TYPE_GENERIC, 0) == TRUE;
 }
 
 QString KeyChain::errorMessage() const

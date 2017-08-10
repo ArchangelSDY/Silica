@@ -93,6 +93,8 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
 
                 success = rar.open(QtRAR::OpenModeList, password);
                 if (!success) {
+                    passwordRejected(packagePath);
+
                     return imageSources;
                 }
 

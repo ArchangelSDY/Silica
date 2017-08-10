@@ -53,6 +53,7 @@ public:
 
     virtual bool requestPassword(const QString &archivePath, QString &password) = 0;
     virtual void passwordAccepted(const QString &archivePath, const QString &password) = 0;
+    virtual void passwordRejected(const QString &archivePath) = 0;
 };
 
 #endif // IMAGESOURCEMANAGER_H

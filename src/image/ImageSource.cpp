@@ -50,6 +50,11 @@ void ImageSource::passwordAccepted(const QString &archivePath, const QString &pa
     m_factory->passwordAccepted(archivePath, password);
 }
 
+void ImageSource::passwordRejected(const QString &archivePath)
+{
+    m_factory->passwordRejected(archivePath);
+}
+
 void ImageSource::close()
 {
     if (!m_device.isNull()) {

@@ -87,6 +87,11 @@ bool SevenzImageSource::open()
             pkg->open();
             if (pkg->isOpen()) {
                factory->m_packageCache.insert(hash, pkg);
+            } else {
+                if (!m_password.isEmpty()) {
+                    // Password is present but open failed, consider it wrong password
+                    passwordRejected(m_packagePath);
+                }
             }
         }
     }

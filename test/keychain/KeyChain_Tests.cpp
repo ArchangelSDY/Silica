@@ -13,7 +13,7 @@ class TestKeyChain : public STestCase
 {
     Q_OBJECT
 private slots:
-    void writeRead();
+    void writeReadRemove();
     void cleanup();
 
 private:
@@ -23,13 +23,15 @@ private:
 QString TestKeyChain::KEY = "silica-test-key-chain";
 
 #ifdef Q_OS_WIN
-void TestKeyChain::writeRead()
+void TestKeyChain::writeReadRemove()
 {
     KeyChain keyChain;
     QByteArray data("foobar");
 
     QVERIFY(keyChain.write(KEY, data, ""));
     QCOMPARE(keyChain.read(KEY), data);
+    QVERIFY(keyChain.remove(KEY));
+    QVERIFY(keyChain.read(KEY).isEmpty());
 }
 
 void TestKeyChain::cleanup()

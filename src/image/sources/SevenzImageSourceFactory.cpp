@@ -120,35 +120,42 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         pkg.setClient(&client);
         bool success = pkg.open();
 
-        if (success) {
-            QStringList fileNameList = pkg.getFileNameList();
-            QString password = client.password();
-
-            if (password.isEmpty() && !fileNameList.isEmpty()) {
-                Qt7zFileInfo firstFileInfo = pkg.fileInfoList().first();
-                if (firstFileInfo.isEncrypted) {
-                    if (!requestPassword(packagePath, password)) {
-                        return imageSources;
-                    }
-                }
+        if (!success) {
+            if (!client.password().isEmpty()) {
+                // Password is requested but open failed, consider it a wrong password
+                passwordRejected(packagePath);
             }
 
-            if (!password.isEmpty()) {
-                passwordAccepted(packagePath, password);
-            }
-
-            foreach(const QString &name, fileNameList) {
-                QUrl imageUrl = url;
-                imageUrl.setFragment(name);
-
-                ImageSource *source = createSingle(imageUrl, password);
-                if (source) {
-                    imageSources << source;
-                }
-            }
-
-            pkg.close();
+            return imageSources;
         }
+
+        QStringList fileNameList = pkg.getFileNameList();
+        QString password = client.password();
+
+        if (password.isEmpty() && !fileNameList.isEmpty()) {
+            Qt7zFileInfo firstFileInfo = pkg.fileInfoList().first();
+            if (firstFileInfo.isEncrypted) {
+                if (!requestPassword(packagePath, password)) {
+                    return imageSources;
+                }
+            }
+        }
+
+        if (!password.isEmpty()) {
+            passwordAccepted(packagePath, password);
+        }
+
+        foreach(const QString &name, fileNameList) {
+            QUrl imageUrl = url;
+            imageUrl.setFragment(name);
+
+            ImageSource *source = createSingle(imageUrl, password);
+            if (source) {
+                imageSources << source;
+            }
+        }
+
+        pkg.close();
     }
 
     return imageSources;

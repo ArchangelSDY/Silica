@@ -27,6 +27,7 @@ public:
 protected:
     bool requestPassword(const QString &archivePath, QString &password);
     void passwordAccepted(const QString &archivePath, const QString &password);
+    void passwordRejected(const QString &archivePath);
     bool isValidFileName(const QString &name);
 
     ImageSourceManager *m_mgr;
