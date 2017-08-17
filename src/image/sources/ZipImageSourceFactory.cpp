@@ -49,9 +49,31 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
     }
 }
 
-ImageSource *ZipImageSourceFactory::createSingle(const QString &)
+ImageSource *ZipImageSourceFactory::createSingle(const QString &packagePath)
 {
-    return 0;
+    if (!isValidFileName(packagePath)) {
+        return nullptr;
+    }
+
+    QuaZip zip(packagePath);
+    bool success = zip.open(QuaZip::mdUnzip);
+    if (!success) {
+        return nullptr;
+    }
+
+    QStringList fileNameList = zip.getFileNameList();
+    if (fileNameList.isEmpty()) {
+        return nullptr;
+    }
+
+    foreach(const QString &imageName, fileNameList) {
+        QFileInfo nameInfo(imageName);
+        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+            return new ZipImageSource(this, packagePath, imageName);
+        }
+    }
+
+    return nullptr;
 }
 
 QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)

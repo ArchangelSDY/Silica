@@ -55,9 +55,33 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
     }
 }
 
-ImageSource *RARImageSourceFactory::createSingle(const QString &)
+ImageSource *RARImageSourceFactory::createSingle(const QString &packagePath)
 {
-    return 0;
+    if (!isValidFileName(packagePath)) {
+        return nullptr;
+    }
+
+    QtRAR rar(packagePath);
+    bool success = rar.open(QtRAR::OpenModeList);
+
+    if (!success) {
+        return nullptr;
+    }
+
+    // TODO: Support password
+    if (rar.isHeadersEncrypted() || rar.isFilesEncrypted()) {
+        return nullptr;
+    }
+
+    QStringList fileNameList = rar.fileNameList();
+    foreach(const QString &imageName, fileNameList) {
+        QFileInfo nameInfo(imageName);
+        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+            return new RARImageSource(this, packagePath, imageName, QByteArray());
+        }
+    }
+
+    return nullptr;
 }
 
 QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
