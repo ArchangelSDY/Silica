@@ -25,8 +25,8 @@ void TestImageGalleryItem::load()
     QFETCH(AbstractRendererFactory *, rendererFactory);
     QFETCH(QString, imagePath);
 
-    ImageSource *src = ImageSourceManager::instance()->createSingle(imagePath);
-    ImagePtr image = ImagePtr::create(src);
+    QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(imagePath));
+    ImagePtr image(new Image(src));
 
     ImageGalleryItem item(image, rendererFactory);
     QSignalSpy spy(&item, SIGNAL(readyToShow()));

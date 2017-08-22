@@ -283,7 +283,7 @@ Image::Image(const QUrl &url, QObject *parent) :
             this, SLOT(onThumbnailLoadFailed()));
 }
 
-Image::Image(ImageSource *imageSource, QObject *parent) :
+Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,

@@ -177,9 +177,9 @@ void TestLocalDatabase::playListUpdate()
 void TestLocalDatabase::insertImagesToPlayList()
 {
     ImagePtr imageA(new Image(
-        ImageSourceManager::instance()->createSingle(":/assets/me.jpg")));
+        QSharedPointer<ImageSource>(ImageSourceManager::instance()->createSingle(":/assets/me.jpg"))));
     ImagePtr imageB(new Image(
-        ImageSourceManager::instance()->createSingle(":/assets/silica.png")));
+        QSharedPointer<ImageSource>(ImageSourceManager::instance()->createSingle(":/assets/silica.png"))));
 
     auto pl = QSharedPointer<PlayList>::create();
     pl->append(imageA);

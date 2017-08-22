@@ -77,7 +77,7 @@ void TestPlayList::sortByName()
 
     PlayList pl;
     foreach (const QString &name, unsortedNames) {
-        pl << QSharedPointer<Image>::create(new MockImageSource(name));
+        pl << QSharedPointer<Image>(new Image(QSharedPointer<ImageSource>(new MockImageSource(name))));
     }
 
     pl.sortByName();

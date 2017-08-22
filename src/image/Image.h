@@ -19,7 +19,7 @@ class Image : public QObject
 public:
     explicit Image(const QString &path, QObject *parent = 0);
     explicit Image(const QUrl &url, QObject *parent = 0);
-    explicit Image(ImageSource *, QObject *parent = 0);
+    explicit Image(QSharedPointer<ImageSource> imageSource, QObject *parent = 0);
     ~Image();
 
     enum Status {

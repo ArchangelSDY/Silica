@@ -5,6 +5,7 @@
 
 #include "image/Image.h"
 #include "image/ImageHistogram.h"
+#include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
@@ -91,10 +92,9 @@ void PlayList::clear()
 
 ImagePtr PlayList::addSinglePath(const QString &path)
 {
-    ImageSource *imageSource =
-        ImageSourceManager::instance()->createSingle(path);
+    QSharedPointer<ImageSource> imageSource(ImageSourceManager::instance()->createSingle(path));
     if (imageSource) {
-        ImagePtr image = ImagePtr::create(imageSource);
+        ImagePtr image(new Image(imageSource));
         *this << image;
         return image;
     } else {
@@ -108,10 +108,9 @@ ImagePtr PlayList::addSinglePath(const QUrl &url)
         return ImagePtr();
     }
 
-    ImageSource *imageSource =
-        ImageSourceManager::instance()->createSingle(url);
+    QSharedPointer<ImageSource> imageSource(ImageSourceManager::instance()->createSingle(url));
     if (imageSource) {
-        ImagePtr image = ImagePtr::create(imageSource);
+        ImagePtr image(new Image(imageSource));
         *this << image;
         return image;
     } else {
@@ -124,7 +123,7 @@ void PlayList::addMultiplePath(const QString &path)
     QList<ImageSource *> imageSources =
         ImageSourceManager::instance()->createMultiple(path);
     foreach (ImageSource *imageSource, imageSources) {
-        *this << QSharedPointer<Image>(new Image(imageSource));
+        *this << QSharedPointer<Image>(new Image(QSharedPointer<ImageSource>(imageSource)));
     }
 }
 
@@ -137,7 +136,7 @@ void PlayList::addMultiplePath(const QUrl &url)
     QList<ImageSource *> imageSources =
         ImageSourceManager::instance()->createMultiple(url);
     foreach (ImageSource *imageSource, imageSources) {
-        *this << QSharedPointer<Image>(new Image(imageSource));
+        *this << QSharedPointer<Image>(new Image(QSharedPointer<ImageSource>(imageSource)));
     }
 }
 

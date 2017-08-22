@@ -10,6 +10,7 @@
 #include <QUrl>
 #include <QVariantHash>
 
+#include "image/ImageSource.h"
 #include "Definitions.h"
 #include "GlobalConfig.h"
 #include "PlayList.h"
@@ -115,6 +116,7 @@ void GlobalConfig::load()
     qRegisterMetaType<QList<QUrl> >("QList<QUrl>");
     qRegisterMetaType<QList<QVariantHash> >("QList<QVariantHash>");
     qRegisterMetaType<QSharedPointer<PlayList> >("QSharedPointer<PlayList>");
+    qRegisterMetaType<QSharedPointer<ImageSource> >("QSharedPointer<ImageSource>");
 
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");

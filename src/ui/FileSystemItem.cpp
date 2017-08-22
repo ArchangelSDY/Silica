@@ -46,13 +46,11 @@ public:
             bool found = false;
             while (dirIter.hasNext()) {
                 QString path = dirIter.next();
-                ImageSource *src = ImageSourceManager::instance()->createSingle(
-                    path);
+                QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(path));
                 if (src) {
                     emit markIsDefaultFolderCover(false);
-                    emit loadCover(path);
+                    emit loadCover(src);
                     found = true;
-                    delete src;
                     break;
                 }
             }
@@ -65,12 +63,10 @@ public:
         } else {
             // Individual file
             QString path = m_pathInfo.absoluteFilePath();
-            ImageSource *src =
-                ImageSourceManager::instance()->createSingle(path);
+            QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(path));
             if (src) {
                 // Load thumbnail for image file
-                emit loadCover(path);
-                delete src;
+                emit loadCover(src);
             } else {
                 // Not valid image
                 emit gotThumbnail(":/res/image.png");
@@ -81,7 +77,7 @@ public:
 signals:
     void markIsDefaultFolderCover(bool isDefault);
     void gotThumbnail(QString path);
-    void loadCover(QString path);
+    void loadCover(QSharedPointer<ImageSource> imageSource);
 
 private:
     QFileInfo m_pathInfo;
@@ -101,7 +97,7 @@ FileSystemItem::FileSystemItem(const QString &path,
                                QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
     m_pathInfo(QFileInfo(path)) ,
-    m_coverImage(0) ,
+    m_coverImage(nullptr) ,
     m_useDefaultFolderCover(true)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -111,9 +107,6 @@ FileSystemItem::FileSystemItem(const QString &path,
 
 FileSystemItem::~FileSystemItem()
 {
-    if (m_coverImage) {
-        m_coverImage->deleteLater();
-    }
 }
 
 QString FileSystemItem::name() const
@@ -154,8 +147,8 @@ void FileSystemItem::load()
                 this, SLOT(markIsDefaultFolderCover(bool)));
         connect(r, SIGNAL(gotThumbnail(QString)),
                 this, SLOT(gotThumbnail(QString)));
-        connect(r, SIGNAL(loadCover(QString)),
-                this, SLOT(loadCover(QString)));
+        connect(r, SIGNAL(loadCover(QSharedPointer<ImageSource>)),
+                this, SLOT(loadCover(QSharedPointer<ImageSource>)));
         threadPool()->start(r);
     }
 }
@@ -192,8 +185,7 @@ void FileSystemItem::coverThumbnailLoaded()
     }
     g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
-    m_coverImage->deleteLater();
-    m_coverImage = 0;
+    m_coverImage.reset();
 }
 
 void FileSystemItem::coverThumbnailLoadFailed()
@@ -201,17 +193,15 @@ void FileSystemItem::coverThumbnailLoadFailed()
     QImage *coverImage = new QImage(":/res/image.png");
     g_coverCache.insert(coverCacheKey(), coverImage);
     setThumbnail(new QImage(*coverImage));
-    m_coverImage->deleteLater();
-    m_coverImage = 0;
+    m_coverImage.reset();
 }
 
-void FileSystemItem::loadCover(QString path)
+void FileSystemItem::loadCover(QSharedPointer<ImageSource> imageSource)
 {
-    ImageSource *src = ImageSourceManager::instance()->createSingle(path);
-    m_coverImage = new Image(src);
-    connect(m_coverImage, SIGNAL(thumbnailLoaded()),
+    m_coverImage.reset(new Image(imageSource));
+    connect(m_coverImage.data(), SIGNAL(thumbnailLoaded()),
             this, SLOT(coverThumbnailLoaded()));
-    connect(m_coverImage, SIGNAL(thumbnailLoadFailed()),
+    connect(m_coverImage.data(), SIGNAL(thumbnailLoadFailed()),
             this, SLOT(coverThumbnailLoadFailed()));
     m_coverImage->loadThumbnail(true);
 }
