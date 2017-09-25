@@ -14,6 +14,7 @@ public:
     GamepadController(MainWindow *mainWindow);
 
 private slots:
+    void buttonR1Changed(bool pressed);
     void buttonL2Changed(bool pressed);
     void buttonR2Changed(bool pressed);
     void buttonLeftChanged(bool pressed);
@@ -25,6 +26,7 @@ private slots:
     void buttonBChanged(bool pressed);
     void buttonSelectChanged(bool pressed);
     void axisLeftScroll(int dx, int dy);
+    void axisRightScroll(int dx, int dy);
 
 private:
     MainWindow *m_mainWindow;
@@ -34,4 +36,5 @@ private:
     QTime m_gamepadLastL2;
     QTime m_gamepadLastR2;
     QScopedPointer<GamepadAxisScroller> m_axisLeftScroller;
+    QScopedPointer<GamepadAxisScroller> m_axisRightScroller;
 };
