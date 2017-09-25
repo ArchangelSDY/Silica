@@ -24,6 +24,8 @@ file(GLOB SILICA_UI_SRCS
     "ui/ViewState.cpp"
     "ui/ViewStateManager.cpp"
     "ui/hotspots/*.cpp"
+    "ui/gamepad/GamepadAxisScroller.cpp"
+    "ui/gamepad/GamepadController.cpp"
     "ui/renderers/*.cpp"
     "MainWindow.cpp"
 )
@@ -42,7 +44,11 @@ file(GLOB SILICA_UIS
 qt5_wrap_ui(SILICA_UI_HEADERS ${SILICA_UIS})
 
 set(SILICA_UI_SRCS ${SILICA_UI_SRCS} ${SILICA_UI_HEADERS} ${DEFINITION_SRCS})
-set(SILICA_UI_LIBS sapi silicacoreobjs)
+set(SILICA_UI_LIBS
+    sapi
+    silicacoreobjs
+    Qt5::Gamepad
+)
 
 if (WIN32)
     find_library(D2D1_LIB "d2d1" ${WINDOWSSDK_LIB_DIRS})

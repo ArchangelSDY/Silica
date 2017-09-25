@@ -53,6 +53,11 @@ void MainGraphicsView::setFitInView(const QRectF &rect, Qt::AspectRatioMode aspe
     QGraphicsView::fitInView(rect, aspectRatioMode);
 }
 
+void MainGraphicsView::scroll(int dx, int dy)
+{
+    QGraphicsView::scroll(dx, dy);
+}
+
 bool MainGraphicsView::isVisible() const
 {
     return QGraphicsView::isVisible();

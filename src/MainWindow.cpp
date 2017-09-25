@@ -27,6 +27,7 @@
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
+#include "ui/gamepad/GamepadController.h"
 #include "ui/models/MainGraphicsViewModel.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
@@ -125,6 +126,9 @@ MainWindow::MainWindow(QWidget *parent) :
     // Navigation binding for gallery
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
+
+    // Gamepad
+    m_gamepadController.reset(new GamepadController(this));
 
     processCommandLineOptions();
 }
@@ -950,6 +954,72 @@ void MainWindow::switchViews()
     int nextIndex = (currentIndex + 1) % m_toolBarActs->actions().count();
     QAction *nextAct = m_toolBarActs->actions()[nextIndex];
     nextAct->trigger();
+}
+
+void MainWindow::moveCursor(Qt::Key direction)
+{
+    GalleryView *galleryView = nullptr;
+    const int *moveOffset; // Up, Right, Down, Left
+    if (ui->stackedViews->currentWidget() == ui->pageFav) {
+        // Play list view
+        galleryView = ui->playListGallery;
+        static const int PLAY_LIST_MOVE_OFFSET[] = { 50, 1, 50, 1 };
+        moveOffset = PLAY_LIST_MOVE_OFFSET;
+    } else if (ui->stackedViews->currentWidget() == ui->pageFileSystem) {
+        // File system view
+        galleryView = ui->fsView;
+        static const int FILE_SYSTEM_MOVE_OFFSET[] = { 1, 1, 1, 1 };
+        moveOffset = FILE_SYSTEM_MOVE_OFFSET;
+    } else if (ui->stackedViews->currentWidget() == ui->pageGallery) {
+        // Gallery view
+        galleryView = ui->gallery;
+        static const int GALLERY_MOVE_OFFSET[] = { 1, 1, 1, 1 };
+        moveOffset = GALLERY_MOVE_OFFSET;
+    } else {
+        return;
+    }
+
+    QGraphicsScene *scene = galleryView->scene();
+    QList<GalleryItem *> selectedItems = galleryView->selectedGalleryItems();
+    QGraphicsItem *nextItem = nullptr;
+    if (selectedItems.count() == 0) {
+        QList<GalleryItem *> items = galleryView->galleryItems();
+        if (!items.isEmpty()) {
+            nextItem = items.first();
+        }
+    } else if (selectedItems.count() == 1) {
+        GalleryItem *selectedItem = selectedItems[0];
+        QSizeF size = selectedItem->boundingRect().size();
+        QPointF pos = selectedItem->scenePos();
+
+        QPointF nextPos;
+        switch (direction)
+        {
+        case Qt::Key_Up:
+            nextPos = QPointF(pos.x() + size.width() / 2, pos.y() - moveOffset[0]);
+            break;
+        case Qt::Key_Right:
+            nextPos = QPointF(pos.x() + size.width() + moveOffset[1], pos.y() + size.height() / 2);
+            break;
+        case Qt::Key_Down:
+            nextPos = QPointF(pos.x() + size.width() / 2, pos.y() + size.height() + moveOffset[2]);
+            break;
+        case Qt::Key_Left:
+            nextPos = QPointF(pos.x() - moveOffset[3], pos.y() + size.height() / 2);
+            break;
+        default:
+            return;
+        }
+
+        nextItem = scene->itemAt(nextPos, QTransform());
+    }
+
+    if (nextItem) {
+        scene->clearSelection();
+        nextItem->setSelected(true);
+        Q_ASSERT(!scene->views().isEmpty());
+        scene->views()[0]->ensureVisible(nextItem);
+    }
 }
 
 void MainWindow::toggleSecondaryNavigator()

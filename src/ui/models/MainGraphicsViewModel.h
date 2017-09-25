@@ -37,6 +37,7 @@ public:
         virtual void setViewportRect(const QRect &rect) = 0;;
         virtual void setTransform(const QTransform &transform) = 0;
         virtual void setFitInView(const QRectF & rect, Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio) = 0;
+        virtual void scroll(int dx, int dy) = 0;
         virtual bool isVisible() const = 0;
         virtual QSize viewSize() const = 0;
         virtual QRectF viewportRect() const = 0;
@@ -59,6 +60,7 @@ public:
     void fitGridInView(int grid);
     void fitInViewIfNecessary();
     void toggleFitInView();
+    void scroll(int dx, int dy);
     void rotate(qreal angle);
 
     // HotspotsEditor *hotspotsEditor();

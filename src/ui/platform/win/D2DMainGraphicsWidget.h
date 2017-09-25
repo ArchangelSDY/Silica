@@ -45,6 +45,7 @@ private:
     void centerOn(const QPointF &center);
     void scale(qreal sx, qreal sy);
     void scroll(qreal dx, qreal dy);
+    virtual void scroll(int dx, int dy);
 
     QPointF drawOffset() const;
 

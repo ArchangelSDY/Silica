@@ -16,12 +16,13 @@ class MainWindow;
 
 class ImagesCache;
 class ImagePathCorrector;
+class GamepadController;
 class MainGraphicsViewModel;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
+    friend class GamepadController;
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -63,6 +64,7 @@ private:
 
     void updateSidebarTitle();
     void switchViews();
+    void moveCursor(Qt::Key direction);
     void toggleSecondaryNavigator();
     void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist);
 
@@ -94,6 +96,8 @@ private:
         KEY_STATE_SHARE,
     };
     KeyState m_keyState;
+
+    QScopedPointer<GamepadController> m_gamepadController;
 };
 
 #endif // MAINWINDOW_H

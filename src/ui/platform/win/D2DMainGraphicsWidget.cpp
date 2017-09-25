@@ -137,6 +137,11 @@ void D2DMainGraphicsWidget::scale(qreal sx, qreal sy)
     setTransform(transform);
 }
 
+void D2DMainGraphicsWidget::scroll(int dx, int dy)
+{
+    scroll((qreal)dx, (qreal)dy);
+}
+
 // Scroll viewport
 // Note that dx, dy are relative to actual view.
 void D2DMainGraphicsWidget::scroll(qreal dx, qreal dy)

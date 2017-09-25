@@ -34,6 +34,7 @@ private:
     virtual void setViewportRect(const QRect &rect);
     virtual void setTransform(const QTransform &transform);
     virtual void setFitInView(const QRectF & rect, Qt::AspectRatioMode aspectRatioMode = Qt::IgnoreAspectRatio);
+    virtual void scroll(int dx, int dy);
     virtual QSize viewSize() const;
     virtual QRectF viewportRect() const;
     virtual QTransform transform() const;

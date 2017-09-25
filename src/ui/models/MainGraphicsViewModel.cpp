@@ -285,6 +285,11 @@ void MainGraphicsViewModel::toggleFitInView()
     m_fitInView = static_cast<MainGraphicsViewModel::FitMode>((static_cast<int>(m_fitInView) + 1) % 3);
 }
 
+void MainGraphicsViewModel::scroll(int dx, int dy)
+{
+    m_view->scroll(dx, dy);
+}
+
 void MainGraphicsViewModel::rotate(qreal angle)
 {
     QTransform transform = m_view->transform();
