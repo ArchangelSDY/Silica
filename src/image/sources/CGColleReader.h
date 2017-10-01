@@ -1,45 +1,17 @@
-#ifndef CGCOLLEREADER_H
-#define CGCOLLEREADER_H
+#pragma once
 
-#include <QByteArray>
-#include <QFile>
-#include <QHash>
-#include <QStringList>
+#include <QString>
 
 class CGColleReader
 {
 public:
-    class CGColleImage
-    {
-    public:
-        QString name;
-        uint32_t id;
-        uint32_t mainFrameId;
-        uint32_t size;
-        uint32_t offset;
-    };
+    virtual ~CGColleReader() {}
 
-    CGColleReader(const QString &packagePath);
-    ~CGColleReader();
+    virtual bool open() = 0;
+    virtual void close() = 0;
 
-    bool open();
-    void close();
+    virtual QByteArray read(const QString &imageName) = 0;
+    virtual QStringList imageNames() const = 0;
 
-    QByteArray read(const QString &imageName);
-    QByteArray read(uint32_t id);
-    QStringList imageNames() const;
-
-private:
-    bool isValidFormat() const;
-    bool scanMeta();
-    uchar *seekChunk(const char chunkName[4]);
-    void clear();
-
-    QFile m_file;
-    uchar *m_data;
-    QStringList m_imageNames;
-    QHash<QString, CGColleImage *> m_imagesByName;
-    QList<CGColleImage *> m_images;
+    static CGColleReader *create(const QString &path);
 };
-
-#endif // CGCOLLEREADER_H

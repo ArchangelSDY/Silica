@@ -65,11 +65,11 @@ QList<ImageSource *> CGColleImageSourceFactory::createMultiple(const QUrl &url)
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
 
-        CGColleReader package(packagePath);
-        bool success = package.open();
+        QScopedPointer<CGColleReader> package(CGColleReader::create(packagePath));
+        bool success = package->open();
 
         if (success) {
-            QStringList imageNames = package.imageNames();
+            QStringList imageNames = package->imageNames();
 
             foreach(const QString &name, imageNames) {
                 QUrl imageUrl = url;
@@ -81,7 +81,7 @@ QList<ImageSource *> CGColleImageSourceFactory::createMultiple(const QUrl &url)
                 }
             }
 
-            package.close();
+            package->close();
         }
     }
 

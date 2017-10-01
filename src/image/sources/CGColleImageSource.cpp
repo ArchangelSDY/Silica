@@ -28,15 +28,15 @@ CGColleImageSource::CGColleImageSource(ImageSourceFactory *factory,
 
 bool CGColleImageSource::open()
 {
-    CGColleReader package(m_packagePath);
-    if (package.open()) {
+    QScopedPointer<CGColleReader> package(CGColleReader::create(m_packagePath));
+    if (package->open()) {
         m_device.reset(new QBuffer());
         if (!m_device->open(QIODevice::ReadWrite)) {
             m_device.reset();
             return false;
         }
 
-        m_device->write(package.read(m_name));
+        m_device->write(package->read(m_name));
         m_device->reset();
         return true;
     } else {

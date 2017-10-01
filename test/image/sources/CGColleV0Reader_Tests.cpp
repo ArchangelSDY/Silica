@@ -1,9 +1,9 @@
 #include <QTest>
 
 #include "STestCase.h"
-#include "../../../src/image/sources/CGColleReader.h"
+#include "../../../src/image/sources/CGColleV0Reader.h"
 
-class TestCGColleReader : public STestCase
+class TestCGColleV0Reader : public STestCase
 {
     Q_OBJECT
 private slots:
@@ -14,12 +14,12 @@ private slots:
 
 };
 
-void TestCGColleReader::imageNames()
+void TestCGColleV0Reader::imageNames()
 {
     QFETCH(QString, res);
     QFETCH(QStringList, imageNames);
 
-    CGColleReader reader(res);
+    CGColleV0Reader reader(res);
     QVERIFY(reader.open());
 
     QStringList actImageNames = reader.imageNames();
@@ -30,21 +30,21 @@ void TestCGColleReader::imageNames()
     }
 }
 
-void TestCGColleReader::imageNames_data()
+void TestCGColleV0Reader::imageNames_data()
 {
     QTest::addColumn<QString>("res");
     QTest::addColumn<QStringList>("imageNames");
 
     QTest::newRow("Normal")
-        << ":/assets/pack.cgc"
+        << ":/assets/pack-v0.cgc"
         << (QStringList() << "cg_1_1.png" << "cg_1_2.png");
 }
 
-void TestCGColleReader::read()
+void TestCGColleV0Reader::read()
 {
     QFETCH(QString, res);
 
-    CGColleReader reader(res);
+    CGColleV0Reader reader(res);
     QVERIFY(reader.open());
 
     QStringList imageNames = reader.imageNames();
@@ -54,14 +54,14 @@ void TestCGColleReader::read()
     }
 }
 
-void TestCGColleReader::read_data()
+void TestCGColleV0Reader::read_data()
 {
     QTest::addColumn<QString>("res");
 
     QTest::newRow("Normal")
-        << ":/assets/pack.cgc";
+        << ":/assets/pack-v0.cgc";
 }
 
 
-QTEST_MAIN(TestCGColleReader)
-#include "CGColleReader_Tests.moc"
+QTEST_MAIN(TestCGColleV0Reader)
+#include "CGColleV0Reader_Tests.moc"
