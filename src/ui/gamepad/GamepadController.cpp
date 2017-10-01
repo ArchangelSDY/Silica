@@ -15,6 +15,7 @@ GamepadController::GamepadController(MainWindow *mainWindow) :
     connect(&m_gamepad, &QGamepad::buttonR1Changed, this, &GamepadController::buttonR1Changed);
     connect(&m_gamepad, &QGamepad::buttonL2Changed, this, &GamepadController::buttonL2Changed);
     connect(&m_gamepad, &QGamepad::buttonR2Changed, this, &GamepadController::buttonR2Changed);
+    connect(&m_gamepad, &QGamepad::buttonXChanged, this, &GamepadController::buttonXChanged);
     connect(&m_gamepad, &QGamepad::buttonYChanged, this, &GamepadController::buttonYChanged);
     connect(&m_gamepad, &QGamepad::buttonAChanged, this, &GamepadController::buttonAChanged);
     connect(&m_gamepad, &QGamepad::buttonBChanged, this, &GamepadController::buttonBChanged);
@@ -102,7 +103,7 @@ void GamepadController::buttonDownChanged(bool pressed)
     }
 }
 
-void GamepadController::buttonYChanged(bool pressed)
+void GamepadController::buttonXChanged(bool pressed)
 {
     if (pressed) {
         m_mainWindow->m_mainGraphicsViewModel->toggleFitInView();
@@ -111,6 +112,17 @@ void GamepadController::buttonYChanged(bool pressed)
         if (!m_mainWindow->m_secondaryMainGraphicsViewModel.isNull()) {
             m_mainWindow->m_secondaryMainGraphicsViewModel->toggleFitInView();
             m_mainWindow->m_secondaryMainGraphicsViewModel->fitInViewIfNecessary();
+        }
+    }
+}
+
+void GamepadController::buttonYChanged(bool pressed)
+{
+    if (pressed) {
+        auto *ui = m_mainWindow->ui;
+        QWidget *currentWidget = ui->stackedViews->currentWidget();
+        if (currentWidget == ui->pageImageView) {
+            m_mainWindow->m_navigator->goPrev();
         }
     }
 }

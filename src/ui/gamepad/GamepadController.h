@@ -21,6 +21,7 @@ private slots:
     void buttonRightChanged(bool pressed);
     void buttonUpChanged(bool pressed);
     void buttonDownChanged(bool pressed);
+    void buttonXChanged(bool pressed);
     void buttonYChanged(bool pressed);
     void buttonAChanged(bool pressed);
     void buttonBChanged(bool pressed);
