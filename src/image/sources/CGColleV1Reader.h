@@ -17,7 +17,7 @@ public:
     virtual bool open() override;
     virtual void close() override;
 
-    virtual QByteArray read(const QString &imageName) override;
+    virtual CGColleReader::ImageReader *createReader(const QString &imageName) override;
     virtual QStringList imageNames() const override;
 
     static bool isValidFormat(const QString &path);
@@ -29,7 +29,6 @@ private:
     void clear();
 
     QFile m_file;
-    uchar *m_data;
     uint32_t m_dataStart;
     QStringList m_imageNames;
     QHash<QString, CGColleV1Image *> m_imagesByName;

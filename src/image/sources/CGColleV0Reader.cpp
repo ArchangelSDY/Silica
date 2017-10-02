@@ -4,6 +4,67 @@
 #include <QImage>
 #include <QPainter>
 
+class CGColleV0ImageReader : public CGColleReader::ImageReader
+{
+public:
+    CGColleV0ImageReader(const QString &packagePath,
+                         bool isBase,
+                         uint32_t dataPos,
+                         uint32_t dataSize,
+                         uint32_t baseDataPos,
+                         uint32_t baseDataSize) :
+        m_packagePath(packagePath),
+        m_isBase(isBase),
+        m_dataPos(dataPos),
+        m_dataSize(dataSize),
+        m_baseDataPos(baseDataPos),
+        m_baseDataSize(baseDataSize)
+    {
+    }
+    
+    virtual QByteArray read() override;
+
+private:
+    QString m_packagePath;
+    bool m_isBase;
+    uint32_t m_dataPos;
+    uint32_t m_dataSize;
+    uint32_t m_baseDataPos;
+    uint32_t m_baseDataSize;
+    uint32_t m_offsetX;
+    uint32_t m_offsetY;
+};
+
+QByteArray CGColleV0ImageReader::read()
+{
+    QFile f(m_packagePath);
+    if (!f.open(QIODevice::ReadOnly)) {
+        return QByteArray();
+    }
+
+    uchar *ptr = f.map(0, f.size());
+
+    if (m_isBase) {
+        // Base frame
+        return QByteArray(reinterpret_cast<const char *>(ptr + m_dataPos), m_dataSize);
+    } else {
+        // Layer frame
+        QImage frame = QImage::fromData(ptr + m_baseDataPos, m_baseDataSize);
+        QImage subFrame = QImage::fromData(ptr + m_dataPos, m_dataSize);
+
+        QPainter painter(&frame);
+        painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
+        painter.drawImage(QPointF(), subFrame);
+
+        QByteArray frameData;
+        QBuffer buf(&frameData);
+        buf.open(QIODevice::WriteOnly);
+        frame.save(&buf, "BMP");
+
+        return frameData;
+    }
+}
+
 CGColleV0Reader::CGColleV0Reader(const QString &packagePath) :
     m_file(packagePath)
 {
@@ -149,34 +210,35 @@ void CGColleV0Reader::close()
     m_file.close();
 }
 
-QByteArray CGColleV0Reader::read(const QString &imageName)
+CGColleReader::ImageReader *CGColleV0Reader::createReader(const QString &imageName)
 {
     auto it = m_imagesByName.find(imageName);
     if (it == m_imagesByName.end()) {
-        return QByteArray();
+        return nullptr;
     }
 
     CGColleImage *imageMeta = *it;
     if (imageMeta->id == imageMeta->mainFrameId) {
         // Main frame
-        return QByteArray(reinterpret_cast<const char *>(m_data + imageMeta->offset), imageMeta->size);
+        return new CGColleV0ImageReader(
+            m_file.fileName(),
+            true,
+            imageMeta->offset,
+            imageMeta->size,
+            0,
+            0
+        );
     } else {
         // Sub frame
         CGColleImage *mainFrameMeta = m_images[imageMeta->mainFrameId];
-
-        QImage frame = QImage::fromData(m_data + mainFrameMeta->offset, mainFrameMeta->size);
-        QImage subFrame = QImage::fromData(m_data + imageMeta->offset, imageMeta->size);
-
-        QPainter painter(&frame);
-        painter.setCompositionMode(QPainter::RasterOp_SourceXorDestination);
-        painter.drawImage(QPointF(), subFrame);
-
-        QByteArray frameData;
-        QBuffer buf(&frameData);
-        buf.open(QIODevice::WriteOnly);
-        frame.save(&buf, "BMP");
-
-        return frameData;
+        return new CGColleV0ImageReader(
+            m_file.fileName(),
+            false,
+            imageMeta->offset,
+            imageMeta->size,
+            mainFrameMeta->offset,
+            mainFrameMeta->size
+        );
     }
 }
 

@@ -8,8 +8,9 @@
 #include "CGColleReader.h"
 
 CGColleImageSource::CGColleImageSource(ImageSourceFactory *factory,
-                                       QString packagePath, QString imageName) :
-    ImageSource(factory)
+                                       QString packagePath, QString imageName, CGColleReader::ImageReader *reader) :
+    ImageSource(factory) ,
+    m_reader(reader)
 {
     m_packagePath = findRealPath(packagePath);
     m_name = imageName;
@@ -28,20 +29,16 @@ CGColleImageSource::CGColleImageSource(ImageSourceFactory *factory,
 
 bool CGColleImageSource::open()
 {
-    QScopedPointer<CGColleReader> package(CGColleReader::create(m_packagePath));
-    if (package->open()) {
-        m_device.reset(new QBuffer());
-        if (!m_device->open(QIODevice::ReadWrite)) {
-            m_device.reset();
-            return false;
-        }
-
-        m_device->write(package->read(m_name));
-        m_device->reset();
-        return true;
-    } else {
+    Q_ASSERT(!m_reader.isNull());
+    m_device.reset(new QBuffer());
+    if (!m_device->open(QIODevice::ReadWrite)) {
+        m_device.reset();
         return false;
     }
+
+    m_device->write(m_reader->read());
+    m_device->reset();
+    return true;
 }
 
 bool CGColleImageSource::exists()

@@ -35,7 +35,15 @@ ImageSource *CGColleImageSourceFactory::createSingle(const QUrl &url)
         packageUrl.setFragment("");
         QString packagePath = packageUrl.toLocalFile();
 
-        return new CGColleImageSource(this, packagePath, imageName);
+        QScopedPointer<CGColleReader> package(CGColleReader::create(packagePath));
+        if (package->open()) {
+            CGColleReader::ImageReader *reader = package->createReader(imageName);
+            if (reader) {
+                return new CGColleImageSource(this, packagePath, imageName, reader);
+            }
+        }
+
+        return nullptr;
     } else {
         return 0;
     }
@@ -72,10 +80,7 @@ QList<ImageSource *> CGColleImageSourceFactory::createMultiple(const QUrl &url)
             QStringList imageNames = package->imageNames();
 
             foreach(const QString &name, imageNames) {
-                QUrl imageUrl = url;
-                imageUrl.setFragment(name);
-
-                ImageSource *source = createSingle(imageUrl);
+                ImageSource *source = new CGColleImageSource(this, packagePath, name, package->createReader(name));
                 if (source) {
                     imageSources << source;
                 }

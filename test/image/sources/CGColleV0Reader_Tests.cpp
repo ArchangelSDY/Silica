@@ -49,8 +49,9 @@ void TestCGColleV0Reader::read()
 
     QStringList imageNames = reader.imageNames();
     foreach (const QString &name, imageNames) {
-        QByteArray data = reader.read(name);
-        QVERIFY(!data.isEmpty());
+        QScopedPointer<CGColleReader::ImageReader> imageReader(reader.createReader(name));
+        QVERIFY(!imageReader.isNull());
+        QVERIFY(!imageReader->read().isEmpty());
     }
 }
 

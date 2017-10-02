@@ -37,6 +37,74 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(CGColleV1Reader::CGColleV1Image::Flags)
 
+class CGColleV1ImageReader : public CGColleReader::ImageReader
+{
+public:
+    CGColleV1ImageReader(const QString &packagePath,
+                         CGColleV1Reader::CGColleV1Image::Type type,
+                         uint32_t dataPos,
+                         uint32_t dataSize,
+                         uint32_t baseDataPos,
+                         uint32_t baseDataSize,
+                         uint32_t offsetX,
+                         uint32_t offsetY) :
+        m_packagePath(packagePath),
+        m_type(type),
+        m_dataPos(dataPos),
+        m_dataSize(dataSize),
+        m_baseDataPos(baseDataPos),
+        m_baseDataSize(baseDataSize),
+        m_offsetX(offsetX),
+        m_offsetY(offsetY)
+    {
+    }
+    
+    virtual QByteArray read() override;
+
+private:
+    QString m_packagePath;
+    CGColleV1Reader::CGColleV1Image::Type m_type;
+    uint32_t m_dataPos;
+    uint32_t m_dataSize;
+    uint32_t m_baseDataPos;
+    uint32_t m_baseDataSize;
+    uint32_t m_offsetX;
+    uint32_t m_offsetY;
+};
+
+QByteArray CGColleV1ImageReader::read()
+{
+    QFile f(m_packagePath);
+    if (!f.open(QIODevice::ReadOnly)) {
+        return QByteArray();
+    }
+
+    if (m_type == CGColleV1Reader::CGColleV1Image::Type::BaseImage) {
+        // Base frame
+        f.seek(m_dataPos);
+        return f.read(m_dataSize);
+    } else if (m_type == CGColleV1Reader::CGColleV1Image::Type::LayerImage) {
+        // Layer frame
+        f.seek(m_baseDataPos);
+        QImage frame = QImage::fromData(f.read(m_baseDataSize));
+
+        f.seek(m_dataPos);
+        QImage layerFrame = QImage::fromData(f.read(m_dataSize));
+
+        QPainter painter(&frame);
+        painter.drawImage(QPointF(m_offsetX, m_offsetY), layerFrame);
+
+        QByteArray frameData;
+        QBuffer buf(&frameData);
+        buf.open(QIODevice::WriteOnly);
+        frame.save(&buf, "BMP");
+
+        return frameData;
+    } else {
+        return QByteArray();
+    }
+}
+
 CGColleV1Reader::CGColleV1Reader(const QString &packagePath) :
     m_file(packagePath)
 {
@@ -63,8 +131,6 @@ bool CGColleV1Reader::open()
         return false;
     }
 
-    m_data = m_file.map(0, m_file.size());
-
     // Check format and scan meta
     if (!isValidFormat() || !scanMeta()) {
         m_file.close();
@@ -86,7 +152,7 @@ bool CGColleV1Reader::isValidFormat(const char *ptr)
 
 bool CGColleV1Reader::isValidFormat() const
 {
-    return CGColleV1Reader::isValidFormat(reinterpret_cast<const char *>(m_data));
+    return CGColleV1Reader::isValidFormat(m_file.fileName());
 }
 
 bool CGColleV1Reader::isValidFormat(const QString &path)
@@ -104,45 +170,39 @@ bool CGColleV1Reader::isValidFormat(const QString &path)
     return CGColleV1Reader::isValidFormat(reinterpret_cast<const char *>(ptr));
 }
 
-#define readNumber(ptr, dst, type) \
-    dst = *reinterpret_cast<type *>(ptr); \
-    ptr += sizeof(dst);
-#define readUInt32(ptr, dst) readNumber(ptr, dst, uint32_t)
-#define readFlags(ptr, dst) readNumber(ptr, dst, CGColleV1Reader::CGColleV1Image::Flags)
-#define readString(ptr, dst) \
+#define readNumber(dst) \
+    m_file.read((char *)&dst, sizeof(dst));
+#define readString(dst) \
     { \
-        uint32_t nameSize = *reinterpret_cast<uint32_t*>(ptr); \
-        ptr += sizeof(nameSize); \
-        QByteArray nameBuf((const char *)ptr, nameSize); \
-        image->name = QString::fromUtf8(nameBuf); \
-        ptr += nameSize; \
+        uint32_t nameSize = 0; \
+        readNumber(nameSize); \
+        QByteArray nameBuf = m_file.read(nameSize); \
+        dst = QString::fromUtf8(nameBuf); \
     }
 
 bool CGColleV1Reader::scanMeta()
 {
-    uchar *metaPtr = m_data + 12;
+    m_file.seek(12);
 
-    uint32_t imagesCount = *reinterpret_cast<uint32_t*>(metaPtr);
-    metaPtr += sizeof(uint32_t);
+    uint32_t imagesCount = 0;
+    readNumber(imagesCount);
 
     int dataOffset = 0;
     int baseImageIdx = 0;
     for (uint32_t i = 0; i < imagesCount; ++i) {
         CGColleV1Image *image = new CGColleV1Image();
 
-        uint32_t type = 0;
-        readUInt32(metaPtr, type);
-        image->type = (CGColleV1Image::Type)(type);
+        readNumber(image->type);
 
-        readString(metaPtr, image->name);
-        readUInt32(metaPtr, image->fileSize);
-        readUInt32(metaPtr, image->width);
-        readUInt32(metaPtr, image->height);
-        readUInt32(metaPtr, image->offsetX);
-        readUInt32(metaPtr, image->offsetY);
-        readUInt32(metaPtr, image->layerId);
-        readUInt32(metaPtr, image->compositionMethod);
-        readFlags(metaPtr, image->flags);
+        readString(image->name);
+        readNumber(image->fileSize);
+        readNumber(image->width);
+        readNumber(image->height);
+        readNumber(image->offsetX);
+        readNumber(image->offsetY);
+        readNumber(image->layerId);
+        readNumber(image->compositionMethod);
+        readNumber(image->flags);
 
         if (image->type == CGColleV1Image::Type::BaseImage) {
             baseImageIdx = i;
@@ -161,7 +221,7 @@ bool CGColleV1Reader::scanMeta()
         dataOffset += image->fileSize;
     }
 
-    m_dataStart = metaPtr - m_data;
+    m_dataStart = m_file.pos();
 
     return true;
 }
@@ -172,35 +232,35 @@ void CGColleV1Reader::close()
     m_file.close();
 }
 
-QByteArray CGColleV1Reader::read(const QString &imageName)
+CGColleReader::ImageReader *CGColleV1Reader::createReader(const QString &imageName)
 {
     auto it = m_imagesByName.find(imageName);
     if (it == m_imagesByName.end()) {
-        return QByteArray();
+        return nullptr;
     }
 
     CGColleV1Image *imageMeta = *it;
     if (imageMeta->type == CGColleV1Image::Type::BaseImage) {
-        // Base frame
-        return QByteArray(reinterpret_cast<const char *>(m_data + m_dataStart + imageMeta->dataOffset), imageMeta->fileSize);
+        return new CGColleV1ImageReader(
+            m_file.fileName(), CGColleV1Image::Type::BaseImage,
+            m_dataStart + imageMeta->dataOffset,
+            imageMeta->fileSize,
+            0,
+            0,
+            0,
+            0);
     } else if (imageMeta->type == CGColleV1Image::Type::LayerImage) {
-        // Layer frame
         CGColleV1Image *baseFrameMeta = m_images[imageMeta->baseImageIdx];
-
-        QImage frame = QImage::fromData(m_data + m_dataStart + baseFrameMeta->dataOffset, baseFrameMeta->fileSize);
-        QImage layerFrame = QImage::fromData(m_data + m_dataStart + imageMeta->dataOffset, imageMeta->fileSize);
-
-        QPainter painter(&frame);
-        painter.drawImage(QPointF(imageMeta->offsetX, imageMeta->offsetY), layerFrame);
-
-        QByteArray frameData;
-        QBuffer buf(&frameData);
-        buf.open(QIODevice::WriteOnly);
-        frame.save(&buf, "BMP");
-
-        return frameData;
+        return new CGColleV1ImageReader(
+            m_file.fileName(), CGColleV1Image::Type::LayerImage,
+            m_dataStart + imageMeta->dataOffset,
+            imageMeta->fileSize,
+            m_dataStart + baseFrameMeta->dataOffset,
+            m_dataStart + baseFrameMeta->fileSize,
+            imageMeta->offsetX,
+            imageMeta->offsetY);
     } else {
-        return QByteArray();
+        return nullptr;
     }
 }
 
