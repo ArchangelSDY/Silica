@@ -41,9 +41,8 @@ public:
     {
         return *(defaultFrame());
     }
-    QImage thumbnail() {
-        Q_ASSERT(m_thumbnail);
-        return *m_thumbnail;
+    QSharedPointer<QImage> thumbnail() {
+        return m_thumbnail;
     }
     QString name() const;
     QString thumbnailPath() const { return m_thumbnailPath; }
@@ -51,8 +50,10 @@ public:
     const ImageSource *source() const { return m_imageSource.data(); }
 
     void load(int priority = NormalPriority);
-    void loadThumbnail(bool makeImmediately = false);
     void scheduleUnload();
+
+    void loadThumbnail(bool makeImmediately = false);
+    void unloadThumbnail();
 
     QList<ImageHotspot *> hotspots() { return m_hotspots; }
     void loadHotspots(bool forceReload = false);
@@ -115,7 +116,7 @@ private:
     QUuid m_uuid;
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
-    QImage *m_thumbnail;
+    QSharedPointer<QImage> m_thumbnail;
     QString m_thumbnailPath;
     int m_loadRequestsCount;
 

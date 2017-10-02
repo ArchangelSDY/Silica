@@ -31,6 +31,11 @@ void PlayListGalleryItem::load()
     loadThumbnail();
 }
 
+void PlayListGalleryItem::unload()
+{
+    // TODO: Need implementation
+}
+
 void PlayListGalleryItem::loadThumbnail()
 {
     if (!m_rendererFactory) {

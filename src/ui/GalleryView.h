@@ -79,6 +79,8 @@ protected:
 
     virtual void markItemIsFiltered(GalleryItem *item);
 
+    void markItemsInsideViewportPreload();
+
     QGraphicsView *m_view;
     QGraphicsScene *m_scene;
     QLineEdit *m_searchBox;
@@ -92,9 +94,12 @@ protected:
 
 private:
     static const int LAYOUT_INTERVAL;
+    class GraphicsView;
+    friend class GraphicsView;
 
     AbstractRendererFactory *m_rendererFactory;
     QList<QGraphicsItem *> m_itemGroupTitles;
+    QSet<QGraphicsItem *> m_viewportPreloadItems;
 };
 
 #endif // GALLERYVIEW_H

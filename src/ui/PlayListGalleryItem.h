@@ -21,7 +21,8 @@ public:
     QRectF boundingRect() const;
     PlayListRecord *record() { return m_record; }
 
-    void load();
+    virtual void load() override;
+    virtual void unload() override;
     virtual void createRenderer();
 
 private slots:

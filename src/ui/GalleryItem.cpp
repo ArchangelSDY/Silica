@@ -25,30 +25,22 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     QGraphicsItem(parent) ,
     m_rendererFactory(rendererFactory) ,
     m_renderer(0) ,
-    m_thumbnail(0) ,
-    m_thumbnailScaled(0) ,
-    m_selectedAfterShownScheduled(false)
-{
-    connect(&m_thumbnailResizeWatcher, SIGNAL(finished()), this, SLOT(onThumbnailResized()));
-
+    m_thumbnail(nullptr) ,
     // Hide until thumbnail is ready.
     // It will show during next view layout after thumbnail is loaded
     //
     // This strategy is to hide the crazy rapid layout procedure when loading
     // remote gallery in waterfall mode.
-    hide();
+    m_isVisible(false) ,
+    m_isInsideViewportPreload(false) ,
+    m_selectedAfterShownScheduled(false)
+{
 }
 
 GalleryItem::~GalleryItem()
 {
     if (m_renderer) {
         delete m_renderer;
-    }
-    if (m_thumbnail) {
-        delete m_thumbnail;
-    }
-    if (m_thumbnailScaled) {
-        delete m_thumbnailScaled;
     }
 }
 
@@ -65,7 +57,8 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
     // Hide until thumbnail scaled and ready to paint.
     hide();
 
-    setThumbnail(m_thumbnail);
+    QImage *thumbnail = m_thumbnail.take();
+    setThumbnail(thumbnail);
 }
 
 void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
@@ -74,47 +67,18 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
     createRenderer();
 }
 
-static QSharedPointer<QImage> resizeThumbnailAtBackground(QSharedPointer<QImage> thumbnail,
-                                                          const QSize &size,
-                                                          Qt::AspectRatioMode aspectRatioMode)
-{
-    return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
-}
-
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
-    if (m_thumbnail && m_thumbnail != thumbnail) {
-        delete m_thumbnail;
-    }
-    m_thumbnail = thumbnail;
+    m_thumbnail.reset(thumbnail);
 
     // Some renderer depends on thumbnail aspect ratio to determine bounding rect.
-    // So before making resized thumbnail image, we layout once using original image.
-    m_renderer->setImage(m_thumbnail);
+    // So before making resized thumbnail image, we layout once using original image size.
+    m_renderer->setImage(m_thumbnail.data());
+    m_renderer->setImageSize(m_thumbnail ? m_thumbnail->size() : QSize());
     m_renderer->layout();
-
-    if (thumbnail) {
-        QFuture<QSharedPointer<QImage> > resizeFuture = QtConcurrent::run(
-            gResizeThumbnailThreads(), resizeThumbnailAtBackground,
-            QSharedPointer<QImage>::create(*thumbnail), boundingRect().size().toSize(),
-            m_renderer->aspectRatioMode());
-        m_thumbnailResizeWatcher.setFuture(resizeFuture);
-    }
-}
-
-void GalleryItem::onThumbnailResized()
-{
-    QSharedPointer<QImage> resized = m_thumbnailResizeWatcher.result();
-
-    if (m_thumbnailScaled) {
-        delete m_thumbnailScaled;
-    }
-    m_thumbnailScaled = new QImage(*resized);
 
     // Re-layout using scaled image
-    m_renderer->setImage(m_thumbnailScaled);
     prepareGeometryChange();
-    m_renderer->layout();
 
     update(boundingRect());
     if (scene()) {
@@ -123,6 +87,12 @@ void GalleryItem::onThumbnailResized()
 
     // We always consider it ready no matter whether thumbnail is null
     emit readyToShow();
+
+    unload();
+
+    if (!m_isInsideViewportPreload) {
+        resetThumbnail();
+    }
 }
 
 bool GalleryItem::isReadyToShow()
@@ -133,6 +103,20 @@ bool GalleryItem::isReadyToShow()
 void GalleryItem::scheduleSelectedAfterShown()
 {
     m_selectedAfterShownScheduled = true;
+}
+
+void GalleryItem::show()
+{
+    m_isVisible = true;
+    onVisibilityChanged(m_isVisible);
+    update(boundingRect());
+}
+
+void GalleryItem::hide()
+{
+    m_isVisible = false;
+    onVisibilityChanged(m_isVisible);
+    update(boundingRect());
 }
 
 void GalleryItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -164,6 +148,10 @@ void GalleryItem::paint(QPainter *painter,
     // Clear painter first
     painter->eraseRect(boundingRect());
 
+    if (!m_isVisible) {
+        return;
+    }
+
     // Render
     m_renderer->paint(painter);
 
@@ -173,14 +161,35 @@ void GalleryItem::paint(QPainter *painter,
     }
 }
 
-QVariant GalleryItem::itemChange(GraphicsItemChange change,
-                                 const QVariant &value)
+void GalleryItem::onVisibilityChanged(bool isVisible)
 {
-    if (change == ItemVisibleHasChanged) {
-        if (value.toBool() && m_selectedAfterShownScheduled) {
-            setSelected(true);
-            m_selectedAfterShownScheduled = false;
-        }
+    if (isVisible && m_selectedAfterShownScheduled) {
+        setSelected(true);
+        m_selectedAfterShownScheduled = false;
     }
-    return QGraphicsItem::itemChange(change, value);
+}
+
+void GalleryItem::setIsInsideViewportPreload(bool isInside)
+{
+    // // if (m_isInsideViewportPreload && !isInside) {
+    if (!isInside) {
+        // Unload thumbnail
+        resetThumbnail();
+        unload();
+        // update(boundingRect());
+    }
+
+    // if (!m_isInsideViewportPreload && isInside) {
+    if (isInside) {
+        load();
+        // show();
+    }
+
+    m_isInsideViewportPreload = isInside;
+}
+
+void GalleryItem::resetThumbnail()
+{
+    m_thumbnail.reset();
+    m_renderer->setImage(nullptr);
 }

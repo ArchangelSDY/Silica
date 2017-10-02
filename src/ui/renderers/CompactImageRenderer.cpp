@@ -26,17 +26,12 @@ void CompactImageRenderer::layout()
 {
     AbstractGalleryItemRenderer::layout();
 
-    if (!m_image) {
-        return;
-    }
-
-    const QSize &imageSize = m_image->size();
     QSize sourcePaintSize = m_boundingRect.size().scaled(
-        imageSize, Qt::KeepAspectRatio);
+        m_imageSize, Qt::KeepAspectRatio);
     m_imageSourceRect.setSize(sourcePaintSize);
     m_imageSourceRect.moveTo(
-        (imageSize.width() - sourcePaintSize.width()) / 2,
-        (imageSize.height() - sourcePaintSize.height()) / 2
+        (m_imageSize.width() - sourcePaintSize.width()) / 2,
+        (m_imageSize.height() - sourcePaintSize.height()) / 2
     );
 
     m_imageRect = m_boundingRect

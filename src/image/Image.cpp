@@ -247,8 +247,9 @@ Image::Image(const QString &path, QObject *parent) :
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
@@ -275,8 +276,9 @@ Image::Image(const QUrl &url, QObject *parent) :
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -307,8 +309,9 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     // TODO: This leads to a performance issue
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -325,9 +328,6 @@ Image::~Image()
 
     if (m_thumbHist) {
         delete m_thumbHist;
-    }
-    if (m_thumbnail) {
-        delete m_thumbnail;
     }
 
     while (!m_hotspots.isEmpty()) {
@@ -446,9 +446,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     m_isLoadingThumbnail = false;
 
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        delete m_thumbnail;
-        m_thumbnail = new QImage(*thumbnail);
-
+        m_thumbnail = thumbnail;
         emit thumbnailLoaded();
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
@@ -517,8 +515,7 @@ void Image::makeThumbnail()
 void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        delete m_thumbnail;
-        m_thumbnail = new QImage(*thumbnail);
+        m_thumbnail.reset(new QImage(*thumbnail));
 
         LocalDatabase::instance()->insertImage(this);
 
@@ -530,6 +527,11 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
     m_isMakingThumbnail = false;
 
     checkUnload();
+}
+
+void Image::unloadThumbnail()
+{
+    m_thumbnail.reset(new QImage());
 }
 
 void Image::computeThumbnailPath()
