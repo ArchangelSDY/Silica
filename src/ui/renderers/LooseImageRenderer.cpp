@@ -16,17 +16,13 @@ Qt::AspectRatioMode LooseImageRenderer::aspectRatioMode() const
 
 void LooseImageRenderer::layout()
 {
-    if (!m_image) {
-        return;
-    }
-
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
     QSize sizeWithoutPadding(
         itemSize.width() - 2 * LooseImageRenderer::PADDING,
         itemSize.height() - 2 * LooseImageRenderer::PADDING
     );
     m_imageRect.setSize(
-        m_image->size().scaled(sizeWithoutPadding, Qt::KeepAspectRatio));
+        m_imageSize.scaled(sizeWithoutPadding, Qt::KeepAspectRatio));
 
     m_imageRect.moveTo(
         (itemSize.width() - m_imageRect.width()) / 2,

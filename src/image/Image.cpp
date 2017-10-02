@@ -326,9 +326,6 @@ Image::~Image()
     if (m_thumbHist) {
         delete m_thumbHist;
     }
-    if (m_thumbnail) {
-        delete m_thumbnail;
-    }
 
     while (!m_hotspots.isEmpty()) {
         delete m_hotspots.takeFirst();
@@ -446,8 +443,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     m_isLoadingThumbnail = false;
 
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        delete m_thumbnail;
-        m_thumbnail = new QImage(*thumbnail);
+        m_thumbnail.reset(new QImage(*thumbnail));
 
         emit thumbnailLoaded();
     } else if (makeImmediately) {
@@ -517,8 +513,7 @@ void Image::makeThumbnail()
 void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        delete m_thumbnail;
-        m_thumbnail = new QImage(*thumbnail);
+        m_thumbnail.reset(new QImage(*thumbnail));
 
         LocalDatabase::instance()->insertImage(this);
 
@@ -530,6 +525,12 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
     m_isMakingThumbnail = false;
 
     checkUnload();
+}
+
+void Image::unloadThumbnail()
+{
+    qDebug() << "delete thumbnail" << m_imageSource->name();
+    m_thumbnail.reset(new QImage());
 }
 
 void Image::computeThumbnailPath()

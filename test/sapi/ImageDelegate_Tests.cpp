@@ -41,7 +41,7 @@ void TestImageDelegate::fields()
     if (makeThumbnailSpy.count() == 0) {
         QVERIFY(makeThumbnailSpy.wait());
     }
-    QCOMPARE(delegate.thumbnail(), image.thumbnail());
+    QCOMPARE(delegate.thumbnail(), *image.thumbnail());
     QVERIFY(!delegate.readRaw().isNull());
 }
 

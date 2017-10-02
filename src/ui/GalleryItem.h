@@ -11,7 +11,7 @@
 class GalleryItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-    Q_INTERFACES(QGraphicsItem)
+        Q_INTERFACES(QGraphicsItem)
 public:
     explicit GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent = 0);
@@ -21,7 +21,13 @@ public:
     virtual QString name() const;
 
     virtual void load() = 0;
+    virtual void unload() = 0;
     void setRendererFactory(AbstractRendererFactory *factory);
+
+    // Have to implement our own visibility system as QGraphicsScene will always
+    // ignore hidden items when selecting by rect
+    void show();
+    void hide();
 
     /**
      * @brief Call by GalleryView during layout to check if thumbnail is ready.
@@ -33,6 +39,8 @@ public:
      * @brief Make this item selected after shown.
      */
     void scheduleSelectedAfterShown();
+
+    void setIsInsideViewportPreload(bool isInside);
 
 signals:
     void requestLayout();
@@ -47,8 +55,6 @@ protected:
     virtual void paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget);
-    virtual QVariant itemChange(GraphicsItemChange change,
-                                const QVariant &value);
     void setRenderer(AbstractGalleryItemRenderer *renderer);
     virtual void createRenderer() = 0;
     void setThumbnail(QImage *thumbnail);
@@ -63,9 +69,14 @@ private slots:
     void onThumbnailResized();
 
 private:
-    QImage *m_thumbnail;
-    QImage *m_thumbnailScaled;
+    void resetThumbnail();
+    void onVisibilityChanged(bool isVisible);
+
+    QScopedPointer<QImage> m_thumbnail;
+    QScopedPointer<QImage> m_thumbnailScaled;
     QFutureWatcher<QSharedPointer<QImage> > m_thumbnailResizeWatcher;
+    bool m_isVisible;
+    bool m_isInsideViewportPreload;
 };
 
 #endif // GALLERYITEM_H

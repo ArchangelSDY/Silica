@@ -16,15 +16,14 @@ Qt::AspectRatioMode WaterfallImageRenderer::aspectRatioMode() const
 
 void WaterfallImageRenderer::layout()
 {
-    if (!m_image || m_image->size().isEmpty()) {
+    if (m_imageSize.isEmpty()) {
         return;
     }
 
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-    const QSize &imageSize = m_image->size();
     qreal imageWidth = itemSize.width() - 2 * WaterfallImageRenderer::PADDING;
-    qreal factor = imageWidth / imageSize.width();
-    qreal imageHeight = imageSize.height() * factor;
+    qreal factor = imageWidth / m_imageSize.width();
+    qreal imageHeight = m_imageSize.height() * factor;
     m_imageRect.setSize(QSize(imageWidth, imageHeight));
 
     m_imageRect.moveTo(

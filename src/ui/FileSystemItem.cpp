@@ -153,6 +153,11 @@ void FileSystemItem::load()
     }
 }
 
+void FileSystemItem::unload()
+{
+    // TODO: Need implementation
+}
+
 void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
 {
     g_isDefaultFolderCover.insert(coverCacheKey(), new bool(isDefault));
@@ -176,10 +181,10 @@ void FileSystemItem::createRenderer()
 
 void FileSystemItem::coverThumbnailLoaded()
 {
-    QImage thumbnail = m_coverImage->thumbnail();
+    QSharedPointer<QImage> thumbnail = m_coverImage->thumbnail();
     QImage *coverImage = 0;
     if (!thumbnail.isNull()) {
-        coverImage = new QImage(m_coverImage->thumbnail());
+        coverImage = new QImage(*m_coverImage->thumbnail());
     } else {
         coverImage = new QImage(":/res/image.png");
     }

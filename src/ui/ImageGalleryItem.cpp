@@ -25,6 +25,11 @@ void ImageGalleryItem::load()
     m_image->loadThumbnail(true);
 }
 
+void ImageGalleryItem::unload()
+{
+    m_image->unloadThumbnail();
+}
+
 void ImageGalleryItem::createRenderer()
 {
     setRenderer(m_rendererFactory->createItemRendererForImageGallery());
@@ -42,6 +47,5 @@ QRectF ImageGalleryItem::boundingRect() const
 
 void ImageGalleryItem::thumbnailLoaded()
 {
-    const QImage &thumbnailImage = m_image->thumbnail();
-    setThumbnail(new QImage(thumbnailImage));
+    setThumbnail(new QImage(*m_image->thumbnail()));
 }

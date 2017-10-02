@@ -28,8 +28,17 @@ void AbstractGalleryItemRenderer::setImage(const QImage *image,
     }
     m_image = image;
     m_isOwnImage = isOwnImage;
+    m_imageSize = image ? image->size() : QSize();
     if (m_parentRenderer) {
         m_parentRenderer->setImage(image);
+    }
+}
+
+void AbstractGalleryItemRenderer::setImageSize(const QSize &size)
+{
+    m_imageSize = size;
+    if (m_parentRenderer) {
+        m_parentRenderer->setImageSize(size);
     }
 }
 

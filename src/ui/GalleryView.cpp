@@ -2,6 +2,8 @@
 
 #include <QGraphicsItem>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsView>
+#include <QScrollbar>
 #include <QVBoxLayout>
 #include <QLineEdit>
 
@@ -14,9 +16,28 @@
 
 const int GalleryView::LAYOUT_INTERVAL = 10;
 
+class GalleryView::GraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+public:
+    GraphicsView(GalleryView *galleryView) : m_galleryView(galleryView)
+    {
+    }
+
+protected:
+    virtual void scrollContentsBy(int dx, int dy) override
+    {
+        m_galleryView->markItemsInsideViewportPreload();
+        QGraphicsView::scrollContentsBy(dx, dy);
+    }
+
+private:
+    GalleryView *m_galleryView;
+};
+
 GalleryView::GalleryView(QWidget *parent) :
     QWidget(parent) ,
-    m_view(new QGraphicsView(this)) ,
+    m_view(new GraphicsView(this)) ,
     m_scene(new QGraphicsScene) ,
     m_searchBox(new QLineEdit()) ,
     m_enableGrouping(false) ,
@@ -109,6 +130,7 @@ const TaskProgress &GalleryView::groupingProgress() const
 void GalleryView::clear()
 {
     // Clear first
+    m_viewportPreloadItems.clear();
     foreach (GalleryItem *item, galleryItems()) {
         m_scene->removeItem(item);
         item->deleteLater();
@@ -161,6 +183,8 @@ void GalleryView::layout()
 
     m_layoutNeeded = false;
     m_layoutTimer.stop();
+
+    markItemsInsideViewportPreload();
 }
 
 void GalleryView::scheduleLayout()
@@ -231,7 +255,10 @@ void GalleryView::addItem(GalleryItem *item)
     connect(item, SIGNAL(mouseDoubleClicked()),
             this, SLOT(itemMouseDoubleClicked()), Qt::UniqueConnection);
     connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
-    item->load();
+
+    item->setIsInsideViewportPreload(true);
+    m_viewportPreloadItems << item;
+    qDebug() << "addItem preload items" << m_viewportPreloadItems.count();
 }
 
 AbstractRendererFactory *GalleryView::rendererFactory()
@@ -305,6 +332,53 @@ void GalleryView::markItemIsFiltered(GalleryItem *item)
     item->setData(GalleryItem::KEY_IS_NAME_FILTERED, isFiltered);
 }
 
+void GalleryView::markItemsInsideViewportPreload()
+{
+    // QPointF viewportTopLeftInScene = m_view->mapToScene(QPoint(0, 0));
+    // QPointF viewportBottomRightInScene = m_view->mapToScene(QPoint(m_view->viewport()->width(), m_view->viewport()->height()));
+    // QRectF preloadArea(viewportTopLeftInScene, viewportBottomRightInScene);
+    // QRectF preloadArea = m_view->mapToScene(m_view->rect());
+    QPointF tl(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
+    QPointF br = tl + m_view->viewport()->rect().bottomRight();
+    QMatrix mat = m_view->matrix().inverted();
+    QRectF preloadArea = mat.mapRect(QRectF(tl, br));
+
+    qDebug() << "viewSize" << m_view->size() << "preload area" << preloadArea;
+
+    // Enlarge by 9 times
+    // QSizeF initialSize = preloadArea.size();
+    // preloadArea.moveTop(-initialSize.height());
+    // preloadArea.moveBottom(initialSize.height());
+    // preloadArea.moveLeft(-initialSize.width());
+    // preloadArea.moveRight(initialSize.width());
+    // qDebug() << "after enlarge" << "preload area" << preloadArea;
+
+    QList<QGraphicsItem *> newPreloadItemsList = m_scene->items(preloadArea);
+    QSet<QGraphicsItem *> newPreloadItems;
+    for (QGraphicsItem *item : newPreloadItemsList) {
+        if (dynamic_cast<GalleryItem *>(item) != nullptr) {
+            newPreloadItems << item;
+        }
+    }
+    qDebug() << "new Preload items" << newPreloadItems.count() << "current" << m_viewportPreloadItems.count();
+
+    for (QGraphicsItem *item : newPreloadItems) {
+        if (!m_viewportPreloadItems.contains(item)) {
+            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+            galleryItem->setIsInsideViewportPreload(true);
+        }
+    }
+
+    for (QGraphicsItem *item : m_viewportPreloadItems) {
+        if (!newPreloadItems.contains(item)) {
+            GalleryItem *galleryItem = static_cast<GalleryItem *>(item);
+            galleryItem->setIsInsideViewportPreload(false);
+        }
+    }
+
+    m_viewportPreloadItems = newPreloadItems;
+}
+
 void GalleryView::enterSearch()
 {
     QRect pos(QPoint(geometry().width() - m_searchBox->width(), 0),
@@ -320,3 +394,5 @@ void GalleryView::leaveSearch()
     setNameFilter(QString());
     setFocus();
 }
+
+#include "GalleryView.moc"

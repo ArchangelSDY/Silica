@@ -89,7 +89,7 @@ void TestImage::loadThumbnail()
     QVERIFY(spyLoad.wait());
 
     QVERIFY(!image.thumbnail().isNull());
-    QVERIFY(image.thumbnail().width() > 0);
+    QVERIFY(image.thumbnail()->width() > 0);
     QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(

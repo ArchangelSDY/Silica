@@ -64,7 +64,7 @@ QList<const QImage *> ImageDelegate::frames() const
 QImage ImageDelegate::thumbnail() const
 {
     Image *image = const_cast<Image *>(m_image);
-    return image->thumbnail();
+    return *image->thumbnail();
 }
 
 QByteArray ImageDelegate::readRaw() const

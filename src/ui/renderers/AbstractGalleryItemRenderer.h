@@ -10,6 +10,7 @@ public:
     virtual ~AbstractGalleryItemRenderer();
 
     void setImage(const QImage *image, bool isOwnImage = false);
+    void setImageSize(const QSize &size);
 
     virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual QRect boundingRect() const;
@@ -20,6 +21,7 @@ protected:
     AbstractGalleryItemRenderer *m_parentRenderer;
     QRect m_boundingRect;
     const QImage *m_image;
+    QSize m_imageSize;
     bool m_isOwnImage;
 };
 

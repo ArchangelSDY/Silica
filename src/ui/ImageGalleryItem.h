@@ -20,7 +20,8 @@ public:
     QRectF boundingRect() const;
     ImagePtr image() { return m_image; }
 
-    void load();
+    virtual void load() override;
+    virtual void unload() override;
     virtual void createRenderer();
 
 private slots:

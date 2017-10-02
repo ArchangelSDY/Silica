@@ -101,7 +101,7 @@ void MainGraphicsViewModel::paintThumbnail(Image *image)
         if (m_view->isVisible()) {
             m_shouldRepaintThumbnailOnShown = false;
 
-            QImage fitThumbnail = image->thumbnail().scaled(
+            QImage fitThumbnail = image->thumbnail()->scaled(
                 m_view->viewSize(), Qt::KeepAspectRatioByExpanding);
 
             m_view->setViewportRect(fitThumbnail.rect());

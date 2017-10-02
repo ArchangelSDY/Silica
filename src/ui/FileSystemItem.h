@@ -24,7 +24,8 @@ public:
     QString path() const;
     QFileInfo fileInfo() const;
 
-    void load();
+    virtual void load() override;
+    virtual void unload() override;
     virtual void createRenderer();
     void removeOnDisk();
 
