@@ -1,6 +1,5 @@
 #include "GamepadController.h"
 
-#include "ui/gamepad/GamepadAxisScroller.h"
 #include "ui/models/MainGraphicsViewModel.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"

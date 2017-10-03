@@ -52,7 +52,8 @@ bool ImageSourceManagerClientImpl::requestPassword(const QString &archivePath, Q
 {
     QByteArray savedPassword = m_keyChain->read(credentialKey(archivePath));
     if (!savedPassword.isEmpty()) {
-        password.swap(QString::fromUtf8(savedPassword));
+        QString savedPasswordStr = QString::fromUtf8(savedPassword);
+        password.swap(savedPasswordStr);
         return true;
     }
 

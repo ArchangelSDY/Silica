@@ -27,7 +27,6 @@
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
-#include "ui/gamepad/GamepadController.h"
 #include "ui/models/MainGraphicsViewModel.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
@@ -374,7 +373,7 @@ void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGra
         mainGraphicsViewWidget = mainGraphicsView;
     }
 #else
-    MainGraphicsView *mainGraphicsViewRaw = new MainGraphicsView(parent);
+    MainGraphicsView *mainGraphicsView = new MainGraphicsView(parent);
     mainGraphicsView->setModel(viewModel);
     viewModel->setView(mainGraphicsView);
     mainGraphicsViewWidget = mainGraphicsView;

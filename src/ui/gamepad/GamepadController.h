@@ -4,6 +4,8 @@
 #include <QScopedPointer>
 #include <QTime>
 
+#include "ui/gamepad/GamepadAxisScroller.h"
+
 class MainWindow;
 class GamepadAxisScroller;
 

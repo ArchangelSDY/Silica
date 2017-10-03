@@ -39,7 +39,7 @@ void TestKeyChain::cleanup()
     CredDeleteW((LPCWSTR)KEY.utf16(), CRED_TYPE_GENERIC, 0);
 }
 #else
-void TestKeyChain::writeRead()
+void TestKeyChain::writeReadRemove()
 {
 }
 

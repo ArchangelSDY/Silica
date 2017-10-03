@@ -7,6 +7,7 @@
 #include <QScopedPointer>
 
 #include "navigation/NavigatorSynchronizer.h"
+#include "ui/gamepad/GamepadController.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
