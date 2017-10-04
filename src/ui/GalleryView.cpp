@@ -334,24 +334,19 @@ void GalleryView::markItemIsFiltered(GalleryItem *item)
 
 void GalleryView::markItemsInsideViewportPreload()
 {
-    // QPointF viewportTopLeftInScene = m_view->mapToScene(QPoint(0, 0));
-    // QPointF viewportBottomRightInScene = m_view->mapToScene(QPoint(m_view->viewport()->width(), m_view->viewport()->height()));
-    // QRectF preloadArea(viewportTopLeftInScene, viewportBottomRightInScene);
-    // QRectF preloadArea = m_view->mapToScene(m_view->rect());
+    // Compute visible area
     QPointF tl(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
     QPointF br = tl + m_view->viewport()->rect().bottomRight();
     QMatrix mat = m_view->matrix().inverted();
-    QRectF preloadArea = mat.mapRect(QRectF(tl, br));
-
-    qDebug() << "viewSize" << m_view->size() << "preload area" << preloadArea;
+    QRectF visibleArea = mat.mapRect(QRectF(tl, br));
 
     // Enlarge by 9 times
-    // QSizeF initialSize = preloadArea.size();
-    // preloadArea.moveTop(-initialSize.height());
-    // preloadArea.moveBottom(initialSize.height());
-    // preloadArea.moveLeft(-initialSize.width());
-    // preloadArea.moveRight(initialSize.width());
-    // qDebug() << "after enlarge" << "preload area" << preloadArea;
+    QRectF preloadArea = QRectF(visibleArea.left() - visibleArea.width(),
+                                visibleArea.top() - visibleArea.height(),
+                                visibleArea.right() + visibleArea.width(),
+                                visibleArea.bottom() + visibleArea.height());
+
+    qDebug() << "viewSize" << m_view->size() << "preload area" << preloadArea;
 
     QList<QGraphicsItem *> newPreloadItemsList = m_scene->items(preloadArea);
     QSet<QGraphicsItem *> newPreloadItems;

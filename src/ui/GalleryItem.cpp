@@ -138,7 +138,6 @@ void GalleryItem::scheduleSelectedAfterShown()
 
 void GalleryItem::show()
 {
-    qDebug("show");
     m_isVisible = true;
     onVisibilityChanged(m_isVisible);
     update(boundingRect());
@@ -146,7 +145,6 @@ void GalleryItem::show()
 
 void GalleryItem::hide()
 {
-    qDebug("hide");
     m_isVisible = false;
     onVisibilityChanged(m_isVisible);
     update(boundingRect());
