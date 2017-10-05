@@ -182,7 +182,6 @@ bool CGColleV1Reader::isValidFormat(const QString &path)
 
 bool CGColleV1Reader::scanMeta()
 {
-    qDebug("scan cgcolle");
     m_file.seek(12);
 
     uint32_t imagesCount = 0;

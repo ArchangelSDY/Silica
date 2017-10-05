@@ -11,7 +11,7 @@
 class GalleryItem : public QObject, public QGraphicsItem
 {
     Q_OBJECT
-        Q_INTERFACES(QGraphicsItem)
+    Q_INTERFACES(QGraphicsItem)
 public:
     explicit GalleryItem(AbstractRendererFactory *rendererFactory,
                          QGraphicsItem *parent = 0);
@@ -65,16 +65,11 @@ protected:
     bool m_isReadyToShow;
     bool m_selectedAfterShownScheduled;
 
-private slots:
-    void onThumbnailResized();
-
 private:
     void resetThumbnail();
     void onVisibilityChanged(bool isVisible);
 
     QScopedPointer<QImage> m_thumbnail;
-    QScopedPointer<QImage> m_thumbnailScaled;
-    QFutureWatcher<QSharedPointer<QImage> > m_thumbnailResizeWatcher;
     bool m_isVisible;
     bool m_isInsideViewportPreload;
 };

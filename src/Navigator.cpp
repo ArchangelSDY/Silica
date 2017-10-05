@@ -307,7 +307,7 @@ void Navigator::thumbnailLoaded()
     Image *image = static_cast<Image*>(QObject::sender());
     if (image &&
         image->status() != Image::LoadComplete &&
-        !image->thumbnail().isNull()) {
+        !image->thumbnail()->isNull()) {
 
         if (image == m_currentImage) {
             emit paintThumbnail(image);

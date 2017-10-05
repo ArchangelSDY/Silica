@@ -256,9 +256,10 @@ void GalleryView::addItem(GalleryItem *item)
             this, SLOT(itemMouseDoubleClicked()), Qt::UniqueConnection);
     connect(item, SIGNAL(readyToShow()), this, SLOT(itemReadyToShow()));
 
+    // Set it in preload state to trigger a load
+    // TODO: Try to refactor this to make more sense
     item->setIsInsideViewportPreload(true);
     m_viewportPreloadItems << item;
-    qDebug() << "addItem preload items" << m_viewportPreloadItems.count();
 }
 
 AbstractRendererFactory *GalleryView::rendererFactory()
@@ -346,8 +347,6 @@ void GalleryView::markItemsInsideViewportPreload()
                                 visibleArea.right() + visibleArea.width(),
                                 visibleArea.bottom() + visibleArea.height());
 
-    qDebug() << "viewSize" << m_view->size() << "preload area" << preloadArea;
-
     QList<QGraphicsItem *> newPreloadItemsList = m_scene->items(preloadArea);
     QSet<QGraphicsItem *> newPreloadItems;
     for (QGraphicsItem *item : newPreloadItemsList) {
@@ -355,7 +354,6 @@ void GalleryView::markItemsInsideViewportPreload()
             newPreloadItems << item;
         }
     }
-    qDebug() << "new Preload items" << newPreloadItems.count() << "current" << m_viewportPreloadItems.count();
 
     for (QGraphicsItem *item : newPreloadItems) {
         if (!m_viewportPreloadItems.contains(item)) {

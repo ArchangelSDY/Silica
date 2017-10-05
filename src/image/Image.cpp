@@ -247,8 +247,9 @@ Image::Image(const QString &path, QObject *parent) :
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
@@ -275,8 +276,9 @@ Image::Image(const QUrl &url, QObject *parent) :
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -307,8 +309,9 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     // TODO: This leads to a performance issue
     // loadMetaFromDatabase();
 
-    connect(this, SIGNAL(thumbnailLoaded()),
-            this, SLOT(initThumbHist()));
+    // TODO: Re-design this to avoid storing a thumbnail instance in it
+    // connect(this, SIGNAL(thumbnailLoaded()),
+    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -443,8 +446,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     m_isLoadingThumbnail = false;
 
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        m_thumbnail.reset(new QImage(*thumbnail));
-
+        m_thumbnail = thumbnail;
         emit thumbnailLoaded();
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
@@ -529,7 +531,6 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 
 void Image::unloadThumbnail()
 {
-    qDebug() << "delete thumbnail" << m_imageSource->name();
     m_thumbnail.reset(new QImage());
 }
 

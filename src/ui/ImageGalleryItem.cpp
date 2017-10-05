@@ -47,5 +47,6 @@ QRectF ImageGalleryItem::boundingRect() const
 
 void ImageGalleryItem::thumbnailLoaded()
 {
-    setThumbnail(new QImage(*m_image->thumbnail()));
+    QImage *image = new QImage(std::move(*m_image->thumbnail()));
+    setThumbnail(image);
 }
