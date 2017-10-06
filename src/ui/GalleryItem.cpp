@@ -32,6 +32,7 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     // This strategy is to hide the crazy rapid layout procedure when loading
     // remote gallery in waterfall mode.
     m_isVisible(false) ,
+    m_isReadyToShow(false) ,
     m_isInsideViewportPreload(false) ,
     m_selectedAfterShownScheduled(false)
 {
@@ -86,7 +87,10 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     }
 
     // We always consider it ready no matter whether thumbnail is null
-    emit readyToShow();
+    if (!m_isReadyToShow && thumbnail != nullptr) {
+        m_isReadyToShow = true;
+        emit readyToShow();
+    }
 
     unload();
 
