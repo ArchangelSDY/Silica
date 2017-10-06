@@ -69,6 +69,7 @@ private:
     void onVisibilityChanged(bool isVisible);
 
     QScopedPointer<QImage> m_thumbnail;
+    QSize m_thumbnailSize;
     bool m_isVisible;
     bool m_isReadyToShow;
     bool m_isInsideViewportPreload;
