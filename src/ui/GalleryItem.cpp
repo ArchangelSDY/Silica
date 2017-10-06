@@ -72,13 +72,13 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
 {
     m_thumbnail.reset(thumbnail);
 
-    // Some renderer depends on thumbnail aspect ratio to determine bounding rect.
-    // So before making resized thumbnail image, we layout once using original image size.
     m_renderer->setImage(m_thumbnail.data());
-    m_renderer->setImageSize(m_thumbnail ? m_thumbnail->size() : QSize());
+    if (m_thumbnail) {
+        m_thumbnailSize = m_thumbnail->size();
+    }
+    m_renderer->setImageSize(m_thumbnailSize);
     m_renderer->layout();
 
-    // Re-layout using scaled image
     prepareGeometryChange();
 
     update(boundingRect());
