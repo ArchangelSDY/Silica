@@ -62,7 +62,6 @@ protected:
     // TODO: should not be accessed by derived classes directly
     AbstractRendererFactory *m_rendererFactory;
     AbstractGalleryItemRenderer *m_renderer;
-    bool m_isReadyToShow;
     bool m_selectedAfterShownScheduled;
 
 private:
@@ -71,6 +70,7 @@ private:
 
     QScopedPointer<QImage> m_thumbnail;
     bool m_isVisible;
+    bool m_isReadyToShow;
     bool m_isInsideViewportPreload;
 };
 
