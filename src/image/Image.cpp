@@ -447,6 +447,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
 
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
         m_thumbnail = thumbnail;
+        m_thumbnailSize = thumbnail->size();
         emit thumbnailLoaded();
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
@@ -567,9 +568,9 @@ qreal Image::aspectRatio() const
         int height = defaultFrame()->height();
 
         return height != 0 ? qreal(width) / qreal(height) : 0;
-    } else if (!m_thumbnail->isNull()) {
-        int width = m_thumbnail->width();
-        int height = m_thumbnail->height();
+    } else if (!m_thumbnailSize.isNull()) {
+        int width = m_thumbnailSize.width();
+        int height = m_thumbnailSize.height();
 
         return height != 0 ? qreal(width) / qreal(height) : 0;
     }
