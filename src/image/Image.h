@@ -117,6 +117,7 @@ private:
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
     QSharedPointer<QImage> m_thumbnail;
+    QSize m_thumbnailSize;
     QString m_thumbnailPath;
     int m_loadRequestsCount;
 
