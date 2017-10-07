@@ -183,7 +183,7 @@ void FileSystemItem::coverThumbnailLoaded()
 {
     QSharedPointer<QImage> thumbnail = m_coverImage->thumbnail();
     QImage *coverImage = 0;
-    if (!thumbnail.isNull()) {
+    if (!thumbnail->isNull()) {
         coverImage = new QImage(*m_coverImage->thumbnail());
     } else {
         coverImage = new QImage(":/res/image.png");
