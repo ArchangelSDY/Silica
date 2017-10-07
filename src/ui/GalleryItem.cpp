@@ -175,6 +175,8 @@ void GalleryItem::onVisibilityChanged(bool isVisible)
 
 void GalleryItem::setIsInsideViewportPreload(bool isInside)
 {
+    m_isInsideViewportPreload = isInside;
+
     // // if (m_isInsideViewportPreload && !isInside) {
     if (!isInside) {
         // Unload thumbnail
@@ -188,8 +190,6 @@ void GalleryItem::setIsInsideViewportPreload(bool isInside)
         load();
         // show();
     }
-
-    m_isInsideViewportPreload = isInside;
 }
 
 void GalleryItem::resetThumbnail()
