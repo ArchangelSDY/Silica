@@ -1,3 +1,5 @@
+#include <QtConcurrent>
+#include <QEventLoop>
 #include <QRegularExpression>
 #include <functional>
 #include <vector>
@@ -7,6 +9,7 @@
 #include "image/ImageHistogram.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
+#include "image/ImageThumbnailBlockLoader.h"
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
 #include "playlist/PlayListRecord.h"
@@ -242,8 +245,8 @@ void PlayList::sortBySize()
     emit itemsChanged();
 }
 
-static bool isHistSame(ImageHistogram* const &left,
-                        ImageHistogram* const &right)
+static bool isHistSame(QSharedPointer<ImageHistogram> left,
+                       QSharedPointer<ImageHistogram> right)
 {
     if (!left || !right) {
         return false;
@@ -286,14 +289,25 @@ int PlayList::groupForImage(Image * const image)
     return m_imageGroups.value(image, -1);
 }
 
+static QSharedPointer<ImageHistogram> computeImageHistogram(ImagePtr image)
+{
+    ImageThumbnailBlockLoader loader(image);
+    loader.loadAndWait();
+
+    QSharedPointer<QImage> thumbnail = loader.thumbnail();
+
+    return QSharedPointer<ImageHistogram>::create(*thumbnail);
+}
+
 void PlayList::groupByThumbHist()
 {
-    std::vector<ImageHistogram *> hists;
+    std::vector<QSharedPointer<ImageHistogram> > hists;
 
-    ImageList::const_iterator it = m_allImages.begin();
-    while (it != m_allImages.end()) {
-        hists.push_back((*it)->thumbHist());
-        ++it;
+    // Load thumbnail and compute thumbnail histograms
+    QFuture<QSharedPointer<ImageHistogram> > f = QtConcurrent::mapped(m_allImages, computeImageHistogram);
+    f.waitForFinished();
+    for (QSharedPointer<ImageHistogram> hist : f) {
+        hists.push_back(hist);
     }
 
     Q_ASSERT(hists.size() == m_allImages.size());

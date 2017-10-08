@@ -11,7 +11,6 @@
 
 #include "deps/quazip/quazip/quazip.h"
 #include "db/LocalDatabase.h"
-#include "image/ImageHistogram.h"
 #include "image/ImageHotspot.h"
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
@@ -236,8 +235,7 @@ Image::Image(const QString &path, QObject *parent) :
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false) ,
-    m_thumbHist(0)
+    m_isAnimation(false)
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -246,10 +244,6 @@ Image::Image(const QString &path, QObject *parent) :
 
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
-
-    // TODO: Re-design this to avoid storing a thumbnail instance in it
-    // connect(this, SIGNAL(thumbnailLoaded()),
-    //         this, SLOT(initThumbHist()));
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
@@ -265,8 +259,7 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false) ,
-    m_thumbHist(0)
+    m_isAnimation(false)
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -276,9 +269,6 @@ Image::Image(const QUrl &url, QObject *parent) :
     // TODO: This leads to a performance issue 
     // loadMetaFromDatabase();
 
-    // TODO: Re-design this to avoid storing a thumbnail instance in it
-    // connect(this, SIGNAL(thumbnailLoaded()),
-    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -298,8 +288,7 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false) ,
-    m_thumbHist(0)
+    m_isAnimation(false)
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -309,9 +298,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     // TODO: This leads to a performance issue
     // loadMetaFromDatabase();
 
-    // TODO: Re-design this to avoid storing a thumbnail instance in it
-    // connect(this, SIGNAL(thumbnailLoaded()),
-    //         this, SLOT(initThumbHist()));
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
     connect(this, SIGNAL(thumbnailLoadFailed()),
@@ -325,10 +311,6 @@ Image::~Image()
     destroyFrames();
 
     m_imageSource.clear();
-
-    if (m_thumbHist) {
-        delete m_thumbHist;
-    }
 
     while (!m_hotspots.isEmpty()) {
         delete m_hotspots.takeFirst();
@@ -619,23 +601,6 @@ QList<QImage *> Image::frames() const
 int Image::frameCount() const
 {
     return m_frames.count();
-}
-
-ImageHistogram *Image::thumbHist() const
-{
-    return m_thumbHist;
-}
-
-void Image::initThumbHist()
-{
-    if (!m_thumbnail || m_thumbnail->isNull()) {
-        return;
-    }
-
-    // No need to create again if there's already one
-    if (!m_thumbHist) {
-        m_thumbHist = new ImageHistogram(*m_thumbnail);
-    }
 }
 
 void Image::onLoad()

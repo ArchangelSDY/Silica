@@ -6,7 +6,6 @@
 
 class QUuid;
 
-class ImageHistogram;
 class ImageHotspot;
 class ImageRank;
 class ImageSource;
@@ -79,8 +78,6 @@ public:
     QList<QImage *> frames() const;
     int frameCount() const;
 
-    ImageHistogram *thumbHist() const;
-
 signals:
     void loaded();
     void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
@@ -91,7 +88,6 @@ private slots:
     void imageReaderFinished(QList<QSharedPointer<QImage> > images, QList<int> durations);
     void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail, bool makeImmediately);
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
-    void initThumbHist();
 
     void onLoad();
     void onThumbnailLoadFailed();
@@ -136,8 +132,6 @@ private:
     QList<QImage *> m_frames;
     QList<int> m_durations;
     bool m_isAnimation;
-
-    ImageHistogram *m_thumbHist;
 };
 
 typedef QList<QSharedPointer<Image> > ImageList;
