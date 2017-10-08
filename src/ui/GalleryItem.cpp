@@ -9,15 +9,15 @@
 
 const QColor GalleryItem::SELECTED_COLOR = QColor("#AAFFFFFF");
 
-static QThreadPool *g_resizeThumbnailThreads = 0;
-static QThreadPool *gResizeThumbnailThreads()
+static QThreadPool *g_scaleThumbnailThreads = 0;
+static QThreadPool *gScaleThumbnailThreads()
 {
-    if (!g_resizeThumbnailThreads) {
-        g_resizeThumbnailThreads = new QThreadPool();
-        g_resizeThumbnailThreads->setMaxThreadCount(QThread::idealThreadCount() - 1);
+    if (!g_scaleThumbnailThreads) {
+        g_scaleThumbnailThreads = new QThreadPool();
+        g_scaleThumbnailThreads->setMaxThreadCount(QThread::idealThreadCount() - 1);
     }
 
-    return g_resizeThumbnailThreads;
+    return g_scaleThumbnailThreads;
 }
 
 GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
@@ -25,7 +25,7 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     QGraphicsItem(parent) ,
     m_rendererFactory(rendererFactory) ,
     m_renderer(0) ,
-    m_thumbnail(nullptr) ,
+    m_thumbnailScaled(nullptr) ,
     // Hide until thumbnail is ready.
     // It will show during next view layout after thumbnail is loaded
     //
@@ -36,6 +36,8 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     m_isInsideViewportPreload(false) ,
     m_selectedAfterShownScheduled(false)
 {
+    connect(&m_thumbnailScaleWatcher, &QFutureWatcher<QSharedPointer<QImage> >::finished,
+            this, &GalleryItem::onThumbnailScaled);
 }
 
 GalleryItem::~GalleryItem()
@@ -57,25 +59,53 @@ void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 
     // Hide until thumbnail scaled and ready to paint.
     hide();
-
-    QImage *thumbnail = m_thumbnail.take();
-    setThumbnail(thumbnail);
 }
 
 void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 {
     m_rendererFactory = factory;
     createRenderer();
+    load();
+}
+
+static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> thumbnail,
+                                                          const QSize &size,
+                                                          Qt::AspectRatioMode aspectRatioMode)
+{
+    return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
 }
 
 void GalleryItem::setThumbnail(QImage *thumbnail)
 {
-    m_thumbnail.reset(thumbnail);
+    if (thumbnail) {
+        // Layout here first using original thumbnail size,
+        // which is required by some view renderers
+        m_renderer->setImageSize(thumbnail->size());
+        m_renderer->layout();
 
-    m_renderer->setImage(m_thumbnail.data());
-    if (m_thumbnail) {
-        m_thumbnailSize = m_thumbnail->size();
+        auto scaleFuture = QtConcurrent::run(
+            gScaleThumbnailThreads(),
+            scaleThumbnailAtBackground,
+            QSharedPointer<QImage>(thumbnail),
+            boundingRect().size().toSize(),
+            m_renderer->aspectRatioMode()
+        );
+        m_thumbnailScaleWatcher.setFuture(scaleFuture);
+    } else {
+        resetThumbnail();
     }
+
+    // Unload original thumbnail to reduce memory usage
+    unload();
+}
+
+void GalleryItem::onThumbnailScaled()
+{
+    m_thumbnailScaled.reset(new QImage(*m_thumbnailScaleWatcher.result()));
+    m_thumbnailSize = m_thumbnailScaled->size();
+
+    // Layout again using scaled thumbnail size
+    m_renderer->setImage(m_thumbnailScaled.data());
     m_renderer->setImageSize(m_thumbnailSize);
     m_renderer->layout();
 
@@ -87,13 +117,12 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     }
 
     // We always consider it ready no matter whether thumbnail is null
-    if (!m_isReadyToShow && thumbnail != nullptr) {
+    if (!m_isReadyToShow) {
         m_isReadyToShow = true;
         emit readyToShow();
     }
 
-    unload();
-
+    // Clear thumbnail if currently this item is not in preload area
     if (!m_isInsideViewportPreload) {
         resetThumbnail();
     }
@@ -101,7 +130,7 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
 
 bool GalleryItem::isReadyToShow()
 {
-    return m_thumbnail != 0;
+    return m_thumbnailScaled != 0;
 }
 
 void GalleryItem::scheduleSelectedAfterShown()
@@ -177,23 +206,21 @@ void GalleryItem::setIsInsideViewportPreload(bool isInside)
 {
     m_isInsideViewportPreload = isInside;
 
-    // // if (m_isInsideViewportPreload && !isInside) {
+    // if (m_isInsideViewportPreload && !isInside) {
     if (!isInside) {
         // Unload thumbnail
         resetThumbnail();
         unload();
-        // update(boundingRect());
     }
 
     // if (!m_isInsideViewportPreload && isInside) {
     if (isInside) {
         load();
-        // show();
     }
 }
 
 void GalleryItem::resetThumbnail()
 {
-    m_thumbnail.reset();
+    m_thumbnailScaled.reset();
     m_renderer->setImage(nullptr);
 }

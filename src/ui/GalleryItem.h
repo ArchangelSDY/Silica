@@ -64,11 +64,15 @@ protected:
     AbstractGalleryItemRenderer *m_renderer;
     bool m_selectedAfterShownScheduled;
 
+private slots:
+    void onThumbnailScaled();
+
 private:
     void resetThumbnail();
     void onVisibilityChanged(bool isVisible);
 
-    QScopedPointer<QImage> m_thumbnail;
+    QScopedPointer<QImage> m_thumbnailScaled;
+    QFutureWatcher<QSharedPointer<QImage> > m_thumbnailScaleWatcher;
     QSize m_thumbnailSize;
     bool m_isVisible;
     bool m_isReadyToShow;
