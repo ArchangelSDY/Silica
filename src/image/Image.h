@@ -83,7 +83,7 @@ public:
 
 signals:
     void loaded();
-    void thumbnailLoaded();
+    void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
     void thumbnailLoadFailed();
     void hotpotsLoaded();
 

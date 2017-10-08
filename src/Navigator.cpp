@@ -115,8 +115,8 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     }
 
     if (shouldPaint) {
-        connect(image, SIGNAL(thumbnailLoaded()),
-                this, SLOT(thumbnailLoaded()));
+        connect(image, &Image::thumbnailLoaded,
+                this, &Navigator::thumbnailLoaded);
         connect(image, SIGNAL(loaded()), this, SLOT(imageLoaded()),
                 Qt::UniqueConnection);
     }
@@ -302,12 +302,12 @@ void Navigator::imageLoaded()
     }
 }
 
-void Navigator::thumbnailLoaded()
+void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
     Image *image = static_cast<Image*>(QObject::sender());
     if (image &&
         image->status() != Image::LoadComplete &&
-        !image->thumbnail()->isNull()) {
+        !thumbnail->isNull()) {
 
         if (image == m_currentImage) {
             emit paintThumbnail(image);

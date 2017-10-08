@@ -179,12 +179,11 @@ void FileSystemItem::createRenderer()
         m_pathInfo, m_useDefaultFolderCover));
 }
 
-void FileSystemItem::coverThumbnailLoaded()
+void FileSystemItem::coverThumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
-    QSharedPointer<QImage> thumbnail = m_coverImage->thumbnail();
     QImage *coverImage = 0;
     if (!thumbnail->isNull()) {
-        coverImage = new QImage(*m_coverImage->thumbnail());
+        coverImage = new QImage(*thumbnail);
     } else {
         coverImage = new QImage(":/res/image.png");
     }
@@ -204,10 +203,10 @@ void FileSystemItem::coverThumbnailLoadFailed()
 void FileSystemItem::loadCover(QSharedPointer<ImageSource> imageSource)
 {
     m_coverImage.reset(new Image(imageSource));
-    connect(m_coverImage.data(), SIGNAL(thumbnailLoaded()),
-            this, SLOT(coverThumbnailLoaded()));
-    connect(m_coverImage.data(), SIGNAL(thumbnailLoadFailed()),
-            this, SLOT(coverThumbnailLoadFailed()));
+    connect(m_coverImage.data(), &Image::thumbnailLoaded,
+            this, &FileSystemItem::coverThumbnailLoaded);
+    connect(m_coverImage.data(), &Image::thumbnailLoadFailed,
+            this, &FileSystemItem::coverThumbnailLoadFailed);
     m_coverImage->loadThumbnail(true);
 }
 

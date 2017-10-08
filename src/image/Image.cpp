@@ -448,7 +448,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
         m_thumbnail = thumbnail;
         m_thumbnailSize = thumbnail->size();
-        emit thumbnailLoaded();
+        emit thumbnailLoaded(thumbnail);
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
         scheduleUnload();       // Release memory after thumbnail generated
@@ -460,7 +460,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
 void Image::loadThumbnail(bool makeImmediately)
 {
     if (!m_thumbnail->isNull()) {
-        emit thumbnailLoaded();
+        emit thumbnailLoaded(m_thumbnail);
         return;
     }
 
@@ -517,10 +517,11 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
         m_thumbnail.reset(new QImage(*thumbnail));
+        m_thumbnailSize = m_thumbnail->size();
 
         LocalDatabase::instance()->insertImage(this);
 
-        emit thumbnailLoaded();
+        emit thumbnailLoaded(thumbnail);
     } else if (m_thumbnail->isNull()) {
         emit thumbnailLoadFailed();
     }
