@@ -84,7 +84,7 @@ public slots:
     bool goUuid(const QUuid &uuid, bool forceReloadCurrent = false);
 
     void imageLoaded();
-    void thumbnailLoaded();
+    void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
 
     void setAutoNavigationInterval(int msec);
     void setLoop(bool loop);

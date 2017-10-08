@@ -14,10 +14,10 @@ ImageGalleryItem::ImageGalleryItem(ImagePtr image,
     setFlag(QGraphicsItem::ItemIsSelectable);
     createRenderer();
 
-    connect(m_image.data(), SIGNAL(thumbnailLoaded()),
-            this, SLOT(thumbnailLoaded()));
-    connect(m_image.data(), SIGNAL(thumbnailLoadFailed()),
-            this, SLOT(thumbnailLoaded()));
+    connect(m_image.data(), &Image::thumbnailLoaded,
+            this, &ImageGalleryItem::thumbnailLoaded);
+    connect(m_image.data(), &Image::thumbnailLoadFailed,
+            this, &ImageGalleryItem::thumbnailLoadFailed);
 }
 
 void ImageGalleryItem::load()
@@ -45,8 +45,13 @@ QRectF ImageGalleryItem::boundingRect() const
     return m_renderer->boundingRect();
 }
 
-void ImageGalleryItem::thumbnailLoaded()
+void ImageGalleryItem::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
-    QImage *image = new QImage(std::move(*m_image->thumbnail()));
+    QImage *image = new QImage(*thumbnail);
     setThumbnail(image);
+}
+
+void ImageGalleryItem::thumbnailLoadFailed()
+{
+    setThumbnail(new QImage());
 }

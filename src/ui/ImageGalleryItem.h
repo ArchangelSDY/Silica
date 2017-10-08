@@ -25,7 +25,8 @@ public:
     virtual void createRenderer();
 
 private slots:
-    void thumbnailLoaded();
+    void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
+    void thumbnailLoadFailed();
 
 private:
     ImagePtr m_image;
