@@ -4,7 +4,6 @@
 #include <QThreadPool>
 #include <QUrl>
 
-#include "image/sources/CGColleImageSourceFactory.h"
 #include "image/sources/LocalImageSourceFactory.h"
 #include "image/sources/RARImageSourceFactory.h"
 #include "image/sources/SevenzImageSourceFactory.h"
@@ -19,7 +18,6 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
     QObject(parent) ,
     m_client(0)
 {
-    registerFactory(new CGColleImageSourceFactory(this));
     registerFactory(new LocalImageSourceFactory(this));
     registerFactory(new RARImageSourceFactory(this));
     registerFactory(new SevenzImageSourceFactory(this));
