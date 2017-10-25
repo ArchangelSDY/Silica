@@ -9,6 +9,7 @@ set(SAPI_SRCS
     "sapi/ISharerPlugin.cpp"
     "sapi/LoadingIndicator.cpp"
     "sapi/Logging.cpp"
+    "sapi/Message.cpp"
     "sapi/NavigatorResource.cpp"
 )
 
@@ -37,6 +38,7 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ISharerPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/LoadingIndicator.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Logging.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Message.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/NavigatorResource.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
