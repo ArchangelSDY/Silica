@@ -13,7 +13,7 @@ namespace sapi {
 
         void SAPI_EXPORT sendMessage(const QString &topic, const QByteArray &payload);
 
-        using Listener = std::function<void(int, const QByteArray &)>;
+        using Listener = std::function<void(long, const QByteArray &)>;
         void SAPI_EXPORT addMessageListener(const QString &topic, Listener listener);
 
     } // namespace message
