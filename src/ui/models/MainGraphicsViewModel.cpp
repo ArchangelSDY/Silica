@@ -301,6 +301,10 @@ void MainGraphicsViewModel::scheduleAnimation()
 {
     if (m_image && m_image->isAnimation() && m_image->frameCount() > 1) {
         int duration = m_image->durations()[m_curFrameNumber];
+        if (duration == 0) {
+            return;
+        }
+
         m_animationTimer.start(duration);
         m_curFrameNumber = (m_curFrameNumber + 1) % (m_image->frameCount());
     }
