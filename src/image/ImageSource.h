@@ -16,6 +16,7 @@ public:
     virtual void close();
     virtual bool exists() = 0;
 
+    virtual bool readFrames(QList<QImage> &images, QList<int> &durations);
     virtual bool copy(const QString &destPath) = 0;
 
     QIODevice *device() { return m_device.data(); }
