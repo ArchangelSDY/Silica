@@ -74,39 +74,19 @@ void LoadImageTask::run()
 {
     QList<QSharedPointer<QImage> > images;
     QList<int> durations;
-    QImageReader reader;
     if (!m_imageSource.isNull() && m_imageSource->open()) {
-        reader.setDevice(m_imageSource->device());
-
-        forever {
-            QImage image = reader.read();
-
-            // If fail to read first frame, try to decide format from content
-            if (image.isNull() && images.isEmpty()) {
-                m_imageSource->device()->reset();
-                reader.setDevice(m_imageSource->device());
-                reader.setDecideFormatFromContent(true);
-                image = reader.read();
-            }
-
-            if (!image.isNull()) {
+        QList<QImage> rawFrames;
+        if (m_imageSource->readFrames(rawFrames, durations)) {
+            for (const QImage &frame : rawFrames) {
                 images << QSharedPointer<QImage>::create(
-                    image.convertToFormat(QImage::Format_ARGB32_Premultiplied));
-                durations << reader.nextImageDelay();
-            } else {
-                break;
+                    frame.convertToFormat(QImage::Format_ARGB32_Premultiplied));
             }
+        } else {
+            images << QSharedPointer<QImage>::create();
+            durations << 0;
         }
 
         m_imageSource->close();
-    }
-
-    if (images.isEmpty()) {
-        qWarning() << "Failed to read image" << m_imageSource->url().toString() << "due to error:"
-            << reader.errorString();
-
-        images << QSharedPointer<QImage>::create();
-        durations << 0;
     }
 
     emit loaded(images, durations);

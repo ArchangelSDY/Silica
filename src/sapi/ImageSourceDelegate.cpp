@@ -40,6 +40,11 @@ bool ImageSourceDelegate::exists()
     return m_source->exists();
 }
 
+bool ImageSourceDelegate::readFrames(QList<QImage> &frames, QList<int> &durations)
+{
+    return m_source->readFrames(frames, durations);
+}
+
 bool ImageSourceDelegate::copy(const QString &destPath)
 {
     // Not implemented

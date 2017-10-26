@@ -14,6 +14,7 @@ public:
     virtual bool open() = 0;
     virtual void close() = 0;
     virtual bool exists() = 0;
+    virtual bool readFrames(QList<QImage> &frames, QList<int> &durations) = 0;
     virtual QIODevice *device() = 0;
 
     virtual QString name() const = 0;

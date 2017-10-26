@@ -15,10 +15,11 @@ public:
     ImageSourceDelegate(ImageSourceFactory *factory, IImageSource *source);
     virtual ~ImageSourceDelegate();
 
-    virtual bool open();
-    virtual void close();
-    virtual bool exists();
-    virtual bool copy(const QString &destPath);
+    virtual bool open() override;
+    virtual void close() override;
+    virtual bool exists() override;
+    virtual bool readFrames(QList<QImage> &frames, QList<int> &durations) override;
+    virtual bool copy(const QString &destPath) override;
 
 private:
     QScopedPointer<IImageSource> m_source;
