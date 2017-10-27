@@ -16,6 +16,7 @@ public:
 
     virtual void goIndexUntilSuccess(int index, int delta) override;
     virtual void focusOnRect(const QRectF &rect) override;
+    virtual void repaint() override;
 
 private:
     Navigator *m_navigator;

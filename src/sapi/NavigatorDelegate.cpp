@@ -30,4 +30,9 @@ void NavigatorDelegate::focusOnRect(const QRectF &rect)
     m_navigator->focusOnRect(rect);
 }
 
+void NavigatorDelegate::repaint()
+{
+    emit m_navigator->paint(m_navigator->currentImage());
+}
+
 }

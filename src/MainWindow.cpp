@@ -19,6 +19,7 @@
 
 #include "image/caches/ImagesCache.h"
 #include "image/caches/LoopImagesCacheStrategy.h"
+#include "image/effects/ImageEffectManager.h"
 #include "image/ImageSourceManager.h"
 #include "logger/listeners/ImagePathCorrector.h"
 #include "logger/Logger.h"
@@ -65,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_actToolBarFav(0) ,
     m_actToolBarGallery(0) ,
     m_actToolBarImage(0) ,
+    m_imageEffectManager(new ImageEffectManager()) ,
     m_keyState(KEY_STATE_NORMAL)
 {
     ui->setupUi(this);
@@ -73,9 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->gallery->setPlayList(m_navigator->playList());
 
     // Side view
-    m_sideViewModel.reset(new MainGraphicsViewModel());
+    m_sideViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data()));
     m_sideViewModel->setView(ui->sideView);
-    m_sideViewModel->setNavigator(m_navigator);
     ui->sideView->setModel(m_sideViewModel.data());
 
     ui->sidebar->hide();
@@ -156,8 +157,7 @@ void MainWindow::setupExtraUi()
 
     // Main graphics view
     ui->graphicsView->deleteLater();
-    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel());
-    m_mainGraphicsViewModel->setNavigator(m_navigator);
+    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data()));
     createMainImageView(&ui->graphicsView, ui->pageImageView, m_mainGraphicsViewModel.data());
 
     ui->pageImageViewLayout->setSpacing(0);
@@ -1034,8 +1034,8 @@ void MainWindow::toggleSecondaryNavigator()
         // Create view at the first time
         Q_ASSERT(willEnable);
 
-        m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel());
-        m_secondaryMainGraphicsViewModel->setNavigator(m_secondaryNavigator.data());
+        m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel(m_secondaryNavigator.data(),
+                                                                         m_imageEffectManager.data()));
         connect(m_secondaryMainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
                 m_actToolBarGallery, SLOT(trigger()));
 

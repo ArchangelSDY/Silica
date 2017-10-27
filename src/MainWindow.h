@@ -15,6 +15,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class ImageEffectManager;
 class ImagesCache;
 class ImagePathCorrector;
 class GamepadController;
@@ -91,6 +92,7 @@ private:
     QAction *m_actToolBarImage;
 
     ImagePathCorrector *m_imagePathCorrector;
+    QScopedPointer<ImageEffectManager> m_imageEffectManager;
 
     enum KeyState {
         KEY_STATE_NORMAL,
