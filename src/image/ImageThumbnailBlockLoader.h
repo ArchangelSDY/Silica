@@ -20,4 +20,5 @@ private:
     QEventLoop m_loop;
     ImagePtr m_image;
     QSharedPointer<QImage> m_thumbnail;
+    bool m_isFinished;
 };

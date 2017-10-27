@@ -31,6 +31,7 @@ void TestImageGalleryItem::load()
     ImageGalleryItem item(image, rendererFactory);
     QSignalSpy spy(&item, SIGNAL(readyToShow()));
     QCOMPARE(item.isReadyToShow(), false);
+    item.setIsInsideViewportPreload(true);
     item.load();
     QVERIFY(spy.wait());
     QCOMPARE(item.isReadyToShow(), true);

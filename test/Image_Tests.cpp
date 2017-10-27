@@ -84,7 +84,7 @@ void TestImage::loadThumbnail()
     QFETCH(QString, imagePath);
 
     Image image(imagePath);
-    QSignalSpy spyLoad(&image, SIGNAL(thumbnailLoaded()));
+    QSignalSpy spyLoad(&image, &Image::thumbnailLoaded);
     image.loadThumbnail(true);
     QVERIFY(spyLoad.wait());
 

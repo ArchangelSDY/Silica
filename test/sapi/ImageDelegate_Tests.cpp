@@ -22,8 +22,8 @@ void TestImageDelegate::fields()
     image.extraInfo().insert("SPECIAL", 1);
     sapi::ImageDelegate delegate(&image);
 
-    QSignalSpy loadSpy(&image, SIGNAL(loaded()));
-    QSignalSpy makeThumbnailSpy(&image, SIGNAL(thumbnailLoaded()));
+    QSignalSpy loadSpy(&image, &Image::loaded);
+    QSignalSpy makeThumbnailSpy(&image, &Image::thumbnailLoaded);
     image.load();
     QVERIFY(loadSpy.wait());
 
