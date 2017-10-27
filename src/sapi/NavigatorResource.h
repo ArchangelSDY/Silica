@@ -17,6 +17,7 @@ public:
 
     virtual void goIndexUntilSuccess(int index, int delta) = 0;
     virtual void focusOnRect(const QRectF &rect) = 0;
+    virtual void repaint() = 0;
 };
 
 }

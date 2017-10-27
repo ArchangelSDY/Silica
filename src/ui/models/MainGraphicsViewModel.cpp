@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QScopedPointer>
 
+#include "image/effects/ImageEffectManager.h"
 #include "share/SharerManager.h"
 #include "ui/RankVoteView.h"
 #include "ui/RemoteWallpapersManager.h"
@@ -10,9 +11,10 @@
 
 static const double SCALE_FACTOR = 0.05;
 
-MainGraphicsViewModel::MainGraphicsViewModel() :
+MainGraphicsViewModel::MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager) :
     m_view(0) ,
-    m_navigator(0) ,
+    m_navigator(navigator) ,
+    m_imageEffectManager(imageEffectManager) ,
     m_image(0) ,
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit),
@@ -21,6 +23,9 @@ MainGraphicsViewModel::MainGraphicsViewModel() :
     m_remoteWallpapersManager(0) ,
     m_curFrameNumber(0)
 {
+    connect(m_navigator, SIGNAL(focusOnRect(QRectF)),
+            this, SLOT(focusOnRect(QRectF)));
+
     m_animationTimer.setSingleShot(true);
     connect(&m_animationTimer, SIGNAL(timeout()),
             this, SLOT(paint()));
@@ -28,15 +33,6 @@ MainGraphicsViewModel::MainGraphicsViewModel() :
 
 MainGraphicsViewModel::~MainGraphicsViewModel()
 {
-}
-
-void MainGraphicsViewModel::setNavigator(Navigator *navigator)
-{
-    m_navigator = navigator;
-    //connect(m_navigator, SIGNAL(navigationChange(int)),
-    //        m_hotspotsEditor, SLOT(navigationChange(int)));
-    connect(m_navigator, SIGNAL(focusOnRect(QRectF)),
-            this, SLOT(focusOnRect(QRectF)));
 }
 
 MainGraphicsViewModel::View *MainGraphicsViewModel::view() const
@@ -78,8 +74,12 @@ void MainGraphicsViewModel::paint(Image *image, bool shouldFitInView)
         }
 
         QImage *frame = image->frames()[m_curFrameNumber];
-        m_view->setViewportRect(frame->rect());
-        m_view->setImage(*frame);
+
+        // Apply effects
+        QImage frameWithEffect = m_imageEffectManager->process(image, *frame);
+
+        m_view->setViewportRect(frameWithEffect.rect());
+        m_view->setImage(frameWithEffect);
 
         if (shouldFitInView) {
             fitInViewIfNecessary();

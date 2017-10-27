@@ -16,6 +16,7 @@ class QWheelEvent;
 // class HotspotsEditor;
 class QImage;
 class Image;
+class ImageEffectManager;
 class Navigator;
 class RankVoteView;
 class RemoteWallpapersManager;
@@ -50,10 +51,9 @@ public:
         MainGraphicsViewModel *m_model;
     };
 
-    explicit MainGraphicsViewModel();
+    explicit MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager);
     ~MainGraphicsViewModel();
 
-    void setNavigator(Navigator *navigator);
     View *view() const;
     void setView(View *view);
 
@@ -89,6 +89,7 @@ private:
 
     View *m_view;
     Navigator *m_navigator;
+    ImageEffectManager *m_imageEffectManager;
     Image *m_image;
     bool m_shouldRepaintThumbnailOnShown;
 
