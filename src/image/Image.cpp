@@ -81,12 +81,18 @@ void LoadImageTask::run()
                 images << QSharedPointer<QImage>::create(
                     frame.convertToFormat(QImage::Format_ARGB32_Premultiplied));
             }
-        } else {
-            images << QSharedPointer<QImage>::create();
-            durations << 0;
         }
 
         m_imageSource->close();
+    } else {
+        qDebug() << "Unable to open image source";
+    }
+
+    Q_ASSERT_X(images.count() == durations.count(), "LoadImageTask::run()", "Images count should equal to durations count");
+
+    if (images.empty()) {
+        images << QSharedPointer<QImage>::create();
+        durations << 0;
     }
 
     emit loaded(images, durations);
