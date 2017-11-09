@@ -85,6 +85,11 @@ void GlobalConfig::load()
                               .toString();
     qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
+    // File system thumbnail path
+    QString defaultFileSystemThumbnailPath = baseDirPath + "/fs_thumbnails";
+    m_fileSystemThumbnailPath = settings.value("FileSystemThumbnailDir", defaultFileSystemThumbnailPath)
+                              .toString();
+
     // Crash dump path
     m_crashDumpPath = baseDirPath + "/crash_dump";
     qDebug() << "Crash dump path:" << m_crashDumpPath;

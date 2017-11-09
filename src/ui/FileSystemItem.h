@@ -31,7 +31,7 @@ public:
 
 private slots:
     void markIsDefaultFolderCover(bool isDefault);
-    void gotThumbnail(QString path);
+    void gotThumbnail(const QImage &path);
     void loadCover(QSharedPointer<ImageSource> imageSource);
     void coverThumbnailLoaded(QSharedPointer<QImage> thumbnail);
     void coverThumbnailLoadFailed();

@@ -1,4 +1,5 @@
 #include <QCache>
+#include <QCryptographicHash>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QThreadPool>
@@ -7,6 +8,7 @@
 #include "image/ImageSourceManager.h"
 #include "ui/FileSystemItem.h"
 #include "ui/GalleryView.h"
+#include "GlobalConfig.h"
 
 // Item cover is loaded through following steps:
 //
@@ -30,6 +32,16 @@
 static QCache<QString, QImage> g_coverCache(500);
 static QCache<QString, bool> g_isDefaultFolderCover(500);
 
+static QString computeThumbnailPath(const QFileInfo &pathInfo)
+{
+    QString pathHash = QCryptographicHash::hash(pathInfo.absoluteFilePath().toUtf8(), QCryptographicHash::Sha1).toHex();
+    QString sub = pathHash.left(2);
+    QString name = pathHash.mid(2);
+
+    QStringList pathParts = QStringList() << GlobalConfig::instance()->fileSystemThumbnailPath() << sub << name << ".jpg";
+    return pathParts.join("/");
+}
+
 class LoadRunnable : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -38,6 +50,15 @@ public:
 
     virtual void run()
     {
+        QString thumbnailPath = computeThumbnailPath(m_pathInfo);
+        if (QFileInfo::exists(thumbnailPath)) {
+            QImage thumbnail(thumbnailPath);
+            if (!isThumbnailExpired(thumbnail)) {
+                emit gotThumbnail(thumbnail);
+                return;
+            }
+        }
+
         if (m_pathInfo.isDir()) {
             // For directory, try to use first image inside as cover
             QDirIterator dirIter(m_pathInfo.absoluteFilePath(),
@@ -58,7 +79,7 @@ public:
             if (!found) {
                 // No suitable image found.
                 emit markIsDefaultFolderCover(true);
-                emit gotThumbnail(":/res/folder.png");
+                emit gotThumbnail(QImage(":/res/folder.png"));
             }
         } else {
             // Individual file
@@ -69,17 +90,55 @@ public:
                 emit loadCover(src);
             } else {
                 // Not valid image
-                emit gotThumbnail(":/res/image.png");
+                emit gotThumbnail(QImage(":/res/image.png"));
             }
         }
     }
 
 signals:
+    void gotThumbnail(const QImage &image);
     void markIsDefaultFolderCover(bool isDefault);
-    void gotThumbnail(QString path);
     void loadCover(QSharedPointer<ImageSource> imageSource);
 
 private:
+
+    bool isThumbnailExpired(const QImage &image) const
+    {
+        QDateTime savedLastModified = QDateTime::fromString(image.text("lastModified"), Qt::DateFormat::ISODateWithMs);
+        QDateTime curLastModified = m_pathInfo.lastModified();
+
+        return savedLastModified != curLastModified;
+    }
+
+    QFileInfo m_pathInfo;
+};
+
+
+class SaveRunnable : public QRunnable
+{
+public:
+    SaveRunnable(const QImage &image, const QFileInfo &pathInfo) :
+        m_image(image) ,
+        m_pathInfo(pathInfo)
+    {
+    }
+
+    virtual void run()
+    {
+        QString thumbnailPath = computeThumbnailPath(m_pathInfo);
+
+        // Create parent directory
+        QFileInfo thumbnailPathInfo(thumbnailPath);
+        QString dirPath = thumbnailPathInfo.absolutePath();
+        QDir dir;
+        dir.mkpath(dirPath);
+
+        m_image.setText("lastModified", m_pathInfo.lastModified().toString(Qt::DateFormat::ISODateWithMs));
+        m_image.save(thumbnailPath);
+    }
+
+private:
+    QImage m_image;
     QFileInfo m_pathInfo;
 };
 
@@ -135,22 +194,28 @@ void FileSystemItem::load()
         return;
     }
 
-    QImage *cachedCover = g_coverCache[coverCacheKey()];
-    if (cachedCover) {
-        bool *isDefaultFolderCover = g_isDefaultFolderCover[coverCacheKey()];
-        markIsDefaultFolderCover(
-            isDefaultFolderCover ? *isDefaultFolderCover : true);
-        setThumbnail(new QImage(*cachedCover));
-    } else {
-        LoadRunnable *r = new LoadRunnable(m_pathInfo);
-        connect(r, SIGNAL(markIsDefaultFolderCover(bool)),
-                this, SLOT(markIsDefaultFolderCover(bool)));
-        connect(r, SIGNAL(gotThumbnail(QString)),
-                this, SLOT(gotThumbnail(QString)));
-        connect(r, SIGNAL(loadCover(QSharedPointer<ImageSource>)),
-                this, SLOT(loadCover(QSharedPointer<ImageSource>)));
-        threadPool()->start(r);
+    QImage *cover = g_coverCache[coverCacheKey()];
+    if (cover) {
+        markIsDefaultFolderCover(false);
+        gotThumbnail(*cover);
+        return;
     }
+
+    bool *isDefaultFolderCover = g_isDefaultFolderCover[coverCacheKey()];
+    if (isDefaultFolderCover) {
+        markIsDefaultFolderCover(true);
+        gotThumbnail(QImage(":/res/folder.png"));
+        return;
+    }
+
+    LoadRunnable *r = new LoadRunnable(m_pathInfo);
+    connect(r, SIGNAL(markIsDefaultFolderCover(bool)),
+            this, SLOT(markIsDefaultFolderCover(bool)));
+    connect(r, SIGNAL(gotThumbnail(const QImage &)),
+            this, SLOT(gotThumbnail(const QImage &)));
+    connect(r, SIGNAL(loadCover(QSharedPointer<ImageSource>)),
+            this, SLOT(loadCover(QSharedPointer<ImageSource>)));
+    threadPool()->start(r);
 }
 
 void FileSystemItem::unload()
@@ -160,17 +225,18 @@ void FileSystemItem::unload()
 
 void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
 {
-    g_isDefaultFolderCover.insert(coverCacheKey(), new bool(isDefault));
+    if (isDefault) {
+        g_isDefaultFolderCover.insert(coverCacheKey(), new bool(true));
+    }
+
     m_useDefaultFolderCover = isDefault;
     // Re-create render here to refresh "m_useDefaultFolderCover"
     createRenderer();
 }
 
-void FileSystemItem::gotThumbnail(QString path)
+void FileSystemItem::gotThumbnail(const QImage &image)
 {
-    QImage *coverImage = new QImage(path);
-    g_coverCache.insert(coverCacheKey(), coverImage);
-    setThumbnail(new QImage(*coverImage));
+    setThumbnail(new QImage(image));
 }
 
 void FileSystemItem::createRenderer()
@@ -184,10 +250,14 @@ void FileSystemItem::coverThumbnailLoaded(QSharedPointer<QImage> thumbnail)
     QImage *coverImage = 0;
     if (!thumbnail->isNull()) {
         coverImage = new QImage(*thumbnail);
+
+        threadPool()->start(new SaveRunnable(*coverImage, m_pathInfo));
     } else {
         coverImage = new QImage(":/res/image.png");
     }
+
     g_coverCache.insert(coverCacheKey(), coverImage);
+
     setThumbnail(new QImage(*coverImage));
     m_coverImage.reset();
 }
