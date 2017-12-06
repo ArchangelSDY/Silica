@@ -7,6 +7,7 @@
 #include "ExpandingNavigationPlayer.h"
 #include "FixedRegionNavigationPlayer.h"
 #include "HotspotsNavigationPlayer.h"
+#include "MangaNavigationPlayer.h"
 #include "NormalNavigationPlayer.h"
 
 NavigationPlayerManager *NavigationPlayerManager::s_instance = nullptr;
@@ -56,6 +57,7 @@ void NavigationPlayerManager::init(Navigator *navigator, QWidget *view)
     registerPlayer(new ExpandingNavigationPlayer(navigator, view));
     registerPlayer(new FixedRegionNavigationPlayer(navigator, view));
     registerPlayer(new CascadeClassifierNavigationPlayer(navigator, view));
+    registerPlayer(new MangaNavigationPlayer(navigator, view));
 
     // Register plugins
     sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this, navigator, view](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
