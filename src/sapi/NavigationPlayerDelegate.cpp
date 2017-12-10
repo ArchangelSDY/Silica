@@ -2,14 +2,20 @@
 
 namespace sapi {
 
-NavigationPlayerDelegate::NavigationPlayerDelegate(INavigationPlayerPlugin *player,
+NavigationPlayerDelegate::NavigationPlayerDelegate(INavigationPlayerPlugin *plugin,
                                                    Navigator *navigator,
                                                    QWidget *view) :
     AbstractNavigationPlayer(navigator) ,
-    m_player(player) ,
+    m_plugin(plugin) ,
+    m_player(plugin->createPlayer()) ,
     m_navigatorDelegate(new sapi::NavigatorDelegate(navigator))
 {
     m_player->onInit(m_navigatorDelegate.data(), view);
+}
+
+NavigationPlayerDelegate::~NavigationPlayerDelegate()
+{
+    m_plugin->destroyPlayer(m_player);
 }
 
 QString NavigationPlayerDelegate::name() const

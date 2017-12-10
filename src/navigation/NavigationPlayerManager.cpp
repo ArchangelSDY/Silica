@@ -1,6 +1,7 @@
 #include "NavigationPlayerManager.h"
 
 #include <QMetaClassInfo>
+#include <QSharedPointer>
 
 #include "sapi/INavigationPlayerPlugin.h"
 #include "sapi/NavigationPlayerDelegate.h"
@@ -42,6 +43,38 @@ private:
     QString m_name;
 };
 
+class PluginNavigationPlayerFactory : public NavigationPlayerManager::Factory
+{
+public:
+    PluginNavigationPlayerFactory(sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) :
+        m_plugin(plugin) ,
+        m_className(meta["name"].toString()) ,
+        m_name(meta["displayName"].toString())
+    {
+    }
+
+    virtual QString className() const override
+    {
+        return m_className;
+    }
+
+    virtual QString name() const override
+    {
+        return m_name;
+    }
+
+    virtual AbstractNavigationPlayer *create(Navigator *navigator, QWidget *view) override
+    {
+        sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(m_plugin.data(), navigator, view);
+        return player;
+    }
+
+private:
+    QScopedPointer<sapi::INavigationPlayerPlugin> m_plugin;
+    QString m_className;
+    QString m_name;
+};
+
 
 NavigationPlayerManager *NavigationPlayerManager::s_instance = nullptr;
 
@@ -63,12 +96,11 @@ NavigationPlayerManager::NavigationPlayerManager()
     registerFactory(new NavigationPlayerFactory<MangaNavigationPlayer>());
 
     // Register plugins
-    // sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this, navigator, view](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
-    //     sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(plugin, navigator, view);
-    //     this->registerPlayer(player);
-    // };
+    sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
+        this->registerFactory(new PluginNavigationPlayerFactory(plugin, meta));
+    };
 
-    // sapi::loadPlugins("navigationplayers", callback);
+    sapi::loadPlugins("navigationplayers", callback);
 }
 
 NavigationPlayerManager::~NavigationPlayerManager()

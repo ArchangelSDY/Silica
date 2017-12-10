@@ -2,6 +2,7 @@
 
 #include <QScopedPointer>
 
+#include "sapi/INavigationPlayer.h"
 #include "sapi/INavigationPlayerPlugin.h"
 #include "sapi/NavigatorDelegate.h"
 #include "navigation/AbstractNavigationPlayer.h"
@@ -11,9 +12,10 @@ namespace sapi {
 class NavigationPlayerDelegate : public AbstractNavigationPlayer
 {
 public:
-    NavigationPlayerDelegate(INavigationPlayerPlugin *player,
+    NavigationPlayerDelegate(INavigationPlayerPlugin *plugin,
                              Navigator *navigator,
                              QWidget *view);
+    ~NavigationPlayerDelegate();
 
     virtual QString name() const override;
     virtual void goNext() override;
@@ -23,7 +25,8 @@ public:
     virtual void reset() override;
 
 private:
-    QScopedPointer<INavigationPlayerPlugin> m_player;
+    INavigationPlayerPlugin *m_plugin;
+    INavigationPlayer *m_player;
     QScopedPointer<NavigatorResource> m_navigatorDelegate;
 };
 
