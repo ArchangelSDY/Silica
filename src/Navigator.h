@@ -50,7 +50,7 @@ public:
     bool isLooping() const { return m_isLooping; }
 
     void setPlayer(AbstractNavigationPlayer *player);
-    AbstractNavigationPlayer *player() { return m_player; }
+    AbstractNavigationPlayer *player() { return m_player.data(); }
 
     QSharedPointer<PlayList> basket() { return m_basket; }
 
@@ -111,7 +111,7 @@ private:
     QSharedPointer<PlayList> m_playList;
     QTimer m_autoNavigationTimer;
 
-    AbstractNavigationPlayer *m_player;
+    QScopedPointer<AbstractNavigationPlayer> m_player;
 
     QSharedPointer<PlayList> m_basket;
 };

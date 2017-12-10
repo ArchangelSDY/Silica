@@ -21,8 +21,6 @@ private slots:
     void onNavigationChange(int index);
 
 private:
-    static int OFFSET;
-
     Navigator *m_primary;
     Navigator *m_secondary;
     bool m_enabled;

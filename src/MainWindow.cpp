@@ -59,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_navigator(new Navigator(m_imagesCache)),
     m_secondaryNavigator(new Navigator(m_imagesCache)) ,
     m_secondaryMainGraphicsViewModel(nullptr) ,
+    m_secondaryMainGraphicsView(nullptr) ,
     m_navigatorSynchronizer(m_navigator, m_secondaryNavigator.data()) ,
     m_toolBar(0) ,
     m_toolBarActs(0) ,
@@ -162,11 +163,9 @@ void MainWindow::setupExtraUi()
 
     ui->pageImageViewLayout->setSpacing(0);
 
-    // Init navigation player manager
-    NavigationPlayerManager::instance()->init(m_navigator, ui->graphicsView);
-    m_navigator->setPlayer(NavigationPlayerManager::instance()->get(0));
-    // TODO: For secondary navigator, player is unchangable at the moment
-    m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->get(0));
+    // Use normal player by default
+    m_navigator->setPlayer(NavigationPlayerManager::instance()->create(0, m_navigator, ui->graphicsView));
+    m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->create(0, m_secondaryNavigator.data(), nullptr));
 
     // Init images cache
     m_imagesCache->setStrategy(new LoopImagesCacheStrategy(m_imagesCache.data(), m_navigator));
@@ -174,7 +173,10 @@ void MainWindow::setupExtraUi()
     // Main menu bar
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
-    menuBarCtx.navigator = m_navigator;
+    menuBarCtx.primaryNavigator = m_navigator;
+    menuBarCtx.secondaryNavigator = m_secondaryNavigator.data();
+    menuBarCtx.pPrimaryGraphicsView = &ui->graphicsView;
+    menuBarCtx.pSecondaryGraphicsView = &m_secondaryMainGraphicsView;
     menuBarCtx.navigatorSynchronizer = &m_navigatorSynchronizer;
     menuBarCtx.imagesCache = m_imagesCache;
     menuBarCtx.imageViewsParentLayout = ui->pageImageViewLayout;
@@ -1026,9 +1028,9 @@ void MainWindow::toggleSecondaryNavigator()
     bool willEnable = !m_navigatorSynchronizer.isEnabled();
     m_navigatorSynchronizer.setEnabled(willEnable);
 
-    NormalNavigationPlayer *normalPlayer = static_cast<NormalNavigationPlayer *>(NavigationPlayerManager::instance()->get(0));
+    // Set step size of primary player
     int stepSize = willEnable ? 2 : 1;
-    normalPlayer->setStepSize(stepSize);
+    m_navigator->player()->setStepSize(stepSize);
 
     if (m_secondaryMainGraphicsViewModel.isNull()) {
         // Create view at the first time
@@ -1044,10 +1046,12 @@ void MainWindow::toggleSecondaryNavigator()
         connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
                 m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
 
+        createMainImageView(&m_secondaryMainGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
+        ui->pageImageViewLayout->insertWidget(0, m_secondaryMainGraphicsView);
 
-        QWidget *secondaryGraphicsView = nullptr;
-        createMainImageView(&secondaryGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
-        ui->pageImageViewLayout->insertWidget(0, secondaryGraphicsView);
+        // Create player
+        m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->create(
+            m_navigator->player()->metaObject()->className(), m_secondaryNavigator.data(), m_secondaryMainGraphicsView));
 
         // Trigger a force reload to do an initial paint
         m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);

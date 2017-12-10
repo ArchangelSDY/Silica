@@ -17,11 +17,6 @@ ExpandingNavigationPlayer::ExpandingNavigationPlayer(Navigator *navigator,
 {
 }
 
-QString ExpandingNavigationPlayer::name() const
-{
-    return "Expanding Player";
-}
-
 void ExpandingNavigationPlayer::goNext()
 {
     if (m_curIndex >= m_toBeFocused.count() - 1) {
@@ -83,7 +78,7 @@ void ExpandingNavigationPlayer::onImageSizeGet(Image *image)
 void ExpandingNavigationPlayer::calcFocused()
 {
     Image *curImage = m_navigator->currentImage();
-    if (curImage) {
+    if (curImage && m_view) {
         m_toBeFocused.clear();
 
         QSize imageSize = curImage->size();

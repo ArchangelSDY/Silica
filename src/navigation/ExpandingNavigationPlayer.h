@@ -10,12 +10,12 @@ class Image;
 class ExpandingNavigationPlayer : public AbstractNavigationPlayer
 {
     Q_OBJECT
+    Q_CLASSINFO("Name", "Expanding Player")
 public:
     explicit ExpandingNavigationPlayer(Navigator *navigator,
                                        QWidget *view,
                                        QObject *parent = 0);
 
-    QString name() const override;
     void goNext() override;
     void goPrev() override;
     void onEnter() override;

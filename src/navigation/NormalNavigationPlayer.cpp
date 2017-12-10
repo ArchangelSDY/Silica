@@ -2,15 +2,10 @@
 #include "NormalNavigationPlayer.h"
 
 NormalNavigationPlayer::NormalNavigationPlayer(Navigator *navigator,
+                                               QWidget *view,
                                                QObject *parent) :
-    AbstractNavigationPlayer(navigator, parent) ,
-    m_stepSize(1)
+    AbstractNavigationPlayer(navigator, parent)
 {
-}
-
-QString NormalNavigationPlayer::name() const
-{
-    return "Normal Player";
 }
 
 void NormalNavigationPlayer::goNext()
@@ -27,9 +22,4 @@ void NormalNavigationPlayer::onEnter()
 {
     // Set focused rect to null to disable focusing
     m_navigator->focusOnRect(QRectF());
-}
-
-void NormalNavigationPlayer::setStepSize(int stepSize)
-{
-    m_stepSize = stepSize;
 }

@@ -1,5 +1,7 @@
 #include "NavigationPlayerManager.h"
 
+#include <QMetaClassInfo>
+
 #include "sapi/INavigationPlayerPlugin.h"
 #include "sapi/NavigationPlayerDelegate.h"
 #include "sapi/PluginLoader.h"
@@ -9,6 +11,37 @@
 #include "HotspotsNavigationPlayer.h"
 #include "MangaNavigationPlayer.h"
 #include "NormalNavigationPlayer.h"
+
+template<class T>
+class NavigationPlayerFactory : public NavigationPlayerManager::Factory
+{
+public:
+    NavigationPlayerFactory() :
+        m_className(T::staticMetaObject.className()) ,
+        m_name(T::staticMetaObject.classInfo(0).value())
+    {
+    }
+
+    virtual QString className() const override
+    {
+        return m_className;
+    }
+
+    virtual QString name() const override
+    {
+        return m_name;
+    }
+
+    virtual AbstractNavigationPlayer *create(Navigator *navigator, QWidget *view) override
+    {
+        return new T(navigator, view);
+    }
+
+private:
+    QString m_className;
+    QString m_name;
+};
+
 
 NavigationPlayerManager *NavigationPlayerManager::s_instance = nullptr;
 
@@ -22,48 +55,56 @@ NavigationPlayerManager *NavigationPlayerManager::instance()
 
 NavigationPlayerManager::NavigationPlayerManager()
 {
+    registerFactory(new NavigationPlayerFactory<NormalNavigationPlayer>());
+    registerFactory(new NavigationPlayerFactory<HotspotsNavigationPlayer>());
+    registerFactory(new NavigationPlayerFactory<ExpandingNavigationPlayer>());
+    registerFactory(new NavigationPlayerFactory<FixedRegionNavigationPlayer>());
+    registerFactory(new NavigationPlayerFactory<CascadeClassifierNavigationPlayer>());
+    registerFactory(new NavigationPlayerFactory<MangaNavigationPlayer>());
 
+    // Register plugins
+    // sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this, navigator, view](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
+    //     sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(plugin, navigator, view);
+    //     this->registerPlayer(player);
+    // };
+
+    // sapi::loadPlugins("navigationplayers", callback);
 }
 
 NavigationPlayerManager::~NavigationPlayerManager()
 {
-    for (AbstractNavigationPlayer *player : m_players) {
-        delete player;
+    for (Factory *factory : m_playerFactories) {
+        delete factory;
     }
 }
 
-AbstractNavigationPlayer *NavigationPlayerManager::get(int idx)
+AbstractNavigationPlayer *NavigationPlayerManager::create(const QString &className, Navigator *navigator, QWidget *view)
 {
-    if (idx < 0 || idx >= m_players.size()) {
+    Factory *factory = m_playerFactoriesByClassName[className];
+    if (factory) {
+        return factory->create(navigator, view);
+    } else {
         return nullptr;
     }
-    return m_players[idx];
 }
 
-QList<AbstractNavigationPlayer *> NavigationPlayerManager::all() const
+AbstractNavigationPlayer *NavigationPlayerManager::create(int idx, Navigator *navigator, QWidget *view)
 {
-    return m_players;
+    if (idx >= 0 && idx < m_playerFactories.count()) {
+        return m_playerFactories[idx]->create(navigator, view);
+    } else {
+        return nullptr;
+    }
 }
 
-void NavigationPlayerManager::registerPlayer(AbstractNavigationPlayer *player)
+QStringList NavigationPlayerManager::names() const
 {
-    m_players << player;
+    return m_names;
 }
 
-void NavigationPlayerManager::init(Navigator *navigator, QWidget *view)
+void NavigationPlayerManager::registerFactory(Factory *factory)
 {
-    registerPlayer(new NormalNavigationPlayer(navigator));
-    registerPlayer(new HotspotsNavigationPlayer(navigator));
-    registerPlayer(new ExpandingNavigationPlayer(navigator, view));
-    registerPlayer(new FixedRegionNavigationPlayer(navigator, view));
-    registerPlayer(new CascadeClassifierNavigationPlayer(navigator, view));
-    registerPlayer(new MangaNavigationPlayer(navigator, view));
-
-    // Register plugins
-    sapi::PluginLoadCallback<sapi::INavigationPlayerPlugin> callback = [this, navigator, view](sapi::INavigationPlayerPlugin *plugin, const QJsonObject &meta) {
-        sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(plugin, navigator, view);
-        this->registerPlayer(player);
-    };
-
-    sapi::loadPlugins("navigationplayers", callback);
+    m_playerFactories << factory;
+    m_playerFactoriesByClassName[factory->className()] = factory;
+    m_names << factory->name();
 }

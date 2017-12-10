@@ -13,11 +13,6 @@ FixedRegionNavigationPlayer::FixedRegionNavigationPlayer(Navigator *navigator,
 {
 }
 
-QString FixedRegionNavigationPlayer::name() const
-{
-    return "Fixed Region Player";
-}
-
 void FixedRegionNavigationPlayer::onEnter()
 {
     // Set focused rect to null to disable focusing
@@ -49,10 +44,16 @@ void FixedRegionNavigationPlayer::goPrev()
     m_navigator->focusOnRect(calcFocusedRect());
 }
 
+void FixedRegionNavigationPlayer::goIndexUntilSuccess(int index, int delta)
+{
+    m_navigator->goIndexUntilSuccess(index, delta);
+    m_navigator->focusOnRect(calcFocusedRect());
+}
+
 QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
 {
     Image *curImage = m_navigator->currentImage();
-    if (!curImage) {
+    if (!curImage || !m_view) {
         return QRectF();
     }
 
@@ -100,5 +101,11 @@ QDialog *FixedRegionNavigationPlayer::createConfigureDialog()
 bool FixedRegionNavigationPlayer::isConfigurable() const
 {
     return true;
+}
+
+void FixedRegionNavigationPlayer::cloneConfigurationFrom(AbstractNavigationPlayer *player)
+{
+    FixedRegionNavigationPlayer *other = static_cast<FixedRegionNavigationPlayer *>(player);
+    m_centers = other->m_centers;
 }
 

@@ -15,6 +15,7 @@ Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
     m_currentUuid(QUuid()) ,
+    m_currentImage(nullptr) ,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
     m_cachedImages(imagesCache) ,
@@ -66,7 +67,9 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
 
     goIndex(0);
 
-    m_player->reset();
+    if (m_player) {
+        m_player->reset();
+    }
 }
 
 void Navigator::playListAppended(int start)
@@ -369,7 +372,7 @@ void Navigator::setPlayer(AbstractNavigationPlayer *player)
         m_player->onLeave();
     }
 
-    m_player = player;
+    m_player.reset(player);
 
     m_player->onEnter();
 }

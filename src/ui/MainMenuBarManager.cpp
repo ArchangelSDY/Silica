@@ -15,7 +15,10 @@
 MainMenuBarManager::MainMenuBarManager(Context context, QObject *parent) :
     QObject(parent) ,
     m_menuBar(context.menuBar) ,
-    m_navigator(context.navigator) ,
+    m_primaryNavigator(context.primaryNavigator) ,
+    m_secondaryNavigator(context.secondaryNavigator) ,
+    m_pPrimaryGraphicsView(context.pPrimaryGraphicsView) ,
+    m_pSecondaryGraphicsView(context.pSecondaryGraphicsView) ,
     m_navigatorSynchronizer(context.navigatorSynchronizer) ,
     m_imagesCache(context.imagesCache) ,
     m_pluginLogsDialog(new PluginLogsDialog()) ,
@@ -51,14 +54,18 @@ void MainMenuBarManager::createMenuNavigationPlayers(QMenu *parentMenu)
     QActionGroup *playersGrp = new QActionGroup(menuPlayers);
     playersGrp->setExclusive(true);
 
-    QList<AbstractNavigationPlayer *> players = NavigationPlayerManager::instance()->all();
-    Navigator *navigator = m_navigator;
-    for (AbstractNavigationPlayer *player : players) {
-        QAction *actPlayer = menuPlayers->addAction(player->name(), [navigator, player]() {
-            navigator->setPlayer(player);
+    QStringList playerNames = NavigationPlayerManager::instance()->names();
+    for (int i = 0; i < playerNames.count(); i++) {
+        const QString &playerName = playerNames[i];
+        QAction *actPlayer = menuPlayers->addAction(playerName, [this, i]() {
+            AbstractNavigationPlayer *newPrimaryPlayer = NavigationPlayerManager::instance()->create(i, this->m_primaryNavigator, *this->m_pPrimaryGraphicsView);
+            newPrimaryPlayer->setStepSize(this->m_primaryNavigator->player()->stepSize());
+            this->m_primaryNavigator->setPlayer(newPrimaryPlayer);
+
+            this->m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->create(i, this->m_secondaryNavigator, *this->m_pSecondaryGraphicsView));
         });
         actPlayer->setCheckable(true);
-        actPlayer->setChecked(navigator->player() == player);
+        actPlayer->setChecked(m_primaryNavigator->player()->name() == playerName);
         playersGrp->addAction(actPlayer);
     }
 
@@ -67,8 +74,8 @@ void MainMenuBarManager::createMenuNavigationPlayers(QMenu *parentMenu)
     QAction *actPlayerConf = menuPlayers->addAction(
         tr("Player Configuration..."), this, SLOT(openPlayerConfDialog()));
 
-    connect(menuPlayers, &QMenu::aboutToShow, [actPlayerConf, navigator]() {
-        actPlayerConf->setEnabled(navigator->player()->isConfigurable());
+    connect(menuPlayers, &QMenu::aboutToShow, [this, actPlayerConf]() {
+        actPlayerConf->setEnabled(this->m_primaryNavigator->player()->isConfigurable());
     });
 }
 
@@ -101,7 +108,7 @@ void MainMenuBarManager::createMenuNavigationTwoColumns(QMenu *parentMenu)
 
 void MainMenuBarManager::createMenuNavigationLoop(QMenu *parentMenu)
 {
-    Navigator *primaryNavigator = m_navigator;
+    Navigator *primaryNavigator = m_primaryNavigator;
     NavigatorSynchronizer *navigatorSynchronizer = m_navigatorSynchronizer;
     QSharedPointer<ImagesCache> imagesCache = m_imagesCache;
     QAction *loop = parentMenu->addAction(tr("Loop"), [primaryNavigator, navigatorSynchronizer, imagesCache](bool loop) {
@@ -117,18 +124,18 @@ void MainMenuBarManager::createMenuNavigationLoop(QMenu *parentMenu)
     });
     loop->setCheckable(true);
     connect(parentMenu, &QMenu::aboutToShow, [this, loop]() {
-        loop->setChecked(this->m_navigator->isLooping());
+        loop->setChecked(this->m_primaryNavigator->isLooping());
     });
 }
 
 void MainMenuBarManager::createMenuNavigationAutoSpeed(QMenu *parentMenu)
 {
-    int currentNavInterval = m_navigator->autoNavigationInterval();
+    int currentNavInterval = m_primaryNavigator->autoNavigationInterval();
     QMenu *autoNavMenu = parentMenu->addMenu(tr("Auto Speed"));
     QActionGroup *autoNavGrp = new QActionGroup(autoNavMenu);
     QSignalMapper *autoNavSigMap = new QSignalMapper(autoNavMenu);
     connect(autoNavSigMap, SIGNAL(mapped(int)),
-            m_navigator, SLOT(setAutoNavigationInterval(int)));
+            m_primaryNavigator, SLOT(setAutoNavigationInterval(int)));
 
     QAction *fastAutoNav = autoNavMenu->addAction(
         tr("Fast"), autoNavSigMap, SLOT(map()));
@@ -160,8 +167,11 @@ void MainMenuBarManager::createMenuNavigationAutoSpeed(QMenu *parentMenu)
 
 void MainMenuBarManager::openPlayerConfDialog()
 {
-    QScopedPointer<QDialog> confDialog(m_navigator->player()->createConfigureDialog());
+    QScopedPointer<QDialog> confDialog(m_primaryNavigator->player()->createConfigureDialog());
     confDialog->exec();
+
+    // Sync to secondary navigator player
+    m_secondaryNavigator->player()->cloneConfigurationFrom(m_primaryNavigator->player());
 }
 
 void MainMenuBarManager::showPluginLogsDialog()

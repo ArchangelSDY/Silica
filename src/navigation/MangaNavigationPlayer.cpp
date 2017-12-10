@@ -12,22 +12,22 @@ MangaNavigationPlayer::MangaNavigationPlayer(Navigator *navigator,
 {
 }
 
-QString MangaNavigationPlayer::name() const
-{
-    return QStringLiteral("Manga Player");
-}
-
-
 void MangaNavigationPlayer::goNext()
 {
-    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() + 1, 1);
+    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() + m_stepSize, 1);
     focus(FocusPolicy::TopRight);
 }
 
 void MangaNavigationPlayer::goPrev()
 {
-    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() - 1, -1);
+    m_navigator->goIndexUntilSuccess(m_navigator->currentIndex() - m_stepSize, -1);
     focus(FocusPolicy::BottomLeft);
+}
+
+void MangaNavigationPlayer::goIndexUntilSuccess(int index, int delta)
+{
+    m_navigator->goIndexUntilSuccess(index, delta);
+    focus(delta > 0 ? FocusPolicy::TopRight : FocusPolicy::BottomLeft);
 }
 
 void MangaNavigationPlayer::onEnter()
@@ -44,7 +44,7 @@ void MangaNavigationPlayer::onLeave()
 void MangaNavigationPlayer::focus(FocusPolicy policy)
 {
     Image *curImage = m_navigator->currentImage();
-    if (!curImage) {
+    if (!curImage || !m_view) {
         return;
     }
 

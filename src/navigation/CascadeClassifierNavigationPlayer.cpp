@@ -20,11 +20,6 @@ CascadeClassifierNavigationPlayer::CascadeClassifierNavigationPlayer(
 {
 }
 
-QString CascadeClassifierNavigationPlayer::name() const
-{
-    return "Cascade Classifier Player";
-}
-
 void CascadeClassifierNavigationPlayer::goNext()
 {
     if (m_curRegionIndex >= m_regions.size() - 1) {
@@ -108,6 +103,10 @@ void CascadeClassifierNavigationPlayer::detectRegions()
 
 void CascadeClassifierNavigationPlayer::focusOnCurrentRegion()
 {
+    if (!m_view) {
+        return;
+    }
+
     if (m_curRegionIndex < m_regions.size() && m_curRegionIndex >= 0) {
         const QRect &rect = m_regions[m_curRegionIndex];
 

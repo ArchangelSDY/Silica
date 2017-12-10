@@ -4,15 +4,11 @@
 #include "Navigator.h"
 
 HotspotsNavigationPlayer::HotspotsNavigationPlayer(Navigator *navigator,
+                                                   QWidget *view,
                                                    QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
     m_curHotspotIndex(0)
 {
-}
-
-QString HotspotsNavigationPlayer::name() const
-{
-    return "Hotspots Player";
 }
 
 void HotspotsNavigationPlayer::goNext()

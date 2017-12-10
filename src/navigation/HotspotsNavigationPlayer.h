@@ -9,11 +9,12 @@ class Navigator;
 class HotspotsNavigationPlayer : public AbstractNavigationPlayer
 {
     Q_OBJECT
+    Q_CLASSINFO("Name", "Hotspots Player")
 public:
     explicit HotspotsNavigationPlayer(Navigator *navigator,
+                                      QWidget *view,
                                       QObject *parent = 0);
 
-    QString name() const override;
     void goNext() override;
     void goPrev() override;
 

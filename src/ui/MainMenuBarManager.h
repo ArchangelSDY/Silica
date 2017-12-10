@@ -15,7 +15,10 @@ class MainMenuBarManager : public QObject
     Q_OBJECT
 public:
     struct Context {
-        Navigator *navigator;
+        Navigator *primaryNavigator;
+        Navigator *secondaryNavigator;
+        QWidget **pPrimaryGraphicsView;
+        QWidget **pSecondaryGraphicsView;
         NavigatorSynchronizer *navigatorSynchronizer;
         QSharedPointer<ImagesCache> imagesCache;
         QMenuBar *menuBar;
@@ -37,7 +40,10 @@ private:
     void createMenuNavigationAutoSpeed(QMenu *parentMenu);
 
     QMenuBar *m_menuBar;
-    Navigator *m_navigator;
+    Navigator *m_primaryNavigator;
+    Navigator *m_secondaryNavigator;
+    QWidget **m_pPrimaryGraphicsView;
+    QWidget **m_pSecondaryGraphicsView;
     NavigatorSynchronizer *m_navigatorSynchronizer;
     QSharedPointer<ImagesCache> m_imagesCache;
     QHBoxLayout *m_imageViewsParentLayout;

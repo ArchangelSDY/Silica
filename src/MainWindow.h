@@ -79,6 +79,7 @@ private:
 
     QScopedPointer<Navigator> m_secondaryNavigator;
     QScopedPointer<MainGraphicsViewModel> m_secondaryMainGraphicsViewModel;
+    QWidget *m_secondaryMainGraphicsView;
     NavigatorSynchronizer m_navigatorSynchronizer;
 
     QScopedPointer<MainGraphicsViewModel> m_sideViewModel;
