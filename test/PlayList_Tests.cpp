@@ -9,6 +9,8 @@
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/ImageRank.h"
 #include "../src/image/ImageSource.h"
+#include "../src/playlist/sort/PlayListImageAspectRatioSorter.h"
+#include "../src/playlist/sort/PlayListImageNameSorter.h"
 #include "../src/playlist/EqualRankFilter.h"
 #include "../src/playlist/MinRankFilter.h"
 #include "../src/playlist/NotEqualRankFilter.h"
@@ -80,7 +82,8 @@ void TestPlayList::sortByName()
         pl << QSharedPointer<Image>(new Image(QSharedPointer<ImageSource>(new MockImageSource(name))));
     }
 
-    pl.sortByName();
+    PlayListImageNameSorter sorter;
+    pl.sortBy(&sorter);
 
     QCOMPARE(pl.count(), sortedNames.count());
     for (int i = 0; i < pl.count(); ++i) {
@@ -134,7 +137,8 @@ void TestPlayList::sortByAspectRatio()
     QSignalSpy spySecond(pl.at(1).data(), SIGNAL(loaded()));
     spySecond.wait();
 
-    pl.sortByAspectRatio();
+    PlayListImageAspectRatioSorter sorter;
+    pl.sortBy(&sorter);
 
     QCOMPARE(pl.at(0)->name(), firstItemName);
     QCOMPARE(pl.at(1)->name(), secondItemName);
@@ -232,12 +236,14 @@ void TestPlayList::setFilter()
     QCOMPARE(pl.size(), filteredCount);
 
     // Sorting has no effect on filter
-    pl.sortByAspectRatio();
+    PlayListImageAspectRatioSorter arSorter;
+    pl.sortBy(&arSorter);
 
     QCOMPARE(pl.count(), filteredCount);
     QCOMPARE(pl.size(), filteredCount);
 
-    pl.sortByName();
+    PlayListImageNameSorter nameSorter;
+    pl.sortBy(&nameSorter);
 
     QCOMPARE(pl.count(), filteredCount);
     QCOMPARE(pl.size(), filteredCount);

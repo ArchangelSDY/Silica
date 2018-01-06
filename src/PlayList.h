@@ -5,6 +5,7 @@
 #include <QUrl>
 
 #include "image/Image.h"
+#include "playList/sort/AbstractPlayListSorter.h"
 
 class AbstractPlayListFilter;
 class PlayListRecord;
@@ -26,9 +27,7 @@ public:
     void addMultiplePath(const QString &);
     void addMultiplePath(const QUrl &);
 
-    void sortByName();
-    void sortByAspectRatio();
-    void sortBySize();
+    void sortBy(AbstractPlayListSorter *sorter);
     void sortByGroup();
 
     int groupForImage(Image * const image);

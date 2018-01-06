@@ -8,12 +8,15 @@
 #include <QRunnable>
 #include <QThreadPool>
 
-#include "CompactRendererFactory.h"
-#include "ImageGalleryItem.h"
-#include "ImageGalleryView.h"
-#include "LooseRendererFactory.h"
+#include "playlist/PlayListRecord.h"
+#include "playlist/sort/PlayListImageAspectRatioSorter.h"
+#include "playlist/sort/PlayListImageNameSorter.h"
+#include "playlist/sort/PlayListImageSizeSorter.h"
+#include "ui/ImageGalleryItem.h"
+#include "ui/ImageGalleryView.h"
+#include "ui/renderers/CompactRendererFactory.h"
+#include "ui/renderers/LooseRendererFactory.h"
 #include "Navigator.h"
-#include "PlayListRecord.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
@@ -124,7 +127,8 @@ void ImageGalleryView::sortByName()
         return;
     }
 
-    m_playList->sortByName();
+    PlayListImageNameSorter sorter;
+    m_playList->sortBy(&sorter);
 }
 
 void ImageGalleryView::sortByAspectRatio()
@@ -133,7 +137,8 @@ void ImageGalleryView::sortByAspectRatio()
         return;
     }
 
-    m_playList->sortByAspectRatio();
+    PlayListImageAspectRatioSorter sorter;
+    m_playList->sortBy(&sorter);
 }
 
 void ImageGalleryView::sortBySize()
@@ -142,7 +147,8 @@ void ImageGalleryView::sortBySize()
         return;
     }
 
-    m_playList->sortBySize();
+    PlayListImageSizeSorter sorter;
+    m_playList->sortBy(&sorter);
 }
 
 void ImageGalleryView::setAsCover()

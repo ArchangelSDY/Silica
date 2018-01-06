@@ -1,6 +1,5 @@
 #include <QtConcurrent>
 #include <QEventLoop>
-#include <QRegularExpression>
 #include <functional>
 #include <vector>
 #include <opencv2/core/core.hpp>
@@ -13,6 +12,7 @@
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
 #include "playlist/PlayListRecord.h"
+#include "playlist/sort/Utils.h"
 #include "PlayList.h"
 
 PlayList::PlayList() :
@@ -160,88 +160,9 @@ void PlayList::removeAt(int index)
     emit itemsChanged();
 }
 
-static bool imageNameLessThan(const QSharedPointer<Image> &left,
-                              const QSharedPointer<Image> &right)
+void PlayList::sortBy(AbstractPlayListSorter *sorter)
 {
-    static QRegularExpression numberRegex("(\\d+)");
-
-    if (left->name().split(numberRegex) == right->name().split(numberRegex)) {
-        // Names are similar except number parts
-
-        // Extract number parts from left
-        QList<int> leftNumbers;
-        QRegularExpressionMatchIterator leftIter =
-            numberRegex.globalMatch(left->name());
-        while (leftIter.hasNext()) {
-            QRegularExpressionMatch m = leftIter.next();
-            leftNumbers << m.captured(1).toInt();
-        }
-
-        // Extract number parts from right
-        QList<int> rightNumbers;
-        QRegularExpressionMatchIterator rightIter =
-            numberRegex.globalMatch(right->name());
-        while (rightIter.hasNext()) {
-            QRegularExpressionMatch m = rightIter.next();
-            rightNumbers << m.captured(1).toInt();
-        }
-
-        int len = qMin(leftNumbers.length(), rightNumbers.length());
-        if (len > 0) {
-            // Compare using first different number
-            for (int i = 0; i < len; ++i) {
-                int delta = rightNumbers[i] - leftNumbers[i];
-                if (delta != 0) {
-                    return delta > 0;
-                }
-            }
-        }
-    }
-
-    // Fallback to string comparison
-    return left->name() < right->name();
-}
-
-void PlayList::sortByName()
-{
-    qSort(m_filteredImages.begin(), m_filteredImages.end(), imageNameLessThan);
-    emit itemsChanged();
-}
-
-static bool imageAspectRatioLessThan(const QSharedPointer<Image> &left,
-                                     const QSharedPointer<Image> &right)
-{
-    return left->aspectRatio() < right->aspectRatio();
-}
-
-void PlayList::sortByAspectRatio()
-{
-    qSort(m_filteredImages.begin(), m_filteredImages.end(),
-          imageAspectRatioLessThan);
-    emit itemsChanged();
-}
-
-static bool imageSizeLessThan(const QSharedPointer<Image> &left,
-                              const QSharedPointer<Image> &right)
-{
-    const QSize leftSize = left->size();
-    const QSize rightSize = right->size();
-
-    if (leftSize.width() != rightSize.width()) {
-        return leftSize.width() < rightSize.width();
-    }
-
-    if (leftSize.height() != rightSize.height()) {
-        return leftSize.height() < rightSize.height();
-    }
-
-    return imageNameLessThan(left, right);
-}
-
-void PlayList::sortBySize()
-{
-    qSort(m_filteredImages.begin(), m_filteredImages.end(),
-          imageSizeLessThan);
+    sorter->sort(m_filteredImages.begin(), m_filteredImages.end());
     emit itemsChanged();
 }
 
@@ -265,7 +186,7 @@ bool PlayList::groupLessThan(const QSharedPointer<Image> &left,
     if (leftGroup != rightGroup) {
         return leftGroup < rightGroup;
     } else {
-        return imageNameLessThan(left, right);
+        return ImageNameLessThan(left->name(), right->name());
     }
 }
 
