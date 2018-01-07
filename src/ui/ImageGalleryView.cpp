@@ -8,10 +8,11 @@
 #include <QRunnable>
 #include <QThreadPool>
 
-#include "playlist/PlayListRecord.h"
+#include "playlist/group/PlayListImageThumbnailHistogramGrouper.h"
 #include "playlist/sort/PlayListImageAspectRatioSorter.h"
 #include "playlist/sort/PlayListImageNameSorter.h"
 #include "playlist/sort/PlayListImageSizeSorter.h"
+#include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageGalleryView.h"
 #include "ui/renderers/CompactRendererFactory.h"
@@ -206,10 +207,9 @@ QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
     ImageGalleryItem *item = static_cast<ImageGalleryItem *>(rawItem);
     const ImagePtr &image = item->image();
     if (!image.isNull()) {
-        int group = m_playList->groupForImage(image.data());
-        return QString(tr("Group %1").arg(group));
+        return m_playList->groupNameOf(image.data());
     } else {
-        return QString();
+        return QStringLiteral("");
     }
 }
 
@@ -220,8 +220,7 @@ public:
     GroupByThumbHistTask(QSharedPointer<PlayList> pl) : m_pl(pl) {}
     void run()
     {
-        m_pl->groupByThumbHist();
-        m_pl->sortByGroup();
+        m_pl->groupBy(new PlayListImageThumbnailHistogramGrouper());
     }
 
 private:

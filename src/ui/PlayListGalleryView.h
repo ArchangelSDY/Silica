@@ -26,7 +26,7 @@ private slots:
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
-    QString groupForItem(GalleryItem *);
+    virtual QString groupForItem(GalleryItem *item) override;
     void sortItemByGroup(QList<GalleryItem *> *items);
 
 private:

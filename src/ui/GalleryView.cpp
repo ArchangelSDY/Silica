@@ -93,24 +93,16 @@ QGraphicsScene *GalleryView::scene() const
     return m_view->scene();
 }
 
-QList<GalleryItem *> GalleryView::galleryItems() const
+const QList<GalleryItem *> &GalleryView::galleryItems() const
 {
-    QList<GalleryItem *> items;
-    foreach (QGraphicsItem *rawItem, scene()->items(Qt::AscendingOrder)) {
-        GalleryItem *item = dynamic_cast<GalleryItem *>(rawItem);
-        if (item) {
-            items << item;
-        }
-    }
-    return items;
+    return m_galleryItems;
 }
 
 QList<GalleryItem *> GalleryView::selectedGalleryItems() const
 {
     QList<GalleryItem *> items;
-    foreach (QGraphicsItem *rawItem, scene()->selectedItems()) {
-        GalleryItem *item = dynamic_cast<GalleryItem *>(rawItem);
-        if (item) {
+    for (GalleryItem *item : galleryItems()) {
+        if (item->isSelected()) {
             items << item;
         }
     }
@@ -135,6 +127,7 @@ void GalleryView::clear()
         m_scene->removeItem(item);
         item->deleteLater();
     }
+    m_galleryItems.clear();
     m_loadProgress.reset();
     m_loadProgress.setMaximum(0);
 }
@@ -171,7 +164,7 @@ void GalleryView::layout()
     if (m_enableGrouping) {
         sortItemByGroup(&items);
 
-        foreach (GalleryItem *item, items) {
+        for (auto item : items) {
             itemGroups << groupForItem(item);
         }
     }
@@ -248,6 +241,7 @@ void GalleryView::itemMouseDoubleClicked()
 
 void GalleryView::addItem(GalleryItem *item)
 {
+    m_galleryItems << item;
     m_scene->addItem(item);
     markItemIsFiltered(item);
     connect(item, SIGNAL(requestLayout()), this, SLOT(scheduleLayout()),

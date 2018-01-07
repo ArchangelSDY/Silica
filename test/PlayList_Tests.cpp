@@ -9,6 +9,7 @@
 #include "../src/db/LocalDatabase.h"
 #include "../src/image/ImageRank.h"
 #include "../src/image/ImageSource.h"
+#include "../src/playlist/group/PlayListImageThumbnailHistogramGrouper.h"
 #include "../src/playlist/sort/PlayListImageAspectRatioSorter.h"
 #include "../src/playlist/sort/PlayListImageNameSorter.h"
 #include "../src/playlist/EqualRankFilter.h"
@@ -182,7 +183,7 @@ void TestPlayList::sortByThumbHist()
         spy.wait();
     }
 
-    pl.sortByGroup();
+    pl.groupBy(new PlayListImageThumbnailHistogramGrouper());
 
     QStringList actSortedImageNames;
     for (int i = 0; i < pl.size(); ++i) {

@@ -44,7 +44,7 @@ protected:
         GroupByThumbHist,
     };
     GroupMode m_groupMode;
-    virtual QString groupForItem(GalleryItem *);
+    virtual QString groupForItem(GalleryItem *item) override;
 };
 
 #endif // IMAGEGALLERYVIEW_H

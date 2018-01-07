@@ -5,6 +5,7 @@
 #include <QUrl>
 
 #include "image/Image.h"
+#include "playList/group/AbstractPlayListGrouper.h"
 #include "playList/sort/AbstractPlayListSorter.h"
 
 class AbstractPlayListFilter;
@@ -28,10 +29,9 @@ public:
     void addMultiplePath(const QUrl &);
 
     void sortBy(AbstractPlayListSorter *sorter);
-    void sortByGroup();
 
-    int groupForImage(Image * const image);
-    void groupByThumbHist();
+    QString groupNameOf(Image *image) const;
+    void groupBy(AbstractPlayListGrouper *grouper);
 
     void setFilter(AbstractPlayListFilter *filter);
 
@@ -97,14 +97,11 @@ signals:
 private:
     PlayList(const PlayList &playList);
 
-    bool groupLessThan(const ImagePtr &left, const ImagePtr &right);
-
     ImageList m_allImages;
     ImageList m_filteredImages;
     PlayListRecord *m_record;
-    AbstractPlayListFilter *m_filter;   // Should never be 0
-
-    QHash<Image *, int> m_imageGroups;
+    QScopedPointer<AbstractPlayListFilter> m_filter;   // Should never be 0
+    QScopedPointer<AbstractPlayListGrouper> m_grouper;
 };
 
 #endif // PLAYLIST_H

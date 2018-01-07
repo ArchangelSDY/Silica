@@ -21,7 +21,7 @@ public:
     ~GalleryView();
 
     QGraphicsScene *scene() const;
-    QList<GalleryItem *> galleryItems() const;
+    const QList<GalleryItem *> &galleryItems() const;
     QList<GalleryItem *> selectedGalleryItems() const;
 
     const TaskProgress &loadProgress() const;
@@ -67,7 +67,7 @@ protected:
     AbstractRendererFactory *rendererFactory();
     void setRendererFactory(AbstractRendererFactory *factory);
 
-    virtual QString groupForItem(GalleryItem *) { return QString(); }
+    virtual QString groupForItem(GalleryItem *item) { return QString(); }
     /**
      * @brief Sort GalleryItem by group.
      *
@@ -97,6 +97,7 @@ private:
     class GraphicsView;
     friend class GraphicsView;
 
+    QList<GalleryItem *> m_galleryItems;
     AbstractRendererFactory *m_rendererFactory;
     QList<QGraphicsItem *> m_itemGroupTitles;
     QSet<QGraphicsItem *> m_viewportPreloadItems;

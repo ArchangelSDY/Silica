@@ -55,6 +55,8 @@ file(GLOB CORE_SRCS
     "navigation/NavigationPlayerManager.cpp"
     "navigation/NavigatorSynchronizer.cpp"
     "navigation/NormalNavigationPlayer.cpp"
+    "playlist/group/AbstractPlayListGrouper.cpp"
+    "playlist/group/PlayListImageThumbnailHistogramGrouper.cpp"
     "playlist/sort/PlayListImageAspectRatioSorter.cpp"
     "playlist/sort/PlayListImageNameSorter.cpp"
     "playlist/sort/PlayListImageSizeSorter.cpp"

@@ -236,7 +236,7 @@ void Navigator::goPrevGroup()
         return;
     }
 
-    int cmpGroup = m_playList->groupForImage(m_currentImage);
+    QString cmpGroup = m_playList->groupNameOf(m_currentImage);
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
     bool isInPrevGroup = false;
@@ -248,7 +248,7 @@ void Navigator::goPrevGroup()
         }
 
         const ImagePtr &image = m_playList->at(index);
-        int group = m_playList->groupForImage(image.data());
+        QString group = m_playList->groupNameOf(image.data());
         if (group != cmpGroup) {
             if (!isInPrevGroup) {
                 // Now at the end of prev group. Try to find the head.
@@ -275,7 +275,7 @@ void Navigator::goNextGroup()
         return;
     }
 
-    int initGroup = m_playList->groupForImage(m_currentImage);
+    QString initGroup = m_playList->groupNameOf(m_currentImage);
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
 
@@ -286,7 +286,7 @@ void Navigator::goNextGroup()
         }
 
         const ImagePtr &image = m_playList->at(index);
-        int group = m_playList->groupForImage(image.data());
+        QString group = m_playList->groupNameOf(image.data());
         if (group != initGroup) {
             break;
         }
