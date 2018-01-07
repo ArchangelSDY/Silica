@@ -8,6 +8,8 @@
 #include <QRunnable>
 #include <QThreadPool>
 
+#include "image/metadata/ImageMetadataConstants.h"
+#include "playlist/group/PlayListImageMetadataGrouper.h"
 #include "playlist/group/PlayListImageThumbnailHistogramGrouper.h"
 #include "playlist/sort/PlayListImageAspectRatioSorter.h"
 #include "playlist/sort/PlayListImageNameSorter.h"
@@ -23,8 +25,7 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
     m_navigator(0) ,
     m_playList(0) ,
-    m_rankFilterMenuManager(0) ,
-    m_groupMode(GroupByThumbHist)
+    m_rankFilterMenuManager(0)
 {
 #ifdef ENABLE_OPENGL
     m_view->setViewport(new QOpenGLWidget(this));
@@ -97,7 +98,15 @@ QMenu *ImageGalleryView::createContextMenu()
 
     QMenu *groups = menu->addMenu(tr("Group By"));
     groups->addAction(tr("None"), this, SLOT(disableGrouping()));
-    groups->addAction(tr("Thumb Hist"), this, SLOT(groupByThumbHist()));
+    groups->addAction(tr("Title"), this, [this]() {
+        this->groupBy(new PlayListImageMetadataGrouper(ImageMetadataConstants::DC_TITLE));
+    });
+    groups->addAction(tr("Label"), this, [this]() {
+        this->groupBy(new PlayListImageMetadataGrouper(ImageMetadataConstants::XMP_LABEL));
+    });
+    groups->addAction(tr("Thumb Hist"), this, [this]() {
+        this->groupBy(new PlayListImageThumbnailHistogramGrouper());
+    });
 
     menu->addMenu(m_rankFilterMenuManager->menu());
 
@@ -213,35 +222,39 @@ QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
     }
 }
 
-class GroupByThumbHistTask : public QObject, public QRunnable
+class BackgroundGroupTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    GroupByThumbHistTask(QSharedPointer<PlayList> pl) : m_pl(pl) {}
+    BackgroundGroupTask(QSharedPointer<PlayList> pl, AbstractPlayListGrouper *grouper) :
+        m_pl(pl),
+        m_grouper(grouper) {}
+
     void run()
     {
-        m_pl->groupBy(new PlayListImageThumbnailHistogramGrouper());
+        m_pl->groupBy(m_grouper);
     }
 
 private:
     QSharedPointer<PlayList> m_pl;
+    AbstractPlayListGrouper *m_grouper;
 };
 
-void ImageGalleryView::groupByThumbHist()
+void ImageGalleryView::groupBy(AbstractPlayListGrouper *grouper)
 {
-    m_groupMode = GroupByThumbHist;
     enableGrouping();
 
     if (m_playList) {
-        GroupByThumbHistTask *task = new GroupByThumbHistTask(m_playList);
+        BackgroundGroupTask *task = new BackgroundGroupTask(m_playList, grouper);
         task->setAutoDelete(true);
         connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
         QThreadPool::globalInstance()->start(task);
 
         PlayListRecord *plr = m_playList->record();
         if (plr) {
-            QString key =
-                QString("ImageGalleryView::groupByThumbHist_%1").arg(plr->id());
+            QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
+                .arg(plr->id())
+                .arg(QUuid::createUuid().toString());
             m_groupingProgress.setKey(key);
             m_groupingProgress.setEstimateEnabled(true);
             m_groupingProgress.setMaximum(36);

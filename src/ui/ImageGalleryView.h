@@ -29,21 +29,16 @@ protected slots:
     void addToBasket();
     void removeSelected();
 
-    void groupByThumbHist();
-
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
-
     virtual QMenu *createContextMenu();
+
+    void groupBy(AbstractPlayListGrouper *grouper);
 
     Navigator *m_navigator;
     QSharedPointer<PlayList> m_playList;
     RankFilterMenuManager *m_rankFilterMenuManager;
 
-    enum GroupMode {
-        GroupByThumbHist,
-    };
-    GroupMode m_groupMode;
     virtual QString groupForItem(GalleryItem *item) override;
 };
 
