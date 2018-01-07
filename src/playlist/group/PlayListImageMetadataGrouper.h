@@ -7,7 +7,6 @@ class PlayListImageMetadataGrouper : public AbstractPlayListGrouper
 public:
     PlayListImageMetadataGrouper(const QString &key);
 
-    virtual QString groupNameOf(Image *image) const override;
     virtual void group(ImageList::iterator begin, ImageList::iterator end) override;
 
 private:

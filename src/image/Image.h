@@ -54,6 +54,8 @@ public:
     void loadThumbnail(bool makeImmediately = false);
     void unloadThumbnail();
 
+    void loadMetadata();
+
     QList<ImageHotspot *> hotspots() { return m_hotspots; }
     void loadHotspots(bool forceReload = false);
 
@@ -107,6 +109,7 @@ private:
     void checkUnload();
     void makeThumbnail();
     void computeThumbnailPath();
+    void resetMetadata(const QVariantHash &metadata);
     void loadMetaFromDatabase();
 
     QUuid m_uuid;

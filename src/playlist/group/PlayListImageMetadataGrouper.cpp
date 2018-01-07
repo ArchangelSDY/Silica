@@ -7,13 +7,12 @@ PlayListImageMetadataGrouper::PlayListImageMetadataGrouper(const QString &key) :
 {
 }
 
-QString PlayListImageMetadataGrouper::groupNameOf(Image *image) const
-{
-    return image->metadata()[m_key].toString();
-}
-
 void PlayListImageMetadataGrouper::group(ImageList::iterator begin, ImageList::iterator end)
 {
+    for (auto it = begin; it != end; it++) {
+        (*it)->loadMetadata();
+    }
+
     const QString &key = m_key;
     std::sort(begin, end, [key](const ImagePtr &left, const ImagePtr &right) -> bool {
         QString leftValue = left->metadata()[key].toString();
@@ -21,9 +20,12 @@ void PlayListImageMetadataGrouper::group(ImageList::iterator begin, ImageList::i
         return leftValue < rightValue;
     });
 
-    QSet<QString> values;
+    m_groupNames << "";
     for (auto it = begin; it != end; it++) {
-        values << (*it)->metadata()[m_key].toString();
+        QString groupName = (*it)->metadata()[m_key].toString();
+        if (groupName != m_groupNames.last()) {
+            m_groupNames << groupName;
+        }
+        m_imageGroups[it->data()] = m_groupNames.count() - 1;
     }
-    m_groupNames = values.toList();
 }

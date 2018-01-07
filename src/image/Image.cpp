@@ -378,7 +378,7 @@ void Image::imageReaderFinished(QVariantHash metadata,
 
     m_isLoadingImage = false;
 
-    m_metadata.unite(metadata);
+    resetMetadata(metadata);
 
     destroyFrames();
     foreach (const QSharedPointer<QImage> &image, images) {
@@ -524,6 +524,21 @@ void Image::computeThumbnailPath()
 
         QStringList pathParts = QStringList() << sub << name;
         m_thumbnailPath = pathParts.join("/");
+    }
+}
+
+void Image::resetMetadata(const QVariantHash &metadata)
+{
+    // We cannot use QHash::unite() because image could be loaded multiple times
+    for (auto it = metadata.begin(); it != metadata.end(); it++) {
+        m_metadata.insert(it.key(), it.value());
+    }
+}
+
+void Image::loadMetadata()
+{
+    if (m_imageSource) {
+        resetMetadata(m_imageSource->readMetadata());
     }
 }
 
