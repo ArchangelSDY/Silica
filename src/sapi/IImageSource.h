@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QIODevice>
+#include <QVariantHash>
 
 #include "sapi_global.h"
 
@@ -14,6 +15,7 @@ public:
     virtual bool open() = 0;
     virtual void close() = 0;
     virtual bool exists() = 0;
+    virtual QVariantHash readMetadata();
     virtual bool readFrames(QList<QImage> &frames, QList<int> &durations) = 0;
     virtual QIODevice *device() = 0;
 

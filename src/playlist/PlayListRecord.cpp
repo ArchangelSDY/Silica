@@ -164,7 +164,7 @@ void PlayListRecord::gotItems(const QList<QUrl> &imageUrls,
     for (int i = 0; i < imageUrls.count(); ++i) {
         ImagePtr image = pl->addSinglePath(imageUrls[i]);
         if (!image.isNull() && extraInfos.count() > i) {
-            image->extraInfo() = extraInfos[i];
+            image->metadata().unite(extraInfos[i]);
         }
     }
     m_playList->append(pl);

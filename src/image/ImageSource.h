@@ -16,6 +16,7 @@ public:
     virtual void close();
     virtual bool exists() = 0;
 
+    virtual QVariantHash readMetadata();
     virtual bool readFrames(QList<QImage> &images, QList<int> &durations);
     virtual bool copy(const QString &destPath) = 0;
 

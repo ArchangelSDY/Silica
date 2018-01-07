@@ -6,4 +6,9 @@ IImageSource::~IImageSource()
 {
 }
 
+QVariantHash IImageSource::readMetadata()
+{
+    return QVariantHash();
+}
+
 }

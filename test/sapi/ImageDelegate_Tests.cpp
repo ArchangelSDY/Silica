@@ -19,7 +19,7 @@ void TestImageDelegate::fields()
     QFETCH(QString, imagePath);
 
     Image image(imagePath);
-    image.extraInfo().insert("SPECIAL", 1);
+    image.metadata().insert("SPECIAL", 1);
     sapi::ImageDelegate delegate(&image);
 
     QSignalSpy loadSpy(&image, &Image::loaded);
@@ -30,7 +30,7 @@ void TestImageDelegate::fields()
     QCOMPARE(delegate.name(), image.name());
     QCOMPARE(delegate.size(), image.size());
     QCOMPARE(delegate.hash(), image.source()->hashStr());
-    QCOMPARE(delegate.extraInfo(), image.extraInfo());
+    QCOMPARE(delegate.extraInfo(), image.metadata());
     QCOMPARE(delegate.isAnimation(), image.isAnimation());
     QCOMPARE(delegate.frameCount(), image.frameCount());
     QCOMPARE(delegate.durations(), image.durations());

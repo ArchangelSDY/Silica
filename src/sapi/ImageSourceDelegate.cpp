@@ -40,6 +40,11 @@ bool ImageSourceDelegate::exists()
     return m_source->exists();
 }
 
+QVariantHash ImageSourceDelegate::readMetadata()
+{
+    return m_source->readMetadata();
+}
+
 bool ImageSourceDelegate::readFrames(QList<QImage> &frames, QList<int> &durations)
 {
     return m_source->readFrames(frames, durations);

@@ -64,7 +64,9 @@ public:
     void run();
 
 signals:
-    void loaded(QList<QSharedPointer<QImage> > images, QList<int> durations);
+    void loaded(QVariantHash metadata,
+                QList<QSharedPointer<QImage> > images,
+                QList<int> durations);
 
 private:
     QSharedPointer<ImageSource> m_imageSource;
@@ -74,7 +76,12 @@ void LoadImageTask::run()
 {
     QList<QSharedPointer<QImage> > images;
     QList<int> durations;
+    QVariantHash metadata;
     if (!m_imageSource.isNull() && m_imageSource->open()) {
+        // Read metadata
+        metadata = m_imageSource->readMetadata();
+
+        // Read frames
         QList<QImage> rawFrames;
         if (m_imageSource->readFrames(rawFrames, durations)) {
             for (const QImage &frame : rawFrames) {
@@ -95,7 +102,7 @@ void LoadImageTask::run()
         durations << 0;
     }
 
-    emit loaded(images, durations);
+    emit loaded(metadata, images, durations);
 }
 
 // ---------- Load Thumbnail Task ----------
@@ -354,21 +361,24 @@ void Image::load(int priority)
 
     LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
     connect(loadImageTask,
-            SIGNAL(loaded(QList<QSharedPointer<QImage> >, QList<int>)),
+            &LoadImageTask::loaded,
             this,
-            SLOT(imageReaderFinished(QList<QSharedPointer<QImage> >, QList<int>)));
+            &Image::imageReaderFinished);
     threadPool()->start(
         new LiveImageRunnable(m_uuid, loadImageTask),
         priority);
 }
 
-void Image::imageReaderFinished(QList<QSharedPointer<QImage> > images,
+void Image::imageReaderFinished(QVariantHash metadata,
+                                QList<QSharedPointer<QImage> > images,
                                 QList<int> durations)
 {
     Q_ASSERT(images.count() > 0);
     Q_ASSERT(durations.count() > 0);
 
     m_isLoadingImage = false;
+
+    m_metadata.unite(metadata);
 
     destroyFrames();
     foreach (const QSharedPointer<QImage> &image, images) {

@@ -18,6 +18,7 @@ public:
     virtual bool open() override;
     virtual void close() override;
     virtual bool exists() override;
+    virtual QVariantHash readMetadata() override;
     virtual bool readFrames(QList<QImage> &frames, QList<int> &durations) override;
     virtual bool copy(const QString &destPath) override;
 

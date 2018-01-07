@@ -34,7 +34,7 @@ QUrl ImageDelegate::url() const
 const QVariantHash &ImageDelegate::extraInfo() const
 {
     Image *image = const_cast<Image *>(m_image);
-    return image->extraInfo();
+    return image->metadata();
 }
 
 bool ImageDelegate::isAnimation() const

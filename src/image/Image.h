@@ -71,7 +71,7 @@ public:
     int width() const { return m_size.width(); }
     int height() const { return m_size.height(); }
     QSize size() const { return m_size; }
-    QVariantHash &extraInfo() { return m_extraInfo; }
+    QVariantHash &metadata() { return m_metadata; }
 
     bool isAnimation() const;
     QList<int> durations() const;
@@ -85,7 +85,7 @@ signals:
     void hotpotsLoaded();
 
 private slots:
-    void imageReaderFinished(QList<QSharedPointer<QImage> > images, QList<int> durations);
+    void imageReaderFinished(QVariantHash metadata, QList<QSharedPointer<QImage> > images, QList<int> durations);
     void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail, bool makeImmediately);
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
@@ -127,7 +127,7 @@ private:
     ImageRank *m_rank;
 
     QSize m_size;
-    QVariantHash m_extraInfo;
+    QVariantHash m_metadata;
 
     QList<QImage *> m_frames;
     QList<int> m_durations;

@@ -65,6 +65,11 @@ void ImageSource::close()
     }
 }
 
+QVariantHash ImageSource::readMetadata()
+{
+    return QVariantHash();
+}
+
 bool ImageSource::readFrames(QList<QImage> &frames, QList<int> &durations)
 {
     QImageReader reader;
