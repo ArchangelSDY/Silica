@@ -18,6 +18,7 @@ public:
     CascadeClassifierNavigationPlayer(Navigator *navigator,
                                       QWidget *view,
                                       QObject *parent = 0);
+    ~CascadeClassifierNavigationPlayer();
 
     void goPrev() override;
     void goNext() override;
@@ -28,7 +29,7 @@ private:
     void focusOnCurrentRegion();
 
     QWidget *m_view;
-    QScopedPointer<cv::CascadeClassifier> m_classifier;
+    cv::CascadeClassifier *m_classifier;
     int m_curRegionIndex;
     QList<QRect> m_regions;
 };

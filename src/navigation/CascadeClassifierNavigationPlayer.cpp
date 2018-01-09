@@ -16,8 +16,16 @@ CascadeClassifierNavigationPlayer::CascadeClassifierNavigationPlayer(
         Navigator *navigator, QWidget *view, QObject *parent) :
     AbstractNavigationPlayer(navigator, parent) ,
     m_view(view) ,
+    m_classifier(nullptr) ,
     m_curRegionIndex(0)
 {
+}
+
+CascadeClassifierNavigationPlayer::~CascadeClassifierNavigationPlayer()
+{
+    if (m_classifier) {
+        delete m_classifier;
+    }
 }
 
 void CascadeClassifierNavigationPlayer::goNext()
@@ -71,9 +79,10 @@ void CascadeClassifierNavigationPlayer::onEnter()
     if (!classifier->read(cvFile.getFirstTopLevelNode())) {
         qWarning("Fail to decode cascade classifer");
         delete classifier;
+        return;
     }
 
-    m_classifier.reset(classifier);
+    m_classifier = classifier;
 }
 
 void CascadeClassifierNavigationPlayer::detectRegions()
