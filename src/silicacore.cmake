@@ -62,6 +62,7 @@ file(GLOB CORE_SRCS
     "playlist/sort/PlayListImageAspectRatioSorter.cpp"
     "playlist/sort/PlayListImageNameSorter.cpp"
     "playlist/sort/PlayListImageSizeSorter.cpp"
+    "playlist/sort/PlayListImageUrlSorter.cpp"
     "playlist/sort/Utils.cpp"
     "playlist/AbstractPlayListFilter.cpp"
     "playlist/DoNothingFilter.cpp"

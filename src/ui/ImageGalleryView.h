@@ -22,6 +22,7 @@ public slots:
 
 protected slots:
     void sortByName();
+    void sortByUrl();
     void sortByAspectRatio();
     void sortBySize();
 

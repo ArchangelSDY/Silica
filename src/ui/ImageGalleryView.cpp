@@ -14,6 +14,7 @@
 #include "playlist/sort/PlayListImageAspectRatioSorter.h"
 #include "playlist/sort/PlayListImageNameSorter.h"
 #include "playlist/sort/PlayListImageSizeSorter.h"
+#include "playlist/sort/PlayListImageUrlSorter.h"
 #include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageGalleryView.h"
@@ -93,6 +94,7 @@ QMenu *ImageGalleryView::createContextMenu()
 
     QMenu *sorts = menu->addMenu(tr("Sort By"));
     sorts->addAction(tr("Name"), this, SLOT(sortByName()));
+    sorts->addAction(tr("Url"), this, SLOT(sortByUrl()));
     sorts->addAction(tr("Aspect Ratio"), this, SLOT(sortByAspectRatio()));
     sorts->addAction(tr("Size"), this, SLOT(sortBySize()));
 
@@ -138,6 +140,16 @@ void ImageGalleryView::sortByName()
     }
 
     PlayListImageNameSorter sorter;
+    m_playList->sortBy(&sorter);
+}
+
+void ImageGalleryView::sortByUrl()
+{
+    if (!m_playList) {
+        return;
+    }
+
+    PlayListImageUrlSorter sorter;
     m_playList->sortBy(&sorter);
 }
 
