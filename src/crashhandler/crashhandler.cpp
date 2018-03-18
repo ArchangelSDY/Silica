@@ -1,5 +1,10 @@
 #include <iostream>
 #include <QApplication>
+#include <QTimer>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 #include "deps/breakpad/client/windows/crash_generation/crash_generation_server.h"
 #include "deps/breakpad/client/windows/crash_generation/client_info.h"
@@ -44,13 +49,29 @@ static void onCrash(void *context, const google_breakpad::ClientInfo *info, cons
     emit handler->emitOnCrash(info, QString::fromStdWString(*dumpPath));
 }
 
-// crashhandler.exe <pipe_name> <dump_path> <upload_host> <client_argument>...
+static void checkParentLiveness(qint64 pid)
+{
+#ifdef Q_OS_WIN
+    HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+    if (handle != NULL) {
+        DWORD parentExitCode = 0;
+        if (GetExitCodeProcess(handle, &parentExitCode) && parentExitCode == STILL_ACTIVE) {
+            CloseHandle(handle);
+            return;
+        }
+    }
+
+    qApp->exit();
+#endif
+}
+
+// crashhandler.exe <pipe_name> <dump_path> <upload_host> <parent_pid> <client_argument>...
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     QStringList args = a.arguments();
-    if (args.size() < 4) {
+    if (args.size() < 5) {
         qWarning("Invalid arguments");
         return 1;
     }
@@ -60,8 +81,8 @@ int main(int argc, char *argv[])
 
     QString uploadHost = args[3];
     QStringList clientStartupArguments;
-    if (args.size() > 4) {
-        clientStartupArguments = args.mid(4);
+    if (args.size() > 5) {
+        clientStartupArguments = args.mid(5);
     }
 
     CrashHandler handler(uploadHost, clientStartupArguments);
@@ -83,6 +104,14 @@ int main(int argc, char *argv[])
     bool status = server.Start();
 
     std::cout << (status ? '0' : '1') << std::flush;
+
+    QTimer livenessTimer;
+    livenessTimer.setInterval(5000);
+    livenessTimer.setSingleShot(false);
+    QObject::connect(&livenessTimer, &QTimer::timeout, [pid = args[4].toInt()]() {
+        checkParentLiveness(pid);
+    });
+    livenessTimer.start();
 
     return a.exec();
 }

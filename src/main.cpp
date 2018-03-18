@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
         << crashHandlerPipe
         << crashDumpPath
         << GlobalConfig::instance()->crashUploadHost()
+        << QString::number(a.applicationPid())
         << a.arguments();
 
     QProcess crashHandlerProc;
