@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QUrl>
 
@@ -58,12 +59,11 @@ QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path
     }
 
     if (file.isDir()) {
-        QDir dir(path);
         QStringList filters = fileNamePattern().split(" ");
-        dir.setNameFilters(filters);
+        QDirIterator dirIter(path, filters, QDir::Files, QDirIterator::Subdirectories);
 
-        foreach (const QFileInfo& fileInfo, dir.entryInfoList()) {
-            ImageSource *source = createSingle(fileInfo.absoluteFilePath());
+        while (dirIter.hasNext()) {
+            ImageSource *source = createSingle(dirIter.next());
             if (source) {
                 imageSources << source;
             }

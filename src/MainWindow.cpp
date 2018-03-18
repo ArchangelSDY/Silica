@@ -25,7 +25,7 @@
 #include "logger/Logger.h"
 #include "navigation/NavigationPlayerManager.h"
 #include "navigation/NormalNavigationPlayer.h"
-#include "playlist/sort/PlayListImageNameSorter.h"
+#include "playlist/sort/PlayListImageUrlSorter.h"
 #include "playlist/LocalPlayListProviderFactory.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
@@ -499,7 +499,7 @@ void MainWindow::loadSelectedPath()
         // Sort can be slow so put it into background
         QtConcurrent::run([=]() {
             if (shouldSortByName) {
-                PlayListImageNameSorter sorter;
+                PlayListImageUrlSorter sorter;
                 pl->sortBy(&sorter);
             }
 
