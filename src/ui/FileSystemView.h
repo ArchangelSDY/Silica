@@ -31,6 +31,7 @@ protected slots:
     void refreshView();
     void dirIterGotItem(const QString &rootPath, const QString &itemAbsPath);
     void dirIterFinished();
+    void refreshSelectedItems();
     void removeSelectedOnDisk();
 
 protected:

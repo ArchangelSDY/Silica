@@ -280,6 +280,12 @@ void FileSystemItem::loadCover(QSharedPointer<ImageSource> imageSource)
     m_coverImage->loadThumbnail(true);
 }
 
+void FileSystemItem::refresh()
+{
+    QFile::remove(computeThumbnailPath(path()));
+    load();
+}
+
 void FileSystemItem::removeOnDisk()
 {
     QFileInfo info(path());

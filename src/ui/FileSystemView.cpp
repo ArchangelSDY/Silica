@@ -337,6 +337,16 @@ void FileSystemView::dirIterFinished()
     }
 }
 
+void FileSystemView::refreshSelectedItems()
+{
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+
+    for (GalleryItem *item : selectedItems) {
+        FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
+        fsItem->refresh();
+    }
+}
+
 void FileSystemView::removeSelectedOnDisk()
 {
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
@@ -390,6 +400,8 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
 
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
     if (selectedItems.count() > 0) {
+        menu->addAction(tr("Refresh"), this,
+                        SLOT(refreshSelectedItems()));
         menu->addAction(tr("Remove On Disk"), this,
                         SLOT(removeSelectedOnDisk()));
     }

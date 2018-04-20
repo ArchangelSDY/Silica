@@ -27,6 +27,7 @@ public:
     virtual void load() override;
     virtual void unload() override;
     virtual void createRenderer();
+    void refresh();
     void removeOnDisk();
 
 private slots:
