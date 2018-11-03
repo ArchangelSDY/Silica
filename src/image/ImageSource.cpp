@@ -74,6 +74,7 @@ bool ImageSource::readFrames(QList<QImage> &frames, QList<int> &durations)
 {
     QImageReader reader;
     reader.setDevice(device());
+    reader.setAutoTransform(true);
 
     forever {
         QImage frame = reader.read();
