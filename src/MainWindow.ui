@@ -70,8 +70,7 @@
         </widget>
        </item>
        <item>
-        <widget class="BasketView" name="basketView">
-        </widget>
+        <widget class="BasketView" name="basketView" native="true"/>
        </item>
       </layout>
      </widget>
@@ -118,7 +117,7 @@
              <property name="maximumSize">
               <size>
                <width>16</width>
-               <height>26</height>
+               <height>21</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -166,7 +165,7 @@ margin: 0.05em;</string>
       <widget class="QWidget" name="pageImageView">
        <layout class="QHBoxLayout" name="pageImageViewLayout">
         <item>
-         <widget class="QWidget" name="graphicsView"></widget>
+         <widget class="QWidget" name="graphicsView" native="true"/>
         </item>
        </layout>
       </widget>
@@ -176,12 +175,6 @@ margin: 0.05em;</string>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="sidebar">
-   <property name="minimumSize">
-    <size>
-     <width>200</width>
-     <height>289</height>
-    </size>
-   </property>
    <property name="floating">
     <bool>false</bool>
    </property>
@@ -192,12 +185,6 @@ margin: 0.05em;</string>
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="sidebarContent">
-    <property name="maximumSize">
-     <size>
-      <width>200</width>
-      <height>16777215</height>
-     </size>
-    </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="spacing">
       <number>3</number>
@@ -217,9 +204,6 @@ margin: 0.05em;</string>
      <item>
       <widget class="QWidget" name="infoWidget" native="true">
        <layout class="QFormLayout" name="formLayout_2">
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-        </property>
         <item row="0" column="0">
          <widget class="QLabel" name="lblNamePrefix">
           <property name="text">
@@ -260,20 +244,16 @@ margin: 0.05em;</string>
           <property name="text">
            <string>TextLabel</string>
           </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="QListWidget" name="playListWidget">
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="QListWidget" name="playListWidget"/>
      </item>
     </layout>
    </widget>
@@ -292,11 +272,6 @@ margin: 0.05em;</string>
    <header>ui/PlayListGalleryView.h</header>
   </customwidget>
   <customwidget>
-   <class>BasketView</class>
-   <extends>GalleryView</extends>
-   <header>ui/BasketView.h</header>
-  </customwidget>
-  <customwidget>
    <class>MainImageGalleryView</class>
    <extends>QGraphicsView</extends>
    <header>ui/MainImageGalleryView.h</header>
@@ -305,6 +280,11 @@ margin: 0.05em;</string>
    <class>FileSystemView</class>
    <extends>QWidget</extends>
    <header>ui/FileSystemView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BasketView</class>
+   <extends>QWidget</extends>
+   <header>ui/BasketView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
