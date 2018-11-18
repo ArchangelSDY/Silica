@@ -35,10 +35,10 @@ const char *SQL_UPDATE_PLAYLIST_BY_ID =
     "set name = ?, cover_path = ?, count = ? "
     "where id = ?";
 
-const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url, playlists.name from images "
-        "left join playlist_images on images.id = playlist_images.image_id "
-        "join playlists on playlists.id = playlist_images.playlist_id "
-        "where playlists.id = ?";
+const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url from images "
+    "left join playlist_images on images.id = playlist_images.image_id "
+    "where playlist_images.playlist_id = ? "
+    "order by images.url";
 
 const char *SQL_INSERT_IMAGE = "insert or ignore into images(hash, name, url) values (?, ?, ?)";
 
