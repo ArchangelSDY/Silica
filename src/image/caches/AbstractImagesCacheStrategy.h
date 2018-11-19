@@ -3,6 +3,8 @@
 
 #include <QMap>
 
+#include "image/Image.h"
+
 class Image;
 class ImagesCache;
 
@@ -15,7 +17,7 @@ public:
     virtual int nextIndexToRemove(int insertedIndex) = 0;
 
 protected:
-    const QMap<int, Image *> &cachedImages() const;
+    const QMap<int, ImagePtr> &cachedImages() const;
 
     ImagesCache *m_cache;
 };

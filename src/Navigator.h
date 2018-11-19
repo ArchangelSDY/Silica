@@ -38,8 +38,8 @@ public:
     void goPrevGroup();
     void goNextGroup();
 
-    Image* currentImage() const { return m_currentImage; }
-    ImagePtr currentImagePtr();
+    Image *currentImage() const;
+    ImagePtr currentImagePtr() const;
     int currentIndex() { return m_currentIndex; }
 
     bool isAutoNavigating() const { return m_autoNavigationTimer.isActive(); }
@@ -70,18 +70,18 @@ public slots:
     /**
      * @brief Go to specific image of `index`.
      * @param index Image index.
-     * @param forceReloadCurrent If true, load even if current index not changed.
+     * @param forceReload If true, ignore all quick paths and do a full reload even if index not changed.
      * @return true if loaded successfully.
      */
-    bool goIndex(int index, bool forceReloadCurrent = false);
+    bool goIndex(int index, bool forceReload = false);
 
     /**
      * @brief Go to specific image of `uuid`.
      * @param uuid Image uuid.
-     * @param forceReloadCurrent If true, load even if current index not changed.
+     * @param forceReload If true, ignore all quick paths and do a full reload even if index not changed.
      * @return true if loaded successfully.
      */
-    bool goUuid(const QUuid &uuid, bool forceReloadCurrent = false);
+    bool goUuid(const QUuid &uuid, bool forceReload = false);
 
     void imageLoaded();
     void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
@@ -95,7 +95,7 @@ private slots:
     void goAutoNavigation();
 
 private:
-    Image* loadIndex(int index, bool shouldPaint);
+    ImagePtr loadIndex(int index, bool shouldPaint, bool forceReload = false);
 
     void preload();
     void reset();
@@ -104,7 +104,7 @@ private:
 
     int m_currentIndex;
     QUuid m_currentUuid;
-    Image* m_currentImage;
+    ImagePtr m_currentImage;
     bool m_reverseNavigation;
     bool m_isLooping;
     QSharedPointer<ImagesCache> m_cachedImages;

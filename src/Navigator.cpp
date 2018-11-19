@@ -95,7 +95,7 @@ void Navigator::reloadPlayList()
     goUuid(m_currentUuid, true);
 }
 
-Image* Navigator::loadIndex(int index, bool shouldPaint)
+ImagePtr Navigator::loadIndex(int index, bool shouldPaint, bool forceReload)
 {
     if (index < 0 || index >= m_playList->count()) {
         if (!m_isLooping) {
@@ -110,17 +110,20 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
         return 0;
     }
 
-    Image *image = m_cachedImages->at(index);
+    ImagePtr image;
+    if (!forceReload) {
+        image = m_cachedImages->at(index);
+    }
 
     if (!image) {
-        image = (*m_playList)[index].data();
+        image = (*m_playList)[index];
         m_cachedImages->insert(index, image);
     }
 
     if (shouldPaint) {
-        connect(image, &Image::thumbnailLoaded,
+        connect(image.data(), &Image::thumbnailLoaded,
                 this, &Navigator::thumbnailLoaded);
-        connect(image, SIGNAL(loaded()), this, SLOT(imageLoaded()),
+        connect(image.data(), SIGNAL(loaded()), this, SLOT(imageLoaded()),
                 Qt::UniqueConnection);
     }
 
@@ -131,18 +134,18 @@ Image* Navigator::loadIndex(int index, bool shouldPaint)
     return image;
 }
 
-bool Navigator::goIndex(int index, bool forceReloadCurrent)
+bool Navigator::goIndex(int index, bool forceReload)
 {
     if (m_playList.isNull() || index < 0 || index >= m_playList->count()) {
         return false;
     }
 
-    if (!forceReloadCurrent && index == m_currentIndex) {
+    if (!forceReload && index == m_currentIndex) {
         return true;
     }
 
     // Load and paint
-    Image *image = loadIndex(index, true);
+    ImagePtr image = loadIndex(index, true, forceReload);
     if (!image || image->status() == Image::LoadError) {
         return false;
     }
@@ -151,7 +154,7 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     m_currentUuid = image->uuid();
     m_currentImage = image;
 
-    emit paint(image);
+    emit paint(image.data());
     emit navigationChange(index);
 
     if (image->status() != Image::LoadComplete) {
@@ -164,7 +167,7 @@ bool Navigator::goIndex(int index, bool forceReloadCurrent)
     return true;
 }
 
-bool Navigator::goUuid(const QUuid &uuid, bool forceReloadCurrent)
+bool Navigator::goUuid(const QUuid &uuid, bool forceReload)
 {
     if (uuid.isNull()) {
         return false;
@@ -178,9 +181,9 @@ bool Navigator::goUuid(const QUuid &uuid, bool forceReloadCurrent)
     }
 
     if (index < m_playList->count()) {
-        return goIndex(index, forceReloadCurrent);
+        return goIndex(index, forceReload);
     } else {
-        return goIndex(0, forceReloadCurrent);
+        return goIndex(0, forceReload);
     }
 }
 
@@ -236,7 +239,7 @@ void Navigator::goPrevGroup()
         return;
     }
 
-    QString cmpGroup = m_playList->groupNameOf(m_currentImage);
+    QString cmpGroup = m_playList->groupNameOf(currentImage());
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
     bool isInPrevGroup = false;
@@ -275,7 +278,7 @@ void Navigator::goNextGroup()
         return;
     }
 
-    QString initGroup = m_playList->groupNameOf(m_currentImage);
+    QString initGroup = m_playList->groupNameOf(currentImage());
     int initIndex = m_currentIndex;
     int index = m_currentIndex;
 
@@ -318,7 +321,12 @@ void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
     }
 }
 
-ImagePtr Navigator::currentImagePtr()
+Image *Navigator::currentImage() const
+{
+    return currentImagePtr().data();
+}
+
+ImagePtr Navigator::currentImagePtr() const
 {
     if (m_playList &&
         m_currentIndex >= 0 && m_currentIndex < m_playList->count()) {

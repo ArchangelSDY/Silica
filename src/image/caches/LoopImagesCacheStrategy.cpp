@@ -12,7 +12,7 @@ int LoopImagesCacheStrategy::nextIndexToRemove(int insertedIndex)
 {
     int total = m_navigator->playList()->count();
     int longestKey = 0, longestDistance = 0;
-    const QMap<int, Image *> &images =
+    const QMap<int, ImagePtr> &images =
         AbstractImagesCacheStrategy::cachedImages();
     foreach (const int &key, images.keys()) {
         int delta = qMax(key, insertedIndex) - qMin(key, insertedIndex);

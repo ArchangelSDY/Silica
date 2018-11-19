@@ -18,8 +18,8 @@ public:
     explicit ImagesCache(int capacity, QObject *parent = 0);
     ~ImagesCache();
 
-    void insert(int index, Image *image);
-    Image *at(int index);
+    void insert(int index, ImagePtr image);
+    ImagePtr at(int index);
     void clear();
 
     void setStrategy(AbstractImagesCacheStrategy *strategy);
@@ -28,7 +28,7 @@ private:
     void trim(int index);
 
     int m_capacity;
-    QMap<int, Image *> m_images;
+    QMap<int, ImagePtr> m_images;
     AbstractImagesCacheStrategy *m_strategy;
 };
 

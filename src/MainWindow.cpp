@@ -17,6 +17,7 @@
 #include <QToolBar>
 #include <QtConcurrent>
 
+#include "db/LocalDatabase.h"
 #include "image/caches/ImagesCache.h"
 #include "image/caches/LoopImagesCacheStrategy.h"
 #include "image/effects/ImageEffectManager.h"
@@ -124,6 +125,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // Navigation binding for playListWidget
     connect(ui->playListWidget, SIGNAL(currentRowChanged(int)),
             m_navigator, SLOT(goIndex(int)));
+    connect(ui->playListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)),
+            this, SLOT(editImageUrl(QListWidgetItem *)));
 
     // Navigation binding for gallery
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
@@ -685,6 +688,45 @@ void MainWindow::promptToCreatePlayListRecord(int type)
     }
 }
 
+void MainWindow::editImageUrl(QListWidgetItem *item)
+{
+    int index = this->ui->playListWidget->row(item);
+    auto playList = this->m_navigator->playList();
+    if (!playList) {
+        return;
+    }
+    auto image = playList->at(index);
+    if (!image) {
+        return;
+    }
+
+    QUrl oldUrl = image->source()->url();
+    bool ok;
+    QString result = QInputDialog::getText(this, tr("Edit URL"), tr("URL"), QLineEdit::Normal, oldUrl.toString(), &ok);
+    if (!ok) {
+        return;
+    }
+
+    QUrl newUrl(result);
+    if (!newUrl.isValid()) {
+        return;
+    }
+
+    ImageSource *newSource = ImageSourceManager::instance()->createSingle(newUrl);
+    if (!newSource) {
+        return;
+    }
+
+    if (!LocalDatabase::instance()->updateImageUrl(oldUrl, newUrl)) {
+        return;
+    }
+
+    (*playList)[index] = ImagePtr(new Image(newUrl));
+
+    // TODO: Trigger the reload in a smaller scale
+    m_navigator->reloadPlayList();
+}
+
 void MainWindow::fsRootPathChanged()
 {
     ui->fsView->setRootPath(ui->fsEditPath->text());
@@ -746,7 +788,8 @@ void MainWindow::playListAppend(int start)
 
     QListWidget *list = ui->playListWidget;
     for (int i = start; i < pl->count(); ++i) {
-        list->addItem(pl->at(i).data()->name());
+        ImagePtr image = pl->at(i);
+        list->addItem(image->name());
     }
 
     updateSidebarTitle();

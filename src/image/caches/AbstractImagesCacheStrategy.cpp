@@ -6,7 +6,7 @@ AbstractImagesCacheStrategy::AbstractImagesCacheStrategy(ImagesCache *cache) :
 {
 }
 
-const QMap<int, Image *> &AbstractImagesCacheStrategy::cachedImages() const
+const QMap<int, ImagePtr> &AbstractImagesCacheStrategy::cachedImages() const
 {
     return m_cache->m_images;
 }

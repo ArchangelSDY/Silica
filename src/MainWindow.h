@@ -15,6 +15,7 @@ namespace Ui {
 class MainWindow;
 }
 
+class QListWidgetItem;
 class ImageEffectManager;
 class ImagesCache;
 class ImagePathCorrector;
@@ -46,6 +47,7 @@ private slots:
     void loadSelectedPath();
 
     void promptToCreatePlayListRecord(int type);
+    void editImageUrl(QListWidgetItem *item);
 
     void fsRootPathChanged();
 

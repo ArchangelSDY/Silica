@@ -17,13 +17,13 @@ ImagesCache::~ImagesCache()
     delete m_strategy;
 }
 
-void ImagesCache::insert(int index, Image *image)
+void ImagesCache::insert(int index, ImagePtr image)
 {
     trim(index);
     m_images.insert(index, image);
 }
 
-Image *ImagesCache::at(int index)
+ImagePtr ImagesCache::at(int index)
 {
     if (m_images.contains(index)) {
         return m_images[index];
@@ -34,9 +34,9 @@ Image *ImagesCache::at(int index)
 
 void ImagesCache::clear()
 {
-    for (QMap<int, Image *>::iterator i = m_images.begin();
+    for (QMap<int, ImagePtr>::iterator i = m_images.begin();
          i != m_images.end(); ++i) {
-        Image *image = i.value();
+        ImagePtr image = i.value();
         if (image) {
             image->scheduleUnload();
         }
@@ -52,7 +52,7 @@ void ImagesCache::trim(int index)
     }
 
     int toRemoveIndex = m_strategy->nextIndexToRemove(index);
-    Image *toRemove = m_images.take(toRemoveIndex);
+    ImagePtr toRemove = m_images.take(toRemoveIndex);
 
     if (toRemove) {
         toRemove->scheduleUnload();
