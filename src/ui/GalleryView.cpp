@@ -242,6 +242,29 @@ void GalleryView::itemMouseDoubleClicked()
 void GalleryView::addItem(GalleryItem *item)
 {
     m_galleryItems << item;
+    setupItem(item);
+}
+
+void GalleryView::replaceItem(int index, GalleryItem *item)
+{
+    GalleryItem *oldItem = m_galleryItems[index];
+
+    // Keep states
+    item->setSelected(oldItem->isSelected());
+    item->setPos(oldItem->pos());
+
+    // Remove old item
+    m_scene->removeItem(oldItem);
+    oldItem->deleteLater();
+    m_viewportPreloadItems.remove(oldItem);
+
+    // Replace with new item
+    m_galleryItems.replace(index, item);
+    setupItem(item);
+}
+
+void GalleryView::setupItem(GalleryItem *item)
+{
     m_scene->addItem(item);
     markItemIsFiltered(item);
     connect(item, SIGNAL(requestLayout()), this, SLOT(scheduleLayout()),

@@ -114,10 +114,9 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(playListAppend(int)));
 
     // Update gallery
-    connect(m_navigator, SIGNAL(playListChange(QSharedPointer<PlayList>)),
-            ui->gallery, SLOT(playListChange(QSharedPointer<PlayList>)));
-    connect(m_navigator, SIGNAL(playListAppend(int)),
-            ui->gallery, SLOT(playListAppend(int)));
+    connect(m_navigator, &Navigator::playListItemChange, ui->gallery, &MainImageGalleryView::playListItemChange);
+    connect(m_navigator, &Navigator::playListChange, ui->gallery, &MainImageGalleryView::playListChange);
+    connect(m_navigator, &Navigator::playListAppend, ui->gallery, &MainImageGalleryView::playListAppend);
 
     connect(m_navigator, SIGNAL(navigationChange(int)),
             this, SLOT(navigationChange(int)));
@@ -721,10 +720,10 @@ void MainWindow::editImageUrl(QListWidgetItem *item)
         return;
     }
 
-    (*playList)[index] = ImagePtr(new Image(newUrl));
-
-    // TODO: Trigger the reload in a smaller scale
-    m_navigator->reloadPlayList();
+    ImagePtr newImage(new Image(newUrl));
+    playList->replace(index, newImage);
+    m_navigator->goIndex(index, true);
+    item->setText(newImage->name());
 }
 
 void MainWindow::fsRootPathChanged()

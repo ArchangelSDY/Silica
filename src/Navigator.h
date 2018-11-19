@@ -57,6 +57,7 @@ public:
 signals:
     void paint(Image *image);
     void paintThumbnail(Image *image);
+    void playListItemChange(int index);
     void playListChange(QSharedPointer<PlayList>);
     void playListAppend(int start);
     void navigationChange(int index);

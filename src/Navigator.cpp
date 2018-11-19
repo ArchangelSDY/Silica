@@ -60,9 +60,9 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
     reset();
 
     m_playList = playList;
-    connect(m_playList.data(), SIGNAL(itemsChanged()), this, SLOT(reloadPlayList()));
-    connect(m_playList.data(), SIGNAL(itemsAppended(int)),
-            this, SLOT(playListAppended(int)));
+    connect(m_playList.data(), &PlayList::itemChanged, this, &Navigator::playListItemChange);
+    connect(m_playList.data(), &PlayList::itemsChanged, this, &Navigator::reloadPlayList);
+    connect(m_playList.data(), &PlayList::itemsAppended, this, &Navigator::playListAppended);
     emit playListChange(m_playList);
 
     goIndex(0);

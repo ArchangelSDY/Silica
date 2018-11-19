@@ -64,6 +64,7 @@ protected:
     virtual void incrItemsToLoad(int count);
 
     void addItem(GalleryItem *item);
+    void replaceItem(int index, GalleryItem *item);
     AbstractRendererFactory *rendererFactory();
     void setRendererFactory(AbstractRendererFactory *factory);
 
@@ -96,6 +97,8 @@ private:
     static const int LAYOUT_INTERVAL;
     class GraphicsView;
     friend class GraphicsView;
+
+    void setupItem(GalleryItem *item);
 
     QList<GalleryItem *> m_galleryItems;
     AbstractRendererFactory *m_rendererFactory;

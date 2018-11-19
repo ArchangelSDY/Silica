@@ -57,6 +57,12 @@ void ImageGalleryView::setPlayList(QSharedPointer<PlayList> playList)
     m_rankFilterMenuManager = new RankFilterMenuManager(m_playList, this);
 }
 
+void ImageGalleryView::playListItemChange(int index)
+{
+    replaceItem(index, new ImageGalleryItem(m_playList->at(index), rendererFactory()));
+    scheduleLayout();
+}
+
 void ImageGalleryView::playListChange(QSharedPointer<PlayList> playList)
 {
     if (playList && playList != m_playList) {

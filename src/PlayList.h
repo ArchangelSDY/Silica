@@ -49,6 +49,7 @@ public:
     void append(const QSharedPointer<Image> &image);
     void append(const ImageList &images);
     void append(QSharedPointer<PlayList> playList);
+    void replace(int index, const ImagePtr &image);
 
     QList<QSharedPointer<Image> > &operator<<(
             const QSharedPointer<Image> &image);
@@ -57,10 +58,6 @@ public:
 
     void clear();
 
-    inline QSharedPointer<Image> &operator[](int i)
-    {
-        return m_filteredImages[i];
-    }
     inline const QSharedPointer<Image> &operator[](int i) const
     {
         return m_filteredImages[i];
@@ -91,6 +88,7 @@ public:
     void removeAt(int index);
 
 signals:
+    void itemChanged(int index);
     void itemsChanged();
     void itemsAppended(int start);
 

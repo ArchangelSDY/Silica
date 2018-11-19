@@ -60,6 +60,15 @@ void PlayList::append(QSharedPointer<PlayList> playList)
     emit itemsAppended(start);
 }
 
+void PlayList::replace(int index, const ImagePtr &image)
+{
+    ImagePtr oldImage = m_filteredImages[index];
+    int allIndex = m_allImages.indexOf(oldImage);
+    m_allImages.replace(allIndex, image);
+    m_filteredImages.replace(index, image);
+    emit itemChanged(index);
+}
+
 QList<QSharedPointer<Image> > &PlayList::operator<<(
         const QSharedPointer<Image> &image)
 {

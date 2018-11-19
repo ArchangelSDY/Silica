@@ -17,6 +17,7 @@ public:
 public slots:
     void setPlayList(QSharedPointer<PlayList> playList);
 
+    void playListItemChange(int index);
     void playListChange(QSharedPointer<PlayList>);
     void playListAppend(int start);
 
