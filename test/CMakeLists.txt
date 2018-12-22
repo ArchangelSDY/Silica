@@ -1,4 +1,5 @@
 add_subdirectory(deps/QtMockWebServer)
+set_target_properties(qtmockwebserver PROPERTIES FOLDER "Dependencies")
 
 # set all include directories for in and out of source builds
 include_directories(
@@ -43,6 +44,9 @@ set(SILICA_TEST_COMMON_LINK_LIBRARIES
 )
 add_library(silicatestcommon ${TEST_COMMON_SRCS})
 target_link_libraries(silicatestcommon ${SILICA_TEST_COMMON_LINK_LIBRARIES})
+set_target_properties(silicatestcommon PROPERTIES
+    FOLDER "Tests"
+)
 
 # Copy test assets
 add_custom_command(TARGET silicatestcommon POST_BUILD
@@ -73,7 +77,10 @@ foreach(TEST_FILE ${TEST_FILES})
     get_filename_component(TEST_TARGET ${TEST_FILE} NAME_WE)
 
     add_executable(${TEST_TARGET} ${TEST_FILE})
-    set_target_properties(${TEST_TARGET} PROPERTIES MACOSX_BUNDLE FALSE)
+    set_target_properties(${TEST_TARGET} PROPERTIES
+        MACOSX_BUNDLE FALSE
+        FOLDER "Tests"
+    )
     target_link_libraries(${TEST_TARGET} silicatestcommon)
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 

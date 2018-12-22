@@ -35,6 +35,16 @@ include("silicaui.cmake")
 include("silica.cmake")
 include("crashhandler.cmake")
 
+set_target_properties(breakpad PROPERTIES FOLDER "Dependencies")
+set_target_properties(qtrar PROPERTIES FOLDER "Dependencies")
+set_target_properties(qtrarobjs PROPERTIES FOLDER "Dependencies")
+set_target_properties(qtrar_test PROPERTIES FOLDER "Dependencies")
+set_target_properties(qtrarfile_test PROPERTIES FOLDER "Dependencies")
+set_target_properties(quazip PROPERTIES FOLDER "Dependencies")
+set_target_properties(qt7z PROPERTIES FOLDER "Dependencies")
+set_target_properties(Qt7zPackage_Tests PROPERTIES FOLDER "Dependencies")
+set_target_properties(qtdbmigration PROPERTIES FOLDER "Dependencies")
+
 set(CPACK_GENERATOR "TGZ;ZIP")
 # TODO: This causes components packaging failure
 # set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};Silica;applications;applications")

@@ -68,6 +68,7 @@ endif()
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 set(CMAKE_AUTOMOC ON)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(BUILD_PRODUCTION "Build for production" OFF)
 message(STATUS "Build Production: ${BUILD_PRODUCTION}")
