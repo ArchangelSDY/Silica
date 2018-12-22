@@ -61,8 +61,8 @@ elseif (WIN32)
 
     install(TARGETS silica RUNTIME DESTINATION . COMPONENT applications)
 
-    install(FILES "${OPENSSL_INCLUDE_DIR}/../lib/libeay32.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${OPENSSL_INCLUDE_DIR}/../lib/ssleay32.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${OPENSSL_INCLUDE_DIR}/../bin/libeay32.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${OPENSSL_INCLUDE_DIR}/../bin/ssleay32.dll" DESTINATION . COMPONENT applications)
     install(FILES "${ZLIB_INCLUDE_DIR}/../bin/zlib.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/bin/Qt5Concurrent.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/bin/Qt5Core.dll" DESTINATION . COMPONENT applications)
