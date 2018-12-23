@@ -7,7 +7,6 @@ project (silica VERSION 0.3.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(Threads)
-find_package(ZLIB REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gamepad REQUIRED)
@@ -17,15 +16,25 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(OpenCV REQUIRED)
 
-if (WIN32)
-    find_package(OPENSSL REQUIRED)
-endif (WIN32)
-
 set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 # if there is no QT_ROOT, try to deduce it from Qt QtCore include
 if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${Qt5Core_DIR}/../../../)
 endif()
+
+if (WIN32)
+    find_package(OPENSSL REQUIRED)
+endif (WIN32)
+
+if (UNIX)
+    find_package(ZLIB REQUIRED)
+else (UNIX)
+    set(ZLIB_INCLUDE_DIRS "${QT_ROOT}/include/QtZlib" CACHE STRING "Path to ZLIB headers of Qt")
+    set(ZLIB_LIBRARIES "")
+    if(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
+        message(FATAL_ERROR "Please specify a valid zlib include dir")
+    endif(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
+endif (UNIX)
 
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${Qt5Concurrent_INCLUDE_DIRS})
