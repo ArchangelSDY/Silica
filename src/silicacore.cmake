@@ -115,7 +115,7 @@ set(CORE_LINK_LIBS
     qt7z
     qtrar
     qtdbmigration
-    quazip
+    quazip_static
     Qt5::Concurrent
     Qt5::Core
     Qt5::Network

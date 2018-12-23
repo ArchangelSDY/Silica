@@ -8,7 +8,7 @@ This file is part of QuaZIP.
 
 QuaZIP is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
 QuaZIP is distributed in the hope that it will be useful,
@@ -70,7 +70,7 @@ struct QUAZIP_EXPORT QuaZipNewInfo {
     */
   quint32 externalAttr;
   /// File comment.
-  /** Will be encoded using QuaZip::getCommentCodec().
+  /** Will be encoded in UTF-8 encoding.
    **/
   QString comment;
   /// File local extra field.

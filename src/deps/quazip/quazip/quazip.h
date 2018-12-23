@@ -8,7 +8,7 @@ This file is part of QuaZIP.
 
 QuaZIP is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
+the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
 QuaZIP is distributed in the hope that it will be useful,
@@ -502,6 +502,28 @@ class QUAZIP_EXPORT QuaZip {
      * \sa setZip64Enabled()
      */
     bool isZip64Enabled() const;
+    /// Enables the use of UTF-8 encoding for file names and comments text.
+    /**
+     * @param utf8 If \c true, the UTF-8 mode is enabled, disabled otherwise.
+     *
+     * Once this is enabled, the names of all new files and comments text (until
+     * the mode is disabled again) will be encoded in UTF-8 encoding, and the
+     * version to extract will be set to 6.3 (63) in ZIP header. By default,
+     * the UTF-8 mode is off due to compatibility reasons.
+     *
+     * Note that when extracting ZIP archives, the UTF-8 mode is determined from
+     * ZIP file header, not from this flag.
+     *
+     * \sa isUtf8Enabled()
+     */
+    void setUtf8Enabled(bool utf8);
+    /// Returns whether the UTF-8 encoding mode is enabled.
+    /**
+     * @return \c true if and only if the UTF-8 mode is enabled.
+     *
+     * \sa setUtf8Enabled()
+     */
+    bool isUtf8Enabled() const;
     /// Returns the auto-close flag.
     /**
       @sa setAutoClose()
