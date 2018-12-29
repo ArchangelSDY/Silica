@@ -2,6 +2,7 @@
 #define FILESYSTEMVIEW_H
 
 #include <QFileSystemWatcher>
+#include <QScopedPointer>
 #include <QStringList>
 
 #include "ui/GalleryView.h"
@@ -48,7 +49,7 @@ private:
     QHash<QString, QPoint> m_historyScrollPositions;
 
     class DirIterThread;
-    DirIterThread *m_dirIterThread;
+    QScopedPointer<DirIterThread, QScopedPointerDeleteLater> m_dirIterThread;
 };
 
 #endif // FILESYSTEMVIEW_H

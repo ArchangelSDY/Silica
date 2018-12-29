@@ -99,28 +99,12 @@ class FileSystemView::DirIterThread : public QThread
 {
     Q_OBJECT
 public:
-    DirIterThread() : m_shouldQuit(false)
+    DirIterThread(const QString &rootPath, const QStringList &nameFilters, QDir::Filters filters, QDir::SortFlags sortFlags) :
+        m_rootPath(rootPath) ,
+        m_nameFilters(nameFilters) ,
+        m_filters(filters) ,
+        m_sortFlags(sortFlags)
     {
-    }
-
-    void setRootPath(const QString &rootPath)
-    {
-        m_rootPath = rootPath;
-    }
-
-    void setNameFilters(const QStringList &nameFilters)
-    {
-        m_nameFilters = nameFilters;
-    }
-
-    void setFilters(QDir::Filters filters)
-    {
-        m_filters = filters;
-    }
-
-    void setSortFlags(QDir::SortFlags sortFlags)
-    {
-        m_sortFlags = sortFlags;
     }
 
     void run() override
@@ -129,7 +113,7 @@ public:
         QList<QFileInfo> itemInfos;
         bool needSort = ((m_sortFlags & QDir::SortByMask) != QDir::Unsorted);
 
-        while (iter.hasNext()) {
+        while (iter.hasNext() && !isInterruptionRequested()) {
             // Emit item at once if sorting is not needed, otherwise hold and
             // sort after all items found
             if (!needSort) {
@@ -138,31 +122,20 @@ public:
                 iter.next();
                 itemInfos.append(iter.fileInfo());
             }
-
-            if (m_shouldQuit) {
-                break;
-            }
         }
 
-        if (needSort) {
+        if (needSort && !isInterruptionRequested()) {
             std::sort(itemInfos.begin(), itemInfos.end(),
                       ItemSortComparator(m_sortFlags));
+
             foreach (const QFileInfo &info, itemInfos) {
+                if (isInterruptionRequested()) {
+                    return;
+                }
+
                 emit gotItem(m_rootPath, info.absoluteFilePath());
             }
         }
-    }
-
-    void reset()
-    {
-        m_shouldQuit = false;
-    }
-
-    void stopIter()
-    {
-        disconnect(this, SIGNAL(gotItem(QString, QString)), 0, 0);
-        disconnect(this, SIGNAL(finished()), 0, 0);
-        m_shouldQuit = true;
     }
 
 signals:
@@ -173,15 +146,13 @@ private:
     QStringList m_nameFilters;
     QDir::Filters m_filters;
     QDir::SortFlags m_sortFlags;
-    bool m_shouldQuit;
 };
 
 
 FileSystemView::FileSystemView(QWidget *parent) :
     GalleryView(parent) ,
     m_sortFlags(QDir::Unsorted) ,
-    m_isFirstRefreshAfterRootPathChanged(true) ,
-    m_dirIterThread(new DirIterThread())
+    m_isFirstRefreshAfterRootPathChanged(true)
 {
 #ifdef ENABLE_OPENGL
     m_view->setViewport(new QOpenGLWidget(this));
@@ -194,11 +165,9 @@ FileSystemView::FileSystemView(QWidget *parent) :
 
 FileSystemView::~FileSystemView()
 {
-    if (m_dirIterThread->isRunning()) {
-        m_dirIterThread->stopIter();
-        m_dirIterThread->wait();
+    if (m_dirIterThread) {
+        m_dirIterThread->requestInterruption();
     }
-    m_dirIterThread->deleteLater();
 }
 
 QString FileSystemView::rootPath() const
@@ -224,9 +193,9 @@ void FileSystemView::setRootPath(const QString &path)
     m_rootPath = path;
     m_isFirstRefreshAfterRootPathChanged = true;
 
-    if (m_dirIterThread->isRunning()) {
-        m_dirIterThread->stopIter();
-        m_dirIterThread->wait();
+    if (m_dirIterThread) {
+        m_dirIterThread->requestInterruption();
+        m_dirIterThread.reset();
     }
 
     if (!m_rootPath.isEmpty()) {
@@ -284,25 +253,24 @@ void FileSystemView::sortByModifiedTime()
 
 void FileSystemView::refreshView()
 {
-    if (m_dirIterThread->isRunning()) {
+    if (m_dirIterThread) {
         return;
     }
 
     clear();
 
-    m_dirIterThread->reset();
-    m_dirIterThread->setRootPath(m_rootPath);
-    m_dirIterThread->setNameFilters(
-        ImageSourceManager::instance()->nameFilters());
-    m_dirIterThread->setFilters(
-        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
-    m_dirIterThread->setSortFlags(m_sortFlags);
+    m_dirIterThread.reset(new DirIterThread(
+        m_rootPath,
+        ImageSourceManager::instance()->nameFilters(),
+        QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+        m_sortFlags
+    ));
 
-    connect(m_dirIterThread, SIGNAL(gotItem(QString, QString)),
+    connect(m_dirIterThread.data(), SIGNAL(gotItem(QString, QString)),
             this, SLOT(dirIterGotItem(QString, QString)),
             static_cast<Qt::ConnectionType>(
                 Qt::AutoConnection | Qt::UniqueConnection));
-    connect(m_dirIterThread, SIGNAL(finished()),
+    connect(m_dirIterThread.data(), SIGNAL(finished()),
             this, SLOT(dirIterFinished()),
             static_cast<Qt::ConnectionType>(
                 Qt::AutoConnection | Qt::UniqueConnection));
@@ -325,6 +293,7 @@ void FileSystemView::dirIterGotItem(const QString &rootPath,
 
 void FileSystemView::dirIterFinished()
 {
+    m_dirIterThread.reset();
     if (m_isFirstRefreshAfterRootPathChanged) {
         m_isFirstRefreshAfterRootPathChanged = false;
 
