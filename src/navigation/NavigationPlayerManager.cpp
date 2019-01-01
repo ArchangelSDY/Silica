@@ -65,7 +65,7 @@ public:
 
     virtual AbstractNavigationPlayer *create(Navigator *navigator, QWidget *view) override
     {
-        sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(m_plugin.data(), navigator, view);
+        sapi::NavigationPlayerDelegate *player = new sapi::NavigationPlayerDelegate(m_plugin.data(), m_className, navigator, view);
         return player;
     }
 

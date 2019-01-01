@@ -3,11 +3,13 @@
 namespace sapi {
 
 NavigationPlayerDelegate::NavigationPlayerDelegate(INavigationPlayerPlugin *plugin,
+                                                   const QString &className,
                                                    Navigator *navigator,
                                                    QWidget *view) :
     AbstractNavigationPlayer(navigator) ,
     m_plugin(plugin) ,
     m_player(plugin->createPlayer()) ,
+    m_className(className) ,
     m_navigatorDelegate(new sapi::NavigatorDelegate(navigator))
 {
     m_player->onInit(m_navigatorDelegate.data(), view);
@@ -21,6 +23,11 @@ NavigationPlayerDelegate::~NavigationPlayerDelegate()
 QString NavigationPlayerDelegate::name() const
 {
     return m_player->name();
+}
+
+QString NavigationPlayerDelegate::className() const
+{
+    return m_className;
 }
 
 void NavigationPlayerDelegate::goNext()

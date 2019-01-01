@@ -14,6 +14,7 @@ public:
     virtual ~AbstractNavigationPlayer();
 
     virtual QString name() const;
+    virtual QString className() const;
     virtual void goNext() = 0;
     virtual void goPrev() = 0;
     virtual void goIndexUntilSuccess(int index, int delta);

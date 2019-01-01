@@ -11,13 +11,16 @@ namespace sapi {
 
 class NavigationPlayerDelegate : public AbstractNavigationPlayer
 {
+    Q_OBJECT
 public:
     NavigationPlayerDelegate(INavigationPlayerPlugin *plugin,
+                             const QString &className,
                              Navigator *navigator,
                              QWidget *view);
     ~NavigationPlayerDelegate();
 
     virtual QString name() const override;
+    virtual QString className() const override;
     virtual void goNext() override;
     virtual void goPrev() override;
     virtual void onEnter() override;
@@ -27,6 +30,7 @@ public:
 private:
     INavigationPlayerPlugin *m_plugin;
     INavigationPlayer *m_player;
+    QString m_className;
     QScopedPointer<NavigatorResource> m_navigatorDelegate;
 };
 

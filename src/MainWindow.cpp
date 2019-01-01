@@ -1095,7 +1095,7 @@ void MainWindow::toggleSecondaryNavigator()
 
         // Create player
         m_secondaryNavigator->setPlayer(NavigationPlayerManager::instance()->create(
-            m_navigator->player()->metaObject()->className(), m_secondaryNavigator.data(), m_secondaryMainGraphicsView));
+            m_navigator->player()->className(), m_secondaryNavigator.data(), m_secondaryMainGraphicsView));
 
         // Trigger a force reload to do an initial paint
         m_secondaryNavigator->goIndex(m_secondaryNavigator->currentIndex(), true);

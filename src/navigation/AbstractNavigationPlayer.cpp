@@ -22,6 +22,11 @@ QString AbstractNavigationPlayer::name() const
     return this->metaObject()->classInfo(0).value();
 }
 
+QString AbstractNavigationPlayer::className() const
+{
+    return this->metaObject()->className();
+}
+
 void AbstractNavigationPlayer::goIndexUntilSuccess(int index, int delta)
 {
     m_navigator->goIndexUntilSuccess(index, delta);
