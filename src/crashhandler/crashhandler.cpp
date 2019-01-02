@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
     QTimer livenessTimer;
     livenessTimer.setInterval(5000);
     livenessTimer.setSingleShot(false);
+    QObject::connect(&handler, &CrashHandler::emitOnCrash, &livenessTimer, &QTimer::stop);
     QObject::connect(&livenessTimer, &QTimer::timeout, [pid = args[4].toInt()]() {
         checkParentLiveness(pid);
     });
