@@ -22,7 +22,6 @@ public:
     PlayListRecord *record() { return m_record; }
 
     virtual void load() override;
-    virtual void unload() override;
     virtual void createRenderer();
 
 private slots:

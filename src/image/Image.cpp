@@ -1,7 +1,10 @@
 #include "Image.h"
 
-#include <QtGlobal>
-#include <QUuid>
+#include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QRunnable>
+#include <QThreadPool>
 
 #ifdef Q_OS_UNIX
 #include <sys/types.h>
@@ -106,11 +109,14 @@ void LoadImageTask::run()
 }
 
 // ---------- Load Thumbnail Task ----------
+
+static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath);
+
 class LoadThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadThumbnailTask(QString thumbnailPath, bool makeImmediately) :
+    LoadThumbnailTask(const QString &thumbnailPath, bool makeImmediately) :
         QRunnable() ,
         m_thumbnailPath(thumbnailPath) ,
         m_makeImmediately(makeImmediately) {}
@@ -127,29 +133,8 @@ private:
 
 void LoadThumbnailTask::run()
 {
-    QFile file(m_thumbnailPath);
-    if (file.exists()) {
-        // Set last access/modified time
-#ifdef Q_OS_UNIX
-        time_t now = time(0);
-        struct utimbuf buf;
-        buf.actime = now;
-        buf.modtime = now;
-        utime(m_thumbnailPath.toUtf8().data(), &buf);
-#endif
-        QSharedPointer<QImage> image =
-            QSharedPointer<QImage>::create(m_thumbnailPath);
-        if (!image->isNull()) {
-            emit loaded(image, m_makeImmediately);
-        } else {
-            // Broken thumbnail, delete it
-            image.clear();
-            file.remove();
-            emit loaded(QSharedPointer<QImage>(), m_makeImmediately);
-        }
-    } else {
-        emit loaded(QSharedPointer<QImage>(), m_makeImmediately);
-    }
+    QSharedPointer<QImage> thumbnail = doLoadThumbnailSync(m_thumbnailPath);
+    emit loaded(thumbnail, m_makeImmediately);
 }
 
 // ---------- Make Thumbnail Task ----------
@@ -220,7 +205,6 @@ Image::Image(const QString &path, QObject *parent) :
     m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(path)) ,
-    m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -244,7 +228,6 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(url)) ,
-    m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -273,7 +256,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_uuid(QUuid::createUuid()) ,
     m_status(Image::NotLoad) ,
     m_imageSource(imageSource) ,
-    m_thumbnail(new QImage()) ,
     m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -386,7 +368,8 @@ void Image::imageReaderFinished(QVariantHash metadata,
     }
     m_durations = durations;
 
-    if (m_thumbnail->isNull()) {
+    // TODO: Make thumbnail if thumbnail load failed
+    if (!m_thumbnail) {
         makeThumbnail();
     }
 
@@ -437,8 +420,9 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
 
 void Image::loadThumbnail(bool makeImmediately)
 {
-    if (!m_thumbnail->isNull()) {
-        emit thumbnailLoaded(m_thumbnail);
+    QSharedPointer<QImage> thumbnail = m_thumbnail.toStrongRef();
+    if (thumbnail) {
+        emit thumbnailLoaded(thumbnail);
         return;
     }
 
@@ -458,12 +442,45 @@ void Image::loadThumbnail(bool makeImmediately)
         "/" + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
         new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
-    connect(loadThumbnailTask, SIGNAL(loaded(QSharedPointer<QImage>, bool)),
-            this, SLOT(thumbnailReaderFinished(QSharedPointer<QImage>, bool)));
+    connect(loadThumbnailTask, &LoadThumbnailTask::loaded, this, &Image::thumbnailReaderFinished);
     // Thumbnail loading should be low priority
     threadPool()->start(
         new LiveImageRunnable(m_uuid, loadThumbnailTask),
         LowPriority);
+}
+
+QSharedPointer<QImage> Image::loadThumbnailSync()
+{
+    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
+        "/" + m_thumbnailPath;
+    return doLoadThumbnailSync(thumbnailFullPath);
+}
+
+static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath)
+{
+    QFile file(thumbnailFullPath);
+    if (file.exists()) {
+        // Set last access/modified time
+#ifdef Q_OS_UNIX
+        time_t now = time(0);
+        struct utimbuf buf;
+        buf.actime = now;
+        buf.modtime = now;
+        utime(thumbnailFullPath.toUtf8().data(), &buf);
+#endif
+        QSharedPointer<QImage> image =
+            QSharedPointer<QImage>::create(thumbnailFullPath);
+        if (!image->isNull()) {
+            return image;
+        } else {
+            // Broken thumbnail, delete it
+            image.clear();
+            file.remove();
+            return QSharedPointer<QImage>();
+        }
+    } else {
+        return QSharedPointer<QImage>();
+    }
 }
 
 void Image::makeThumbnail()
@@ -494,24 +511,19 @@ void Image::makeThumbnail()
 void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
 {
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
-        m_thumbnail.reset(new QImage(*thumbnail));
-        m_thumbnailSize = m_thumbnail->size();
+        m_thumbnail = thumbnail;
+        m_thumbnailSize = thumbnail->size();
 
         LocalDatabase::instance()->insertImage(this);
 
         emit thumbnailLoaded(thumbnail);
-    } else if (m_thumbnail->isNull()) {
+    } else {
         emit thumbnailLoadFailed();
     }
 
     m_isMakingThumbnail = false;
 
     checkUnload();
-}
-
-void Image::unloadThumbnail()
-{
-    m_thumbnail.reset(new QImage());
 }
 
 void Image::computeThumbnailPath()
@@ -554,9 +566,6 @@ QString Image::name() const
 
 qreal Image::aspectRatio() const
 {
-    Q_ASSERT(defaultFrame());
-    Q_ASSERT(m_thumbnail);
-
     if (!defaultFrame()->isNull()) {
         int width = defaultFrame()->width();
         int height = defaultFrame()->height();

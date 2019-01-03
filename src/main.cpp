@@ -1,7 +1,8 @@
 #include <QApplication>
+#include <QDebug>
 #include <QProcess>
 #include <QScopedPointer>
-#include <QtGlobal>
+#include <QThreadPool>
 
 #ifdef Q_OS_WIN
 #include "deps/breakpad/client/windows/handler/exception_handler.h"

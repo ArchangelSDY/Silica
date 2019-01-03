@@ -21,7 +21,6 @@ public:
     ImagePtr image() { return m_image; }
 
     virtual void load() override;
-    virtual void unload() override;
     virtual void createRenderer();
 
 private slots:

@@ -96,12 +96,12 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(imageLoaded(Image *)));
     connect(m_navigator, SIGNAL(paint(Image *)),
             m_mainGraphicsViewModel.data(), SLOT(paint(Image *)));
-    connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
-            m_mainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
+    connect(m_navigator, SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
+            m_mainGraphicsViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
     connect(m_navigator, SIGNAL(paint(Image *)),
             m_sideViewModel.data(), SLOT(paint(Image *)));
-    connect(m_navigator, SIGNAL(paintThumbnail(Image *)),
-            m_sideViewModel.data(), SLOT(paintThumbnail(Image *)));
+    connect(m_navigator, SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
+            m_sideViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -1087,8 +1087,8 @@ void MainWindow::toggleSecondaryNavigator()
 
         connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
                 m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
-        connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(Image *)),
-                m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(Image *)));
+        connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
+                m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
 
         createMainImageView(&m_secondaryMainGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
         ui->pageImageViewLayout->insertWidget(0, m_secondaryMainGraphicsView);

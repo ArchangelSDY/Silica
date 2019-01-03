@@ -1,5 +1,8 @@
 #include "LocalPlayListProvider.h"
 
+#include <QList>
+#include <QUrl>
+
 #include "db/LocalDatabase.h"
 
 LocalPlayListProvider::LocalPlayListProvider(QObject *parent) :

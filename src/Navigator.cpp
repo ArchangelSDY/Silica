@@ -316,7 +316,7 @@ void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
         !thumbnail->isNull()) {
 
         if (image == m_currentImage) {
-            emit paintThumbnail(image);
+            emit paintThumbnail(thumbnail);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 #include <QDialog>
 #include <QHBoxLayout>
+#include <QSignalMapper>
 #include <QScopedPointer>
 
 #include "image/caches/ImagesCache.h"

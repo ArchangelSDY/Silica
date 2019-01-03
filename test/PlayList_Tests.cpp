@@ -53,6 +53,7 @@ private:
 };
 
 Q_DECLARE_METATYPE(AbstractPlayListFilter *)
+Q_DECLARE_METATYPE(QSharedPointer<QImage>)
 
 void TestPlayList::initTestCase()
 {

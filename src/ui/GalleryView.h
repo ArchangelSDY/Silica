@@ -2,6 +2,7 @@
 #define GALLERYVIEW_H
 
 #include <QGraphicsView>
+#include <QSet>
 
 #include "ui/models/TaskProgress.h"
 #include "ui/renderers/AbstractRendererFactory.h"

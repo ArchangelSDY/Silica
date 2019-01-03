@@ -1,6 +1,7 @@
 #ifndef FILESYSTEMVIEW_H
 #define FILESYSTEMVIEW_H
 
+#include <QDir>
 #include <QFileSystemWatcher>
 #include <QScopedPointer>
 #include <QStringList>

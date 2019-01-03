@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSharedPointer>
+#include <QTimer>
 #include <QUuid>
 
 #include "Image.h"
@@ -56,7 +57,7 @@ public:
 
 signals:
     void paint(Image *image);
-    void paintThumbnail(Image *image);
+    void paintThumbnail(QSharedPointer<QImage> thumbnail);
     void playListItemChange(int index);
     void playListChange(QSharedPointer<PlayList>);
     void playListAppend(int start);

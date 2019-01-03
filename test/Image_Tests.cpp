@@ -21,6 +21,8 @@ private slots:
     void hotspots_data();
 };
 
+Q_DECLARE_METATYPE(QSharedPointer<QImage>)
+
 void TestImage::cleanup()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestImage");
@@ -88,8 +90,10 @@ void TestImage::loadThumbnail()
     image.loadThumbnail(true);
     QVERIFY(spyLoad.wait());
 
-    QVERIFY(!image.thumbnail().isNull());
-    QVERIFY(image.thumbnail()->width() > 0);
+    QList<QVariant> arguments = spyLoad.takeFirst();
+    QSharedPointer<QImage> thumbnail = arguments.at(0).value<QSharedPointer<QImage>>();
+    QVERIFY(!thumbnail.isNull());
+    QVERIFY(thumbnail->width() > 0);
     QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(

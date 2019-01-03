@@ -1,9 +1,11 @@
 #ifndef MAINGRAPHICSVIEWMODEL_H
 #define MAINGRAPHICSVIEWMODEL_H
 
+#include <QImage>
 #include <QObject>
 #include <QRectF>
 #include <QScopedPointer>
+#include <QSharedPointer>
 #include <QTimer>
 
 class QContextMenuEvent;
@@ -80,7 +82,7 @@ signals:
 private slots:
     void paint();
     void paint(Image *image, bool shouldFitInView = true);
-    void paintThumbnail(Image *image);
+    void paintThumbnail(QSharedPointer<QImage> thumbnail);
     void focusOnRect(QRectF rect);
 
 private:
@@ -91,6 +93,7 @@ private:
     Navigator *m_navigator;
     ImageEffectManager *m_imageEffectManager;
     Image *m_image;
+    QSharedPointer<QImage> m_thumbnail;
     bool m_shouldRepaintThumbnailOnShown;
 
     FitMode m_fitInView;

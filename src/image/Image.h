@@ -1,10 +1,13 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <QImage>
 #include <QObject>
-#include <QtGui>
+#include <QWeakPointer>
+#include <QUuid>
+#include <QVariant>
 
-class QUuid;
+class QThreadPool;
 
 class ImageHotspot;
 class ImageRank;
@@ -40,9 +43,6 @@ public:
     {
         return *(defaultFrame());
     }
-    QSharedPointer<QImage> thumbnail() {
-        return m_thumbnail;
-    }
     QString name() const;
     QString thumbnailPath() const { return m_thumbnailPath; }
     qreal aspectRatio() const;
@@ -52,7 +52,7 @@ public:
     void scheduleUnload();
 
     void loadThumbnail(bool makeImmediately = false);
-    void unloadThumbnail();
+    QSharedPointer<QImage> loadThumbnailSync();
 
     void loadMetadata();
 
@@ -115,7 +115,7 @@ private:
     QUuid m_uuid;
     Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
-    QSharedPointer<QImage> m_thumbnail;
+    QWeakPointer<QImage> m_thumbnail;
     QSize m_thumbnailSize;
     QString m_thumbnailPath;
     int m_loadRequestsCount;

@@ -2,6 +2,7 @@
 
 #include <QMenu>
 #include <QScopedPointer>
+#include <QSignalMapper>
 
 #include "image/effects/ImageEffectManager.h"
 #include "share/SharerManager.h"
@@ -91,17 +92,14 @@ void MainGraphicsViewModel::paint(Image *image, bool shouldFitInView)
     }
 }
 
-void MainGraphicsViewModel::paintThumbnail(Image *image)
+void MainGraphicsViewModel::paintThumbnail(QSharedPointer<QImage> thumbnail)
 {
-    if (image) {
-        if (m_image != image) {
-            resetImage(image);
-        }
-
+    m_thumbnail = thumbnail;
+    if (m_thumbnail) {
         if (m_view->isVisible()) {
             m_shouldRepaintThumbnailOnShown = false;
 
-            QImage fitThumbnail = image->thumbnail()->scaled(
+            QImage fitThumbnail = m_thumbnail->scaled(
                 m_view->viewSize(), Qt::KeepAspectRatioByExpanding);
 
             m_view->setViewportRect(fitThumbnail.rect());
@@ -126,7 +124,7 @@ void MainGraphicsViewModel::focusOnRect(QRectF rect)
 void MainGraphicsViewModel::showEvent(QShowEvent *)
 {
     if (m_shouldRepaintThumbnailOnShown) {
-        paintThumbnail(m_navigator->currentImage());
+        paintThumbnail(m_thumbnail);
     }
 }
 

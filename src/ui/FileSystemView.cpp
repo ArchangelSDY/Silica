@@ -1,6 +1,8 @@
 #include "ui/FileSystemView.h"
 
+#include <QContextMenuEvent>
 #include <QDir>
+#include <QDirIterator>
 #include <QFileInfo>
 #include <QMenu>
 #include <QMessageBox>

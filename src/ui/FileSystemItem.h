@@ -1,9 +1,10 @@
 #ifndef FILESYSTEMITEM_H
 #define FILESYSTEMITEM_H
 
+#include <QFileInfo>
+
 #include "ui/GalleryItem.h"
 
-class QFileInfo;
 class QThreadPool;
 class Image;
 class ImageSource;
@@ -25,7 +26,6 @@ public:
     QFileInfo fileInfo() const;
 
     virtual void load() override;
-    virtual void unload() override;
     virtual void createRenderer();
     void refresh();
     void removeOnDisk();

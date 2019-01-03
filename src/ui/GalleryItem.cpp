@@ -94,9 +94,6 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
     } else {
         resetThumbnail();
     }
-
-    // Unload original thumbnail to reduce memory usage
-    unload();
 }
 
 void GalleryItem::onThumbnailScaled()
@@ -210,7 +207,6 @@ void GalleryItem::setIsInsideViewportPreload(bool isInside)
     if (!isInside) {
         // Unload thumbnail
         resetThumbnail();
-        unload();
     }
 
     // if (!m_isInsideViewportPreload && isInside) {

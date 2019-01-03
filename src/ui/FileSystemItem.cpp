@@ -218,11 +218,6 @@ void FileSystemItem::load()
     threadPool()->start(r);
 }
 
-void FileSystemItem::unload()
-{
-    // TODO: Need implementation
-}
-
 void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
 {
     if (isDefault) {

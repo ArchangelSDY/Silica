@@ -1,5 +1,7 @@
 #include "MainImageGalleryView.h"
 
+#include <QKeyEvent>
+
 MainImageGalleryView::MainImageGalleryView(QWidget *parent) :
     ImageGalleryView(parent)
 {

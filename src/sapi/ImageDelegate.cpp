@@ -63,8 +63,10 @@ QList<const QImage *> ImageDelegate::frames() const
 
 QImage ImageDelegate::thumbnail() const
 {
+    // TODO: Deprecate this in favor of async version
     Image *image = const_cast<Image *>(m_image);
-    return *image->thumbnail();
+    QSharedPointer<QImage> thumbnail = image->loadThumbnailSync();
+    return *thumbnail;
 }
 
 QByteArray ImageDelegate::readRaw() const

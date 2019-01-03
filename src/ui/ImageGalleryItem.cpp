@@ -25,11 +25,6 @@ void ImageGalleryItem::load()
     m_image->loadThumbnail(true);
 }
 
-void ImageGalleryItem::unload()
-{
-    m_image->unloadThumbnail();
-}
-
 void ImageGalleryItem::createRenderer()
 {
     setRenderer(m_rendererFactory->createItemRendererForImageGallery());

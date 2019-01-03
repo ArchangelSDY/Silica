@@ -1,5 +1,7 @@
 #include "PlayListRecord.h"
 
+#include <QDebug>
+
 #include "db/LocalDatabase.h"
 #include "playlist/PlayListProvider.h"
 #include "playlist/PlayListProviderManager.h"

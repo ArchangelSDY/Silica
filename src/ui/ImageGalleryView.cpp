@@ -3,6 +3,7 @@
 #include <QOpenGLWidget>
 #endif
 
+#include <QContextMenuEvent>
 #include <QMenu>
 #include <QMessageBox>
 #include <QRunnable>

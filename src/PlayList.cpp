@@ -2,7 +2,6 @@
 #include "image/ImageHistogram.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
-#include "image/ImageThumbnailBlockLoader.h"
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
 #include "playlist/PlayListRecord.h"

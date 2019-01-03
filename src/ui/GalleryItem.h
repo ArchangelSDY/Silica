@@ -21,7 +21,6 @@ public:
     virtual QString name() const;
 
     virtual void load() = 0;
-    virtual void unload() = 0;
     void setRendererFactory(AbstractRendererFactory *factory);
 
     // Have to implement our own visibility system as QGraphicsScene will always

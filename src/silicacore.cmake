@@ -32,7 +32,6 @@ file(GLOB CORE_SRCS
     "image/ImageSource.cpp"
     "image/ImageSourceFactory.cpp"
     "image/ImageSourceManager.cpp"
-    "image/ImageThumbnailBlockLoader.cpp"
     "image/caches/*.cpp"
     "image/effects/ImageEffectManager.cpp"
     "image/metadata/ImageMetadataConstants.cpp"

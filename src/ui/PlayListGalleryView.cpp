@@ -1,5 +1,6 @@
 #include "PlayListGalleryView.h"
 
+#include <QContextMenuEvent>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>

@@ -7,16 +7,11 @@
 #include <opencv2/core/core.hpp>
 
 #include "image/ImageHistogram.h"
-#include "image/ImageThumbnailBlockLoader.h"
 #include "playlist/sort/Utils.h"
 
 static QSharedPointer<ImageHistogram> computeImageHistogram(ImagePtr image)
 {
-    ImageThumbnailBlockLoader loader(image);
-    loader.loadAndWait();
-
-    QSharedPointer<QImage> thumbnail = loader.thumbnail();
-
+    QSharedPointer<QImage> thumbnail = image->loadThumbnailSync();
     return QSharedPointer<ImageHistogram>::create(*thumbnail);
 }
 
