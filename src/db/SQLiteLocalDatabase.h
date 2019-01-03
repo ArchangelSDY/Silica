@@ -26,8 +26,6 @@ public:
     int queryImagesCount();
     bool insertImage(Image *image);
     Image *queryImageByHashStr(const QString &hashStr);
-    bool updateImageSize(Image *image);
-    QSize queryImageSize(Image *image);
     bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 
     bool insertImageHotspot(ImageHotspot *hotspot);

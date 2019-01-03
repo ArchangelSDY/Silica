@@ -30,8 +30,6 @@ public:
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
-    virtual bool updateImageSize(Image *image) = 0;
-    virtual QSize queryImageSize(Image *image) = 0;
     virtual bool updateImageUrl(const QUrl &oldUrl,
                                 const QUrl &newUrl) = 0;
 

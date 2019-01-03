@@ -46,10 +46,6 @@ const char *SQL_QUERY_IMAGES_COUNT = "select count(id) from images";
 
 const char *SQL_QUERY_IMAGE_BY_HASH = "select url from images where hash = ? limit 1";
 
-const char *SQL_UPDATE_IMAGE_SIZE = "update images set width = ?, height = ? where hash = ?";
-
-const char *SQL_QUERY_IMAGE_SIZE = "select width, height from images where hash = ? limit 1";
-
 const char *SQL_UPDATE_IMAGE_URL = "update images set url = ? where url = ?";
 
 const char *SQL_INSERT_IMAGE_HOTSPOT = "insert into image_hotspots(image_hash, left, top, width, height) "
@@ -305,45 +301,6 @@ Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
     } else {
         QString urlStr = q.value(0).toString();
         return new Image(QUrl(urlStr));
-    }
-}
-
-bool SQLiteLocalDatabase::updateImageSize(Image *image)
-{
-    if (!m_db.isOpen() || !image) {
-        return false;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_UPDATE_IMAGE_SIZE);
-    q.addBindValue(image->width());
-    q.addBindValue(image->height());
-    q.addBindValue(image->source()->hashStr());
-
-    if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
-    }
-
-    return true;
-}
-
-QSize SQLiteLocalDatabase::queryImageSize(Image *image)
-{
-    if (!m_db.isOpen() || !image || !image->source()) {
-        return Image::UNKNOWN_SIZE;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_QUERY_IMAGE_SIZE);
-    q.addBindValue(image->source()->hashStr());
-
-    if (!q.exec() || !q.first()) {
-        return Image::UNKNOWN_SIZE;
-    } else {
-        int width = q.value("width").toInt();
-        int height = q.value("height").toInt();
-        return QSize(width, height);
     }
 }
 

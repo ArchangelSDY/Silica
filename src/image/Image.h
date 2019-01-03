@@ -110,7 +110,6 @@ private:
     void makeThumbnail();
     void computeThumbnailPath();
     void resetMetadata(const QVariantHash &metadata);
-    void loadMetaFromDatabase();
 
     QUuid m_uuid;
     Status m_status;

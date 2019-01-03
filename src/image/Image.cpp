@@ -218,9 +218,6 @@ Image::Image(const QString &path, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-
-    // TODO: This leads to a performance issue 
-    // loadMetaFromDatabase();
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
@@ -241,9 +238,6 @@ Image::Image(const QUrl &url, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-
-    // TODO: This leads to a performance issue 
-    // loadMetaFromDatabase();
 
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
@@ -269,9 +263,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
 
     resetFrames();
     computeThumbnailPath();
-
-    // TODO: This leads to a performance issue
-    // loadMetaFromDatabase();
 
     connect(this, SIGNAL(loaded()),
             this, SLOT(onLoad()));
@@ -376,14 +367,7 @@ void Image::imageReaderFinished(QVariantHash metadata,
     m_isAnimation = (m_frames.count() > 1);
 
     if (!defaultFrame()->isNull()) {
-        bool shouldWriteSizeIntoDatabase = (m_size == Image::UNKNOWN_SIZE);
-
         m_size = defaultFrame()->size();
-
-        // Write image size into database
-        if (shouldWriteSizeIntoDatabase) {
-            LocalDatabase::instance()->updateImageSize(this);
-        }
 
         m_status = Image::LoadComplete;
     } else {
@@ -552,11 +536,6 @@ void Image::loadMetadata()
     if (m_imageSource) {
         resetMetadata(m_imageSource->readMetadata());
     }
-}
-
-void Image::loadMetaFromDatabase()
-{
-    m_size = LocalDatabase::instance()->queryImageSize(this);
 }
 
 QString Image::name() const
