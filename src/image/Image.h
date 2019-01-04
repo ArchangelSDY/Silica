@@ -58,7 +58,7 @@ public:
     bool isError() const;
 
     void load(int priority = NormalPriority, bool forceReload = false);
-    void loadThumbnail(bool makeImmediately = false);
+    void loadThumbnail();
     QSharedPointer<QImage> loadThumbnailSync();
 
     void loadMetadata();
@@ -92,7 +92,7 @@ signals:
 
 private slots:
     void imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image);
-    void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail, bool makeImmediately);
+    void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail);
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
     void onLoad(QSharedPointer<ImageData> image);
@@ -102,7 +102,7 @@ private:
     static QThreadPool *s_threadPool;
 
     QImage defaultFrame() const;
-    void makeThumbnail();
+    void makeThumbnail(QSharedPointer<ImageData> image);
     void computeThumbnailPath();
     void resetMetadata(const QVariantHash &metadata);
 
@@ -116,6 +116,7 @@ private:
     bool m_isLoadingThumbnail;
     bool m_isMakingThumbnail;
     bool m_isError;
+    bool m_needMakeThumbnail;
 
     QList<ImageHotspot *> m_hotspots;
     bool m_hotspotsLoaded;

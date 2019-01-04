@@ -272,7 +272,7 @@ void FileSystemItem::loadCover(QSharedPointer<ImageSource> imageSource)
             this, &FileSystemItem::coverThumbnailLoaded);
     connect(m_coverImage.data(), &Image::thumbnailLoadFailed,
             this, &FileSystemItem::coverThumbnailLoadFailed);
-    m_coverImage->loadThumbnail(true);
+    m_coverImage->loadThumbnail();
 }
 
 void FileSystemItem::refresh()

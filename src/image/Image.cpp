@@ -116,25 +116,25 @@ class LoadThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadThumbnailTask(const QString &thumbnailPath, bool makeImmediately) :
-        QRunnable() ,
-        m_thumbnailPath(thumbnailPath) ,
-        m_makeImmediately(makeImmediately) {}
+    LoadThumbnailTask(const QString &thumbnailPath) :
+        QRunnable(),
+        m_thumbnailPath(thumbnailPath)
+    {
+    }
 
     void run();
 
 signals:
-    void loaded(QSharedPointer<QImage> thumbnail, bool makeImmediately);
+    void loaded(QSharedPointer<QImage> thumbnail);
 
 private:
     QString m_thumbnailPath;
-    bool m_makeImmediately;
 };
 
 void LoadThumbnailTask::run()
 {
     QSharedPointer<QImage> thumbnail = doLoadThumbnailSync(m_thumbnailPath);
-    emit loaded(thumbnail, m_makeImmediately);
+    emit loaded(thumbnail);
 }
 
 // ---------- Make Thumbnail Task ----------
@@ -147,27 +147,19 @@ public:
         m_image(image) ,
         m_path(path) {}
 
-    ~MakeThumbnailTask()
-    {
-        delete m_image;
-    }
-
     void run();
 
 signals:
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
 private:
-      QImage *m_image;
+      QScopedPointer<QImage> m_image;
       QString m_path;
 };
 
 void MakeThumbnailTask::run()
 {
-    if (!m_image) {
-        emit thumbnailMade(QSharedPointer<QImage>());
-        return;
-    }
+    Q_ASSERT(m_image);
 
     // Create thumbnail dir
     QFileInfo pathInfo(m_path);
@@ -208,6 +200,7 @@ Image::Image(const QString &path, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
+    m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE)
@@ -225,6 +218,7 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
+    m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE)
@@ -247,6 +241,7 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
+    m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
     m_size(Image::UNKNOWN_SIZE)
@@ -303,16 +298,9 @@ void Image::imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData>
     Q_ASSERT(image->frames.count() > 0);
     Q_ASSERT(image->durations.count() > 0);
 
-    m_isLoadingImage = false;
-
     resetMetadata(metadata);
-
     m_image = image;
-
-    // TODO: Make thumbnail if thumbnail load failed
-    if (!m_thumbnail) {
-        makeThumbnail();
-    }
+    m_isLoadingImage = false;
 
     QImage &defaultFrame = image->frames.first();
     if (!defaultFrame.isNull()) {
@@ -327,26 +315,26 @@ void Image::imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData>
     emit loaded(image);
 }
 
-void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
-                                    bool makeImmediately)
+void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail)
 {
     m_isLoadingThumbnail = false;
 
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
         m_thumbnail = thumbnail;
         m_thumbnailSize = thumbnail->size();
+        m_needMakeThumbnail = false;
         emit thumbnailLoaded(thumbnail);
-    } else if (makeImmediately) {
-        load(LowestPriority);   // Thumbnail making should be low priority
     } else {
-        emit thumbnailLoadFailed();
+        m_needMakeThumbnail = true;
+        load(LowestPriority);   // Thumbnail making should be low priority
     }
 }
 
-void Image::loadThumbnail(bool makeImmediately)
+void Image::loadThumbnail()
 {
     QSharedPointer<QImage> thumbnail = m_thumbnail.toStrongRef();
     if (thumbnail) {
+        m_needMakeThumbnail = false;
         emit thumbnailLoaded(thumbnail);
         return;
     }
@@ -366,7 +354,7 @@ void Image::loadThumbnail(bool makeImmediately)
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
     LoadThumbnailTask *loadThumbnailTask =
-        new LoadThumbnailTask(thumbnailFullPath, makeImmediately);
+        new LoadThumbnailTask(thumbnailFullPath);
     connect(loadThumbnailTask, &LoadThumbnailTask::loaded, this, &Image::thumbnailReaderFinished);
     // Thumbnail loading should be low priority
     threadPool()->start(
@@ -408,9 +396,9 @@ static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPa
     }
 }
 
-void Image::makeThumbnail()
+void Image::makeThumbnail(QSharedPointer<ImageData> image)
 {
-    QImage frame = defaultFrame();
+    QImage frame = image->defaultFrame();
     if (frame.isNull()) {
         emit thumbnailLoadFailed();
         return;
@@ -426,8 +414,8 @@ void Image::makeThumbnail()
         "/" + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
         new MakeThumbnailTask(new QImage(frame), thumbnailFullPath);
-    connect(makeThumbnailTask, SIGNAL(thumbnailMade(QSharedPointer<QImage>)),
-            this, SLOT(thumbnailMade(QSharedPointer<QImage>)));
+    connect(makeThumbnailTask, &MakeThumbnailTask::thumbnailMade,
+            this, &Image::thumbnailMade);
     threadPool()->start(
         new LiveImageRunnable(m_uuid, makeThumbnailTask));
 }
@@ -542,6 +530,10 @@ void Image::loadHotspots(bool forceReload)
 
 void Image::onLoad(QSharedPointer<ImageData> image)
 {
+    if (m_needMakeThumbnail) {
+        makeThumbnail(image);
+    }
+
     if (image->defaultFrame().isNull()) {
         Logger::instance()->log(Logger::IMAGE_LOAD_ERROR)
             .describe("ImageHashStr", m_imageSource->hashStr())
