@@ -40,7 +40,7 @@ private slots:
     void playListChange();
     void playListAppend(int start);
 
-    void imageLoaded(Image *image);
+    void imageLoaded(QSharedPointer<ImageData> image);
     void loadSavedPlayLists();
     void loadSelectedPlayList();
     void loadOrEnterSelectedPath();
@@ -66,6 +66,7 @@ private:
     void promptToSaveLocalPlayList();
     void showAbout();
 
+    void updateWindowTitle();
     void updateSidebarTitle();
     void switchViews();
     void moveCursor(Qt::Key direction);

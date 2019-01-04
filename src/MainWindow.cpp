@@ -92,16 +92,15 @@ MainWindow::MainWindow(QWidget *parent) :
     // Maximize on start
     showMaximized();
 
-    connect(m_navigator, SIGNAL(paint(Image *)),
-            this, SLOT(imageLoaded(Image *)));
-    connect(m_navigator, SIGNAL(paint(Image *)),
-            m_mainGraphicsViewModel.data(), SLOT(paint(Image *)));
-    connect(m_navigator, SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
-            m_mainGraphicsViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
-    connect(m_navigator, SIGNAL(paint(Image *)),
-            m_sideViewModel.data(), SLOT(paint(Image *)));
-    connect(m_navigator, SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
-            m_sideViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
+    connect(m_navigator, &Navigator::paint, this, &MainWindow::imageLoaded);
+
+    connect(m_navigator, &Navigator::navigationChange, m_mainGraphicsViewModel.data(), &MainGraphicsViewModel::reset);
+    connect(m_navigator, &Navigator::paint, m_mainGraphicsViewModel.data(), &MainGraphicsViewModel::setImage);
+    connect(m_navigator, &Navigator::paintThumbnail, m_mainGraphicsViewModel.data(), &MainGraphicsViewModel::setThumbnail);
+
+    connect(m_navigator, &Navigator::navigationChange, m_sideViewModel.data(), &MainGraphicsViewModel::reset);
+    connect(m_navigator, &Navigator::paint, m_sideViewModel.data(), &MainGraphicsViewModel::setImage);
+    connect(m_navigator, &Navigator::paintThumbnail, m_sideViewModel.data(), &MainGraphicsViewModel::setThumbnail);
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -742,31 +741,17 @@ void MainWindow::showAbout()
     QMessageBox::about(this, tr("About Silica"), text);
 }
 
-void MainWindow::imageLoaded(Image *image)
+void MainWindow::imageLoaded(QSharedPointer<ImageData> imageData)
 {
-    // Title bar
-    QString status;
-    if (image->status() == Image::Loading) {
-        status = "[Loading]";
-    } else if (image->status() == Image::LoadError) {
-        status = "[Error]";
-    } else {
-        status = "";
-    }
+    Image *image = m_navigator->currentImage();
 
-    QString progress;
-    QTextStream(&progress) << "["
-        << (m_navigator->currentIndex() + 1) << "/"
-        << m_navigator->playList()->count() << "] ";
-
-    QString title;
-    QTextStream(&title) << status << progress << image->name();
-    setWindowTitle(title);
+    // Title
+    updateWindowTitle();
 
     // Info widget
     ui->lblName->setText(image->name());
-    ui->lblWidth->setText(QString::number(image->data().width()));
-    ui->lblHeight->setText(QString::number(image->data().height()));
+    ui->lblWidth->setText(QString::number(imageData->defaultFrame().width()));
+    ui->lblHeight->setText(QString::number(imageData->defaultFrame().height()));
 }
 
 void MainWindow::playListChange()
@@ -810,8 +795,36 @@ void MainWindow::navigationChange(int index)
         }
     }
 
+    // Title
+    updateWindowTitle();
+
     // Sidebar
     updateSidebarTitle();
+}
+
+void MainWindow::updateWindowTitle()
+{
+    Image *image = m_navigator->currentImage();
+
+    QString status;
+    if (image) {
+        if (image->isLoading()) {
+            status = "[Loading]";
+        } else if (image->isError()) {
+            status = "[Error]";
+        } else {
+            status = "";
+        }
+    }
+
+    QString progress;
+    QTextStream(&progress) << "["
+        << (m_navigator->currentIndex() + 1) << "/"
+        << m_navigator->playList()->count() << "] ";
+
+    QString title;
+    QTextStream(&title) << status << progress << image->name();
+    setWindowTitle(title);
 }
 
 void MainWindow::updateSidebarTitle()
@@ -1085,10 +1098,9 @@ void MainWindow::toggleSecondaryNavigator()
         connect(m_secondaryMainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
                 m_actToolBarGallery, SLOT(trigger()));
 
-        connect(m_secondaryNavigator.data(), SIGNAL(paint(Image *)),
-                m_secondaryMainGraphicsViewModel.data(), SLOT(paint(Image *)));
-        connect(m_secondaryNavigator.data(), SIGNAL(paintThumbnail(QSharedPointer<QImage>)),
-                m_secondaryMainGraphicsViewModel.data(), SLOT(paintThumbnail(QSharedPointer<QImage>)));
+        connect(m_secondaryNavigator.data(), &Navigator::navigationChange, m_secondaryMainGraphicsViewModel.data(), &MainGraphicsViewModel::reset);
+        connect(m_secondaryNavigator.data(), &Navigator::paint, m_secondaryMainGraphicsViewModel.data(), &MainGraphicsViewModel::setImage);
+        connect(m_secondaryNavigator.data(), &Navigator::paintThumbnail, m_secondaryMainGraphicsViewModel.data(), &MainGraphicsViewModel::setThumbnail);
 
         createMainImageView(&m_secondaryMainGraphicsView, ui->pageImageView, m_secondaryMainGraphicsViewModel.data());
         ui->pageImageViewLayout->insertWidget(0, m_secondaryMainGraphicsView);

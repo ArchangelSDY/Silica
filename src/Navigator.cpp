@@ -46,8 +46,17 @@ void Navigator::preload()
 {
     for (int i = 1; i <= MAX_PRELOAD; ++i) {
         int delta = m_reverseNavigation ? (-i) : i;
-        // Load but not paint
-        loadIndex(m_currentIndex + delta, false);
+        int index = m_currentIndex + delta;
+        ImagePtr image = m_playList->at(resolveIndex(index));
+        if (!image) {
+            continue;
+        }
+
+        connect(image.data(), &Image::loaded, this, [index, cachedImages = m_cachedImages](QSharedPointer<ImageData> imageData) {
+            cachedImages->insert(index, imageData);
+        }, Qt::UniqueConnection);
+
+        image->load(Image::LoadPriority::NormalPriority);
     }
 }
 
@@ -95,7 +104,7 @@ void Navigator::reloadPlayList()
     goUuid(m_currentUuid, true);
 }
 
-ImagePtr Navigator::loadIndex(int index, bool shouldPaint, bool forceReload)
+int Navigator::resolveIndex(int index)
 {
     if (index < 0 || index >= m_playList->count()) {
         if (!m_isLooping) {
@@ -110,28 +119,7 @@ ImagePtr Navigator::loadIndex(int index, bool shouldPaint, bool forceReload)
         return 0;
     }
 
-    ImagePtr image;
-    if (!forceReload) {
-        image = m_cachedImages->at(index);
-    }
-
-    if (!image) {
-        image = (*m_playList)[index];
-        m_cachedImages->insert(index, image);
-    }
-
-    if (shouldPaint) {
-        connect(image.data(), &Image::thumbnailLoaded,
-                this, &Navigator::thumbnailLoaded);
-        connect(image.data(), SIGNAL(loaded()), this, SLOT(imageLoaded()),
-                Qt::UniqueConnection);
-    }
-
-    if (image->status() == Image::NotLoad) {
-        image->load();
-    }
-
-    return image;
+    return index;
 }
 
 bool Navigator::goIndex(int index, bool forceReload)
@@ -144,9 +132,8 @@ bool Navigator::goIndex(int index, bool forceReload)
         return true;
     }
 
-    // Load and paint
-    ImagePtr image = loadIndex(index, true, forceReload);
-    if (!image || image->status() == Image::LoadError) {
+    ImagePtr image = m_playList->at(resolveIndex(index));
+    if (!image) {
         return false;
     }
 
@@ -154,12 +141,15 @@ bool Navigator::goIndex(int index, bool forceReload)
     m_currentUuid = image->uuid();
     m_currentImage = image;
 
-    emit paint(image.data());
     emit navigationChange(index);
+    
+    connect(image.data(), &Image::thumbnailLoaded, this, &Navigator::thumbnailLoaded,
+            static_cast<Qt::ConnectionType>(Qt::UniqueConnection | Qt::QueuedConnection));
+    connect(image.data(), &Image::loaded, this, &Navigator::imageLoaded,
+            static_cast<Qt::ConnectionType>(Qt::UniqueConnection | Qt::QueuedConnection));
 
-    if (image->status() != Image::LoadComplete) {
-        image->loadThumbnail();
-    }
+    image->loadThumbnail();
+    image->load(Image::LoadPriority::NormalPriority, forceReload);
 
     preload();
     checkContinueProvide();
@@ -298,12 +288,28 @@ void Navigator::goNextGroup()
     goIndex(index);
 }
 
-void Navigator::imageLoaded()
+void Navigator::repaint()
+{
+    ImagePtr image = m_currentImage;
+    if (!image) {
+        return;
+    }
+
+    QSharedPointer<ImageData> imageData = image->image().toStrongRef();
+    if (!imageData) {
+        return;
+    }
+
+    emit paint(imageData);
+}
+
+void Navigator::imageLoaded(QSharedPointer<ImageData> imageData)
 {
     Image *loadedImage = static_cast<Image*>(QObject::sender());
     if (loadedImage) {
         if (loadedImage == m_currentImage) {
-            emit paint(loadedImage);
+            m_cachedImages->insert(m_currentIndex, imageData);
+            emit paint(imageData);
         }
     }
 }
@@ -311,13 +317,8 @@ void Navigator::imageLoaded()
 void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
     Image *image = static_cast<Image*>(QObject::sender());
-    if (image &&
-        image->status() != Image::LoadComplete &&
-        !thumbnail->isNull()) {
-
-        if (image == m_currentImage) {
-            emit paintThumbnail(thumbnail);
-        }
+    if (image && image == m_currentImage && !thumbnail->isNull()) {
+        emit paintThumbnail(thumbnail);
     }
 }
 

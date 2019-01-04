@@ -92,7 +92,12 @@ void CascadeClassifierNavigationPlayer::detectRegions()
     }
 
     Image *curImage = m_navigator->currentImage();
-    cv::Mat cvImage = CvUtils::QImageToCvMat(curImage->data());
+    QSharedPointer<ImageData> imageData = curImage->image().toStrongRef();
+    if (!imageData) {
+        return;
+    }
+
+    cv::Mat cvImage = CvUtils::QImageToCvMat(imageData->defaultFrame());
 
     cv::Mat grayImage;
     cv::cvtColor(cvImage, grayImage, cv::COLOR_BGR2GRAY);

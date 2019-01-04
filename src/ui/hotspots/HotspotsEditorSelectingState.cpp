@@ -130,6 +130,9 @@ void HotspotsEditorSelectingState::scaleDownSelectingArea()
 int HotspotsEditorSelectingState::selectingAreaScaleDelta()
 {
     Image *image = (*(m_editor->m_navigator))->currentImage();
-    return image->data().width() / 15;
+    if (!image) {
+        return 0;
+    }
+    return image->size().width() / 15;
 }
 

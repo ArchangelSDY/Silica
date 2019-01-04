@@ -28,8 +28,9 @@ MainGraphicsViewModel::MainGraphicsViewModel(Navigator *navigator, ImageEffectMa
             this, SLOT(focusOnRect(QRectF)));
 
     m_animationTimer.setSingleShot(true);
-    connect(&m_animationTimer, SIGNAL(timeout()),
-            this, SLOT(paint()));
+    connect(&m_animationTimer, &QTimer::timeout, this, [this]() {
+        this->paint(false);
+    });
 }
 
 MainGraphicsViewModel::~MainGraphicsViewModel()
@@ -48,36 +49,45 @@ void MainGraphicsViewModel::setView(View *view)
     m_remoteWallpapersManager.reset(new RemoteWallpapersManager(m_view->widget()));
 }
 
-void MainGraphicsViewModel::resetImage(Image *image)
+void MainGraphicsViewModel::reset()
 {
-    m_image = image;
+    m_animationTimer.stop();
     m_focusedRect = QRectF();
     m_curFrameNumber = 0;
-    m_animationTimer.stop();
+    m_image.reset();
+    m_thumbnail.reset();
 }
 
-void MainGraphicsViewModel::paint()
+void MainGraphicsViewModel::setImage(QSharedPointer<ImageData> image)
 {
-    paint(m_image, false);
+    m_image = image;
+    paint();
 }
 
-void MainGraphicsViewModel::paint(Image *image, bool shouldFitInView)
+void MainGraphicsViewModel::setThumbnail(QSharedPointer<QImage> thumbnail)
 {
-    if (image) {
-        if (m_image != image) {
-            resetImage(image);
-        }
+    // Skip if full image already loaded
+    if (m_image) {
+        return;
+    }
 
+    m_thumbnail = thumbnail;
+    paintThumbnail();
+}
+
+void MainGraphicsViewModel::paint(bool shouldFitInView)
+{
+    if (m_image) {
         m_shouldRepaintThumbnailOnShown = false;
 
-        if (m_curFrameNumber < 0 || m_curFrameNumber >= image->frameCount()) {
+        if (m_curFrameNumber < 0 || m_curFrameNumber >= m_image->frames.count()) {
             m_curFrameNumber = 0;
         }
 
-        QImage *frame = image->frames()[m_curFrameNumber];
+        const QImage &frame = m_image->frames[m_curFrameNumber];
 
         // Apply effects
-        QImage frameWithEffect = m_imageEffectManager->process(image, *frame);
+        QImage frameWithEffect = m_imageEffectManager->process(m_navigator->currentImage(), frame);
 
         m_view->setViewportRect(frameWithEffect.rect());
         m_view->setImage(frameWithEffect);
@@ -92,9 +102,8 @@ void MainGraphicsViewModel::paint(Image *image, bool shouldFitInView)
     }
 }
 
-void MainGraphicsViewModel::paintThumbnail(QSharedPointer<QImage> thumbnail)
+void MainGraphicsViewModel::paintThumbnail()
 {
-    m_thumbnail = thumbnail;
     if (m_thumbnail) {
         if (m_view->isVisible()) {
             m_shouldRepaintThumbnailOnShown = false;
@@ -124,7 +133,7 @@ void MainGraphicsViewModel::focusOnRect(QRectF rect)
 void MainGraphicsViewModel::showEvent(QShowEvent *)
 {
     if (m_shouldRepaintThumbnailOnShown) {
-        paintThumbnail(m_thumbnail);
+        paintThumbnail();
     }
 }
 
@@ -297,13 +306,13 @@ void MainGraphicsViewModel::rotate(qreal angle)
 
 void MainGraphicsViewModel::scheduleAnimation()
 {
-    if (m_image && m_image->isAnimation() && m_image->frameCount() > 1) {
-        int duration = m_image->durations()[m_curFrameNumber];
+    if (m_image && m_image->isAnimation() && m_image->frames.count() > 1) {
+        int duration = m_image->durations[m_curFrameNumber];
         if (duration == 0) {
             return;
         }
 
         m_animationTimer.start(duration);
-        m_curFrameNumber = (m_curFrameNumber + 1) % (m_image->frameCount());
+        m_curFrameNumber = (m_curFrameNumber + 1) % (m_image->frames.count());
     }
 }

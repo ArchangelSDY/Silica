@@ -122,6 +122,7 @@ void GlobalConfig::load()
     qRegisterMetaType<QList<QVariantHash> >("QList<QVariantHash>");
     qRegisterMetaType<QSharedPointer<PlayList> >("QSharedPointer<PlayList>");
     qRegisterMetaType<QSharedPointer<ImageSource> >("QSharedPointer<ImageSource>");
+    qRegisterMetaType<QSharedPointer<ImageData> >("QSharedPointer<ImageData>");
 
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");

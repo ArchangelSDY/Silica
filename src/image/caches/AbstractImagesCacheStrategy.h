@@ -17,7 +17,7 @@ public:
     virtual int nextIndexToRemove(int insertedIndex) = 0;
 
 protected:
-    const QMap<int, ImagePtr> &cachedImages() const;
+    const QMap<int, QSharedPointer<ImageData>> &cachedImages() const;
 
     ImagesCache *m_cache;
 };

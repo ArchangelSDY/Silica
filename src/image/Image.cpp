@@ -67,9 +67,7 @@ public:
     void run();
 
 signals:
-    void loaded(QVariantHash metadata,
-                QList<QSharedPointer<QImage> > images,
-                QList<int> durations);
+    void loaded(QVariantHash metadata, QSharedPointer<ImageData> image);
 
 private:
     QSharedPointer<ImageSource> m_imageSource;
@@ -77,7 +75,7 @@ private:
 
 void LoadImageTask::run()
 {
-    QList<QSharedPointer<QImage> > images;
+    QList<QImage> frames;
     QList<int> durations;
     QVariantHash metadata;
     if (!m_imageSource.isNull() && m_imageSource->open()) {
@@ -88,8 +86,7 @@ void LoadImageTask::run()
         QList<QImage> rawFrames;
         if (m_imageSource->readFrames(rawFrames, durations)) {
             for (const QImage &frame : rawFrames) {
-                images << QSharedPointer<QImage>::create(
-                    frame.convertToFormat(QImage::Format_ARGB32_Premultiplied));
+                frames << frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
             }
         }
 
@@ -98,14 +95,17 @@ void LoadImageTask::run()
         qDebug() << "Unable to open image source";
     }
 
-    Q_ASSERT_X(images.count() == durations.count(), "LoadImageTask::run()", "Images count should equal to durations count");
+    Q_ASSERT_X(frames.count() == durations.count(), "LoadImageTask::run()", "Images count should equal to durations count");
 
-    if (images.empty()) {
-        images << QSharedPointer<QImage>::create();
+    if (frames.empty()) {
+        frames << QImage();
         durations << 0;
     }
 
-    emit loaded(metadata, images, durations);
+    QSharedPointer<ImageData> image = QSharedPointer<ImageData>::create();
+    image->frames = frames;
+    image->durations = durations;
+    emit loaded(metadata, image);
 }
 
 // ---------- Load Thumbnail Task ----------
@@ -203,78 +203,67 @@ static QThreadPool *threadPool()
 Image::Image(const QString &path, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
-    m_status(Image::NotLoad) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(path)) ,
-    m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
+    m_isError(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false)
+    m_size(Image::UNKNOWN_SIZE)
 {
     s_liveImages.insert(m_uuid, true);
 
-    resetFrames();
     computeThumbnailPath();
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
-    m_status(Image::NotLoad) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(url)) ,
-    m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
+    m_isError(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false)
+    m_size(Image::UNKNOWN_SIZE)
 {
     s_liveImages.insert(m_uuid, true);
 
-    resetFrames();
     computeThumbnailPath();
 
-    connect(this, SIGNAL(loaded()),
-            this, SLOT(onLoad()));
-    connect(this, SIGNAL(thumbnailLoadFailed()),
-            this, SLOT(onThumbnailLoadFailed()));
+    connect(this, &Image::loaded,
+            this, &Image::onLoad);
+    connect(this, &Image::thumbnailLoadFailed,
+            this, &Image::onThumbnailLoadFailed);
 }
 
 Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
-    m_status(Image::NotLoad) ,
     m_imageSource(imageSource) ,
-    m_loadRequestsCount(0) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
+    m_isError(false) ,
     m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE) ,
-    m_isAnimation(false)
+    m_size(Image::UNKNOWN_SIZE)
 {
     s_liveImages.insert(m_uuid, true);
 
-    resetFrames();
     computeThumbnailPath();
 
-    connect(this, SIGNAL(loaded()),
-            this, SLOT(onLoad()));
-    connect(this, SIGNAL(thumbnailLoadFailed()),
-            this, SLOT(onThumbnailLoadFailed()));
+    connect(this, &Image::loaded,
+            this, &Image::onLoad);
+    connect(this, &Image::thumbnailLoadFailed,
+            this, &Image::onThumbnailLoadFailed);
 }
 
 Image::~Image()
 {
     s_liveImages.remove(m_uuid);
-
-    destroyFrames();
 
     m_imageSource.clear();
 
@@ -283,48 +272,15 @@ Image::~Image()
     }
 }
 
-void Image::scheduleUnload()
+void Image::load(int priority, bool forceReload)
 {
-    // if (m_status == Image::LoadComplete) {
-
-    --m_loadRequestsCount;
-    checkUnload();
-
-    // }
-}
-
-void Image::checkUnload()
-{
-    if (m_loadRequestsCount == 0) {
-        // If error, keep this state to prevent further try
-        if (m_status != Image::LoadError) {
-            m_status = Image::NotLoad;
+    if (!forceReload) {
+        QSharedPointer<ImageData> image = m_image.toStrongRef();
+        if (image) {
+            emit loaded(image);
+            return;
         }
-
-        resetFrames();
     }
-}
-
-void Image::destroyFrames()
-{
-    foreach (QImage *image, m_frames) {
-        delete image;
-    }
-    m_frames.clear();
-    m_durations.clear();
-}
-
-void Image::resetFrames(QImage *defaultFrame, int defaultDuration)
-{
-    destroyFrames();
-    m_frames << defaultFrame;
-    m_durations << defaultDuration;
-}
-
-void Image::load(int priority)
-{
-    ++m_loadRequestsCount;
-    m_status = Image::Loading;
 
     if (m_isLoadingImage) {
         return;
@@ -342,47 +298,33 @@ void Image::load(int priority)
         priority);
 }
 
-void Image::imageReaderFinished(QVariantHash metadata,
-                                QList<QSharedPointer<QImage> > images,
-                                QList<int> durations)
+void Image::imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image)
 {
-    Q_ASSERT(images.count() > 0);
-    Q_ASSERT(durations.count() > 0);
+    Q_ASSERT(image->frames.count() > 0);
+    Q_ASSERT(image->durations.count() > 0);
 
     m_isLoadingImage = false;
 
     resetMetadata(metadata);
 
-    destroyFrames();
-    foreach (const QSharedPointer<QImage> &image, images) {
-        m_frames.append(new QImage(*image));
-    }
-    m_durations = durations;
+    m_image = image;
 
     // TODO: Make thumbnail if thumbnail load failed
     if (!m_thumbnail) {
         makeThumbnail();
     }
 
-    m_isAnimation = (m_frames.count() > 1);
-
-    if (!defaultFrame()->isNull()) {
-        m_size = defaultFrame()->size();
-
-        m_status = Image::LoadComplete;
+    QImage &defaultFrame = image->frames.first();
+    if (!defaultFrame.isNull()) {
+        m_size = defaultFrame.size();
+        m_isError = false;
     } else {
-        m_status = Image::LoadError;
-
         // Show a warning image
-        resetFrames(new QImage(":/res/warning.png"), 0);
+        defaultFrame = QImage(":/res/warning.png");
+        m_isError = true;
     }
 
-    emit loaded();
-
-    // If unload scheduled during loading, there will be no further chance to unload,
-    // leading to a memory leak. So we check here right after loaded to see if we
-    // are no longer requested.
-    checkUnload();
+    emit loaded(image);
 }
 
 void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
@@ -396,7 +338,6 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail,
         emit thumbnailLoaded(thumbnail);
     } else if (makeImmediately) {
         load(LowestPriority);   // Thumbnail making should be low priority
-        scheduleUnload();       // Release memory after thumbnail generated
     } else {
         emit thumbnailLoadFailed();
     }
@@ -469,9 +410,8 @@ static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPa
 
 void Image::makeThumbnail()
 {
-    Q_ASSERT(defaultFrame());
-
-    if (defaultFrame()->isNull()) {
+    QImage frame = defaultFrame();
+    if (frame.isNull()) {
         emit thumbnailLoadFailed();
         return;
     }
@@ -485,7 +425,7 @@ void Image::makeThumbnail()
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
-        new MakeThumbnailTask(new QImage(*defaultFrame()), thumbnailFullPath);
+        new MakeThumbnailTask(new QImage(frame), thumbnailFullPath);
     connect(makeThumbnailTask, SIGNAL(thumbnailMade(QSharedPointer<QImage>)),
             this, SLOT(thumbnailMade(QSharedPointer<QImage>)));
     threadPool()->start(
@@ -506,8 +446,6 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
     }
 
     m_isMakingThumbnail = false;
-
-    checkUnload();
 }
 
 void Image::computeThumbnailPath()
@@ -543,11 +481,21 @@ QString Image::name() const
     return m_imageSource.isNull() ? QString() : m_imageSource->name();
 }
 
+QImage Image::defaultFrame() const
+{
+    QSharedPointer<ImageData> image = m_image.toStrongRef();
+    if (!image) {
+        return QImage();
+    }
+
+    return image->defaultFrame();
+}
+
 qreal Image::aspectRatio() const
 {
-    if (!defaultFrame()->isNull()) {
-        int width = defaultFrame()->width();
-        int height = defaultFrame()->height();
+    if (!m_size.isNull()) {
+        int width = m_size.width();
+        int height = m_size.height();
 
         return height != 0 ? qreal(width) / qreal(height) : 0;
     } else if (!m_thumbnailSize.isNull()) {
@@ -558,6 +506,16 @@ qreal Image::aspectRatio() const
     }
 
     return 0;
+}
+
+bool Image::isLoading() const
+{
+    return m_isLoadingImage;
+}
+
+bool Image::isError() const
+{
+    return m_isError;
 }
 
 bool Image::copy(const QString &destPath)
@@ -582,29 +540,9 @@ void Image::loadHotspots(bool forceReload)
     emit hotpotsLoaded();
 }
 
-bool Image::isAnimation() const
+void Image::onLoad(QSharedPointer<ImageData> image)
 {
-    return m_isAnimation;
-}
-
-QList<int> Image::durations() const
-{
-    return m_durations;
-}
-
-QList<QImage *> Image::frames() const
-{
-    return m_frames;
-}
-
-int Image::frameCount() const
-{
-    return m_frames.count();
-}
-
-void Image::onLoad()
-{
-    if (m_status == Image::LoadError) {
+    if (image->defaultFrame().isNull()) {
         Logger::instance()->log(Logger::IMAGE_LOAD_ERROR)
             .describe("ImageHashStr", m_imageSource->hashStr())
             .describe("ImageURL", m_imageSource->url())

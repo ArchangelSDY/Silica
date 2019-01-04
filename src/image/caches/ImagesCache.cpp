@@ -17,13 +17,13 @@ ImagesCache::~ImagesCache()
     delete m_strategy;
 }
 
-void ImagesCache::insert(int index, ImagePtr image)
+void ImagesCache::insert(int index, QSharedPointer<ImageData> image)
 {
     trim(index);
     m_images.insert(index, image);
 }
 
-ImagePtr ImagesCache::at(int index)
+QSharedPointer<ImageData> ImagesCache::at(int index)
 {
     if (m_images.contains(index)) {
         return m_images[index];
@@ -34,14 +34,6 @@ ImagePtr ImagesCache::at(int index)
 
 void ImagesCache::clear()
 {
-    for (QMap<int, ImagePtr>::iterator i = m_images.begin();
-         i != m_images.end(); ++i) {
-        ImagePtr image = i.value();
-        if (image) {
-            image->scheduleUnload();
-        }
-    }
-
     m_images.clear();
 }
 
@@ -52,11 +44,7 @@ void ImagesCache::trim(int index)
     }
 
     int toRemoveIndex = m_strategy->nextIndexToRemove(index);
-    ImagePtr toRemove = m_images.take(toRemoveIndex);
-
-    if (toRemove) {
-        toRemove->scheduleUnload();
-    }
+    m_images.remove(toRemoveIndex);
 }
 
 void ImagesCache::setStrategy(AbstractImagesCacheStrategy *strategy)

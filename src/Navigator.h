@@ -38,6 +38,7 @@ public:
     void goIndexUntilSuccess(int index, int delta);
     void goPrevGroup();
     void goNextGroup();
+    void repaint();
 
     Image *currentImage() const;
     ImagePtr currentImagePtr() const;
@@ -56,7 +57,7 @@ public:
     QSharedPointer<PlayList> basket() { return m_basket; }
 
 signals:
-    void paint(Image *image);
+    void paint(QSharedPointer<ImageData> image);
     void paintThumbnail(QSharedPointer<QImage> thumbnail);
     void playListItemChange(int index);
     void playListChange(QSharedPointer<PlayList>);
@@ -85,7 +86,7 @@ public slots:
      */
     bool goUuid(const QUuid &uuid, bool forceReload = false);
 
-    void imageLoaded();
+    void imageLoaded(QSharedPointer<ImageData> image);
     void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
 
     void setAutoNavigationInterval(int msec);
@@ -97,7 +98,7 @@ private slots:
     void goAutoNavigation();
 
 private:
-    ImagePtr loadIndex(int index, bool shouldPaint, bool forceReload = false);
+    int resolveIndex(int index);
 
     void preload();
     void reset();

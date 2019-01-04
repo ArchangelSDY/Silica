@@ -13,6 +13,24 @@ class ImageHotspot;
 class ImageRank;
 class ImageSource;
 
+class ImageData
+{
+public:
+    bool isAnimation() const
+    {
+        return frames.count() > 1;
+    }
+
+    QImage defaultFrame() const
+    {
+        Q_ASSERT(frames.count() > 0);
+        return frames.first();
+    }
+
+    QList<QImage> frames;
+    QList<int> durations;
+};
+
 class Image : public QObject
 {
     Q_OBJECT
@@ -24,13 +42,6 @@ public:
     explicit Image(QSharedPointer<ImageSource> imageSource, QObject *parent = 0);
     ~Image();
 
-    enum Status {
-        NotLoad,
-        Loading,
-        LoadComplete,
-        LoadError,
-    };
-
     enum LoadPriority {
         NormalPriority = 0,
         LowPriority = -1,
@@ -38,19 +49,15 @@ public:
     };
 
     QUuid uuid() const { return m_uuid; }
-    Status status() const { return m_status; }
-    QImage data()
-    {
-        return *(defaultFrame());
-    }
     QString name() const;
     QString thumbnailPath() const { return m_thumbnailPath; }
     qreal aspectRatio() const;
     const ImageSource *source() const { return m_imageSource.data(); }
 
-    void load(int priority = NormalPriority);
-    void scheduleUnload();
+    bool isLoading() const;
+    bool isError() const;
 
+    void load(int priority = NormalPriority, bool forceReload = false);
     void loadThumbnail(bool makeImmediately = false);
     QSharedPointer<QImage> loadThumbnailSync();
 
@@ -75,53 +82,40 @@ public:
     QSize size() const { return m_size; }
     QVariantHash &metadata() { return m_metadata; }
 
-    bool isAnimation() const;
-    QList<int> durations() const;
-    QList<QImage *> frames() const;
-    int frameCount() const;
+    QWeakPointer<ImageData> image() const { return m_image; }
 
 signals:
-    void loaded();
+    void loaded(QSharedPointer<ImageData> image);
     void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
     void thumbnailLoadFailed();
     void hotpotsLoaded();
 
 private slots:
-    void imageReaderFinished(QVariantHash metadata, QList<QSharedPointer<QImage> > images, QList<int> durations);
+    void imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image);
     void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail, bool makeImmediately);
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
-    void onLoad();
+    void onLoad(QSharedPointer<ImageData> image);
     void onThumbnailLoadFailed();
 
 private:
     static QThreadPool *s_threadPool;
 
-    inline QImage *defaultFrame() const
-    {
-        Q_ASSERT(!m_frames.isEmpty());
-        return m_frames[0];
-    }
-
-    void destroyFrames();
-    void resetFrames(QImage *defaultFrame = new QImage(),
-                     int defaultDuration = 0);
-    void checkUnload();
+    QImage defaultFrame() const;
     void makeThumbnail();
     void computeThumbnailPath();
     void resetMetadata(const QVariantHash &metadata);
 
     QUuid m_uuid;
-    Status m_status;
     QSharedPointer<ImageSource> m_imageSource;
     QWeakPointer<QImage> m_thumbnail;
     QSize m_thumbnailSize;
     QString m_thumbnailPath;
-    int m_loadRequestsCount;
 
     bool m_isLoadingImage;
     bool m_isLoadingThumbnail;
     bool m_isMakingThumbnail;
+    bool m_isError;
 
     QList<ImageHotspot *> m_hotspots;
     bool m_hotspotsLoaded;
@@ -131,8 +125,7 @@ private:
     QSize m_size;
     QVariantHash m_metadata;
 
-    QList<QImage *> m_frames;
-    QList<int> m_durations;
+    QWeakPointer<ImageData> m_image;
     bool m_isAnimation;
 };
 

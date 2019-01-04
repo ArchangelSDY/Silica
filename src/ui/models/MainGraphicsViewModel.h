@@ -8,6 +8,8 @@
 #include <QSharedPointer>
 #include <QTimer>
 
+#include "image/Image.h"
+
 class QContextMenuEvent;
 class QKeyEvent;
 class QMouseEvent;
@@ -15,9 +17,6 @@ class QResizeEvent;
 class QShowEvent;
 class QWheelEvent;
 
-// class HotspotsEditor;
-class QImage;
-class Image;
 class ImageEffectManager;
 class Navigator;
 class RankVoteView;
@@ -79,20 +78,23 @@ public:
 signals:
     void mouseDoubleClicked();
 
+public slots:
+    void reset();
+    void setImage(QSharedPointer<ImageData> image);
+    void setThumbnail(QSharedPointer<QImage> thumbnail);
+
 private slots:
-    void paint();
-    void paint(Image *image, bool shouldFitInView = true);
-    void paintThumbnail(QSharedPointer<QImage> thumbnail);
+    void paint(bool shouldFitInView = true);
+    void paintThumbnail();
     void focusOnRect(QRectF rect);
 
 private:
     void scheduleAnimation();
-    void resetImage(Image *image);
 
     View *m_view;
     Navigator *m_navigator;
     ImageEffectManager *m_imageEffectManager;
-    Image *m_image;
+    QSharedPointer<ImageData> m_image;
     QSharedPointer<QImage> m_thumbnail;
     bool m_shouldRepaintThumbnailOnShown;
 

@@ -7,7 +7,7 @@ NormalImagesCacheStrategy::NormalImagesCacheStrategy(ImagesCache *cache) :
 
 int NormalImagesCacheStrategy::nextIndexToRemove(int insertedIndex)
 {
-    const QMap<int, ImagePtr> &images =
+    const QMap<int, QSharedPointer<ImageData>> &images =
         AbstractImagesCacheStrategy::cachedImages();
 
     int min = images.firstKey();
