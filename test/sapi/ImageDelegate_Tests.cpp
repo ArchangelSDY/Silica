@@ -23,7 +23,6 @@ void TestImageDelegate::fields()
     sapi::ImageDelegate delegate(&image);
 
     QSignalSpy loadSpy(&image, &Image::loaded);
-    QSignalSpy makeThumbnailSpy(&image, &Image::thumbnailLoaded);
     image.load();
     QVERIFY(loadSpy.wait());
 
@@ -31,18 +30,18 @@ void TestImageDelegate::fields()
     QCOMPARE(delegate.size(), image.size());
     QCOMPARE(delegate.hash(), image.source()->hashStr());
     QCOMPARE(delegate.extraInfo(), image.metadata());
-    QCOMPARE(delegate.isAnimation(), image.isAnimation());
-    QCOMPARE(delegate.frameCount(), image.frameCount());
-    QCOMPARE(delegate.durations(), image.durations());
+    QCOMPARE(delegate.isAnimation(), image.image().toStrongRef()->isAnimation());
+    QCOMPARE(delegate.frameCount(), image.image().toStrongRef()->frames.count());
+    QCOMPARE(delegate.durations(), image.image().toStrongRef()->durations);
     for (int i = 0; i < delegate.frameCount(); ++i) {
-        QCOMPARE(*(delegate.frames()[i]), *(image.frames()[i]));
+        QCOMPARE(*(delegate.frames()[i]), image.image().toStrongRef()->frames[i]);
     }
-
-    if (makeThumbnailSpy.count() == 0) {
-        QVERIFY(makeThumbnailSpy.wait());
-    }
-    QVERIFY(!delegate.thumbnail().isNull());
     QVERIFY(!delegate.readRaw().isNull());
+
+    QSignalSpy thumbnailSpy(&image, &Image::thumbnailLoaded);
+    image.loadThumbnail();
+    QVERIFY(thumbnailSpy.wait());
+    QVERIFY(!delegate.thumbnail().isNull());
 }
 
 

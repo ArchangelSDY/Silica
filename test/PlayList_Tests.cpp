@@ -132,11 +132,11 @@ void TestPlayList::sortByAspectRatio()
     PlayList pl(srcUrls);
 
     pl.at(0)->load();
-    QSignalSpy spyFirst(pl.at(0).data(), SIGNAL(loaded()));
+    QSignalSpy spyFirst(pl.at(0).data(), &Image::loaded);
     spyFirst.wait();
 
     pl.at(1)->load();
-    QSignalSpy spySecond(pl.at(1).data(), SIGNAL(loaded()));
+    QSignalSpy spySecond(pl.at(1).data(), &Image::loaded);
     spySecond.wait();
 
     PlayListImageAspectRatioSorter sorter;
@@ -180,7 +180,7 @@ void TestPlayList::sortByThumbHist()
     for (int i = 0; i < pl.size(); ++i) {
         ImagePtr image = pl[i];
         QSignalSpy spy(image.data(), &Image::thumbnailLoaded);
-        image->loadThumbnail(true);
+        image->loadThumbnail();
         spy.wait();
     }
 

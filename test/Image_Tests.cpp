@@ -22,6 +22,7 @@ private slots:
 };
 
 Q_DECLARE_METATYPE(QSharedPointer<QImage>)
+Q_DECLARE_METATYPE(QSharedPointer<ImageData>)
 
 void TestImage::cleanup()
 {
@@ -38,47 +39,54 @@ void TestImage::load()
 {
     QFETCH(QString, imagePath);
     QFETCH(bool, isSuccess);
-    QFETCH(int, loadCnt);
 
     Image image(imagePath);
-    QCOMPARE(image.status(), Image::NotLoad);
-    QVERIFY2(image.data().isNull(), "Image data should be null before load");
+    QSharedPointer<ImageData> imageData;
 
-    QSignalSpy spyLoad(&image, SIGNAL(loaded()));
-    for (int i = 0; i < loadCnt; ++i) {
+    // First load
+    {
+        QSignalSpy spyLoad(&image, &Image::loaded);
         image.load();
-    }
-    QCOMPARE(image.status(), Image::Loading);
-    QVERIFY(spyLoad.wait());
+        QVERIFY(image.isLoading());
+        QVERIFY(spyLoad.wait());
 
-    QCOMPARE(image.status(),
-             isSuccess ? Image::LoadComplete : Image::LoadError);
-    QCOMPARE(!image.data().isNull(), isSuccess);
+        QVERIFY(!image.isLoading());
+        QCOMPARE(image.isError(), !isSuccess);
+        QVERIFY2(!image.image().isNull(), "Image data should not be null as data is owned by spyLoad");
+        QCOMPARE(image.image().toStrongRef()->defaultFrame().isNull(), !isSuccess);
 
-    for (int i = 0; i < loadCnt - 1; ++i) {
-        image.scheduleUnload();
-        QVERIFY2(!image.data().isNull(),
-                 "Image should not unload until last load request finished");
+        QCOMPARE(spyLoad.count(), 1);
+        QList<QVariant> args = spyLoad.takeFirst();
+        QCOMPARE(args.count(), 1);
+        imageData = args.takeFirst().value<QSharedPointer<ImageData>>();
+        QVERIFY(!imageData.isNull());
+        QCOMPARE(imageData->defaultFrame().isNull(), !isSuccess);
     }
-    image.scheduleUnload();
-    QCOMPARE(image.status(), Image::NotLoad);
-    QVERIFY2(image.data().isNull(), "Image data should be null after unload");
+
+    // Second load should return immediately as we cache a weak reference
+    {
+        QSignalSpy spyLoad(&image, &Image::loaded);
+        QCOMPARE(spyLoad.count(), 0);
+        image.load();
+        QCOMPARE(spyLoad.count(), 1);
+        auto imageData2 = spyLoad.takeFirst().takeFirst().value<QSharedPointer<ImageData>>();
+        QVERIFY(!imageData2.isNull());
+        QCOMPARE(imageData2->defaultFrame().isNull(), !isSuccess);
+    }
+
+    // Release all references
+    imageData.reset();
+    QVERIFY2(image.image().isNull(), "Image data should be null as data is not owned by anyone");
 }
 
 void TestImage::load_data()
 {
     QTest::addColumn<QString>("imagePath");
     QTest::addColumn<bool>("isSuccess");
-    QTest::addColumn<int>("loadCnt");
 
     QTest::newRow("Load successfully")
         << ":/assets/silica.png"
-        << true
-        << 1;
-    QTest::newRow("Multiple loads")
-        << ":/assets/silica.png"
-        << true
-        << 3;
+        << true;
 }
 
 void TestImage::loadThumbnail()
@@ -87,14 +95,14 @@ void TestImage::loadThumbnail()
 
     Image image(imagePath);
     QSignalSpy spyLoad(&image, &Image::thumbnailLoaded);
-    image.loadThumbnail(true);
+    image.loadThumbnail();
     QVERIFY(spyLoad.wait());
 
     QList<QVariant> arguments = spyLoad.takeFirst();
     QSharedPointer<QImage> thumbnail = arguments.at(0).value<QSharedPointer<QImage>>();
     QVERIFY(!thumbnail.isNull());
     QVERIFY(thumbnail->width() > 0);
-    QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
+    QVERIFY2(image.image().isNull(), "Image should unload after thumbnail made");
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
         image.source()->hashStr());

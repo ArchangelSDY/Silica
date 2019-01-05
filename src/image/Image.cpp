@@ -202,6 +202,11 @@ Image::Image(const QString &path, QObject *parent) :
     s_liveImages.insert(m_uuid, true);
 
     computeThumbnailPath();
+
+    connect(this, &Image::loaded,
+            this, &Image::onLoad);
+    connect(this, &Image::thumbnailLoadFailed,
+            this, &Image::onThumbnailLoadFailed);
 }
 
 Image::Image(const QUrl &url, QObject *parent) :
