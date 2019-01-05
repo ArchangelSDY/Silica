@@ -1,5 +1,5 @@
 # Silica
-An image viewer optimized for Otaku.
+An image viewer.
 
 # Screenshots
 
@@ -7,31 +7,28 @@ An image viewer optimized for Otaku.
 
 # Features
 
-* Vim like keybindings.
-* Multiple fashion layouts: Compact/Loose/Waterfall.
-* Progressive scroll for manga.
-* OpenGL accelerated.
-* Grouping by similarity.
-* Rank system.
-* Auto play.
-* WebP support with animation.
-* Optimized for visiting images on remote device(eg. NAS).
-* Open API for plugins.
+* View images inside ZIP, RAR and 7-zip archives directly
+* Manga mode
+* Vim like keybindings
+* Hardward accelerated graphics
+* Gamepad support
 
 # Dependencies
 
-* Qt 5.4
+* Qt 5.12
 * OpenCV
 
 # Build
 
 Silica uses CMake for building.
 
+## Linux / OS X
+
 ```shell
-$ git clone https://github.com/ArchangelSDY/Silica.git
+$ git clone --recurse-submodules https://github.com/ArchangelSDY/Silica.git
 $ mkdir build
 $ cd build
-$ cmake ../silica
+$ cmake ../Silica
 $ make -j
 ```
 
@@ -52,6 +49,16 @@ Finally, you can make distribution packages after build via:
 
 ```shell
 $ make package
+```
+
+## Windows
+
+```batch
+git clone --recurse-submodules https://github.com/ArchangelSDY/Silica.git
+mkdir build
+cd build
+cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_PREFIX_PATH=<QT_ROOT> -DOpenCV_DIR=<OpenCV_ROOT> -DOpenCV_STATIC=true -DOPENSSL_ROOT_DIR=<OpenSSL_ROOT> ..\Silica
+cmake --build . --config Debug
 ```
 
 # License
