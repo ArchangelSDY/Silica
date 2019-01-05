@@ -310,8 +310,7 @@ void Image::thumbnailReaderFinished(QSharedPointer<QImage> thumbnail)
         m_needMakeThumbnail = false;
         emit thumbnailLoaded(thumbnail);
     } else {
-        m_needMakeThumbnail = true;
-        load(LowestPriority);   // Thumbnail making should be low priority
+        makeThumbnail();
     }
 }
 
@@ -379,6 +378,12 @@ static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPa
     } else {
         return QSharedPointer<QImage>();
     }
+}
+
+void Image::makeThumbnail()
+{
+    m_needMakeThumbnail = true;
+    load(LowestPriority);   // Thumbnail making should be low priority
 }
 
 void Image::makeThumbnail(QSharedPointer<ImageData> image)

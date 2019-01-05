@@ -134,6 +134,7 @@ QMenu *ImageGalleryView::createContextMenu()
     }
 
     if (!selectedItems.isEmpty()) {
+        menu->addAction(tr("Refresh"), this, SLOT(refreshSelected()));
         menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
     }
 
@@ -227,6 +228,17 @@ void ImageGalleryView::removeSelected()
                 record->removeImage(toRemove);
             }
         }
+    }
+}
+
+void ImageGalleryView::refreshSelected()
+{
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+
+    for (GalleryItem *rawItem : selectedItems) {
+        ImageGalleryItem *item = static_cast<ImageGalleryItem *>(rawItem);
+        ImagePtr image = item->image();
+        image->makeThumbnail();
     }
 }
 

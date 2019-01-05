@@ -62,6 +62,7 @@ public:
     void load(int priority = NormalPriority, bool forceReload = false);
     void loadThumbnail();
     QSharedPointer<QImage> loadThumbnailSync();
+    void makeThumbnail();
     void loadMetadata();
 
 signals:
