@@ -342,7 +342,7 @@ void FileSystemView::contextMenuEvent(QContextMenuEvent *event)
     QMenu *menuSort = menu->addMenu(tr("Sort By"));
 
     // Disable sort if dir listing or sort is in progress
-    if (m_dirIterThread->isRunning()) {
+    if (m_dirIterThread) {
         menuSort->setDisabled(true);
         menuSort->setTitle(tr("Sort By (In progress...)"));
     } else {
