@@ -11,6 +11,6 @@ MinRankFilter::MinRankFilter(int minRank,
 
 bool MinRankFilter::filter(const ImagePtr &image)
 {
-    int rank = image->rank()->value();
-    return rank >= m_minRank;
+    ImageRank rank(image.data());
+    return rank.value() >= m_minRank;
 }

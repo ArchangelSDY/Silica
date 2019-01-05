@@ -14,7 +14,6 @@
 
 #include "deps/quazip/quazip/quazip.h"
 #include "db/LocalDatabase.h"
-#include "image/ImageRank.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
 #include "logger/Logger.h"
@@ -194,8 +193,7 @@ Image::Image(const QString &path, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
-    m_needMakeThumbnail(false) ,
-    m_rank(new ImageRank(this, this))
+    m_needMakeThumbnail(false)
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -215,8 +213,7 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
-    m_needMakeThumbnail(false) ,
-    m_rank(new ImageRank(this, this))
+    m_needMakeThumbnail(false)
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -236,8 +233,7 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_isLoadingThumbnail(false) ,
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
-    m_needMakeThumbnail(false) ,
-    m_rank(new ImageRank(this, this))
+    m_needMakeThumbnail(false)
 {
     s_liveImages.insert(m_uuid, true);
 

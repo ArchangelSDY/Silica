@@ -11,6 +11,6 @@ EqualRankFilter::EqualRankFilter(int rank,
 
 bool EqualRankFilter::filter(const ImagePtr &image)
 {
-    int rank = image->rank()->value();
-    return rank == m_rank;
+    ImageRank rank(image.data());
+    return rank.value() == m_rank;
 }

@@ -28,7 +28,8 @@ void RankVoteView::upVote()
 {
     Navigator *navigator = *m_navigator;
     if (navigator && navigator->currentImage()) {
-        navigator->currentImage()->rank()->upVote();
+        ImageRank rank(navigator->currentImage());
+        rank.upVote();
         showNotification();
     }
 }
@@ -37,7 +38,8 @@ void RankVoteView::downVote()
 {
     Navigator *navigator = *m_navigator;
     if (navigator && navigator->currentImage()) {
-        navigator->currentImage()->rank()->downVote();
+        ImageRank rank(navigator->currentImage());
+        rank.downVote();
         showNotification();
     }
 }
@@ -49,8 +51,9 @@ void RankVoteView::showNotification()
         NotificationWidget *w = new NotificationWidget(m_parentWidget);
 
         w->setTheme(NotificationWidget::ThemeMessage);
-        int rank = navigator->currentImage()->rank()->value();
-        w->setMessage(QString("Rank %1").arg(rank));
+
+        ImageRank rank(navigator->currentImage());
+        w->setMessage(QString("Rank %1").arg(rank.value()));
 
         w->showOnce();
     }

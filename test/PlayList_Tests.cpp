@@ -263,17 +263,17 @@ void TestPlayList::setFilter_data()
     QUrl silicaUrl = QUrl::fromLocalFile(
         tmpDirPath + "/" + "silica.png");
     ImagePtr imgSilica(new Image(silicaUrl));
-    imgSilica->rank()->setValue(3);
+    ImageRank(imgSilica.data()).setValue(3);
 
     QUrl lisbethUrl = QUrl::fromLocalFile(
         tmpDirPath + "/" + "lisbeth.png");
     ImagePtr imgLisbeth(new Image(lisbethUrl));
-    imgLisbeth->rank()->setValue(2);
+    ImageRank(imgLisbeth.data()).setValue(2);
 
     QUrl asunaUrl = QUrl::fromLocalFile(
         tmpDirPath + "/" + "asuna.png");
     ImagePtr imgAsuna(new Image(asunaUrl));
-    imgAsuna->rank()->setValue(5);
+    ImageRank(imgAsuna.data()).setValue(5);
 
     QTest::newRow("Empty image list with no filter")
         << (ImageList())
@@ -305,26 +305,26 @@ void TestPlayList::setFilter_data()
     QTest::newRow("EqualRankFilter equal")
         << (ImageList() << imgSilica)
         << static_cast<AbstractPlayListFilter *>(
-            new EqualRankFilter(imgSilica->rank()->value()))
+            new EqualRankFilter(ImageRank(imgSilica.data()).value()))
         << 1
         << 1;
     QTest::newRow("EqualRankFilter not equal")
         << (ImageList() << imgSilica)
         << static_cast<AbstractPlayListFilter *>(
-            new EqualRankFilter(imgSilica->rank()->value() - 1))
+            new EqualRankFilter(ImageRank(imgSilica.data()).value() - 1))
         << 1
         << 0;
 
     QTest::newRow("NotEqualRankFilter not equal")
         << (ImageList() << imgSilica)
         << static_cast<AbstractPlayListFilter *>(
-            new NotEqualRankFilter(imgSilica->rank()->value() - 1))
+            new NotEqualRankFilter(ImageRank(imgSilica.data()).value() - 1))
         << 1
         << 1;
     QTest::newRow("NotEqualRankFilter equal")
         << (ImageList() << imgSilica)
         << static_cast<AbstractPlayListFilter *>(
-            new NotEqualRankFilter(imgSilica->rank()->value()))
+            new NotEqualRankFilter(ImageRank(imgSilica.data()).value()))
         << 1
         << 0;
 

@@ -36,12 +36,13 @@ void TestImageRank::saveAndLoad()
     QFETCH(int, savedRank);
 
     Image image(imagePath);
+    ImageRank rank(&image);
 
-    int defaultRank = image.rank()->value();
+    int defaultRank = rank.value();
     QCOMPARE(defaultRank, ImageRank::DEFAULT_VALUE);
 
-    image.rank()->setValue(setRank);
-    QCOMPARE(image.rank()->value(), savedRank);
+    rank.setValue(setRank);
+    QCOMPARE(rank.value(), savedRank);
 
     int savedValue = LocalDatabase::instance()->queryImageRankValue(&image);
     QCOMPARE(savedValue, savedRank);
@@ -67,21 +68,22 @@ void TestImageRank::upDownVote()
     QFETCH(int, newRankAfterDownVote);
 
     Image image(imagePath);
-    image.rank()->setValue(oldRank);
+    ImageRank rank(&image);
+    rank.setValue(oldRank);
 
     // Test up vote
-    image.rank()->upVote();
-    QCOMPARE(image.rank()->value(), newRankAfterUpVote);
+    rank.upVote();
+    QCOMPARE(rank.value(), newRankAfterUpVote);
     QCOMPARE(
         LocalDatabase::instance()->queryImageRankValue(&image),
         newRankAfterUpVote);
 
     // Reset rank
-    image.rank()->setValue(oldRank);
+    rank.setValue(oldRank);
 
     // Test down vote
-    image.rank()->downVote();
-    QCOMPARE(image.rank()->value(), newRankAfterDownVote);
+    rank.downVote();
+    QCOMPARE(rank.value(), newRankAfterDownVote);
     QCOMPARE(
         LocalDatabase::instance()->queryImageRankValue(&image),
         newRankAfterDownVote);

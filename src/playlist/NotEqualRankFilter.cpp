@@ -11,6 +11,6 @@ NotEqualRankFilter::NotEqualRankFilter(int rank,
 
 bool NotEqualRankFilter::filter(const ImagePtr &image)
 {
-    int rank = image->rank()->value();
-    return rank != m_rank;
+    ImageRank rank(image.data());
+    return rank.value() != m_rank;
 }

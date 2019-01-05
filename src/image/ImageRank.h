@@ -5,11 +5,10 @@
 
 class Image;
 
-class ImageRank : public QObject
+class ImageRank
 {
-    Q_OBJECT
 public:
-    explicit ImageRank(Image *image, QObject *parent = 0);
+    explicit ImageRank(Image *image);
 
     static const int DEFAULT_VALUE;
     static const int MIN_VALUE;
@@ -23,9 +22,6 @@ public:
     void downVote();
 
     Image *image() { return m_image; }
-
-signals:
-    void imageRankChanged(int rank);
 
 private:
     void load();

@@ -7,8 +7,7 @@ const int ImageRank::MIN_VALUE = 1;
 const int ImageRank::MAX_VALUE = 5;
 const int ImageRank::MIN_SHOWN_VALUE = 3;
 
-ImageRank::ImageRank(Image *image, QObject *parent) :
-    QObject(parent) ,
+ImageRank::ImageRank(Image *image) :
     m_image(image) ,
     m_inited(false) ,
     m_value(DEFAULT_VALUE)
@@ -30,7 +29,6 @@ void ImageRank::setValue(int rank)
     if (m_value != rank) {
         m_value = rank;
         save();
-        emit imageRankChanged(rank);
     }
 }
 

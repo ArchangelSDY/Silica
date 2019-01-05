@@ -9,7 +9,6 @@
 
 class QThreadPool;
 
-class ImageRank;
 class ImageSource;
 
 class ImageData
@@ -60,8 +59,6 @@ public:
 
     void loadMetadata();
 
-    ImageRank *rank() { return m_rank; }
-
     bool copy(const QString &destPath);
 
     inline bool operator ==(const Image &other)
@@ -109,8 +106,6 @@ private:
     bool m_isMakingThumbnail;
     bool m_isError;
     bool m_needMakeThumbnail;
-
-    ImageRank *m_rank;
 
     QSize m_size;
     QVariantHash m_metadata;
