@@ -20,15 +20,10 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     setMouseTracking(true);
 
     setScene(m_scene);
-
-    // Hotspots editor must be initialized after scene's added to view
-    // because its mode indicator needs a parent widget
-    // m_hotspotsEditor = new HotspotsEditor(m_scene, &m_navigator);
 }
 
 MainGraphicsView::~MainGraphicsView()
 {
-    // delete m_hotspotsEditor;
 }
 
 void MainGraphicsView::setImage(const QImage &image)

@@ -48,13 +48,6 @@ const char *SQL_QUERY_IMAGE_BY_HASH = "select url from images where hash = ? lim
 
 const char *SQL_UPDATE_IMAGE_URL = "update images set url = ? where url = ?";
 
-const char *SQL_INSERT_IMAGE_HOTSPOT = "insert into image_hotspots(image_hash, left, top, width, height) "
-        "values (?, ?, ?, ?, ?)";
-
-const char *SQL_REMOVE_IMAGE_HOTSPOT_BY_ID = "delete from image_hotspots where id = ?";
-
-const char *SQL_QUERY_IMAGE_HOTSPOTS = "select id, left, top, width, height from image_hotspots where image_hash = ?";
-
 const char *SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH = "select rank from image_ranks where image_hash = ?";
 
 const char *SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH = "insert or replace into image_ranks (rank, image_hash) values (?, ?)";
@@ -321,82 +314,6 @@ bool SQLiteLocalDatabase::updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl)
     }
 
     return true;
-}
-
-bool SQLiteLocalDatabase::insertImageHotspot(ImageHotspot *hotspot)
-{
-    if (!m_db.isOpen()) {
-        return false;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_INSERT_IMAGE_HOTSPOT);
-    QRect rect = hotspot->rect();
-    q.addBindValue(hotspot->image()->source()->hashStr());
-    q.addBindValue(rect.left());
-    q.addBindValue(rect.top());
-    q.addBindValue(rect.width());
-    q.addBindValue(rect.height());
-
-    if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
-    }
-
-    int id = q.lastInsertId().toInt();
-    hotspot->setId(id);
-
-    return true;
-}
-
-bool SQLiteLocalDatabase::removeImageHotspot(ImageHotspot *hotspot)
-{
-    if (!m_db.isOpen()) {
-        return false;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_REMOVE_IMAGE_HOTSPOT_BY_ID);
-    q.addBindValue(hotspot->id());
-
-    if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
-    }
-
-    return true;
-}
-
-QList<ImageHotspot *> SQLiteLocalDatabase::queryImageHotspots(Image *image)
-{
-    QList<ImageHotspot *> hotspots;
-
-    if (!m_db.isOpen()) {
-        return hotspots;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_QUERY_IMAGE_HOTSPOTS);
-    q.addBindValue(image->source()->hashStr());
-
-    if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return hotspots;
-    }
-
-    while (q.next()) {
-        int id = q.value("id").toInt();
-        int left = q.value("left").toInt();
-        int top = q.value("top").toInt();
-        int width = q.value("width").toInt();
-        int height = q.value("height").toInt();
-        ImageHotspot *hotspot =
-            new ImageHotspot(image, QRect(left, top, width, height));
-        hotspot->setId(id);
-        hotspots << hotspot;
-    }
-
-    return hotspots;
 }
 
 int SQLiteLocalDatabase::queryImageRankValue(Image *image)

@@ -17,8 +17,6 @@ private slots:
     void load_data();
     void loadThumbnail();
     void loadThumbnail_data();
-    void hotspots();
-    void hotspots_data();
 };
 
 Q_DECLARE_METATYPE(QSharedPointer<QImage>)
@@ -117,34 +115,6 @@ void TestImage::loadThumbnail_data()
 
     QTest::newRow("Basic")
         << ":/assets/me.jpg";
-}
-
-void TestImage::hotspots()
-{
-    QFETCH(QString, imagePath);
-    QFETCH(QList<QRect>, rects);
-
-    Image image(imagePath);
-    foreach (const QRect &rect, rects) {
-        ImageHotspot hotspot(&image, rect);
-        hotspot.save();
-    }
-
-    QList<ImageHotspot *> hotspots = image.hotspots();
-    QCOMPARE(hotspots.count(), rects.count());
-    foreach (ImageHotspot *hotspot, hotspots) {
-        QCOMPARE(rects.contains(hotspot->rect()), true);
-    }
-}
-
-void TestImage::hotspots_data()
-{
-    QTest::addColumn<QString>("imagePath");
-    QTest::addColumn<QList<QRect> >("rects");
-
-    QTest::newRow("Basic")
-        << ":/assets/me.jpg"
-        << (QList<QRect>() << QRect(0, 0, 10, 10) << QRect(10, 10, 20, 20));
 }
 
 QTEST_MAIN(TestImage)

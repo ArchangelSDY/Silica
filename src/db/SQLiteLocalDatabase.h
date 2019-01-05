@@ -28,10 +28,6 @@ public:
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 
-    bool insertImageHotspot(ImageHotspot *hotspot);
-    bool removeImageHotspot(ImageHotspot *hotspot);
-    QList<ImageHotspot *> queryImageHotspots(Image *image);
-
     int queryImageRankValue(Image *image);
     bool updateImageRank(Image *image, int rank);
 

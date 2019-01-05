@@ -9,7 +9,6 @@
 #include "CascadeClassifierNavigationPlayer.h"
 #include "ExpandingNavigationPlayer.h"
 #include "FixedRegionNavigationPlayer.h"
-#include "HotspotsNavigationPlayer.h"
 #include "MangaNavigationPlayer.h"
 #include "NormalNavigationPlayer.h"
 
@@ -89,7 +88,6 @@ NavigationPlayerManager *NavigationPlayerManager::instance()
 NavigationPlayerManager::NavigationPlayerManager()
 {
     registerFactory(new NavigationPlayerFactory<NormalNavigationPlayer>());
-    registerFactory(new NavigationPlayerFactory<HotspotsNavigationPlayer>());
     registerFactory(new NavigationPlayerFactory<ExpandingNavigationPlayer>());
     registerFactory(new NavigationPlayerFactory<FixedRegionNavigationPlayer>());
     registerFactory(new NavigationPlayerFactory<CascadeClassifierNavigationPlayer>());

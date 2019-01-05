@@ -9,7 +9,6 @@
 
 class QThreadPool;
 
-class ImageHotspot;
 class ImageRank;
 class ImageSource;
 
@@ -34,8 +33,6 @@ public:
 class Image : public QObject
 {
     Q_OBJECT
-
-    friend class ImageHotspot;
 public:
     explicit Image(const QString &path, QObject *parent = 0);
     explicit Image(const QUrl &url, QObject *parent = 0);
@@ -62,9 +59,6 @@ public:
     QSharedPointer<QImage> loadThumbnailSync();
 
     void loadMetadata();
-
-    QList<ImageHotspot *> hotspots() { return m_hotspots; }
-    void loadHotspots(bool forceReload = false);
 
     ImageRank *rank() { return m_rank; }
 
@@ -115,9 +109,6 @@ private:
     bool m_isMakingThumbnail;
     bool m_isError;
     bool m_needMakeThumbnail;
-
-    QList<ImageHotspot *> m_hotspots;
-    bool m_hotspotsLoaded;
 
     ImageRank *m_rank;
 

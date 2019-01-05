@@ -33,10 +33,6 @@ public:
     virtual bool updateImageUrl(const QUrl &oldUrl,
                                 const QUrl &newUrl) = 0;
 
-    virtual bool insertImageHotspot(ImageHotspot *hotspot) = 0;
-    virtual bool removeImageHotspot(ImageHotspot *hotspot) = 0;
-    virtual QList<ImageHotspot *> queryImageHotspots(Image *image) = 0;
-
     virtual int queryImageRankValue(Image *image) = 0;
     virtual bool updateImageRank(Image *image, int rank) = 0;
 

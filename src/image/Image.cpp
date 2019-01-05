@@ -14,7 +14,6 @@
 
 #include "deps/quazip/quazip/quazip.h"
 #include "db/LocalDatabase.h"
-#include "image/ImageHotspot.h"
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
@@ -196,7 +195,6 @@ Image::Image(const QString &path, QObject *parent) :
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
-    m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
@@ -218,7 +216,6 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
-    m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
@@ -240,7 +237,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_isMakingThumbnail(false) ,
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
-    m_hotspotsLoaded(false) ,
     m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
@@ -258,10 +254,6 @@ Image::~Image()
     s_liveImages.remove(m_uuid);
 
     m_imageSource.clear();
-
-    while (!m_hotspots.isEmpty()) {
-        delete m_hotspots.takeFirst();
-    }
 }
 
 void Image::load(int priority, bool forceReload)
@@ -510,19 +502,6 @@ bool Image::copy(const QString &destPath)
     } else {
         return false;
     }
-}
-
-void Image::loadHotspots(bool forceReload)
-{
-    if (!m_hotspotsLoaded || forceReload) {
-        while (!m_hotspots.isEmpty()) {
-            delete m_hotspots.takeFirst();
-        }
-
-        m_hotspots = LocalDatabase::instance()->queryImageHotspots(this);
-        m_hotspotsLoaded = true;
-    }
-    emit hotpotsLoaded();
 }
 
 void Image::onLoad(QSharedPointer<ImageData> image)

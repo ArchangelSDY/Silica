@@ -6,7 +6,6 @@
 #include <QWheelEvent>
 
 #include "ui/models/MainGraphicsViewModel.h"
-#include "HotspotsEditor.h"
 
 class MainGraphicsView : public QGraphicsView, public MainGraphicsViewModel::View
 {
@@ -14,8 +13,6 @@ class MainGraphicsView : public QGraphicsView, public MainGraphicsViewModel::Vie
 public:
     explicit MainGraphicsView(QWidget *parent = 0);
     virtual ~MainGraphicsView();
-
-    //HotspotsEditor *hotspotsEditor() { return m_hotspotsEditor; }
 
     virtual bool isVisible() const;
 
