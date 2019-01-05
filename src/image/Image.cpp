@@ -176,11 +176,6 @@ void MakeThumbnailTask::run()
     emit thumbnailMade(thumbnail);
 }
 
-
-// ---------- Image ----------
-const QSize Image::UNKNOWN_SIZE = QSize(-1, -1);
-
-
 // ---------- Thread Pool ----------
 static QThreadPool *threadPool()
 {
@@ -202,8 +197,7 @@ Image::Image(const QString &path, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
-    m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE)
+    m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -220,8 +214,7 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
-    m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE)
+    m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
 
@@ -243,8 +236,7 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false) ,
     m_hotspotsLoaded(false) ,
-    m_rank(new ImageRank(this, this)) ,
-    m_size(Image::UNKNOWN_SIZE)
+    m_rank(new ImageRank(this, this))
 {
     s_liveImages.insert(m_uuid, true);
 

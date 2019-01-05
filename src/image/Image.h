@@ -75,8 +75,6 @@ public:
         return m_imageSource == other.m_imageSource;
     }
 
-    static const QSize UNKNOWN_SIZE;
-
     int width() const { return m_size.width(); }
     int height() const { return m_size.height(); }
     QSize size() const { return m_size; }
