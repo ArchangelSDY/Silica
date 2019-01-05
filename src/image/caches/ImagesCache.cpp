@@ -23,13 +23,9 @@ void ImagesCache::insert(int index, QSharedPointer<ImageData> image)
     m_images.insert(index, image);
 }
 
-QSharedPointer<ImageData> ImagesCache::at(int index)
+bool ImagesCache::contains(int index) const
 {
-    if (m_images.contains(index)) {
-        return m_images[index];
-    } else {
-        return 0;
-    }
+    return m_images.contains(index);
 }
 
 void ImagesCache::clear()

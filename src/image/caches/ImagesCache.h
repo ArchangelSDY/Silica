@@ -19,7 +19,7 @@ public:
     ~ImagesCache();
 
     void insert(int index, QSharedPointer<ImageData> image);
-    QSharedPointer<ImageData> at(int index);
+    bool contains(int index) const;
     void clear();
 
     void setStrategy(AbstractImagesCacheStrategy *strategy);

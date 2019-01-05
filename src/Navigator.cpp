@@ -46,17 +46,20 @@ void Navigator::preload()
 {
     for (int i = 1; i <= MAX_PRELOAD; ++i) {
         int delta = m_reverseNavigation ? (-i) : i;
-        int index = m_currentIndex + delta;
-        ImagePtr image = m_playList->at(resolveIndex(index));
+        int index = resolveIndex(m_currentIndex + delta);
+        ImagePtr image = m_playList->at(index);
         if (!image) {
             continue;
         }
 
-        connect(image.data(), &Image::loaded, this, [index, cachedImages = m_cachedImages](QSharedPointer<ImageData> imageData) {
-            cachedImages->insert(index, imageData);
-        }, Qt::UniqueConnection);
+        if (!m_cachedImages->contains(index)) {
+            connect(image.data(), &Image::loaded, this, [index, cachedImages = m_cachedImages](QSharedPointer<ImageData> imageData) {
+                cachedImages->insert(index, imageData);
+            }, Qt::UniqueConnection);
 
-        image->load(Image::LoadPriority::NormalPriority);
+            image->load(Image::LoadPriority::NormalPriority);
+        }
+
     }
 }
 
