@@ -39,7 +39,7 @@ const QVariantHash &ImageDelegate::extraInfo() const
 
 bool ImageDelegate::isAnimation() const
 {
-    QSharedPointer<ImageData> imageData = m_image->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = m_image->data().toStrongRef();
     if (!imageData) {
         return false;
     }
@@ -49,7 +49,7 @@ bool ImageDelegate::isAnimation() const
 
 int ImageDelegate::frameCount() const
 {
-    QSharedPointer<ImageData> imageData = m_image->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = m_image->data().toStrongRef();
     if (!imageData) {
         return 0;
     }
@@ -59,7 +59,7 @@ int ImageDelegate::frameCount() const
 
 QList<int> ImageDelegate::durations() const
 {
-    QSharedPointer<ImageData> imageData = m_image->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = m_image->data().toStrongRef();
     if (!imageData) {
         return QList<int>();
     }
@@ -71,7 +71,7 @@ QList<const QImage *> ImageDelegate::frames() const
 {
     QList<const QImage *> frames;
     
-    QSharedPointer<ImageData> imageData = m_image->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = m_image->data().toStrongRef();
     if (!imageData) {
         return frames;
     }

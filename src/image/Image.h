@@ -80,7 +80,7 @@ public:
     QSize size() const { return m_size; }
     QVariantHash &metadata() { return m_metadata; }
 
-    QWeakPointer<ImageData> image() const { return m_image; }
+    QWeakPointer<ImageData> data() const { return m_image; }
 
 signals:
     void loaded(QSharedPointer<ImageData> image);

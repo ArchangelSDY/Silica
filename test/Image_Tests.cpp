@@ -52,8 +52,8 @@ void TestImage::load()
 
         QVERIFY(!image.isLoading());
         QCOMPARE(image.isError(), !isSuccess);
-        QVERIFY2(!image.image().isNull(), "Image data should not be null as data is owned by spyLoad");
-        QCOMPARE(image.image().toStrongRef()->defaultFrame().isNull(), !isSuccess);
+        QVERIFY2(!image.data().isNull(), "Image data should not be null as data is owned by spyLoad");
+        QCOMPARE(image.data().toStrongRef()->defaultFrame().isNull(), !isSuccess);
 
         QCOMPARE(spyLoad.count(), 1);
         QList<QVariant> args = spyLoad.takeFirst();
@@ -76,7 +76,7 @@ void TestImage::load()
 
     // Release all references
     imageData.reset();
-    QVERIFY2(image.image().isNull(), "Image data should be null as data is not owned by anyone");
+    QVERIFY2(image.data().isNull(), "Image data should be null as data is not owned by anyone");
 }
 
 void TestImage::load_data()
@@ -102,7 +102,7 @@ void TestImage::loadThumbnail()
     QSharedPointer<QImage> thumbnail = arguments.at(0).value<QSharedPointer<QImage>>();
     QVERIFY(!thumbnail.isNull());
     QVERIFY(thumbnail->width() > 0);
-    QVERIFY2(image.image().isNull(), "Image should unload after thumbnail made");
+    QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
 
     Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
         image.source()->hashStr());

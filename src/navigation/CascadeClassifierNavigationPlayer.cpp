@@ -92,7 +92,7 @@ void CascadeClassifierNavigationPlayer::detectRegions()
     }
 
     Image *curImage = m_navigator->currentImage();
-    QSharedPointer<ImageData> imageData = curImage->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = curImage->data().toStrongRef();
     if (!imageData) {
         return;
     }

@@ -298,7 +298,7 @@ void Navigator::repaint()
         return;
     }
 
-    QSharedPointer<ImageData> imageData = image->image().toStrongRef();
+    QSharedPointer<ImageData> imageData = image->data().toStrongRef();
     if (!imageData) {
         return;
     }
