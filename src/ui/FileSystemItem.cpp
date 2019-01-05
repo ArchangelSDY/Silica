@@ -278,6 +278,7 @@ void FileSystemItem::loadCover(QSharedPointer<ImageSource> imageSource)
 void FileSystemItem::refresh()
 {
     QFile::remove(computeThumbnailPath(path()));
+    g_coverCache.remove(coverCacheKey());
     load();
 }
 
