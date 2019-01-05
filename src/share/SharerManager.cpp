@@ -44,7 +44,7 @@ QStringList SharerManager::sharerNames() const
     return m_sharerNames;
 }
 
-bool SharerManager::share(int index, const Image *image)
+bool SharerManager::share(int index, QSharedPointer<Image> image)
 {
     return m_sharers[index]->share(image);
 }

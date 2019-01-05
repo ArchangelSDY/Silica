@@ -18,28 +18,28 @@ void TestImageDelegate::fields()
 {
     QFETCH(QString, imagePath);
 
-    Image image(imagePath);
-    image.metadata().insert("SPECIAL", 1);
-    sapi::ImageDelegate delegate(&image);
+    QSharedPointer<Image> image = QSharedPointer<Image>::create(imagePath);
+    image->metadata().insert("SPECIAL", 1);
+    sapi::ImageDelegate delegate(image);
 
-    QSignalSpy loadSpy(&image, &Image::loaded);
-    image.load();
+    QSignalSpy loadSpy(image.data(), &Image::loaded);
+    image->load();
     QVERIFY(loadSpy.wait());
 
-    QCOMPARE(delegate.name(), image.name());
-    QCOMPARE(delegate.size(), image.size());
-    QCOMPARE(delegate.hash(), image.source()->hashStr());
-    QCOMPARE(delegate.extraInfo(), image.metadata());
-    QCOMPARE(delegate.isAnimation(), image.data().toStrongRef()->isAnimation());
-    QCOMPARE(delegate.frameCount(), image.data().toStrongRef()->frames.count());
-    QCOMPARE(delegate.durations(), image.data().toStrongRef()->durations);
+    QCOMPARE(delegate.name(), image->name());
+    QCOMPARE(delegate.size(), image->size());
+    QCOMPARE(delegate.hash(), image->source()->hashStr());
+    QCOMPARE(delegate.extraInfo(), image->metadata());
+    QCOMPARE(delegate.isAnimation(), image->data().toStrongRef()->isAnimation());
+    QCOMPARE(delegate.frameCount(), image->data().toStrongRef()->frames.count());
+    QCOMPARE(delegate.durations(), image->data().toStrongRef()->durations);
     for (int i = 0; i < delegate.frameCount(); ++i) {
-        QCOMPARE(*(delegate.frames()[i]), image.data().toStrongRef()->frames[i]);
+        QCOMPARE(*(delegate.frames()[i]), image->data().toStrongRef()->frames[i]);
     }
     QVERIFY(!delegate.readRaw().isNull());
 
-    QSignalSpy thumbnailSpy(&image, &Image::thumbnailLoaded);
-    image.loadThumbnail();
+    QSignalSpy thumbnailSpy(image.data(), &Image::thumbnailLoaded);
+    image->loadThumbnail();
     QVERIFY(thumbnailSpy.wait());
     QVERIFY(!delegate.thumbnail().isNull());
 }

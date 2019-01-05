@@ -9,7 +9,7 @@ ImageEffectDelegate::ImageEffectDelegate(IImageEffectPlugin *plugin) :
 {
 }
 
-void ImageEffectDelegate::process(Image *image, QImage &frame)
+void ImageEffectDelegate::process(QSharedPointer<Image> image, QImage &frame)
 {
     ImageDelegate imageDelegate(image);
     m_plugin->process(&imageDelegate, frame);

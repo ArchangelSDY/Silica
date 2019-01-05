@@ -52,7 +52,7 @@ void FixedRegionNavigationPlayer::goIndexUntilSuccess(int index, int delta)
 
 QRectF FixedRegionNavigationPlayer::calcFocusedRect() const
 {
-    Image *curImage = m_navigator->currentImage();
+    ImagePtr curImage = m_navigator->currentImage();
     if (!curImage || !m_view) {
         return QRectF();
     }

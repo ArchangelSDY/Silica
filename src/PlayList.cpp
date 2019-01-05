@@ -68,20 +68,18 @@ void PlayList::replace(int index, const ImagePtr &image)
     emit itemChanged(index);
 }
 
-QList<QSharedPointer<Image> > &PlayList::operator<<(
-        const QSharedPointer<Image> &image)
+QList<ImagePtr> &PlayList::operator<<(const ImagePtr &image)
 {
     ImageList l;
     l << image;
     return (*this << l);
 }
 
-QList<QSharedPointer<Image> > &PlayList::operator<<(
-        const ImageList &images)
+QList<ImagePtr> &PlayList::operator<<(const ImageList &images)
 {
     int start = count();
     m_allImages << images;
-    QList<QSharedPointer<Image> > &ret =
+    QList<ImagePtr> &ret =
         m_filteredImages << m_filter->filtered(images);
     emit itemsAppended(start);
     return ret;
@@ -167,10 +165,10 @@ void PlayList::sortBy(AbstractPlayListSorter *sorter)
     emit itemsChanged();
 }
 
-QString PlayList::groupNameOf(Image *image) const
+QString PlayList::groupNameOf(const ImagePtr &image) const
 {
     if (m_grouper) {
-        return m_grouper->groupNameOf(image);
+        return m_grouper->groupNameOf(image.data());
     } else {
         return QStringLiteral("");
     }

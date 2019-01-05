@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QList>
+#include <QSharedPointer>
 
 class Image;
 class Sharer;
@@ -13,7 +14,7 @@ public:
     ~SharerManager();
 
     QStringList sharerNames() const;
-    bool share(int index, const Image *image);
+    bool share(int index, QSharedPointer<Image> image);
 
 private:
     SharerManager();

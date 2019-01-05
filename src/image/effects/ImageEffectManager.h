@@ -12,7 +12,7 @@ public:
     ImageEffectManager();
     ~ImageEffectManager();
 
-    QImage process(Image *image, const QImage &frame);
+    QImage process(QSharedPointer<Image> image, const QImage &frame);
 
 private:
     QVector<ImageEffect *> m_effects;

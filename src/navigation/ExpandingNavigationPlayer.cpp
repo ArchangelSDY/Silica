@@ -77,7 +77,7 @@ void ExpandingNavigationPlayer::onImageSizeGet(Image *image)
 
 void ExpandingNavigationPlayer::calcFocused()
 {
-    Image *curImage = m_navigator->currentImage();
+    ImagePtr curImage = m_navigator->currentImage();
     if (curImage && m_view) {
         m_toBeFocused.clear();
 

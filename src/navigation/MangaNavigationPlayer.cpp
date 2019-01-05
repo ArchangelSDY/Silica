@@ -43,7 +43,7 @@ void MangaNavigationPlayer::onLeave()
 
 void MangaNavigationPlayer::focus(FocusPolicy policy)
 {
-    Image *curImage = m_navigator->currentImage();
+    ImagePtr curImage = m_navigator->currentImage();
     if (!curImage || !m_view) {
         return;
     }

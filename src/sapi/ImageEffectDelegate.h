@@ -12,7 +12,7 @@ class ImageEffectDelegate : public ImageEffect
 public:
     ImageEffectDelegate(IImageEffectPlugin *plugin);
 
-    virtual void process(Image *image, QImage &frame) override;
+    virtual void process(QSharedPointer<Image> image, QImage &frame) override;
 
 private:
     QScopedPointer<IImageEffectPlugin> m_plugin;

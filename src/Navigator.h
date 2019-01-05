@@ -40,8 +40,7 @@ public:
     void goNextGroup();
     void repaint();
 
-    Image *currentImage() const;
-    ImagePtr currentImagePtr() const;
+    ImagePtr currentImage() const;
     int currentIndex() { return m_currentIndex; }
 
     bool isAutoNavigating() const { return m_autoNavigationTimer.isActive(); }

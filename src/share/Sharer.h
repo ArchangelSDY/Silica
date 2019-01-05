@@ -9,7 +9,7 @@ class Sharer : public QObject
 {
     Q_OBJECT
 public:
-    virtual bool share(const Image *image) = 0;
+    virtual bool share(QSharedPointer<Image> image) = 0;
 
 signals:
     void finished(bool success);

@@ -9,6 +9,6 @@ class ImageEffect
 public:
     virtual ~ImageEffect() {}
 
-    virtual void process(Image *image, QImage &frame) = 0;
+    virtual void process(QSharedPointer<Image> image, QImage &frame) = 0;
 
 };

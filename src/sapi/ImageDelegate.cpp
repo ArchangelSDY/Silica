@@ -6,7 +6,7 @@
 
 namespace sapi {
 
-ImageDelegate::ImageDelegate(const Image *image) :
+ImageDelegate::ImageDelegate(ImagePtr image) :
     m_image(image)
 {
 }
@@ -33,8 +33,7 @@ QUrl ImageDelegate::url() const
 
 const QVariantHash &ImageDelegate::extraInfo() const
 {
-    Image *image = const_cast<Image *>(m_image);
-    return image->metadata();
+    return m_image->metadata();
 }
 
 bool ImageDelegate::isAnimation() const
@@ -86,8 +85,7 @@ QList<const QImage *> ImageDelegate::frames() const
 QImage ImageDelegate::thumbnail() const
 {
     // TODO: Deprecate this in favor of async version
-    Image *image = const_cast<Image *>(m_image);
-    QSharedPointer<QImage> thumbnail = image->loadThumbnailSync();
+    QSharedPointer<QImage> thumbnail = m_image->loadThumbnailSync();
     return *thumbnail;
 }
 

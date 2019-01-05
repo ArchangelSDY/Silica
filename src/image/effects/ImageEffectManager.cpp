@@ -21,7 +21,7 @@ ImageEffectManager::~ImageEffectManager()
     }
 }
 
-QImage ImageEffectManager::process(Image *image, const QImage &frame)
+QImage ImageEffectManager::process(QSharedPointer<Image> image, const QImage &frame)
 {
     QImage ret = frame;
 

@@ -1,6 +1,8 @@
 #ifndef IMAGEDELEGATE_H
 #define IMAGEDELEGATE_H
 
+#include <QSharedPointer>
+
 #include "sapi/ImageResource.h"
 
 class Image;
@@ -10,7 +12,7 @@ namespace sapi {
 class ImageDelegate : public sapi::ImageResource
 {
 public:
-    ImageDelegate(const Image *image);
+    ImageDelegate(QSharedPointer<Image> image);
 
     // Image interface
     QString name() const;
@@ -26,7 +28,7 @@ public:
     QByteArray readRaw() const;
 
 private:
-    const Image *m_image;
+    QSharedPointer<Image> m_image;
 };
 
 }

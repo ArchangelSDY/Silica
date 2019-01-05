@@ -30,13 +30,13 @@ public:
 
     void sortBy(AbstractPlayListSorter *sorter);
 
-    QString groupNameOf(Image *image) const;
+    QString groupNameOf(const ImagePtr &mage) const;
     void groupBy(AbstractPlayListGrouper *grouper);
 
     void setFilter(AbstractPlayListFilter *filter);
 
     // Delegate to inner QList
-    typedef QList<QSharedPointer<Image> >::const_iterator const_iterator;
+    typedef QList<ImagePtr>::const_iterator const_iterator;
     inline const_iterator begin() const
     {
         return m_filteredImages.begin();
@@ -46,23 +46,21 @@ public:
         return m_filteredImages.end();
     }
 
-    void append(const QSharedPointer<Image> &image);
+    void append(const ImagePtr &image);
     void append(const ImageList &images);
     void append(QSharedPointer<PlayList> playList);
     void replace(int index, const ImagePtr &image);
 
-    QList<QSharedPointer<Image> > &operator<<(
-            const QSharedPointer<Image> &image);
-    QList<QSharedPointer<Image> > &operator<<(
-            const ImageList &images);
+    QList<ImagePtr> &operator<<(const ImagePtr &image);
+    QList<ImagePtr> &operator<<(const ImageList &images);
 
     void clear();
 
-    inline const QSharedPointer<Image> &operator[](int i) const
+    inline const ImagePtr &operator[](int i) const
     {
         return m_filteredImages[i];
     }
-    inline const QSharedPointer<Image> &at(int i) const
+    inline const ImagePtr &at(int i) const
     {
         return m_filteredImages.at(i);
     }

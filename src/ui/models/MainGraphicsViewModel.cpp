@@ -185,16 +185,14 @@ void MainGraphicsViewModel::keyPressEvent(QKeyEvent *event)
 
     // Press 'Shift + B' to add current image to basket
     if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_B) {
-        m_navigator->basket()->append(
-            m_navigator->currentImagePtr());
+        m_navigator->basket()->append(m_navigator->currentImage());
         event->accept();
         return;
     }
 
     // Press 'Shift + W' to add as remote wallpaper
     if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_W) {
-        m_remoteWallpapersManager->addImageToWallpapers(
-            m_navigator->currentImagePtr());
+        m_remoteWallpapersManager->addImageToWallpapers(m_navigator->currentImage());
         event->accept();
         return;
     }

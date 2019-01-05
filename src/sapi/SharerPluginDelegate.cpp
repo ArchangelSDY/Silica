@@ -18,7 +18,7 @@ SharerPluginDelegate::~SharerPluginDelegate()
     delete m_sharer;
 }
 
-bool SharerPluginDelegate::share(const Image *image)
+bool SharerPluginDelegate::share(QSharedPointer<Image> image)
 {
     ImageDelegate imageDelegate(image);
     return m_sharer->share(imageDelegate);

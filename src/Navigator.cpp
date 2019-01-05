@@ -244,7 +244,7 @@ void Navigator::goPrevGroup()
         }
 
         const ImagePtr &image = m_playList->at(index);
-        QString group = m_playList->groupNameOf(image.data());
+        QString group = m_playList->groupNameOf(image);
         if (group != cmpGroup) {
             if (!isInPrevGroup) {
                 // Now at the end of prev group. Try to find the head.
@@ -282,7 +282,7 @@ void Navigator::goNextGroup()
         }
 
         const ImagePtr &image = m_playList->at(index);
-        QString group = m_playList->groupNameOf(image.data());
+        QString group = m_playList->groupNameOf(image);
         if (group != initGroup) {
             break;
         }
@@ -325,12 +325,7 @@ void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
     }
 }
 
-Image *Navigator::currentImage() const
-{
-    return currentImagePtr().data();
-}
-
-ImagePtr Navigator::currentImagePtr() const
+ImagePtr Navigator::currentImage() const
 {
     if (m_playList &&
         m_currentIndex >= 0 && m_currentIndex < m_playList->count()) {

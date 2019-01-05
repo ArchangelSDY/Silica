@@ -620,7 +620,7 @@ void MainWindow::promptToSaveImage()
 
 void MainWindow::promptToSaveLocalPlayList()
 {
-    Image *image = m_navigator->currentImage();
+    ImagePtr image = m_navigator->currentImage();
     if (!image) {
         return;
     }
@@ -743,7 +743,7 @@ void MainWindow::showAbout()
 
 void MainWindow::imageLoaded(QSharedPointer<ImageData> imageData)
 {
-    Image *image = m_navigator->currentImage();
+    ImagePtr image = m_navigator->currentImage();
 
     // Title
     updateWindowTitle();
@@ -804,7 +804,7 @@ void MainWindow::navigationChange(int index)
 
 void MainWindow::updateWindowTitle()
 {
-    Image *image = m_navigator->currentImage();
+    ImagePtr image = m_navigator->currentImage();
 
     QString status;
     if (image) {

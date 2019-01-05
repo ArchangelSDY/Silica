@@ -17,7 +17,7 @@ int NavigatorDelegate::currentIndex() const
 
 QSharedPointer<sapi::ImageResource> NavigatorDelegate::currentImage()
 {
-    Image *currentImage = m_navigator->currentImage();
+    ImagePtr currentImage = m_navigator->currentImage();
     if (currentImage) {
         return QSharedPointer<sapi::ImageResource>(new sapi::ImageDelegate(currentImage));
     } else {

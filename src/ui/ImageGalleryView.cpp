@@ -233,9 +233,9 @@ void ImageGalleryView::removeSelected()
 QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
 {
     ImageGalleryItem *item = static_cast<ImageGalleryItem *>(rawItem);
-    const ImagePtr &image = item->image();
+    ImagePtr image = item->image();
     if (!image.isNull()) {
-        return m_playList->groupNameOf(image.data());
+        return m_playList->groupNameOf(image);
     } else {
         return QStringLiteral("");
     }
