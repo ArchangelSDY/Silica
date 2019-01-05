@@ -255,7 +255,7 @@ Image::~Image()
 void Image::load(int priority, bool forceReload)
 {
     if (!forceReload) {
-        QSharedPointer<ImageData> image = m_image.toStrongRef();
+        QSharedPointer<ImageData> image = m_data.toStrongRef();
         if (image) {
             emit loaded(image);
             return;
@@ -284,7 +284,7 @@ void Image::imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData>
     Q_ASSERT(image->durations.count() > 0);
 
     resetMetadata(metadata);
-    m_image = image;
+    m_data = image;
     m_isLoadingImage = false;
 
     QImage &defaultFrame = image->frames.first();
@@ -456,7 +456,7 @@ QString Image::name() const
 
 QImage Image::defaultFrame() const
 {
-    QSharedPointer<ImageData> image = m_image.toStrongRef();
+    QSharedPointer<ImageData> image = m_data.toStrongRef();
     if (!image) {
         return QImage();
     }
@@ -489,15 +489,6 @@ bool Image::isLoading() const
 bool Image::isError() const
 {
     return m_isError;
-}
-
-bool Image::copy(const QString &destPath)
-{
-    if (!m_imageSource.isNull()) {
-        return m_imageSource->copy(destPath);
-    } else {
-        return false;
-    }
 }
 
 void Image::onLoad(QSharedPointer<ImageData> image)

@@ -47,8 +47,14 @@ public:
     QUuid uuid() const { return m_uuid; }
     QString name() const;
     QString thumbnailPath() const { return m_thumbnailPath; }
+    QSharedPointer<ImageSource> source() const { return m_imageSource; }
+    QVariantHash &metadata() { return m_metadata; }
+    QWeakPointer<ImageData> data() const { return m_data; }
+
+    int width() const { return m_size.width(); }
+    int height() const { return m_size.height(); }
+    QSize size() const { return m_size; }
     qreal aspectRatio() const;
-    const ImageSource *source() const { return m_imageSource.data(); }
 
     bool isLoading() const;
     bool isError() const;
@@ -56,28 +62,12 @@ public:
     void load(int priority = NormalPriority, bool forceReload = false);
     void loadThumbnail();
     QSharedPointer<QImage> loadThumbnailSync();
-
     void loadMetadata();
-
-    bool copy(const QString &destPath);
-
-    inline bool operator ==(const Image &other)
-    {
-        return m_imageSource == other.m_imageSource;
-    }
-
-    int width() const { return m_size.width(); }
-    int height() const { return m_size.height(); }
-    QSize size() const { return m_size; }
-    QVariantHash &metadata() { return m_metadata; }
-
-    QWeakPointer<ImageData> data() const { return m_image; }
 
 signals:
     void loaded(QSharedPointer<ImageData> image);
     void thumbnailLoaded(QSharedPointer<QImage> thumbnail);
     void thumbnailLoadFailed();
-    void hotpotsLoaded();
 
 private slots:
     void imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image);
@@ -98,20 +88,18 @@ private:
     QUuid m_uuid;
     QSharedPointer<ImageSource> m_imageSource;
     QWeakPointer<QImage> m_thumbnail;
+    QWeakPointer<ImageData> m_data;
+
+    QSize m_size;
     QSize m_thumbnailSize;
     QString m_thumbnailPath;
+    QVariantHash m_metadata;
 
     bool m_isLoadingImage;
     bool m_isLoadingThumbnail;
     bool m_isMakingThumbnail;
     bool m_isError;
     bool m_needMakeThumbnail;
-
-    QSize m_size;
-    QVariantHash m_metadata;
-
-    QWeakPointer<ImageData> m_image;
-    bool m_isAnimation;
 };
 
 typedef QList<QSharedPointer<Image> > ImageList;

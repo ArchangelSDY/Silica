@@ -604,7 +604,7 @@ void MainWindow::promptToSaveImage()
                 QFileInfo imageFile(image->name()); // Remove dir in image name
                 QString destPath = destDir + "/" +
                     imageFile.fileName();
-                bool success = image->copy(destPath);
+                bool success = image->source()->copy(destPath);
                 QString msg;
                 if (success) {
                     QTextStream(&msg) << image->name() << " saved!";
