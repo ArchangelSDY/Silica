@@ -1,4 +1,4 @@
-file(GLOB SILICA_UI_SRCS
+set(SILICA_UI_SRCS
     "ui/BasketView.cpp"
     "ui/FileSystemItem.cpp"
     "ui/FileSystemView.cpp"
@@ -23,10 +23,25 @@ file(GLOB SILICA_UI_SRCS
     "ui/RemoteWallpapersManager.cpp"
     "ui/ViewState.cpp"
     "ui/ViewStateManager.cpp"
-    "ui/hotspots/*.cpp"
     "ui/gamepad/GamepadAxisScroller.cpp"
     "ui/gamepad/GamepadController.cpp"
-    "ui/renderers/*.cpp"
+    "ui/renderers/AbstractGalleryItemRenderer.cpp"
+    "ui/renderers/AbstractGalleryViewRenderer.cpp"
+    "ui/renderers/AbstractRendererFactory.cpp"
+    "ui/renderers/BoundingRectExpandRenderer.cpp"
+    "ui/renderers/CompactCornerIconRenderer.cpp"
+    "ui/renderers/CompactCountRenderer.cpp"
+    "ui/renderers/CompactImageRenderer.cpp"
+    "ui/renderers/CompactRendererFactory.cpp"
+    "ui/renderers/CompactTitleRenderer.cpp"
+    "ui/renderers/GridGalleryViewRenderer.cpp"
+    "ui/renderers/ItemGroupTitle.cpp"
+    "ui/renderers/LooseImageBackgroundRenderer.cpp"
+    "ui/renderers/LooseImageRenderer.cpp"
+    "ui/renderers/LooseRendererFactory.cpp"
+    "ui/renderers/WaterfallGalleryViewRenderer.cpp"
+    "ui/renderers/WaterfallImageRenderer.cpp"
+    "ui/renderers/WaterfallRendererFactory.cpp"
     "MainWindow.cpp"
 )
 
@@ -37,9 +52,10 @@ if (WIN32)
     )
 endif()
 
-file(GLOB SILICA_UIS
-    "*.ui"
-    "ui/*.ui"
+set(SILICA_UIS
+    "MainWindow.ui"
+    "ui/NotificationWidget.ui"
+    "ui/PluginLogsDialog.ui"
 )
 qt5_wrap_ui(SILICA_UI_HEADERS ${SILICA_UIS})
 

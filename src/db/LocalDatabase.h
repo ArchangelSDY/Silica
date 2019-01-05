@@ -5,7 +5,6 @@
 #include <QObject>
 
 #include "image/Image.h"
-#include "image/ImageHotspot.h"
 #include "playlist/PlayListRecord.h"
 #include "playlist/PlayListProviderFactory.h"
 
