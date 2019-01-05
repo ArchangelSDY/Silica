@@ -54,6 +54,7 @@ endif()
 
 set(SILICA_UIS
     "MainWindow.ui"
+    "ui/ImagePathCorrectorDialog.ui"
     "ui/NotificationWidget.ui"
     "ui/PluginLogsDialog.ui"
 )
