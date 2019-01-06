@@ -504,8 +504,7 @@ void MainWindow::loadSelectedPath()
                 pl->sortBy(&sorter);
             }
 
-            // Navigator should take ownership of PlayList in this case
-            this->m_navigator->setPlayList(pl);
+            m_navigator->setPlayList(pl);
         });
     }
 }

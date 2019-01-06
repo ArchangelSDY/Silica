@@ -28,6 +28,7 @@ public:
 
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
+    virtual void insertImagesAsync(const ImageList &images) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
     virtual bool updateImageUrl(const QUrl &oldUrl,
                                 const QUrl &newUrl) = 0;

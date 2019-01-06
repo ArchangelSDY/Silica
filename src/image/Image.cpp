@@ -13,7 +13,6 @@
 #endif
 
 #include "deps/quazip/quazip/quazip.h"
-#include "db/LocalDatabase.h"
 #include "image/ImageSource.h"
 #include "image/ImageSourceManager.h"
 #include "logger/Logger.h"
@@ -415,9 +414,6 @@ void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
     if (!thumbnail.isNull() && !thumbnail->isNull()) {
         m_thumbnail = thumbnail;
         m_thumbnailSize = thumbnail->size();
-
-        LocalDatabase::instance()->insertImage(this);
-
         emit thumbnailLoaded(thumbnail);
     } else {
         emit thumbnailLoadFailed();

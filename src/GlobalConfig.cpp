@@ -82,13 +82,13 @@ void GlobalConfig::load()
     // Thumbnail path
     QString defaultThumbnailPath = baseDirPath + "/thumbnails";
     m_thumbnailPath = settings.value("ThumbnailDir", defaultThumbnailPath)
-                              .toString();
+        .toString();
     qDebug() << "ThumbnailDir:" << m_thumbnailPath;
 
     // File system thumbnail path
     QString defaultFileSystemThumbnailPath = baseDirPath + "/fs_thumbnails";
     m_fileSystemThumbnailPath = settings.value("FileSystemThumbnailDir", defaultFileSystemThumbnailPath)
-                              .toString();
+        .toString();
 
     // Crash dump path
     m_crashDumpPath = baseDirPath + "/crash_dump";
@@ -120,6 +120,8 @@ void GlobalConfig::load()
     qRegisterMetaType<QList<QSharedPointer<QImage> > >("QList<QSharedPointer<QImage> >");
     qRegisterMetaType<QList<QUrl> >("QList<QUrl>");
     qRegisterMetaType<QList<QVariantHash> >("QList<QVariantHash>");
+    qRegisterMetaType<ImageList>("ImageList");
+    qRegisterMetaType<ImagePtr>("ImagePtr");
     qRegisterMetaType<QSharedPointer<PlayList> >("QSharedPointer<PlayList>");
     qRegisterMetaType<QSharedPointer<ImageSource> >("QSharedPointer<ImageSource>");
     qRegisterMetaType<QSharedPointer<ImageData> >("QSharedPointer<ImageData>");

@@ -64,6 +64,10 @@ public:
     {
         return m_filteredImages.at(i);
     }
+    inline ImageList mid(int pos, int length = -1) const
+    {
+        return m_filteredImages.mid(pos, length);
+    }
 
     inline int count() const
     {

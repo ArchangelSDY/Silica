@@ -1,10 +1,13 @@
 #ifndef SQLITELOCALDATABASE_H
 #define SQLITELOCALDATABASE_H
 
+#include <QScopedPointer>
 #include <QtSql>
 
 #include "db/LocalDatabase.h"
 #include "image/Image.h"
+
+class SQLiteLocalDatabaseBackgroundWorker;
 
 class SQLiteLocalDatabase : public LocalDatabase
 {
@@ -25,6 +28,7 @@ public:
 
     int queryImagesCount();
     bool insertImage(Image *image);
+    void insertImagesAsync(const ImageList &images);
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 
@@ -39,9 +43,10 @@ public:
     qint64 queryTaskProgressTimeConsumption(const QString &key);
 
 private:
-    QSqlDatabase m_db;
-
     static const int PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET = 100;
+
+    QSqlDatabase m_db;
+    QScopedPointer<SQLiteLocalDatabaseBackgroundWorker> m_worker;
 };
 
 #endif // SQLITELOCALDATABASE_H

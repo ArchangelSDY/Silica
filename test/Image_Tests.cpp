@@ -4,7 +4,6 @@
 
 #include "STestCase.h"
 #include "../src/GlobalConfig.h"
-#include "../src/db/LocalDatabase.h"
 #include "../src/image/Image.h"
 #include "../src/image/ImageSource.h"
 
@@ -12,7 +11,6 @@ class TestImage : public STestCase
 {
     Q_OBJECT
 private slots:
-    void cleanup();
     void load();
     void load_data();
     void loadThumbnail();
@@ -21,17 +19,6 @@ private slots:
 
 Q_DECLARE_METATYPE(QSharedPointer<QImage>)
 Q_DECLARE_METATYPE(QSharedPointer<ImageData>)
-
-void TestImage::cleanup()
-{
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestImage");
-    db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
-    db.open();
-    db.exec("delete from images");
-    db.exec("delete from image_hotspots");
-    db.close();
-    QSqlDatabase::removeDatabase("TestImage");
-}
 
 void TestImage::load()
 {
@@ -101,12 +88,6 @@ void TestImage::loadThumbnail()
     QVERIFY(!thumbnail.isNull());
     QVERIFY(thumbnail->width() > 0);
     QVERIFY2(image.data().isNull(), "Image should unload after thumbnail made");
-
-    Image *insertedImage = LocalDatabase::instance()->queryImageByHashStr(
-        image.source()->hashStr());
-    QVERIFY(insertedImage !=  0);
-    QCOMPARE(insertedImage->name(), image.name());
-    delete insertedImage;
 }
 
 void TestImage::loadThumbnail_data()

@@ -1,5 +1,6 @@
 #include "Navigator.h"
 
+#include "db/LocalDatabase.h"
 #include "image/caches/ImagesCache.h"
 #include "navigation/AbstractNavigationPlayer.h"
 #include "navigation/NormalNavigationPlayer.h"
@@ -77,6 +78,8 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
     connect(m_playList.data(), &PlayList::itemsAppended, this, &Navigator::playListAppended);
     emit playListChange(m_playList);
 
+    LocalDatabase::instance()->insertImagesAsync(playList->toImageList());
+
     goIndex(0);
 
     if (m_player) {
@@ -94,6 +97,8 @@ void Navigator::playListAppended(int start)
     if (shouldGoFirst) {
         goIndex(0);
     }
+
+    LocalDatabase::instance()->insertImagesAsync(m_playList->mid(start));
 }
 
 void Navigator::reloadPlayList()
