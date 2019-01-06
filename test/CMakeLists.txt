@@ -1,5 +1,6 @@
 add_subdirectory(deps/QtMockWebServer)
 set_target_properties(qtmockwebserver PROPERTIES FOLDER "Dependencies")
+add_subdirectory(deps/googlemock)
 
 # set all include directories for in and out of source builds
 include_directories(
