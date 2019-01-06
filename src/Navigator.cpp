@@ -12,7 +12,7 @@ const int Navigator::FAST_AUTO_NAVIGATION_INTERVAL = 200;
 const int Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL = 500;
 const int Navigator::SLOW_AUTO_NAVIGATION_INTERVAL = 1000;
 
-Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
+Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, LocalDatabase *db, QObject *parent) :
     QObject(parent) ,
     m_currentIndex(-1) ,
     m_currentUuid(QUuid()) ,
@@ -21,6 +21,7 @@ Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent) :
     m_isLooping(true) ,
     m_cachedImages(imagesCache) ,
     m_playList(0) ,
+    m_db(db) ,
     m_player(nullptr) ,
     m_basket(new PlayList())
 {
@@ -78,7 +79,7 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
     connect(m_playList.data(), &PlayList::itemsAppended, this, &Navigator::playListAppended);
     emit playListChange(m_playList);
 
-    LocalDatabase::instance()->insertImagesAsync(playList->toImageList());
+    m_db->insertImagesAsync(playList->toImageList());
 
     goIndex(0);
 
@@ -98,7 +99,7 @@ void Navigator::playListAppended(int start)
         goIndex(0);
     }
 
-    LocalDatabase::instance()->insertImagesAsync(m_playList->mid(start));
+    m_db->insertImagesAsync(m_playList->mid(start));
 }
 
 void Navigator::reloadPlayList()

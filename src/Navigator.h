@@ -11,6 +11,7 @@
 
 class AbstractNavigationPlayer;
 class ImagesCache;
+class LocalDatabase;
 
 class Navigator : public QObject
 {
@@ -26,7 +27,7 @@ public:
     static const int MEDIUM_AUTO_NAVIGATION_INTERVAL;
     static const int SLOW_AUTO_NAVIGATION_INTERVAL;
 
-    explicit Navigator(QSharedPointer<ImagesCache> imagesCache, QObject *parent = 0);
+    explicit Navigator(QSharedPointer<ImagesCache> imagesCache, LocalDatabase *db, QObject *parent = 0);
     ~Navigator();
 
     QSharedPointer<PlayList> playList() { return m_playList; }
@@ -111,6 +112,7 @@ private:
     bool m_isLooping;
     QSharedPointer<ImagesCache> m_cachedImages;
     QSharedPointer<PlayList> m_playList;
+    LocalDatabase *m_db;
     QTimer m_autoNavigationTimer;
 
     QScopedPointer<AbstractNavigationPlayer> m_player;
