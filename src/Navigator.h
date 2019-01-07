@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QUuid>
 
-#include "Image.h"
+#include "image/Image.h"
 #include "PlayList.h"
 
 class AbstractNavigationPlayer;

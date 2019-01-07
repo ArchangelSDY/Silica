@@ -19,8 +19,10 @@ ImagesCache::~ImagesCache()
 
 void ImagesCache::insert(int index, QSharedPointer<ImageData> image)
 {
-    trim(index);
-    m_images.insert(index, image);
+    if (m_capacity > 0) {
+        trim(index);
+        m_images.insert(index, image);
+    }
 }
 
 bool ImagesCache::contains(int index) const

@@ -1,12 +1,17 @@
 add_subdirectory(deps/QtMockWebServer)
 set_target_properties(qtmockwebserver PROPERTIES FOLDER "Dependencies")
-add_subdirectory(deps/googlemock)
+set(INSTALL_GTEST OFF)
+set(gtest_force_shared_crt ON)
+add_subdirectory(deps/googletest)
+set_target_properties(gtest gtest_main PROPERTIES FOLDER "Dependencies")
+set_target_properties(gmock gmock_main PROPERTIES FOLDER "Dependencies")
 
 # set all include directories for in and out of source builds
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/QtMockWebServer
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/googletest/googlemock/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -41,6 +46,7 @@ set(SILICA_TEST_COMMON_LINK_LIBRARIES
     silicacoreobjs
     silicaui
     qtmockwebserver
+    gmock_main
     Qt5::Test
 )
 add_library(silicatestcommon ${TEST_COMMON_SRCS})

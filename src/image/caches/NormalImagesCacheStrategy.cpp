@@ -10,6 +10,10 @@ int NormalImagesCacheStrategy::nextIndexToRemove(int insertedIndex)
     const QMap<int, QSharedPointer<ImageData>> &images =
         AbstractImagesCacheStrategy::cachedImages();
 
+    if (images.isEmpty()) {
+        return insertedIndex;
+    }
+
     int min = images.firstKey();
     int max = images.lastKey();
     int minDistance = qAbs(insertedIndex - min);

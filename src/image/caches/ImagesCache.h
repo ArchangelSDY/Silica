@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "AbstractImagesCacheStrategy.h"
-#include "Image.h"
+#include "../Image.h"
 
 class Navigator;
 
