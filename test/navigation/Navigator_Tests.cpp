@@ -19,12 +19,12 @@ public:
     MOCK_METHOD1(insertPlayListRecord, bool(PlayListRecord *playListRecord));
     MOCK_METHOD1(removePlayListRecord, bool(PlayListRecord *playListRecord));
     MOCK_METHOD1(updatePlayListRecord, bool(PlayListRecord *playListRecord));
-    MOCK_METHOD2(insertImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
+    MOCK_METHOD2(insertImagesForLocalPlayListProviderAsync, QFuture<bool>(const PlayListRecord &record, const ImageList &images));
     MOCK_METHOD2(removeImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
 
     MOCK_METHOD0(queryImagesCount, int());
     MOCK_METHOD1(insertImage, bool(Image *image));
-    MOCK_METHOD1(insertImagesAsync, void(const ImageList &images));
+    MOCK_METHOD1(insertImagesAsync, QFuture<bool>(const ImageList &images));
     MOCK_METHOD1(queryImageByHashStr, Image*(const QString &hashStr));
     MOCK_METHOD2(updateImageUrl, bool(const QUrl &oldUrl, const QUrl &newUrl));
 

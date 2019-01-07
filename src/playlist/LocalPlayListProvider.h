@@ -17,8 +17,6 @@ public:
     bool isImagesReadOnly() const;
     bool insertImages(const PlayListRecord &record, const ImageList &images);
     bool removeImages(const PlayListRecord &record, const ImageList &images);
-    void onPlayListRecordCreated(const PlayListRecord &record,
-                                 const ImageList &images);
 };
 
 #endif // LOCALPLAYLISTPROVIDER_H

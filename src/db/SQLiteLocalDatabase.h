@@ -21,14 +21,14 @@ public:
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);
-    bool insertImagesForLocalPlayListProvider(
+    QFuture<bool> insertImagesForLocalPlayListProviderAsync(
         const PlayListRecord &record, const ImageList &images);
     bool removeImagesForLocalPlayListProvider(
         const PlayListRecord &record, const ImageList &images);
 
     int queryImagesCount();
     bool insertImage(Image *image);
-    void insertImagesAsync(const ImageList &images);
+    QFuture<bool> insertImagesAsync(const ImageList &images);
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 
@@ -46,7 +46,6 @@ private:
     static const int PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET = 100;
 
     QSqlDatabase m_db;
-    QScopedPointer<SQLiteLocalDatabaseBackgroundWorker> m_worker;
 };
 
 #endif // SQLITELOCALDATABASE_H

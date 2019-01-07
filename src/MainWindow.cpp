@@ -16,6 +16,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QtConcurrent>
+#include <asyncfuture.h>
 
 #include "db/LocalDatabase.h"
 #include "image/caches/ImagesCache.h"
@@ -641,19 +642,27 @@ void MainWindow::promptToSaveLocalPlayList()
 
     QString name = dialog.textValue();
     if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
+        QSharedPointer<PlayList> playList = m_navigator->playList();
         PlayListRecordBuilder plrBuilder;
         plrBuilder
             .setName(name)
             .setCoverPath(image->thumbnailPath())
-            .setPlayList(m_navigator->playList())
+            .setPlayList(playList)
             .setType(LocalPlayListProviderFactory::TYPE);
         PlayListRecord *record = plrBuilder.obtain();
         if (record->save()) {
-            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
-                                     2000);
+            QFuture<bool> ret = LocalDatabase::instance()->insertImagesForLocalPlayListProviderAsync(*record, playList->toImageList());
+            AsyncFuture::observe(ret).subscribe([this, name](bool ok) {
+                if (ok) {
+                    this->statusBar()->showMessage(QString("PlayList %1 saved!").arg(name), 2000);
 
-            // Refresh playlist gallery
-            loadSavedPlayLists();
+                    // Refresh playlist gallery
+                    this->loadSavedPlayLists();
+                } else {
+                    this->statusBar()->showMessage(
+                        QString("Failed to associate images to playList %1!").arg(name), 2000);
+                }
+            });
         } else {
             statusBar()->showMessage(
                 QString("Failed to save playList %1!").arg(name), 2000);

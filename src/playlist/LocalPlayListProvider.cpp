@@ -43,7 +43,7 @@ bool LocalPlayListProvider::isImagesReadOnly() const
 bool LocalPlayListProvider::insertImages(const PlayListRecord &record,
                                          const ImageList &images)
 {
-    return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
+    return LocalDatabase::instance()->insertImagesForLocalPlayListProviderAsync(
         record, images);
 }
 
@@ -51,12 +51,5 @@ bool LocalPlayListProvider::removeImages(const PlayListRecord &record,
                                          const ImageList &images)
 {
     return LocalDatabase::instance()->removeImagesForLocalPlayListProvider(
-        record, images);
-}
-
-void LocalPlayListProvider::onPlayListRecordCreated(
-        const PlayListRecord &record, const ImageList &images)
-{
-    LocalDatabase::instance()->insertImagesForLocalPlayListProvider(
         record, images);
 }

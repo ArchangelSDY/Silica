@@ -29,9 +29,6 @@ public:
     virtual bool removeImages(const PlayListRecord &record,
                               const ImageList &images) { return false; }
 
-    virtual void onPlayListRecordCreated(const PlayListRecord &record,
-                                       const ImageList &images) {}
-
 signals:
     void gotItems(const QList<QUrl> &urls,
                   const QList<QVariantHash> &extraInfos);

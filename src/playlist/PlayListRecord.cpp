@@ -91,11 +91,6 @@ bool PlayListRecord::save()
     bool ok = false;
     if (m_id == PlayListRecord::EMPTY_ID) {
         ok = LocalDatabase::instance()->insertPlayListRecord(this);
-
-        // Notify provider
-        if (m_playList && m_provider && !m_provider->isImagesReadOnly()) {
-            m_provider->onPlayListRecordCreated(*this, m_playList->toImageList());
-        }
     } else {
         ok = LocalDatabase::instance()->updatePlayListRecord(this);
     }

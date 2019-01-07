@@ -1,5 +1,8 @@
 #include "SQLiteLocalDatabase.h"
 
+#include <QtConcurrent>
+#include <QUuid>
+
 #include "deps/QtDBMigration/src/QtDBMigration.h"
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
@@ -64,77 +67,21 @@ const char *SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION =
 const char *SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION =
         "select last_time_consumption from task_progresses where task_key = ?";
 
+#define OPEN_BACKGROUND_DATABASE(NAME) \
+    QString dbConnName = QStringLiteral(NAME) + QUuid::createUuid().toString(); \
+    { \
+        QSqlDatabase db = QSqlDatabase::cloneDatabase(m_db, dbConnName); \
+        if (!db.open()) { \
+            return false; \
+        }
 
-class SQLiteLocalDatabaseBackgroundWorker : public QThread
-{
-    Q_OBJECT
-public:
-    SQLiteLocalDatabaseBackgroundWorker(const QString &dbPath) :
-        m_dbPath(dbPath)
-    {
-    }
-
-protected:
-    void run();
-
-public slots:
-    void open();
-    void insertImages(const ImageList &images);
-
-private:
-    QString m_dbPath;
-    QSqlDatabase m_db;
-};
-
-void SQLiteLocalDatabaseBackgroundWorker::run()
-{
-    open();
-    QThread::run();
-}
-
-void SQLiteLocalDatabaseBackgroundWorker::open()
-{
-    m_db = QSqlDatabase::addDatabase("QSQLITE", "Background");
-    m_db.setDatabaseName(m_dbPath);
-    if (!m_db.open()) {
-        qWarning("Unable to open local database at background!");
-        return;
-    }
-
-    m_db.exec(SQL_ENABLE_FOREIGN_KEYS);
-}
-
-void SQLiteLocalDatabaseBackgroundWorker::insertImages(const ImageList &images)
-{
-    if (!m_db.isOpen()) {
-        return;
-    }
-
-    QSqlQuery q;
-    q.prepare(SQL_INSERT_IMAGE);
-
-    QVariantList hashes;
-    QVariantList names;
-    QVariantList urls;
-
-    for (const ImagePtr &image : images) {
-        hashes << image->source()->hashStr();
-        names << image->name();
-        urls << image->source()->url().toString();
-    }
-    q.addBindValue(hashes);
-    q.addBindValue(names);
-    q.addBindValue(urls);
-
-    if (!q.execBatch()) {
-        qWarning() << q.lastError() << q.lastQuery();
-    }
-}
+#define CLOSE_BACKGROUND_DATABASE \
+    } \
+    QSqlDatabase::removeDatabase(dbConnName);
 
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
     QString dbPath = GlobalConfig::instance()->localDatabasePath();
-
     m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(dbPath);
     if (!m_db.open()) {
@@ -142,9 +89,6 @@ SQLiteLocalDatabase::SQLiteLocalDatabase()
         return;
     }
     m_db.exec(SQL_ENABLE_FOREIGN_KEYS);
-
-    m_worker.reset(new SQLiteLocalDatabaseBackgroundWorker(dbPath));
-    m_worker->start();
 }
 
 bool SQLiteLocalDatabase::migrate()
@@ -255,32 +199,40 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
     return q.exec();
 }
 
-bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
+QFuture<bool> SQLiteLocalDatabase::insertImagesForLocalPlayListProviderAsync(
     const PlayListRecord &record, const ImageList &images)
 {
     // Insert images
     insertImagesAsync(images);
 
-    // Insert relationship records
     int playListId = record.id();
-    QSqlQuery q;
-    q.prepare(SQL_INSERT_PLAYLIST_IMAGES);
+    return QtConcurrent::run([m_db = m_db, playListId, images]() -> bool {
+        bool ret = false;
 
-    QVariantList playListIds;
-    QVariantList imageHashes;
-    for (ImagePtr image : images) {
-        playListIds << playListId;
-        imageHashes << image->source()->hashStr();
-    }
-    q.addBindValue(playListIds);
-    q.addBindValue(imageHashes);
+        OPEN_BACKGROUND_DATABASE("insertImagesForLocalPlayListProviderAsync")
 
-    if (!q.execBatch()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
-    }
+        // Insert relationship records
+        QSqlQuery q(db);
+        q.prepare(SQL_INSERT_PLAYLIST_IMAGES);
 
-    return true;
+        QVariantList playListIds;
+        QVariantList imageHashes;
+        for (ImagePtr image : images) {
+            playListIds << playListId;
+            imageHashes << image->source()->hashStr();
+        }
+        q.addBindValue(playListIds);
+        q.addBindValue(imageHashes);
+
+        ret = q.execBatch();
+        if (!ret) {
+            qWarning() << q.lastError() << q.lastQuery();
+        }
+
+        CLOSE_BACKGROUND_DATABASE
+
+        return ret;
+    });
 }
 
 bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
@@ -345,13 +297,42 @@ bool SQLiteLocalDatabase::insertImage(Image *image)
     return true;
 }
 
-void SQLiteLocalDatabase::insertImagesAsync(const ImageList &images)
+QFuture<bool> SQLiteLocalDatabase::insertImagesAsync(const ImageList &images)
 {
-    if (images.isEmpty()) {
-        return;
-    }
+    return QtConcurrent::run([m_db = m_db, images]() -> bool {
+        if (images.isEmpty()) {
+            return true;
+        }
 
-    QMetaObject::invokeMethod(m_worker.data(), "insertImages", Q_ARG(const ImageList &, images));
+        bool ret = false;
+
+        OPEN_BACKGROUND_DATABASE("insertImagesAsync")
+
+        QSqlQuery q(db);
+        q.prepare(SQL_INSERT_IMAGE);
+
+        QVariantList hashes;
+        QVariantList names;
+        QVariantList urls;
+
+        for (const ImagePtr &image : images) {
+            hashes << image->source()->hashStr();
+            names << image->name();
+            urls << image->source()->url().toString();
+        }
+        q.addBindValue(hashes);
+        q.addBindValue(names);
+        q.addBindValue(urls);
+
+        ret = q.execBatch();
+        if (!ret) {
+            qWarning() << q.lastError() << q.lastQuery();
+        }
+
+        CLOSE_BACKGROUND_DATABASE
+
+        return ret;
+    });
 }
 
 Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
@@ -513,5 +494,3 @@ qint64 SQLiteLocalDatabase::queryTaskProgressTimeConsumption(const QString &key)
 
     return 0;
 }
-
-#include "SQLiteLocalDatabase.moc"
