@@ -1,5 +1,7 @@
 #include "BasketView.h"
 
+#include <QtConcurrent>
+
 #include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 
@@ -51,7 +53,9 @@ void BasketView::appendToNavigator()
         // Sync with record if any
         PlayListRecord *record = navPl->record();
         if (record) {
-            record->insertImages(m_playList->toImageList());
+            QtConcurrent::run([record, playList = m_playList]() {
+                record->insertImages(playList->toImageList());
+            });
         }
     }
     m_playList->clear();

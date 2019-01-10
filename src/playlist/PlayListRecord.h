@@ -40,7 +40,7 @@ public:
     QVariantHash providerExtra() const;
     bool save();
     bool remove();
-    bool removeImage(ImagePtr image);
+    bool removeImages(const ImageList &images);
     bool insertImages(const ImageList &images);
 
     void continueProvide();

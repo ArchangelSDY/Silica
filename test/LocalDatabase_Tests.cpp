@@ -1,3 +1,4 @@
+#include <QScopedPointer>
 #include <QtSql>
 #include <QTest>
 
@@ -35,14 +36,15 @@ void TestLocalDatabase::initTestCase()
 {
     STestCase::initTestCase();
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
-    db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
-    db.open();
-    db.exec("delete from playlists");
-    db.exec("delete from playlist_images");
-    db.exec("delete from images");
-    db.exec("delete from plugin_playlist_providers");
-    db.close();
+    {
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "TestLocalDatabase");
+        db.setDatabaseName(GlobalConfig::instance()->localDatabasePath());
+        db.open();
+        db.exec("delete from playlists");
+        db.exec("delete from playlist_images");
+        db.exec("delete from images");
+        db.exec("delete from plugin_playlist_providers");
+    }
     QSqlDatabase::removeDatabase("TestLocalDatabase");
 }
 
@@ -63,12 +65,15 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
         .setCoverPath("/cover/path.png")
         .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
-    PlayListRecord *record = plrBuilder.obtain();
+    QScopedPointer<PlayListRecord> record(plrBuilder.obtain());
 
     int beforeCount = LocalDatabase::instance()->queryPlayListRecords().count();
 
     bool ret = record->save();
     QVERIFY(ret);
+
+    QVERIFY(LocalDatabase::instance()->insertImages(pl->toImageList()));
+    QVERIFY(LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, pl->toImageList()));
 
     QList<PlayListRecord *> records = PlayListRecord::all();
     QCOMPARE(records.count(), beforeCount + 1);
@@ -79,7 +84,6 @@ void TestLocalDatabase::localPlayListsSaveAndLoad()
     QCOMPARE(savedRecord->playList()->count(), pl->count());
 
     qDeleteAll(records.begin(), records.end());
-    delete record;
 }
 
 void TestLocalDatabase::localPlayListsSaveAndLoad_data()
@@ -190,17 +194,21 @@ void TestLocalDatabase::insertImagesToPlayList()
         .setCoverPath("")
         .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
-    PlayListRecord *record = plrBuilder.obtain();
+    QScopedPointer<PlayListRecord> record(plrBuilder.obtain());
     record->save();
     int rid = record->id();
 
     QVERIFY2(record->isSaved(), "PlayListRecord should be saved.");
     QCOMPARE(record->playList()->count(), 1);
 
+    QVERIFY(LocalDatabase::instance()->insertImages(pl->toImageList()));
+    QVERIFY(LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, pl->toImageList()));
+
     ImageList images;
     images << imageB;
     record->insertImages(images);
-    delete record;
+    QVERIFY(LocalDatabase::instance()->insertImages(images));
+    QVERIFY(LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, images));
 
     PlayListRecordBuilder plrBuilder2;
     plrBuilder2
@@ -208,12 +216,10 @@ void TestLocalDatabase::insertImagesToPlayList()
         .setCoverPath("")
         .setId(rid)
         .setType(LocalPlayListProviderFactory::TYPE);
-    PlayListRecord *record2 = plrBuilder2.obtain();
+    QScopedPointer<PlayListRecord> record2(plrBuilder2.obtain());
 
     QSharedPointer<PlayList> spl = record2->playList();
     QCOMPARE(spl->count(), 2);
-
-    delete record2;
 }
 
 void TestLocalDatabase::removeImagesFromPlayList()
@@ -228,15 +234,19 @@ void TestLocalDatabase::removeImagesFromPlayList()
         .setCoverPath("")
         .setPlayList(pl)
         .setType(LocalPlayListProviderFactory::TYPE);
-    PlayListRecord *record = plrBuilder.obtain();
+    QScopedPointer<PlayListRecord> record(plrBuilder.obtain());
     record->save();
     int rid = record->id();
 
     QVERIFY2(record->isSaved(), "PlayListRecord should be saved.");
     QCOMPARE(record->playList()->count(), 2);
 
-    QVERIFY(record->removeImage(imageB));
-    delete record;
+    QVERIFY(LocalDatabase::instance()->insertImages(pl->toImageList()));
+    QVERIFY(LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, pl->toImageList()));
+
+    ImageList l; l << imageB;
+    QVERIFY(record->removeImages(l));
+    QVERIFY(LocalDatabase::instance()->removeImagesForLocalPlayListProvider(*record, l));
 
     PlayListRecordBuilder plrBuilder2;
     plrBuilder2

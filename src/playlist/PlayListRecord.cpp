@@ -109,14 +109,11 @@ void PlayListRecord::flushPlayList()
     m_playList.reset();
 }
 
-bool PlayListRecord::removeImage(ImagePtr image)
+bool PlayListRecord::removeImages(const ImageList &images)
 {
     if (!m_provider || m_provider->isImagesReadOnly()){
         return false;
     }
-
-    ImageList images;
-    images << image;
 
     bool ret = m_provider->removeImages(*this, images);
 

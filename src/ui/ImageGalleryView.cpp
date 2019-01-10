@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QRunnable>
 #include <QThreadPool>
+#include <QtConcurrent>
 
 #include "image/metadata/ImageMetadataConstants.h"
 #include "playlist/group/PlayListImageMetadataGrouper.h"
@@ -215,18 +216,22 @@ void ImageGalleryView::removeSelected()
     QString msg = tr("Remove %1 images?").arg(selectedItems.count());
     if (QMessageBox::question(
             this, tr("Images Remove"), msg) == QMessageBox::Yes) {
+        ImageList toRemoves;
         foreach (GalleryItem *item, selectedItems) {
             ImageGalleryItem *galleryItem =
                 static_cast<ImageGalleryItem *>(item);
             ImagePtr toRemove = galleryItem->image();
 
+            toRemoves << toRemove;
             m_playList->removeOne(toRemove);
+        }
 
-            // Sync to record if any
-            PlayListRecord *record = m_playList->record();
-            if (record) {
-                record->removeImage(toRemove);
-            }
+        // Sync to record if any
+        PlayListRecord *record = m_playList->record();
+        if (record && !toRemoves.isEmpty()) {
+            QtConcurrent::run([record, toRemoves]() {
+                record->removeImages(toRemoves);
+            });
         }
     }
 }

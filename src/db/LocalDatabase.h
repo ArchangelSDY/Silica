@@ -22,14 +22,14 @@ public:
     virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool removePlayListRecord(PlayListRecord *playListRecord) = 0;
     virtual bool updatePlayListRecord(PlayListRecord *playListRecord) = 0;
-    virtual QFuture<bool> insertImagesForLocalPlayListProviderAsync(
+    virtual bool insertImagesForLocalPlayListProvider(
         const PlayListRecord &record, const ImageList &images) = 0;
     virtual bool removeImagesForLocalPlayListProvider(
         const PlayListRecord &record, const ImageList &images) = 0;
 
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;
-    virtual QFuture<bool> insertImagesAsync(const ImageList &images) = 0;
+    virtual bool insertImages(const ImageList &images) = 0;
     virtual Image *queryImageByHashStr(const QString &hashStr) = 0;
     virtual bool updateImageUrl(const QUrl &oldUrl,
                                 const QUrl &newUrl) = 0;

@@ -44,4 +44,3 @@ void PlayListProviderDelegate::request(const QString &name,
 }
 
 }
-

@@ -5,6 +5,7 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFutureWatcher>
 #include <QGraphicsPixmapItem>
 #include <QGridLayout>
 #include <QInputDialog>
@@ -16,7 +17,6 @@
 #include <QStatusBar>
 #include <QToolBar>
 #include <QtConcurrent>
-#include <asyncfuture.h>
 
 #include "db/LocalDatabase.h"
 #include "image/caches/ImagesCache.h"
@@ -499,14 +499,17 @@ void MainWindow::loadSelectedPath()
         }
 
         // Sort can be slow so put it into background
-        QtConcurrent::run([=]() {
+        QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+        connect(watcher, &QFutureWatcher<void>::finished, this, [this, pl, watcher]() {
+            this->setPrimaryNavigatorPlayList(pl);
+            watcher->deleteLater();
+        });
+        watcher->setFuture(QtConcurrent::run([shouldSortByName, pl]() {
             if (shouldSortByName) {
                 PlayListImageUrlSorter sorter;
                 pl->sortBy(&sorter);
             }
-
-            m_navigator->setPlayList(pl);
-        });
+        }));
     }
 }
 
@@ -649,11 +652,12 @@ void MainWindow::promptToSaveLocalPlayList()
             .setCoverPath(image->thumbnailPath())
             .setPlayList(playList)
             .setType(LocalPlayListProviderFactory::TYPE);
-        PlayListRecord *record = plrBuilder.obtain();
+        QSharedPointer<PlayListRecord> record(plrBuilder.obtain());
         if (record->save()) {
-            QFuture<bool> ret = LocalDatabase::instance()->insertImagesForLocalPlayListProviderAsync(*record, playList->toImageList());
-            AsyncFuture::observe(ret).subscribe([this, name](bool ok) {
-                if (ok) {
+            ImageList images = playList->toImageList();
+            QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>();
+            connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, name]() {
+                if (watcher->result()) {
                     this->statusBar()->showMessage(QString("PlayList %1 saved!").arg(name), 2000);
 
                     // Refresh playlist gallery
@@ -662,12 +666,18 @@ void MainWindow::promptToSaveLocalPlayList()
                     this->statusBar()->showMessage(
                         QString("Failed to associate images to playList %1!").arg(name), 2000);
                 }
+                watcher->deleteLater();
             });
+            watcher->setFuture(QtConcurrent::run([images, record]() {
+                if (!LocalDatabase::instance()->insertImages(images)) {
+                    return false;
+                }
+                return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, images);
+            }));
         } else {
             statusBar()->showMessage(
                 QString("Failed to save playList %1!").arg(name), 2000);
         }
-        delete record;
     }
 }
 

@@ -21,14 +21,14 @@ public:
     bool insertPlayListRecord(PlayListRecord *playListRecord);
     bool removePlayListRecord(PlayListRecord *playListRecord);
     bool updatePlayListRecord(PlayListRecord *playListRecord);
-    QFuture<bool> insertImagesForLocalPlayListProviderAsync(
+    bool insertImagesForLocalPlayListProvider(
         const PlayListRecord &record, const ImageList &images);
     bool removeImagesForLocalPlayListProvider(
         const PlayListRecord &record, const ImageList &images);
 
     int queryImagesCount();
     bool insertImage(Image *image);
-    QFuture<bool> insertImagesAsync(const ImageList &images);
+    bool insertImages(const ImageList &images);
     Image *queryImageByHashStr(const QString &hashStr);
     bool updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl);
 

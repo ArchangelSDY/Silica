@@ -79,8 +79,6 @@ void Navigator::setPlayList(QSharedPointer<PlayList> playList)
     connect(m_playList.data(), &PlayList::itemsAppended, this, &Navigator::playListAppended);
     emit playListChange(m_playList);
 
-    m_db->insertImagesAsync(playList->toImageList());
-
     goIndex(0);
 
     if (m_player) {
@@ -98,8 +96,6 @@ void Navigator::playListAppended(int start)
     if (shouldGoFirst) {
         goIndex(0);
     }
-
-    m_db->insertImagesAsync(m_playList->mid(start));
 }
 
 void Navigator::reloadPlayList()
@@ -326,6 +322,7 @@ void Navigator::imageLoaded(QSharedPointer<ImageData> imageData)
 void Navigator::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
     Image *image = static_cast<Image*>(QObject::sender());
+    m_db->insertImage(image);
     if (image && image == m_currentImage && !thumbnail->isNull()) {
         emit paintThumbnail(thumbnail);
     }

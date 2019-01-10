@@ -1,5 +1,6 @@
 #include <QSignalSpy>
 #include <QTest>
+#include <QThreadPool>
 #include <gmock/gmock.h>
 
 #include "STestCase.h"
@@ -19,12 +20,12 @@ public:
     MOCK_METHOD1(insertPlayListRecord, bool(PlayListRecord *playListRecord));
     MOCK_METHOD1(removePlayListRecord, bool(PlayListRecord *playListRecord));
     MOCK_METHOD1(updatePlayListRecord, bool(PlayListRecord *playListRecord));
-    MOCK_METHOD2(insertImagesForLocalPlayListProviderAsync, QFuture<bool>(const PlayListRecord &record, const ImageList &images));
+    MOCK_METHOD2(insertImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
     MOCK_METHOD2(removeImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
 
     MOCK_METHOD0(queryImagesCount, int());
     MOCK_METHOD1(insertImage, bool(Image *image));
-    MOCK_METHOD1(insertImagesAsync, QFuture<bool>(const ImageList &images));
+    MOCK_METHOD1(insertImages, bool(const ImageList &images));
     MOCK_METHOD1(queryImageByHashStr, Image*(const QString &hashStr));
     MOCK_METHOD2(updateImageUrl, bool(const QUrl &oldUrl, const QUrl &newUrl));
 
@@ -48,17 +49,20 @@ private slots:
 void TestNavigator::setPlayList()
 {
     MockLocalDatabase db;
-    EXPECT_CALL(db, insertImagesAsync(::testing::SizeIs(1))).Times(1);
+    EXPECT_CALL(db, insertImage(::testing::Property(&Image::size, ::testing::Eq(QSize(109, 109))))).Times(1);
 
     QSharedPointer<ImagesCache> cache = QSharedPointer<ImagesCache>::create(0);
     Navigator navigator(cache, &db);
 
     QSignalSpy playListChangeSpy(&navigator, &Navigator::playListChange);
+    QSignalSpy thumbnailSpy(&navigator, &Navigator::paintThumbnail);
 
     QSharedPointer<PlayList> pl = QSharedPointer<PlayList>::create(QStringList{ QStringLiteral(":/assets/me.jpg") });
     navigator.setPlayList(pl);
 
     QCOMPARE(playListChangeSpy.takeFirst().takeFirst().value<QSharedPointer<PlayList>>(), pl);
+    QVERIFY(thumbnailSpy.wait());
+    QCOMPARE(thumbnailSpy.count(), 1);
 }
 
 int main(int argc, char *argv[])

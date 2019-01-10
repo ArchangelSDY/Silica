@@ -45,7 +45,6 @@ include_directories(${Qt5Sql_INCLUDE_DIRS})
 include_directories(${Qt5Test_INCLUDE_DIRS})
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/asyncfuture)
 
 # All build libraries are moved to this directory
 # SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
