@@ -22,8 +22,7 @@ Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, LocalDatabase *db,
     m_cachedImages(imagesCache) ,
     m_playList(0) ,
     m_db(db) ,
-    m_player(nullptr) ,
-    m_basket(new PlayList())
+    m_player(nullptr)
 {
     m_autoNavigationTimer.setInterval(Navigator::MEDIUM_AUTO_NAVIGATION_INTERVAL);
     connect(&m_autoNavigationTimer, SIGNAL(timeout()),

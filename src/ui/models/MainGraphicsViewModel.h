@@ -17,6 +17,7 @@ class QResizeEvent;
 class QShowEvent;
 class QWheelEvent;
 
+class BasketModel;
 class ImageEffectManager;
 class Navigator;
 class RankVoteView;
@@ -52,7 +53,7 @@ public:
         MainGraphicsViewModel *m_model;
     };
 
-    explicit MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager);
+    explicit MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager, BasketModel *basket);
     ~MainGraphicsViewModel();
 
     View *view() const;
@@ -94,6 +95,7 @@ private:
     View *m_view;
     Navigator *m_navigator;
     ImageEffectManager *m_imageEffectManager;
+    BasketModel *m_basket;
     QSharedPointer<ImageData> m_image;
     QSharedPointer<QImage> m_thumbnail;
     bool m_shouldRepaintThumbnailOnShown;

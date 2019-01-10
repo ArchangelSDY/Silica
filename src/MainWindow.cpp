@@ -79,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->gallery->setPlayList(m_navigator->playList());
 
     // Side view
-    m_sideViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data()));
+    m_sideViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data(), nullptr));
     m_sideViewModel->setView(ui->sideView);
     ui->sideView->setModel(m_sideViewModel.data());
 
@@ -161,7 +161,7 @@ void MainWindow::setupExtraUi()
 
     // Main graphics view
     ui->graphicsView->deleteLater();
-    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data()));
+    m_mainGraphicsViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data(), &m_basket));
     createMainImageView(&ui->graphicsView, ui->pageImageView, m_mainGraphicsViewModel.data());
 
     ui->pageImageViewLayout->setSpacing(0);
@@ -332,12 +332,8 @@ void MainWindow::setupExtraUi()
     ui->basketPane->layout()->setSpacing(0);
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
     ui->basketView->setNavigator(m_navigator);
-    ui->basketView->setPlayList(m_navigator->basket());
-    connect(m_navigator->basket().data(), SIGNAL(itemsAppended(int)),
-            ui->basketView, SLOT(playListAppend(int)));
-    connect(m_navigator->basket().data(), &PlayList::itemsChanged, [basketView = ui->basketView, basket = m_navigator->basket()]() {
-        basketView->playListChange(basket);
-    });
+    ui->basketView->setBasketModel(&m_basket);
+    ui->gallery->setBasketModel(&m_basket);
 
     // Init image source manager client
     ImageSourceManager::instance()->setClient(
@@ -1111,8 +1107,8 @@ void MainWindow::toggleSecondaryNavigator()
         // Create view at the first time
         Q_ASSERT(willEnable);
 
-        m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel(m_secondaryNavigator.data(),
-                                                                         m_imageEffectManager.data()));
+        m_secondaryMainGraphicsViewModel.reset(new MainGraphicsViewModel(
+            m_secondaryNavigator.data(), m_imageEffectManager.data(), nullptr));
         connect(m_secondaryMainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
                 m_actToolBarGallery, SLOT(trigger()));
 

@@ -28,7 +28,6 @@ protected slots:
     void sortBySize();
 
     void setAsCover();
-    void addToBasket();
     void removeSelected();
     void refreshSelected();
 

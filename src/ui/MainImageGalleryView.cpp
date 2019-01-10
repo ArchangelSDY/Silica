@@ -2,9 +2,18 @@
 
 #include <QKeyEvent>
 
+#include "models/BasketModel.h"
+#include "ImageGalleryItem.h"
+
 MainImageGalleryView::MainImageGalleryView(QWidget *parent) :
-    ImageGalleryView(parent)
+    ImageGalleryView(parent) ,
+    m_basket(nullptr)
 {
+}
+
+void MainImageGalleryView::setBasketModel(BasketModel *basket)
+{
+    m_basket = basket;
 }
 
 void MainImageGalleryView::keyPressEvent(QKeyEvent *event)
@@ -28,4 +37,16 @@ QMenu *MainImageGalleryView::createContextMenu()
     }
 
     return menu;
+}
+
+void MainImageGalleryView::addToBasket()
+{
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    for (int i = 0; i < selectedItems.count(); ++i) {
+        ImageGalleryItem *item =
+            static_cast<ImageGalleryItem *>(selectedItems[i]);
+
+        ImagePtr image = item->image();
+        m_basket->add(image);
+    }
 }

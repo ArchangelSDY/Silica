@@ -197,18 +197,6 @@ void ImageGalleryView::setAsCover()
     }
 }
 
-void ImageGalleryView::addToBasket()
-{
-    QList<GalleryItem *> selectedItems = selectedGalleryItems();
-    for (int i = 0; i < selectedItems.count(); ++i) {
-        ImageGalleryItem *item =
-            static_cast<ImageGalleryItem *>(selectedItems[i]);
-
-        ImagePtr image = item->image();
-        *(m_navigator->basket()) << image;
-    }
-}
-
 void ImageGalleryView::removeSelected()
 {
     QList<GalleryItem *> selectedItems = selectedGalleryItems();

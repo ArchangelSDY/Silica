@@ -2,11 +2,13 @@
 
 #include <QtConcurrent>
 
+#include "models/BasketModel.h"
 #include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 
 BasketView::BasketView(QWidget *parent) :
-    ImageGalleryView(parent)
+    ImageGalleryView(parent) ,
+    m_basket(nullptr)
 {
     QPalette pal;
     pal.setBrush(QPalette::Foreground, QColor("#71929E"));
@@ -16,19 +18,32 @@ BasketView::BasketView(QWidget *parent) :
     m_view->setLineWidth(0);
 }
 
+void BasketView::setBasketModel(BasketModel *basket)
+{
+    Q_ASSERT_X(m_basket == nullptr, "BasketView::setBasketModel", "Basket model should only been set once");
+
+    m_basket = basket;
+    setPlayList(m_basket->playList());
+    connect(m_playList.data(), SIGNAL(itemsAppended(int)),
+            this, SLOT(playListAppend(int)));
+    connect(m_playList.data(), &PlayList::itemsChanged, [this]() {
+        this->playListChange(this->m_playList);
+    });
+}
+
 QMenu *BasketView::createContextMenu()
 {
     QMenu *menu = ImageGalleryView::createContextMenu();
 
     QAction *actExport = menu->addAction(
         tr("Export To Navigator"), this, SLOT(exportToNavigator()));
-    if (!m_playList || m_playList->count() == 0) {
+    if (m_playList->count() == 0) {
         actExport->setDisabled(true);
     }
 
     QAction *actAppend = menu->addAction(
         tr("Append To Navigator"), this, SLOT(appendToNavigator()));
-    if (!m_playList || m_playList->count() == 0) {
+    if (m_playList->count() == 0) {
         actAppend->setDisabled(true);
     }
 
@@ -38,26 +53,27 @@ QMenu *BasketView::createContextMenu()
 void BasketView::exportToNavigator()
 {
     QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
-    dupPl->append(m_playList);
+    dupPl->append(m_basket->playList());
     // TODO: Propagate to Main Window?
     m_navigator->setPlayList(dupPl);
-    m_playList->clear();
+    m_basket->clear();
 }
 
 void BasketView::appendToNavigator()
 {
     QSharedPointer<PlayList> navPl = m_navigator->playList();
-    if (navPl && m_playList) {
-        navPl->append(m_playList);
+    QSharedPointer<PlayList> basketPl = m_basket->playList();
+    if (navPl) {
+        navPl->append(basketPl);
 
         // Sync with record if any
         PlayListRecord *record = navPl->record();
         if (record) {
-            ImageList images = m_playList->toImageList();
+            ImageList images = basketPl->toImageList();
             QtConcurrent::run([record, images]() {
                 record->insertImages(images);
             });
         }
     }
-    m_playList->clear();
+    m_basket->clear();
 }

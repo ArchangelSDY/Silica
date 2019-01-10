@@ -54,8 +54,6 @@ public:
     void setPlayer(AbstractNavigationPlayer *player);
     AbstractNavigationPlayer *player() { return m_player.data(); }
 
-    QSharedPointer<PlayList> basket() { return m_basket; }
-
 signals:
     void paint(QSharedPointer<ImageData> image);
     void paintThumbnail(QSharedPointer<QImage> thumbnail);
@@ -116,8 +114,6 @@ private:
     QTimer m_autoNavigationTimer;
 
     QScopedPointer<AbstractNavigationPlayer> m_player;
-
-    QSharedPointer<PlayList> m_basket;
 };
 
 #endif // NAVIGATOR_H

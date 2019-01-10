@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QScopedPointer>
 
+#include "models/BasketModel.h"
 #include "navigation/NavigatorSynchronizer.h"
 #include "ui/gamepad/GamepadController.h"
 #include "Navigator.h"
@@ -86,6 +87,8 @@ private:
     NavigatorSynchronizer m_navigatorSynchronizer;
 
     QScopedPointer<MainGraphicsViewModel> m_sideViewModel;
+
+    BasketModel m_basket;
 
     // TODO: Separate toolbar logic out
     QToolBar *m_toolBar;

@@ -91,6 +91,7 @@ file(GLOB CORE_SRCS
     "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"
     "sapi/SharerPluginDelegate.cpp"
+    "ui/models/BasketModel.cpp"
     "ui/models/MainGraphicsViewModel.cpp"
     "ui/models/TaskProgress.cpp"
     "util/CvUtils.cpp"

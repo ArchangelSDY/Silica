@@ -6,16 +6,18 @@
 
 #include "image/effects/ImageEffectManager.h"
 #include "share/SharerManager.h"
+#include "ui/models/BasketModel.h"
 #include "ui/RankVoteView.h"
 #include "ui/RemoteWallpapersManager.h"
 #include "Navigator.h"
 
 static const double SCALE_FACTOR = 0.05;
 
-MainGraphicsViewModel::MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager) :
+MainGraphicsViewModel::MainGraphicsViewModel(Navigator *navigator, ImageEffectManager *imageEffectManager, BasketModel *basket) :
     m_view(0) ,
     m_navigator(navigator) ,
     m_imageEffectManager(imageEffectManager) ,
+    m_basket(basket) ,
     m_image(0) ,
     m_shouldRepaintThumbnailOnShown(false) ,
     m_fitInView(Fit),
@@ -184,8 +186,8 @@ void MainGraphicsViewModel::keyPressEvent(QKeyEvent *event)
     }
 
     // Press 'Shift + B' to add current image to basket
-    if (event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_B) {
-        m_navigator->basket()->append(m_navigator->currentImage());
+    if (m_basket && event->modifiers() & Qt::ShiftModifier && event->key() == Qt::Key_B) {
+        m_basket->add(m_navigator->currentImage());
         event->accept();
         return;
     }
