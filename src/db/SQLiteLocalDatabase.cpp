@@ -210,6 +210,10 @@ bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
 bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
     const PlayListRecord &record, const ImageList &images)
 {
+    if (images.isEmpty()) {
+        return true;
+    }
+
     bool ret = false;
 
     OPEN_BACKGROUND_DATABASE("insertImagesForLocalPlayListProviderAsync")
@@ -240,6 +244,10 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
 bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
     const PlayListRecord &record, const ImageList &images)
 {
+    if (images.isEmpty()) {
+        return true;
+    }
+
     bool ret = false;
 
     OPEN_BACKGROUND_DATABASE("insertImagesForLocalPlayListProviderAsync")

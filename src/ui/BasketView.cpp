@@ -53,8 +53,9 @@ void BasketView::appendToNavigator()
         // Sync with record if any
         PlayListRecord *record = navPl->record();
         if (record) {
-            QtConcurrent::run([record, playList = m_playList]() {
-                record->insertImages(playList->toImageList());
+            ImageList images = m_playList->toImageList();
+            QtConcurrent::run([record, images]() {
+                record->insertImages(images);
             });
         }
     }
