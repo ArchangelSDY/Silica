@@ -1,5 +1,6 @@
 #include <QDir>
 #include <QGraphicsScene>
+#include <QtConcurrent>
 
 #include "CompactImageRenderer.h"
 #include "CompactTitleRenderer.h"
@@ -19,6 +20,7 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
     createRenderer();
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
+    connect(&m_coverLoader, &QFutureWatcher<QImage>::finished, this, &PlayListGalleryItem::onThumbnailLoaded);
 }
 
 PlayListGalleryItem::~PlayListGalleryItem()
@@ -39,10 +41,18 @@ void PlayListGalleryItem::loadThumbnail()
 
     QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_record->coverPath();
-    QImage *thumbnail = new QImage(coverFullPath);
-    if (thumbnail->isNull()) {
-        thumbnail->load(":/res/playlist.png");
-    }
+    m_coverLoader.setFuture(QtConcurrent::run([coverFullPath]() -> QImage {
+        QImage thumbnail(coverFullPath);
+        if (thumbnail.isNull()) {
+            thumbnail.load(":/res/playlist.png");
+        }
+        return thumbnail;
+    }));
+}
+
+void PlayListGalleryItem::onThumbnailLoaded()
+{
+    QImage *thumbnail = new QImage(m_coverLoader.result());
 
     setThumbnail(thumbnail);
 

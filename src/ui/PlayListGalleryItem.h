@@ -1,6 +1,7 @@
 #ifndef PLAYLISTGALLERYITEM_H
 #define PLAYLISTGALLERYITEM_H
 
+#include <QFutureWatcher>
 #include <QGraphicsItem>
 
 #include "AbstractGalleryItemRenderer.h"
@@ -26,9 +27,11 @@ public:
 
 private slots:
     void loadThumbnail();
+    void onThumbnailLoaded();
 
 private:
     PlayListRecord *m_record;
+    QFutureWatcher<QImage> m_coverLoader;
 };
 
 #endif // PLAYLISTGALLERYITEM_H
