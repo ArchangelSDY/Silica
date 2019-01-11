@@ -2,6 +2,7 @@
 #define FILESYSTEMITEM_H
 
 #include <QFileInfo>
+#include <QFutureWatcher>
 
 #include "ui/GalleryItem.h"
 
@@ -13,7 +14,6 @@ class FileSystemItem : public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
-    friend class LoadRunnable;
 public:
     explicit FileSystemItem(const QString &path,
                             AbstractRendererFactory *rendererFactory,
@@ -31,9 +31,7 @@ public:
     void removeOnDisk();
 
 private slots:
-    void markIsDefaultFolderCover(bool isDefault);
-    void gotThumbnail(QSharedPointer<QImage> image);
-    void loadCover(QSharedPointer<ImageSource> imageSource);
+    void loaded();
     void coverThumbnailLoaded(QSharedPointer<QImage> thumbnail);
     void coverThumbnailLoadFailed();
 
@@ -41,11 +39,22 @@ private:
     static QThreadPool *threadPool();
     static QThreadPool *s_threadPool;
 
+    void markIsDefaultFolderCover(bool isDefault);
+
+    struct LoadResult
+    {
+        QSharedPointer<ImageSource> coverImageSource;
+        QSharedPointer<QImage> image;
+        bool useDefaultFolderCover = false;
+    };
+
     QString coverCacheKey() const;
 
     QFileInfo m_pathInfo;
     QScopedPointer<Image, QScopedPointerDeleteLater> m_coverImage;
     bool m_useDefaultFolderCover;
+
+    QFutureWatcher<LoadResult> m_loader;
 };
 
 #endif // FILESYSTEMITEM_H
