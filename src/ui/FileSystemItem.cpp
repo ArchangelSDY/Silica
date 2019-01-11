@@ -52,7 +52,7 @@ public:
     {
         QString thumbnailPath = computeThumbnailPath(m_pathInfo);
         if (QFileInfo::exists(thumbnailPath)) {
-            QImage thumbnail(thumbnailPath);
+            QSharedPointer<QImage> thumbnail(new QImage(thumbnailPath));
             if (!isThumbnailExpired(thumbnail)) {
                 emit gotThumbnail(thumbnail);
                 return;
@@ -79,7 +79,7 @@ public:
             if (!found) {
                 // No suitable image found.
                 emit markIsDefaultFolderCover(true);
-                emit gotThumbnail(QImage(":/res/folder.png"));
+                emit gotThumbnail(QSharedPointer<QImage>::create(":/res/folder.png"));
             }
         } else {
             // Individual file
@@ -90,21 +90,21 @@ public:
                 emit loadCover(src);
             } else {
                 // Not valid image
-                emit gotThumbnail(QImage(":/res/image.png"));
+                emit gotThumbnail(QSharedPointer<QImage>::create(":/res/image.png"));
             }
         }
     }
 
 signals:
-    void gotThumbnail(const QImage &image);
+    void gotThumbnail(QSharedPointer<QImage> image);
     void markIsDefaultFolderCover(bool isDefault);
     void loadCover(QSharedPointer<ImageSource> imageSource);
 
 private:
 
-    bool isThumbnailExpired(const QImage &image) const
+    bool isThumbnailExpired(QSharedPointer<QImage> image) const
     {
-        QDateTime savedLastModified = QDateTime::fromString(image.text("lastModified"), Qt::DateFormat::ISODateWithMs);
+        QDateTime savedLastModified = QDateTime::fromString(image->text("lastModified"), Qt::DateFormat::ISODateWithMs);
         QDateTime curLastModified = m_pathInfo.lastModified();
 
         return savedLastModified != curLastModified;
@@ -197,22 +197,22 @@ void FileSystemItem::load()
     QImage *cover = g_coverCache[coverCacheKey()];
     if (cover) {
         markIsDefaultFolderCover(false);
-        gotThumbnail(*cover);
+        gotThumbnail(QSharedPointer<QImage>::create(*cover));
         return;
     }
 
     bool *isDefaultFolderCover = g_isDefaultFolderCover[coverCacheKey()];
     if (isDefaultFolderCover) {
         markIsDefaultFolderCover(true);
-        gotThumbnail(QImage(":/res/folder.png"));
+        gotThumbnail(QSharedPointer<QImage>::create(":/res/folder.png"));
         return;
     }
 
     LoadRunnable *r = new LoadRunnable(m_pathInfo);
     connect(r, SIGNAL(markIsDefaultFolderCover(bool)),
             this, SLOT(markIsDefaultFolderCover(bool)));
-    connect(r, SIGNAL(gotThumbnail(const QImage &)),
-            this, SLOT(gotThumbnail(const QImage &)));
+    connect(r, SIGNAL(gotThumbnail(QSharedPointer<QImage>)),
+            this, SLOT(gotThumbnail(QSharedPointer<QImage>)));
     connect(r, SIGNAL(loadCover(QSharedPointer<ImageSource>)),
             this, SLOT(loadCover(QSharedPointer<ImageSource>)));
     threadPool()->start(r);
@@ -229,9 +229,9 @@ void FileSystemItem::markIsDefaultFolderCover(bool isDefault)
     createRenderer();
 }
 
-void FileSystemItem::gotThumbnail(const QImage &image)
+void FileSystemItem::gotThumbnail(QSharedPointer<QImage> image)
 {
-    setThumbnail(new QImage(image));
+    setThumbnail(image);
 }
 
 void FileSystemItem::createRenderer()
@@ -253,7 +253,7 @@ void FileSystemItem::coverThumbnailLoaded(QSharedPointer<QImage> thumbnail)
 
     g_coverCache.insert(coverCacheKey(), coverImage);
 
-    setThumbnail(new QImage(*coverImage));
+    setThumbnail(QSharedPointer<QImage>::create(*coverImage));
     m_coverImage.reset();
 }
 
@@ -261,7 +261,7 @@ void FileSystemItem::coverThumbnailLoadFailed()
 {
     QImage *coverImage = new QImage(":/res/image.png");
     g_coverCache.insert(coverCacheKey(), coverImage);
-    setThumbnail(new QImage(*coverImage));
+    setThumbnail(QSharedPointer<QImage>::create(*coverImage));
     m_coverImage.reset();
 }
 

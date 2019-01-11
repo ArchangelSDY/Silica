@@ -20,7 +20,7 @@ PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
     createRenderer();
 
     connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
-    connect(&m_coverLoader, &QFutureWatcher<QImage>::finished, this, &PlayListGalleryItem::onThumbnailLoaded);
+    connect(&m_thumbnailLoader, &QFutureWatcher<QImage>::finished, this, &PlayListGalleryItem::onThumbnailLoaded);
 }
 
 PlayListGalleryItem::~PlayListGalleryItem()
@@ -41,10 +41,10 @@ void PlayListGalleryItem::loadThumbnail()
 
     QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_record->coverPath();
-    m_coverLoader.setFuture(QtConcurrent::run([coverFullPath]() -> QImage {
-        QImage thumbnail(coverFullPath);
-        if (thumbnail.isNull()) {
-            thumbnail.load(":/res/playlist.png");
+    m_thumbnailLoader.setFuture(QtConcurrent::run([coverFullPath]() -> QSharedPointer<QImage> {
+        QSharedPointer<QImage> thumbnail(new QImage(coverFullPath));
+        if (thumbnail->isNull()) {
+            thumbnail->load(":/res/playlist.png");
         }
         return thumbnail;
     }));
@@ -52,9 +52,7 @@ void PlayListGalleryItem::loadThumbnail()
 
 void PlayListGalleryItem::onThumbnailLoaded()
 {
-    QImage *thumbnail = new QImage(m_coverLoader.result());
-
-    setThumbnail(thumbnail);
+    setThumbnail(m_thumbnailLoader.result());
 
     // Replace with new render since cover image has changed
     createRenderer();

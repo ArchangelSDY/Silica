@@ -42,11 +42,10 @@ QRectF ImageGalleryItem::boundingRect() const
 
 void ImageGalleryItem::thumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
-    QImage *image = new QImage(*thumbnail);
-    setThumbnail(image);
+    setThumbnail(thumbnail);
 }
 
 void ImageGalleryItem::thumbnailLoadFailed()
 {
-    setThumbnail(new QImage());
+    setThumbnail(QSharedPointer<QImage>::create());
 }

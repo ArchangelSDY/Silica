@@ -75,7 +75,7 @@ static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> 
     return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
 }
 
-void GalleryItem::setThumbnail(QImage *thumbnail)
+void GalleryItem::setThumbnail(QSharedPointer<QImage> thumbnail)
 {
     if (thumbnail) {
         // Layout here first using original thumbnail size,
@@ -86,7 +86,7 @@ void GalleryItem::setThumbnail(QImage *thumbnail)
         auto scaleFuture = QtConcurrent::run(
             gScaleThumbnailThreads(),
             scaleThumbnailAtBackground,
-            QSharedPointer<QImage>(thumbnail),
+            thumbnail,
             boundingRect().size().toSize(),
             m_renderer->aspectRatioMode()
         );

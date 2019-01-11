@@ -31,7 +31,7 @@ private slots:
 
 private:
     PlayListRecord *m_record;
-    QFutureWatcher<QImage> m_coverLoader;
+    QFutureWatcher<QSharedPointer<QImage>> m_thumbnailLoader;
 };
 
 #endif // PLAYLISTGALLERYITEM_H

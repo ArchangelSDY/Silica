@@ -56,7 +56,7 @@ protected:
                        QWidget *widget);
     void setRenderer(AbstractGalleryItemRenderer *renderer);
     virtual void createRenderer() = 0;
-    void setThumbnail(QImage *thumbnail);
+    void setThumbnail(QSharedPointer<QImage> thumbnail);
 
     // TODO: should not be accessed by derived classes directly
     AbstractRendererFactory *m_rendererFactory;
