@@ -51,34 +51,6 @@ static bool isThumbnailExpired(const QFileInfo &pathInfo, QSharedPointer<QImage>
     return savedLastModified != curLastModified;
 }
 
-class SaveRunnable : public QRunnable
-{
-public:
-    SaveRunnable(const QImage &image, const QFileInfo &pathInfo) :
-        m_image(image) ,
-        m_pathInfo(pathInfo)
-    {
-    }
-
-    virtual void run()
-    {
-        QString thumbnailPath = computeThumbnailPath(m_pathInfo);
-
-        // Create parent directory
-        QFileInfo thumbnailPathInfo(thumbnailPath);
-        QString dirPath = thumbnailPathInfo.absolutePath();
-        QDir dir;
-        dir.mkpath(dirPath);
-
-        m_image.setText("lastModified", m_pathInfo.lastModified().toString(Qt::DateFormat::ISODateWithMs));
-        m_image.save(thumbnailPath);
-    }
-
-private:
-    QImage m_image;
-    QFileInfo m_pathInfo;
-};
-
 QThreadPool *FileSystemItem::s_threadPool = 0;
 QThreadPool *FileSystemItem::threadPool()
 {
@@ -233,18 +205,29 @@ void FileSystemItem::createRenderer()
 
 void FileSystemItem::coverThumbnailLoaded(QSharedPointer<QImage> thumbnail)
 {
-    QImage *coverImage = 0;
+    QSharedPointer<QImage> coverImage;
     if (!thumbnail->isNull()) {
-        coverImage = new QImage(*thumbnail);
+        coverImage.reset(new QImage(*thumbnail));
 
-        threadPool()->start(new SaveRunnable(*coverImage, m_pathInfo));
+        QtConcurrent::run(threadPool(), [pathInfo = m_pathInfo, coverImage]() {
+            QString thumbnailPath = computeThumbnailPath(pathInfo);
+
+            // Create parent directory
+            QFileInfo thumbnailPathInfo(thumbnailPath);
+            QString dirPath = thumbnailPathInfo.absolutePath();
+            QDir dir;
+            dir.mkpath(dirPath);
+
+            coverImage->setText("lastModified", pathInfo.lastModified().toString(Qt::DateFormat::ISODateWithMs));
+            coverImage->save(thumbnailPath);
+        });
     } else {
-        coverImage = new QImage(":/res/image.png");
+        coverImage.reset(new QImage(":/res/image.png"));
     }
 
-    g_coverCache.insert(coverCacheKey(), coverImage);
+    g_coverCache.insert(coverCacheKey(), new QImage(*coverImage));
 
-    setThumbnail(QSharedPointer<QImage>::create(*coverImage));
+    setThumbnail(coverImage);
     m_coverImage.reset();
 }
 
@@ -280,6 +263,3 @@ QString FileSystemItem::coverCacheKey() const
         .arg(m_pathInfo.absoluteFilePath())
         .arg(QString::number(m_pathInfo.lastModified().toMSecsSinceEpoch()));
 }
-
-
-#include "FileSystemItem.moc"
