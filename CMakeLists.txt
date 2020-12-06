@@ -23,7 +23,7 @@ if ("${QT_ROOT}" STREQUAL "")
 endif()
 
 if (WIN32)
-    find_package(OPENSSL REQUIRED)
+    find_package(OpenSSL REQUIRED)
 endif (WIN32)
 
 if (UNIX)
