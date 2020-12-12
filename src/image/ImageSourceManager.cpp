@@ -5,6 +5,7 @@
 #include <QUrl>
 
 #include "image/sources/LocalImageSourceFactory.h"
+#include "image/sources/PdfImageSourceFactory.h"
 #include "image/sources/RARImageSourceFactory.h"
 #include "image/sources/SevenzImageSourceFactory.h"
 #include "image/sources/ZipImageSourceFactory.h"
@@ -19,6 +20,7 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
     m_client(0)
 {
     registerFactory(new LocalImageSourceFactory(this));
+    registerFactory(new PdfImageSourceFactory(this));
     registerFactory(new RARImageSourceFactory(this));
     registerFactory(new SevenzImageSourceFactory(this));
     registerFactory(new ZipImageSourceFactory(this));
