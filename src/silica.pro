@@ -17,8 +17,6 @@ include(silica.pri)
 
 SOURCES += main.cpp
 
-DEFINES += QUAZIP_STATIC
-
 # DEFINES += ENABLE_OPENGL
 
 contains(DEFINES, "ENABLE_OPENGL") : QT += opengl

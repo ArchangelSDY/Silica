@@ -20,11 +20,10 @@ set(DEFINITION_SRCS
 )
 
 add_definitions(-DQTRAR_STATIC)
-add_definitions(-DQUAZIP_STATIC)
 add_definitions(-DQT7Z_STATIC)
 
 set(QTRAR_NO_TEST TRUE)
-
+set(BUILD_SHARED_LIBS FALSE)
 add_subdirectory(deps/breakpad)
 add_subdirectory(deps/quazip)
 add_subdirectory(deps/Qt7z)
@@ -40,8 +39,7 @@ include("crashhandler.cmake")
 set_target_properties(breakpad PROPERTIES FOLDER "Dependencies")
 set_target_properties(qtrar PROPERTIES FOLDER "Dependencies")
 set_target_properties(qtrarobjs PROPERTIES FOLDER "Dependencies")
-set_target_properties(quazip5 PROPERTIES FOLDER "Dependencies")
-set_target_properties(quazip_static PROPERTIES FOLDER "Dependencies")
+set_target_properties(QuaZip PROPERTIES FOLDER "Dependencies")
 set_target_properties(qt7z PROPERTIES FOLDER "Dependencies")
 set_target_properties(Qt7zPackage_Tests PROPERTIES FOLDER "Dependencies")
 set_target_properties(qtdbmigration PROPERTIES FOLDER "Dependencies")
