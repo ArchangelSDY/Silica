@@ -6,10 +6,9 @@
 #include "LocalImageSource.h"
 
 LocalImageSource::LocalImageSource(ImageSourceFactory *factory, QString path) :
-    ImageSource(factory)
+    ImageSource(factory) ,
+    m_path(path)
 {
-    m_path = findRealPath(path);
-
     QFileInfo info(m_path);
     m_name = info.fileName();
 

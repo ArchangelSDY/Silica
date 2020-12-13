@@ -34,7 +34,6 @@ public:
 protected:
     ImageSource(ImageSourceFactory *factory);
 
-    QString findRealPath(QString path);
     bool requestPassword(const QString &archivePath, QString &password);
     void passwordAccepted(const QString &archivePath, const QString &password);
     void passwordRejected(const QString &archivePath);

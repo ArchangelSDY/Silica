@@ -10,7 +10,7 @@ class PdfImageSource : public ImageSource
 {
 public:
     PdfImageSource(ImageSourceFactory* factory,
-                   const QString& arcPath, int page);
+                   const QString &arcPath, int page);
 
     virtual bool open() override;
     virtual void close() override;

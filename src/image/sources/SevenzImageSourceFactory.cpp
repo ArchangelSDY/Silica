@@ -80,8 +80,9 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url, const QStri
             sevenzUrl.setScheme("file");
             sevenzUrl.setFragment("");
             QString sevenzPath = sevenzUrl.toLocalFile();
+            QString realSevenzPath = findRealPath(sevenzPath);
 
-            return new SevenzImageSource(this, sevenzPath, imageName, password);
+            return new SevenzImageSource(this, realSevenzPath, imageName, password);
         } else {
             // Unsupported image format
             return 0;
@@ -114,16 +115,17 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
+        QString realPackagePath = findRealPath(packagePath);
 
-        Qt7zPackage pkg(packagePath);
-        Client client(this, packagePath);
+        Qt7zPackage pkg(realPackagePath);
+        Client client(this, realPackagePath);
         pkg.setClient(&client);
         bool success = pkg.open();
 
         if (!success) {
             if (!client.password().isEmpty()) {
                 // Password is requested but open failed, consider it a wrong password
-                passwordRejected(packagePath);
+                passwordRejected(realPackagePath);
             }
 
             return imageSources;
@@ -135,14 +137,14 @@ QList<ImageSource *> SevenzImageSourceFactory::createMultiple(const QUrl &url)
         if (password.isEmpty() && !fileNameList.isEmpty()) {
             Qt7zFileInfo firstFileInfo = pkg.fileInfoList().first();
             if (firstFileInfo.isEncrypted) {
-                if (!requestPassword(packagePath, password)) {
+                if (!requestPassword(realPackagePath, password)) {
                     return imageSources;
                 }
             }
         }
 
         if (!password.isEmpty()) {
-            passwordAccepted(packagePath, password);
+            passwordAccepted(realPackagePath, password);
         }
 
         foreach(const QString &name, fileNameList) {

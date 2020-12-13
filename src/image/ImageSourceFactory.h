@@ -25,6 +25,7 @@ public:
     virtual void clearCache() {}
 
 protected:
+    QString findRealPath(QString path);
     bool requestPassword(const QString &archivePath, QString &password);
     void passwordAccepted(const QString &archivePath, const QString &password);
     void passwordRejected(const QString &archivePath);

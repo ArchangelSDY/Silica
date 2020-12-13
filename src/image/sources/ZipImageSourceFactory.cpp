@@ -38,8 +38,9 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
             zipUrl.setScheme("file");
             zipUrl.setFragment("");
             QString zipPath = zipUrl.toLocalFile();
+            QString realZipPath = findRealPath(zipPath);
 
-            return new ZipImageSource(this, zipPath, imageName);
+            return new ZipImageSource(this, realZipPath, imageName);
         } else {
             // Unsupported image format
             return 0;
@@ -55,7 +56,9 @@ ImageSource *ZipImageSourceFactory::createSingle(const QString &packagePath)
         return nullptr;
     }
 
-    QuaZip zip(packagePath);
+    QString realPackagePath = findRealPath(packagePath);
+
+    QuaZip zip(realPackagePath);
     bool success = zip.open(QuaZip::mdUnzip);
     if (!success) {
         return nullptr;
@@ -94,8 +97,9 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
+        QString realPackagePath = findRealPath(packagePath);
 
-        QuaZip zip(packagePath);
+        QuaZip zip(realPackagePath);
         bool success = zip.open(QuaZip::mdUnzip);
 
         if (success) {
@@ -104,7 +108,7 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
             foreach(const QString &name, fileNameList) {
                 QFileInfo nameInfo(name);
                 if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
-                    imageSources << new ZipImageSource(this, packagePath, name);
+                    imageSources << new ZipImageSource(this, realPackagePath, name);
                 }
             }
 

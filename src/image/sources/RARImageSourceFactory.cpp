@@ -44,8 +44,9 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
             rarUrl.setScheme("file");
             rarUrl.setFragment("");
             QString rarPath = rarUrl.toLocalFile();
+            QString realRarPath = findRealPath(rarPath);
 
-            return new RARImageSource(this, rarPath, imageName, password);
+            return new RARImageSource(this, realRarPath, imageName, password);
         } else {
             // Unsupported image format
             return 0;
@@ -61,7 +62,9 @@ ImageSource *RARImageSourceFactory::createSingle(const QString &packagePath)
         return nullptr;
     }
 
-    QtRAR rar(packagePath);
+    QString realPackagePath = findRealPath(packagePath);
+
+    QtRAR rar(realPackagePath);
     bool success = rar.open(QtRAR::OpenModeList);
 
     if (!success) {
@@ -77,7 +80,7 @@ ImageSource *RARImageSourceFactory::createSingle(const QString &packagePath)
     foreach(const QString &imageName, fileNameList) {
         QFileInfo nameInfo(imageName);
         if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
-            return new RARImageSource(this, packagePath, imageName, QByteArray());
+            return new RARImageSource(this, realPackagePath, imageName, QByteArray());
         }
     }
 
@@ -102,8 +105,9 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
+        QString realPackagePath = findRealPath(packagePath);
 
-        QtRAR rar(packagePath);
+        QtRAR rar(realPackagePath);
         bool success = rar.open(QtRAR::OpenModeList);
 
         if (success) {
@@ -111,18 +115,18 @@ QList<ImageSource *> RARImageSourceFactory::createMultiple(const QUrl &url)
             if (rar.isHeadersEncrypted() || rar.isFilesEncrypted()) {
                 rar.close();
 
-                if (!requestPassword(packagePath, password)) {
+                if (!requestPassword(realPackagePath, password)) {
                     return imageSources;
                 }
 
                 success = rar.open(QtRAR::OpenModeList, password);
                 if (!success) {
-                    passwordRejected(packagePath);
+                    passwordRejected(realPackagePath);
 
                     return imageSources;
                 }
 
-                passwordAccepted(packagePath, password);
+                passwordAccepted(realPackagePath, password);
             }
 
             QStringList fileNameList = rar.fileNameList();

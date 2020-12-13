@@ -38,9 +38,9 @@ SevenzImageSource::SevenzImageSource(ImageSourceFactory *factory,
                                      QString imageName,
                                      QString password) :
     ImageSource(factory) ,
+    m_packagePath(packagePath) ,
     m_password(password)
 {
-    m_packagePath = findRealPath(packagePath);
     m_name = imageName;
 
     // Compute hash

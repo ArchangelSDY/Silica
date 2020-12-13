@@ -27,13 +27,14 @@ QString PdfImageSourceFactory::urlScheme() const
 ImageSource *PdfImageSourceFactory::createSingle(const QUrl &url)
 {
     if (url.scheme() == urlScheme()) {
-		QUrl pdfUrl = url;
-		pdfUrl.setScheme("file");
-		pdfUrl.setFragment("");
-		QString pdfPath = pdfUrl.toLocalFile();
+        QUrl pdfUrl = url;
+        pdfUrl.setScheme("file");
+        pdfUrl.setFragment("");
+        QString pdfPath = pdfUrl.toLocalFile();
+        QString realPdfPath = findRealPath(pdfPath);
         int page = url.fragment().toInt();
 
-		return new PdfImageSource(this, pdfPath, page);
+        return new PdfImageSource(this, pdfPath, page);
     } else {
         return 0;
     }
@@ -45,15 +46,17 @@ ImageSource *PdfImageSourceFactory::createSingle(const QString &packagePath)
         return nullptr;
     }
 
+    QString realPackagePath = findRealPath(packagePath);
+
     QPdfDocument doc;
-	QPdfDocument::DocumentError err = doc.load(packagePath);
+    QPdfDocument::DocumentError err = doc.load(realPackagePath);
     if (err != QPdfDocument::DocumentError::NoError) {
         return nullptr;
     }
 
     if (doc.pageCount() > 0) {
         doc.close();
-        return new PdfImageSource(this, packagePath, 0);
+        return new PdfImageSource(this, realPackagePath, 0);
     }
 
     doc.close();
@@ -78,9 +81,10 @@ QList<ImageSource *> PdfImageSourceFactory::createMultiple(const QUrl &url)
         QUrl fileUrl = url;
         fileUrl.setScheme("file");
         QString packagePath = fileUrl.toLocalFile();
+        QString realPackagePath = findRealPath(packagePath);
 
         QPdfDocument doc;
-        QPdfDocument::DocumentError err = doc.load(packagePath);
+        QPdfDocument::DocumentError err = doc.load(realPackagePath);
         if (err == QPdfDocument::DocumentError::NoError) {
             int pageCount = doc.pageCount();
             for (int i = 0; i < pageCount; i++) {

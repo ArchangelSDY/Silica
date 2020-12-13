@@ -3,14 +3,12 @@
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
-#include <QFileInfo>
 #include <QImageReader>
 #include <QSettings>
 #include <QTextStream>
 #include <QUrl>
 
 #include "deps/quazip/quazip/quazipfile.h"
-#include "GlobalConfig.h"
 
 ImageSource::ImageSource(ImageSourceFactory *factory) :
     m_factory(factory)
@@ -19,27 +17,6 @@ ImageSource::ImageSource(ImageSourceFactory *factory) :
 
 ImageSource::~ImageSource()
 {
-}
-
-QString ImageSource::findRealPath(QString path)
-{
-    // Given path exists, should be exact real path
-    QFileInfo file(path);
-    if (file.exists()) {
-        return path;
-    }
-
-    // Try all search directories
-    foreach (const QString &dir, GlobalConfig::instance()->searchDirs()) {
-        QString realPath = dir + path;
-        file = QFileInfo(realPath);
-        if (file.exists()) {
-            return realPath;
-        }
-    }
-
-    // Not found in search directories, leave path unchanged
-    return path;
 }
 
 bool ImageSource::requestPassword(const QString &archivePath, QString &password)

@@ -14,9 +14,9 @@ RARImageSource::RARImageSource(ImageSourceFactory *factory,
                                const QString &imageName,
                                const QString &password) :
     ImageSource(factory) ,
+    m_arcPath(arcPath) ,
     m_password(password)
 {
-    m_arcPath = findRealPath(arcPath);
     m_name = imageName;
 
     // Compute hash

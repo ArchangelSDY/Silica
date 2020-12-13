@@ -9,10 +9,10 @@
 
 PdfImageSource::PdfImageSource(ImageSourceFactory* factory,
 	const QString& arcPath, int page) :
-	ImageSource(factory),
+	ImageSource(factory) ,
+	m_arcPath(arcPath) ,
 	m_page(page)
 {
-	m_arcPath = findRealPath(arcPath);
 	m_name = QString::number(page).rightJustified(5, '0');
 
 	// Compute hash

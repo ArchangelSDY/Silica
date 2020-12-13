@@ -10,9 +10,9 @@
 
 ZipImageSource::ZipImageSource(ImageSourceFactory *factory,
                                QString zipPath, QString imageName) :
-    ImageSource(factory)
+    ImageSource(factory) ,
+    m_zipPath(zipPath)
 {
-    m_zipPath = findRealPath(zipPath);
     m_name = imageName;
 
     // Compute hash

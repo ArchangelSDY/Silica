@@ -1,6 +1,8 @@
+#include <QFileInfo>
 #include <QRegExp>
 #include <QStringList>
 
+#include "GlobalConfig.h"
 #include "ImageSourceFactory.h"
 #include "ImageSourceManager.h"
 
@@ -9,6 +11,27 @@ ImageSourceFactory::ImageSourceFactory(ImageSourceManager *mgr,
     QObject(parent) ,
     m_mgr(mgr)
 {
+}
+
+QString ImageSourceFactory::findRealPath(QString path)
+{
+    // Given path exists, should be exact real path
+    QFileInfo file(path);
+    if (file.exists()) {
+        return path;
+    }
+
+    // Try all search directories
+    for (const QString &dir : GlobalConfig::instance()->searchDirs()) {
+        QString realPath = dir + path;
+        file = QFileInfo(realPath);
+        if (file.exists()) {
+            return realPath;
+        }
+    }
+
+    // Not found in search directories, leave path unchanged
+    return path;
 }
 
 bool ImageSourceFactory::requestPassword(const QString &archivePath, QString &password)
