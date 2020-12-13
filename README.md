@@ -15,7 +15,7 @@ An image viewer.
 
 # Dependencies
 
-* Qt 5.12
+* Qt 5.15 (with schannel)
 * OpenCV
 
 # Build
@@ -57,7 +57,7 @@ $ make package
 git clone --recurse-submodules https://github.com/ArchangelSDY/Silica.git
 mkdir build
 cd build
-cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_PREFIX_PATH=<QT_ROOT> -DOpenCV_DIR=<OpenCV_ROOT> -DOpenCV_STATIC=true -DOPENSSL_ROOT_DIR=<OpenSSL_ROOT> ..\Silica
+cmake -G "Visual Studio 16 2019 Win64" -DCMAKE_PREFIX_PATH=<QT_ROOT> -DOpenCV_DIR=<OpenCV_ROOT> -DOpenCV_STATIC=true ..\Silica
 cmake --build . --config Debug
 ```
 

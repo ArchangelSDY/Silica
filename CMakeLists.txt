@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0042 NEW)   # Set MACOSX_RPATH default to ON
 cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
 
@@ -22,10 +22,6 @@ set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
 if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${Qt5Core_DIR}/../../../)
 endif()
-
-if (WIN32)
-    find_package(OpenSSL REQUIRED)
-endif (WIN32)
 
 if (UNIX)
     find_package(ZLIB REQUIRED)
