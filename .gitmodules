@@ -10,3 +10,6 @@
 [submodule "src/deps/QtRAR"]
 	path = src/deps/QtRAR
 	url = https://github.com/ArchangelSDY/QtRAR.git
+[submodule "test/deps/googletest"]
+	path = test/deps/googletest
+	url = https://github.com/google/googletest.git
