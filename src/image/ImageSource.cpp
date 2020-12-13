@@ -70,6 +70,10 @@ bool ImageSource::readFrames(QList<QImage> &frames, QList<int> &durations)
         } else {
             break;
         }
+
+        if (!reader.supportsAnimation()) {
+            break;
+        }
     }
 
     if (frames.isEmpty()) {
