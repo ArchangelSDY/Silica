@@ -1,3 +1,4 @@
+#include <QSharedPointer>
 #include <QString>
 #include <QPdfDocument>
 
@@ -34,13 +35,18 @@ ImageSource *PdfImageSourceFactory::createSingle(const QUrl &url)
         QString realPdfPath = findRealPath(pdfPath);
         int page = url.fragment().toInt();
 
-        return new PdfImageSource(this, pdfPath, page);
+        return createSingle(realPdfPath, page);
     } else {
         return 0;
     }
 }
 
-ImageSource *PdfImageSourceFactory::createSingle(const QString &packagePath)
+ImageSource* PdfImageSourceFactory::createSingle(const QString& packagePath)
+{
+    return createSingle(packagePath, 0);
+}
+
+ImageSource* PdfImageSourceFactory::createSingle(const QString& packagePath, int page)
 {
     if (!isValidFileName(packagePath)) {
         return nullptr;
@@ -48,19 +54,18 @@ ImageSource *PdfImageSourceFactory::createSingle(const QString &packagePath)
 
     QString realPackagePath = findRealPath(packagePath);
 
-    QPdfDocument doc;
-    QPdfDocument::DocumentError err = doc.load(realPackagePath);
+    QSharedPointer<QPdfDocument> doc(new QPdfDocument());
+	QPdfDocument::DocumentError err = doc->load(realPackagePath);
     if (err != QPdfDocument::DocumentError::NoError) {
         return nullptr;
     }
 
-    if (doc.pageCount() > 0) {
-        doc.close();
-        return new PdfImageSource(this, realPackagePath, 0);
+    if (doc->pageCount() > 0 && page < doc->pageCount()) {
+        return new PdfImageSource(this, realPackagePath, doc, page);
     }
 
-    doc.close();
     return nullptr;
+
 }
 
 QList<ImageSource *> PdfImageSourceFactory::createMultiple(const QUrl &url)
@@ -83,21 +88,16 @@ QList<ImageSource *> PdfImageSourceFactory::createMultiple(const QUrl &url)
         QString packagePath = fileUrl.toLocalFile();
         QString realPackagePath = findRealPath(packagePath);
 
-        QPdfDocument doc;
-        QPdfDocument::DocumentError err = doc.load(realPackagePath);
+        QSharedPointer<QPdfDocument> doc(new QPdfDocument());
+        QPdfDocument::DocumentError err = doc->load(realPackagePath);
         if (err == QPdfDocument::DocumentError::NoError) {
-            int pageCount = doc.pageCount();
+            int pageCount = doc->pageCount();
             for (int i = 0; i < pageCount; i++) {
-                QUrl imageUrl = url;
-                imageUrl.setFragment(QString::number(i));
-
-                ImageSource *source = createSingle(imageUrl);
+                ImageSource *source = new PdfImageSource(this, realPackagePath, doc, i);
                 if (source) {
                     imageSources << source;
                 }
             }
-
-            doc.close();
         }
     }
 

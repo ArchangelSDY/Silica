@@ -8,9 +8,10 @@
 #include "PdfImageSource.h"
 
 PdfImageSource::PdfImageSource(ImageSourceFactory* factory,
-	const QString& arcPath, int page) :
+	const QString& arcPath, QSharedPointer<QPdfDocument> doc, int page) :
 	ImageSource(factory) ,
 	m_arcPath(arcPath) ,
+	m_doc(doc) ,
 	m_page(page)
 {
 	m_name = QString::number(page).rightJustified(5, '0');
@@ -29,17 +30,11 @@ PdfImageSource::PdfImageSource(ImageSourceFactory* factory,
 
 bool PdfImageSource::open()
 {
-	m_doc.reset(new QPdfDocument());
-	QPdfDocument::DocumentError err = m_doc->load(m_arcPath);
-	return err == QPdfDocument::DocumentError::NoError;
+	return true;
 }
 
 void PdfImageSource::close()
 {
-	if (m_doc) {
-		m_doc->close();
-	}
-	m_doc.reset();
 }
 
 bool PdfImageSource::readFrames(QList<QImage>& images, QList<int>& durations)

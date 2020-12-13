@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QScopedPointer>
+#include <QSharedPointer>
 
 #include "image/ImageSource.h"
 
@@ -10,7 +10,7 @@ class PdfImageSource : public ImageSource
 {
 public:
     PdfImageSource(ImageSourceFactory* factory,
-                   const QString &arcPath, int page);
+                   const QString &arcPath, QSharedPointer<QPdfDocument> doc, int page);
 
     virtual bool open() override;
     virtual void close() override;
@@ -20,6 +20,6 @@ public:
 
 private:
     QString m_arcPath;
-    QScopedPointer<QPdfDocument> m_doc;
+    QSharedPointer<QPdfDocument> m_doc;
     int m_page;
 };
