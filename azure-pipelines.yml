@@ -1,0 +1,45 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: PowerShell@2
+  displayName: Install Build Tools
+  inputs:
+    targetType: inline
+    script: |
+      mkdir C:\BuildTools
+      mkdir C:\BuildTools\Download
+
+      (new-object net.webclient).DownloadFile(${env:OpenCV_URL}, 'C:/BuildTools/Download/OpenCV.7z')
+      7z x C:\BuildTools\Download\OpenCV.7z -oC:\BuildTools\OpenCV
+
+      (new-object net.webclient).DownloadFile(${env:Qt_URL}, 'C:/BuildTools/Download/Qt.7z')
+      7z x C:\BuildTools\Download\Qt.7z -oC:\BuildTools\Qt
+
+- task: CmdLine@2
+  displayName: Build
+  inputs:
+    script: |
+      git submodule update --init --recursive
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+      mkdir build
+      cd build
+      cmake -G "Visual Studio 16 2019" -DOpenCV_DIR=C:\BuildTools\OpenCV -DOpenCV_STATIC=true ..
+      cmake --build . --config %CONFIGURATION%
+      cpack -C %CONFIGURATION% --config ./CPackConfig.cmake
+      ctest -C %CONFIGURATION% -T Test --no-compress-output -E "KeyChain"
+      cd ..
+      mkdir drop
+      move build\silica-*.zip drop\
+      move build\silica-*.exe drop\
+
+- task: PublishTestResults@2
+  inputs:
+   testResultsFormat: CTest
+   testResultsFiles: build/Testing/**/Test.xml
+   buildConfiguration: ${Configuration}      
+
+- publish: drop/
