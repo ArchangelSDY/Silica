@@ -4,6 +4,9 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+variables:
+- group: BuildTools
+
 steps:
 - task: PowerShell@2
   displayName: Install Build Tools
