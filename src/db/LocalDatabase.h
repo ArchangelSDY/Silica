@@ -5,8 +5,8 @@
 #include <QList>
 #include <QObject>
 
+#include "db/PlayListEntityData.h"
 #include "image/Image.h"
-#include "playlist/PlayListRecord.h"
 #include "playlist/PlayListProviderFactory.h"
 
 class ImageRank;
@@ -17,15 +17,15 @@ class LocalDatabase : public QObject
 public:
     virtual bool migrate() = 0;
 
-    virtual QList<PlayListRecord *> queryPlayListRecords() = 0;
-    virtual QList<QUrl> queryImageUrlsForLocalPlayListRecord(int playListId) = 0;
-    virtual bool insertPlayListRecord(PlayListRecord *playListRecord) = 0;
-    virtual bool removePlayListRecord(PlayListRecord *playListRecord) = 0;
-    virtual bool updatePlayListRecord(PlayListRecord *playListRecord) = 0;
+    virtual QList<PlayListEntityData> queryPlayListEntities(int type) = 0;
+    virtual QList<QUrl> queryImageUrlsForLocalPlayListEntity(int playListId) = 0;
+    virtual bool insertPlayListRecord(const PlayListEntityData &data) = 0;
+    virtual bool removePlayListRecord(const PlayListEntityData &data) = 0;
+    virtual bool updatePlayListRecord(const PlayListEntityData &data) = 0;
     virtual bool insertImagesForLocalPlayListProvider(
-        const PlayListRecord &record, const ImageList &images) = 0;
+        const PlayListEntityData &data, const ImageList &images) = 0;
     virtual bool removeImagesForLocalPlayListProvider(
-        const PlayListRecord &record, const ImageList &images) = 0;
+        const PlayListEntityData &data, const ImageList &images) = 0;
 
     virtual int queryImagesCount() = 0;
     virtual bool insertImage(Image *image) = 0;

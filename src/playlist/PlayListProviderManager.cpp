@@ -1,12 +1,10 @@
 #include "PlayListProviderManager.h"
 
 #include "db/LocalDatabase.h"
-#include "playlist/LocalPlayListProviderFactory.h"
+#include "playlist/LocalPlayListProvider.h"
 #include "playlist/PlayListProvider.h"
-#include "playlist/PlayListProviderFactory.h"
-#include "playlist/PlayListRecord.h"
 #include "sapi/IPlayListProviderPlugin.h"
-#include "sapi/PlayListProviderFactoryDelegate.h"
+#include "sapi/PlayListProviderDelegate.h"
 #include "sapi/PluginLoader.h"
 #include "GlobalConfig.h"
 
@@ -25,17 +23,29 @@ PlayListProviderManager::PlayListProviderManager()
     // Register plugin providers
     sapi::PluginLoadCallback<sapi::IPlayListProviderPlugin> callback = [this](sapi::IPlayListProviderPlugin *plugin, const QJsonObject &meta) {
         QString name = meta["name"].toString();
+        if (name.isEmpty()) {
+            return;
+        }
 
-        PlayListProviderFactory *factory =
-            new sapi::PlayListProviderFactoryDelegate(plugin, meta);
-        this->registerPluginProvider(name, factory);
+        int typeId = LocalDatabase::instance()->queryPluginPlayListProviderType(name);
+        // TODO: Replace with named constant
+        if (typeId == -1) {
+            typeId = LocalDatabase::instance()->insertPluginPlayListProviderType(name);
+        }
+
+        auto provider = new sapi::PlayListProviderDelegate(
+			plugin, plugin->create(),
+            typeId,
+			meta["name"].toString(),
+			meta["displayName"].toString(),
+			meta["canContinueProvide"].toBool(false));
+        this->registerProvider(typeId, provider);
     };
 
     sapi::loadPlugins("playlistproviders", callback);
 
     // Register internal providers
-    registerProvider(LocalPlayListProviderFactory::TYPE,
-                     new LocalPlayListProviderFactory());
+    registerProvider(LocalPlayListProvider::TYPE, new LocalPlayListProvider());
 }
 
 PlayListProviderManager::~PlayListProviderManager()
@@ -43,41 +53,17 @@ PlayListProviderManager::~PlayListProviderManager()
     qDeleteAll(m_providers.begin(), m_providers.end());
 }
 
-PlayListProvider *PlayListProviderManager::create(int type)
+PlayListProvider *PlayListProviderManager::get(int type)
 {
-    if (!m_providers.contains(type)) {
-        return 0;
-    }
-
-    PlayListProviderFactory *factory = m_providers.value(type);
-    PlayListProvider *provider = factory->create();
-
-    return provider;
+    return m_providers[type];
 }
 
-QList<int> PlayListProviderManager::registeredTypes() const
+QList<PlayListProvider *> PlayListProviderManager::all() const
 {
-    return m_providers.keys();
+    return m_providers.values();
 }
 
-void PlayListProviderManager::registerPluginProvider(const QString &name,
-                                               PlayListProviderFactory *factory)
+void PlayListProviderManager::registerProvider(int type, PlayListProvider *provider)
 {
-    if (name.isEmpty()) {
-        return;
-    }
-
-    int typeId = LocalDatabase::instance()->queryPluginPlayListProviderType(name);
-    if (typeId == PlayListRecord::UNKNOWN_TYPE) {
-        typeId = LocalDatabase::instance()->insertPluginPlayListProviderType(name);
-    }
-
-    registerProvider(typeId, factory);
+    m_providers.insert(type, provider);
 }
-
-void PlayListProviderManager::registerProvider(int typeId,
-        PlayListProviderFactory *factory)
-{
-    m_providers.insert(typeId, factory);
-}
-

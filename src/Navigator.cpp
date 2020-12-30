@@ -4,7 +4,6 @@
 #include "image/caches/ImagesCache.h"
 #include "navigation/AbstractNavigationPlayer.h"
 #include "navigation/NormalNavigationPlayer.h"
-#include "playlist/PlayListRecord.h"
 
 
 const int Navigator::MAX_PRELOAD = 5;
@@ -388,8 +387,9 @@ void Navigator::setPlayer(AbstractNavigationPlayer *player)
 
 void Navigator::checkContinueProvide()
 {
-    if (m_playList->count() - m_currentIndex <= MAX_PRELOAD
-            && m_playList->record()) {
-        m_playList->record()->continueProvide();
-    }
+    // TODO
+    //if (m_playList->count() - m_currentIndex <= MAX_PRELOAD
+    //        && m_playList->record()) {
+    //    m_playList->record()->continueProvide();
+    //}
 }

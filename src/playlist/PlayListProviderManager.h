@@ -5,27 +5,23 @@
 
 class PlayListProvider;
 class PlayListProviderFactory;
-class PlayListRecord;
 
 class PlayListProviderManager
 {
 public:
     ~PlayListProviderManager();
 
-    PlayListProvider *create(int type);
-    QList<int> registeredTypes() const;
-
-    void registerProvider(int typeId, PlayListProviderFactory *factory);
+    PlayListProvider *get(int type);
+    QList<PlayListProvider *> all() const;
 
     static PlayListProviderManager *instance();
 
 private:
     PlayListProviderManager();
-    void registerPluginProvider(const QString &name,
-                                PlayListProviderFactory *factory);
+    void registerProvider(int type, PlayListProvider *provider);
 
     static PlayListProviderManager *s_instance;
-    QHash<int, PlayListProviderFactory *> m_providers;
+    QHash<int, PlayListProvider *> m_providers;
 };
 
 #endif // PLAYLISTPROVIDERMANAGER_H

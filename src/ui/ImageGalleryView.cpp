@@ -17,7 +17,6 @@
 #include "playlist/sort/PlayListImageNameSorter.h"
 #include "playlist/sort/PlayListImageSizeSorter.h"
 #include "playlist/sort/PlayListImageUrlSorter.h"
-#include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageGalleryView.h"
 #include "ui/renderers/CompactRendererFactory.h"
@@ -126,13 +125,15 @@ QMenu *ImageGalleryView::createContextMenu()
     renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
 
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
-    if (m_playList && m_playList->record()) {
-        QAction *actSetAsCover =
-            menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
-        if (selectedItems.count() == 0) {
-            actSetAsCover->setEnabled(false);
-        }
-    }
+
+    // TODO
+    // if (m_playList && m_playList->record()) {
+    //     QAction *actSetAsCover =
+    //         menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
+    //     if (selectedItems.count() == 0) {
+    //         actSetAsCover->setEnabled(false);
+    //     }
+    // }
 
     if (!selectedItems.isEmpty()) {
         menu->addAction(tr("Refresh"), this, SLOT(refreshSelected()));
@@ -184,17 +185,18 @@ void ImageGalleryView::sortBySize()
 
 void ImageGalleryView::setAsCover()
 {
-    QList<GalleryItem *> selectedItems = selectedGalleryItems();
-    if (m_playList && selectedItems.count() > 0) {
-        ImageGalleryItem *item =
-            static_cast<ImageGalleryItem *>(selectedItems[0]);
-        PlayListRecord *record = m_playList->record();
+    // TODO
+    // QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    // if (m_playList && selectedItems.count() > 0) {
+    //     ImageGalleryItem *item =
+    //         static_cast<ImageGalleryItem *>(selectedItems[0]);
+    //     PlayListRecord *record = m_playList->record();
 
-        if (record) {
-             record->setCoverPath(item->image()->thumbnailPath());
-             record->save();
-        }
-    }
+    //     if (record) {
+    //          record->setCoverPath(item->image()->thumbnailPath());
+    //          record->save();
+    //     }
+    // }
 }
 
 void ImageGalleryView::removeSelected()
@@ -214,13 +216,14 @@ void ImageGalleryView::removeSelected()
             m_playList->removeOne(toRemove);
         }
 
-        // Sync to record if any
-        PlayListRecord *record = m_playList->record();
-        if (record && !toRemoves.isEmpty()) {
-            QtConcurrent::run([record, toRemoves]() {
-                record->removeImages(toRemoves);
-            });
-        }
+        // TODO
+        // // Sync to record if any
+        // PlayListRecord *record = m_playList->record();
+        // if (record && !toRemoves.isEmpty()) {
+        //     QtConcurrent::run([record, toRemoves]() {
+        //         record->removeImages(toRemoves);
+        //     });
+        // }
     }
 }
 
@@ -274,14 +277,16 @@ void ImageGalleryView::groupBy(AbstractPlayListGrouper *grouper)
         connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
         QThreadPool::globalInstance()->start(task);
 
-        PlayListRecord *plr = m_playList->record();
-        if (plr) {
-            QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
-                .arg(plr->id())
-                .arg(QUuid::createUuid().toString());
-            m_groupingProgress.setKey(key);
-            m_groupingProgress.setEstimateEnabled(true);
-            m_groupingProgress.setMaximum(36);
+        // TODO
+        // PlayListRecord *plr = m_playList->record();
+        // if (plr) {
+        if (false) {
+            // QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
+            //     .arg(plr->id())
+            //     .arg(QUuid::createUuid().toString());
+            // m_groupingProgress.setKey(key);
+            // m_groupingProgress.setEstimateEnabled(true);
+            // m_groupingProgress.setMaximum(36);
         } else {
             m_groupingProgress.setKey(QString());
             m_groupingProgress.setEstimateEnabled(false);

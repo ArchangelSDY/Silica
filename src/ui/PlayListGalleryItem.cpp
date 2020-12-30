@@ -9,23 +9,23 @@
 #include "LooseImageBackgroundRenderer.h"
 #include "PlayListGalleryItem.h"
 
-PlayListGalleryItem::PlayListGalleryItem(PlayListRecord *record,
+PlayListGalleryItem::PlayListGalleryItem(PlayListEntity *entity,
                                          AbstractRendererFactory *rendererFactory,
                                          QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
-    m_record(record)
+    m_entity(entity)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
-    setToolTip(m_record->name());
+    setToolTip(m_entity->name());
     createRenderer();
 
-    connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
+    // TODO
+    // connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
     connect(&m_thumbnailLoader, &QFutureWatcher<QImage>::finished, this, &PlayListGalleryItem::onThumbnailLoaded);
 }
 
 PlayListGalleryItem::~PlayListGalleryItem()
 {
-    delete m_record;
 }
 
 void PlayListGalleryItem::load()
@@ -39,10 +39,9 @@ void PlayListGalleryItem::loadThumbnail()
         return;
     }
 
-    QString coverFullPath = GlobalConfig::instance()->thumbnailPath() +
-        "/" + m_record->coverPath();
-    m_thumbnailLoader.setFuture(QtConcurrent::run([coverFullPath]() -> QSharedPointer<QImage> {
-        QSharedPointer<QImage> thumbnail(new QImage(coverFullPath));
+    PlayListEntity *entity = m_entity;
+    m_thumbnailLoader.setFuture(QtConcurrent::run([entity]() -> QSharedPointer<QImage> {
+        QSharedPointer<QImage> thumbnail(new QImage(std::move(entity->loadCoverImage())));
         if (thumbnail->isNull()) {
             thumbnail->load(":/res/playlist.png");
         }
@@ -61,12 +60,12 @@ void PlayListGalleryItem::onThumbnailLoaded()
 void PlayListGalleryItem::createRenderer()
 {
     setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
-        m_record->name(), m_record->count()));
+        m_entity->name(), m_entity->count()));
 }
 
 QString PlayListGalleryItem::name() const
 {
-    return m_record->name();
+    return m_entity->name();
 }
 
 QRectF PlayListGalleryItem::boundingRect() const

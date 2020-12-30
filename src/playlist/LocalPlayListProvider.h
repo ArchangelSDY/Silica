@@ -1,22 +1,30 @@
-#ifndef LOCALPLAYLISTPROVIDER_H
-#define LOCALPLAYLISTPROVIDER_H
+#pragma once
 
 #include "playlist/PlayListProvider.h"
+
+class LocalPlayListEntity;
 
 class LocalPlayListProvider : public PlayListProvider
 {
 public:
-    LocalPlayListProvider(QObject *parent = 0);
-    ~LocalPlayListProvider();
+    static const int TYPE = 0;
 
-    QString typeName() const;
-    bool canContinueProvide() const;
+    LocalPlayListProvider(QObject *parent = nullptr);
+    virtual ~LocalPlayListProvider() override;
+    virtual int type() const override;
+    virtual QString name() const override;
+    virtual QList<PlayListEntity *> entities() const override;
+    virtual void loadEntities() override;
+    virtual void triggerEntity(PlayListEntity *entity) override;
 
-    void request(const QString &name, const QVariantHash &extra);
+    // QString typeName() const;
+    // bool canContinueProvide() const;
 
-    bool isImagesReadOnly() const;
-    bool insertImages(const PlayListRecord &record, const ImageList &images);
-    bool removeImages(const PlayListRecord &record, const ImageList &images);
+    // void request(const QString &name, const QVariantHash &extra);
+
+    // bool isImagesReadOnly() const;
+    // bool insertImages(const PlayListRecord &record, const ImageList &images);
+    // bool removeImages(const PlayListRecord &record, const ImageList &images);
+private:
+    QList<LocalPlayListEntity *> m_entities; 
 };
-
-#endif // LOCALPLAYLISTPROVIDER_H

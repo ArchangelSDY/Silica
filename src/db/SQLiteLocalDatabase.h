@@ -16,15 +16,15 @@ public:
     SQLiteLocalDatabase();
     bool migrate();
 
-    QList<PlayListRecord *> queryPlayListRecords();
-    QList<QUrl> queryImageUrlsForLocalPlayListRecord(int playListId);
-    bool insertPlayListRecord(PlayListRecord *playListRecord);
-    bool removePlayListRecord(PlayListRecord *playListRecord);
-    bool updatePlayListRecord(PlayListRecord *playListRecord);
-    bool insertImagesForLocalPlayListProvider(
-        const PlayListRecord &record, const ImageList &images);
-    bool removeImagesForLocalPlayListProvider(
-        const PlayListRecord &record, const ImageList &images);
+    virtual QList<PlayListEntityData> queryPlayListEntities(int type) override;
+    virtual QList<QUrl> queryImageUrlsForLocalPlayListEntity(int playListId) override;
+    virtual bool insertPlayListRecord(const PlayListEntityData &data) override;
+    virtual bool removePlayListRecord(const PlayListEntityData &data) override;
+    virtual bool updatePlayListRecord(const PlayListEntityData &data) override;
+    virtual bool insertImagesForLocalPlayListProvider(
+        const PlayListEntityData &data, const ImageList &images) override;
+    virtual bool removeImagesForLocalPlayListProvider(
+        const PlayListEntityData &data, const ImageList &images) override;
 
     int queryImagesCount();
     bool insertImage(Image *image);

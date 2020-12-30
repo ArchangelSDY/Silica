@@ -28,7 +28,6 @@ public:
         }
 
         emit gotItems(images, extraInfos);
-        emit itemsCountChanged(itemsCount);
     }
 
     // For tests

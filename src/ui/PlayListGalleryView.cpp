@@ -19,16 +19,19 @@ static bool playListTypeLessThan(GalleryItem *left,
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
     PlayListGalleryItem *rightItem = static_cast<PlayListGalleryItem *>(right);
 
-    int leftRecordType = leftItem->record()->type();
-    int rightRecordType = rightItem->record()->type();
+    // TODO
+    // int leftRecordType = leftItem->entity()->type();
+    // int rightRecordType = rightItem->entity()->type();
 
-    if (leftRecordType < rightRecordType) {
-        return true;
-    } else if (leftRecordType > rightRecordType) {
-        return false;
-    } else {
-        return leftItem->record()->name() < rightItem->record()->name();
-    }
+    // if (leftRecordType < rightRecordType) {
+    //     return true;
+    // } else if (leftRecordType > rightRecordType) {
+    //     return false;
+    // } else {
+    //     return leftItem->record()->name() < rightItem->record()->name();
+    // }
+
+    return leftItem->entity()->name() < rightItem->entity()->name();
 }
 
 static bool playListNameLessThan(GalleryItem *left,
@@ -38,8 +41,8 @@ static bool playListNameLessThan(GalleryItem *left,
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
     PlayListGalleryItem *rightItem = static_cast<PlayListGalleryItem *>(right);
 
-    const QString &leftName = leftItem->record()->name();
-    const QString &rightName = rightItem->record()->name();
+    const QString &leftName = leftItem->entity()->name();
+    const QString &rightName = rightItem->entity()->name();
 
     return leftName < rightName;
 }
@@ -54,14 +57,14 @@ PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     groupByType();
 }
 
-void PlayListGalleryView::setPlayListRecords(QList<PlayListRecord *> records)
+void PlayListGalleryView::setPlayListEntities(QList<PlayListEntity *> entities)
 {
     clear();
 
-    incrItemsToLoad(records.count());
+    incrItemsToLoad(entities.count());
 
-    for (int i = 0; i < records.count(); ++i) {
-        PlayListGalleryItem *item = new PlayListGalleryItem(records[i],
+    for (int i = 0; i < entities.count(); ++i) {
+        PlayListGalleryItem *item = new PlayListGalleryItem(entities[i],
             rendererFactory());
         addItem(item);
     }
@@ -76,11 +79,9 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
 
     QMenu *menuNew = menu.addMenu(tr("New"));
     QSignalMapper *plrCreatorMap = new QSignalMapper(&menu);
-    foreach (int type, PlayListProviderManager::instance()->registeredTypes()) {
-        PlayListProvider *provider =
-            PlayListProviderManager::instance()->create(type);
-        QAction *act = menuNew->addAction(provider->typeName(), plrCreatorMap, SLOT(map()));
-        plrCreatorMap->setMapping(act, type);
+    for (auto provider : PlayListProviderManager::instance()->all()) {
+        QAction *act = menuNew->addAction(provider->name(), plrCreatorMap, SLOT(map()));
+        plrCreatorMap->setMapping(act, provider->type());
         delete provider;
     }
     connect(plrCreatorMap, SIGNAL(mapped(int)),
@@ -129,16 +130,17 @@ void PlayListGalleryView::renameSelectedItem()
     if (selectedItems.count() > 0) {
         PlayListGalleryItem *item =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        PlayListRecord *record = item->record();
+        PlayListEntity *entity = item->entity();
 
         QString newName = QInputDialog::getText(
             0, "Rename PlayList", "New Name",
-            QLineEdit::Normal, record->name());
+            QLineEdit::Normal, entity->name());
 
-        if (!newName.isEmpty()) {
-            record->setName(newName);
-            record->save();
-        }
+        // TODO
+        // if (!newName.isEmpty()) {
+        //     record->setName(newName);
+        //     record->save();
+        // }
     }
 }
 
@@ -151,36 +153,40 @@ void PlayListGalleryView::removeSelectedItems()
         foreach(GalleryItem *item, selectedItems) {
             PlayListGalleryItem *playListItem =
                 static_cast<PlayListGalleryItem *>(item);
-            playListNames.append(playListItem->record()->name());
+            playListNames.append(playListItem->entity()->name());
         }
         QString msg = tr("Remove %1 playlist: \n%2 ?")
             .arg(playListNames.count())
             .arg(playListNames.join("\n"));
 
-        if (QMessageBox::question(
-                this, tr("Remove"), msg) == QMessageBox::Yes) {
-            foreach (QGraphicsItem *item, selectedItems) {
-                PlayListGalleryItem *playListItem =
-                    static_cast<PlayListGalleryItem *>(item);
-                playListItem->record()->remove();
-                scene()->removeItem(item);
-            }
+        // TODO
+        // if (QMessageBox::question(
+        //         this, tr("Remove"), msg) == QMessageBox::Yes) {
+        //     foreach (QGraphicsItem *item, selectedItems) {
+        //         PlayListGalleryItem *playListItem =
+        //             static_cast<PlayListGalleryItem *>(item);
+        //         playListItem->record()->remove();
+        //         scene()->removeItem(item);
+        //     }
 
-            scheduleLayout();
-        }
+        //     scheduleLayout();
+        // }
     }
 }
 
 QString PlayListGalleryView::groupForItem(GalleryItem *rawItem)
 {
-    PlayListGalleryItem *item = static_cast<PlayListGalleryItem *>(rawItem);
-    if (m_groupLessThan == playListTypeLessThan) {
-        return item->record()->typeName();
-    } else if (m_groupLessThan == playListNameLessThan) {
-        return item->record()->name().left(5);
-    } else {
-        return QString();
-    }
+    // TODO
+    // PlayListGalleryItem *item = static_cast<PlayListGalleryItem *>(rawItem);
+    // if (m_groupLessThan == playListTypeLessThan) {
+    //     return item->record()->typeName();
+    // } else if (m_groupLessThan == playListNameLessThan) {
+    //     return item->entity()->name().left(5);
+    // } else {
+    //     return QString();
+    // }
+
+    return QString();
 }
 
 void PlayListGalleryView::sortItemByGroup(QList<GalleryItem *> *items)

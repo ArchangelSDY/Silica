@@ -1,5 +1,4 @@
-#ifndef PLAYLIST_H
-#define PLAYLIST_H
+#pragma once
 
 #include <QHash>
 #include <QUrl>
@@ -9,7 +8,6 @@
 #include "playList/sort/AbstractPlayListSorter.h"
 
 class AbstractPlayListFilter;
-class PlayListRecord;
 
 class PlayList : public QObject
 {
@@ -20,8 +18,8 @@ public:
     PlayList(const QStringList &imagePaths);
     ~PlayList();
 
-    PlayListRecord *record() { return m_record; }
-    void setRecord(PlayListRecord *record) { m_record = record; }
+    //PlayListRecord *record() { return m_record; }
+    //void setRecord(PlayListRecord *record) { m_record = record; }
 
     ImagePtr addSinglePath(const QString &);
     ImagePtr addSinglePath(const QUrl &);
@@ -99,9 +97,7 @@ private:
 
     ImageList m_allImages;
     ImageList m_filteredImages;
-    PlayListRecord *m_record;
+    //PlayListRecord *m_record;
     QScopedPointer<AbstractPlayListFilter> m_filter;   // Should never be 0
     QScopedPointer<AbstractPlayListGrouper> m_grouper;
 };
-
-#endif // PLAYLIST_H

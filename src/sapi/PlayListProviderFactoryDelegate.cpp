@@ -21,6 +21,7 @@ PlayListProvider *PlayListProviderFactoryDelegate::create()
 {
     return new PlayListProviderDelegate(
         m_plugin, m_plugin->create(),
+        m_meta["name"].toString(),
         m_meta["displayName"].toString(),
         m_meta["canContinueProvide"].toBool(false));
 }

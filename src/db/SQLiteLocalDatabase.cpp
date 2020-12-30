@@ -15,34 +15,35 @@ const char *SQL_ENABLE_FOREIGN_KEYS = "pragma foreign_keys=on";
 const char *SQL_INSERT_PLAYLIST = "insert into playlists(name, cover_path, type, count) values (?, ?, ?, ?)";
 
 const char *SQL_INSERT_PLAYLIST_IMAGES = "insert into playlist_images(playlist_id, image_id) values ("
-        "?, (select id from images where hash = ?))";
+"?, (select id from images where hash = ?))";
 
 const char *SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH = "delete from playlist_images "
-        "where playlist_id=? and image_id in "
-        "(select id from images where hash = ?)";
+"where playlist_id=? and image_id in "
+"(select id from images where hash = ?)";
 
-const char *SQL_QUERY_PLAYLISTS =
-    "select "
-        "playlists.id, playlists.name, playlists.cover_path, playlists.type, "
-        "count(playlist_images.id), playlists.count "
-    "from playlists "
-    "left outer join playlist_images on "
-        "playlist_images.playlist_id = playlists.id "
-    "group by playlists.id order by playlists.name";
+const char *SQL_QUERY_PLAYLISTS_BY_TYPE =
+"select "
+"playlists.id, playlists.name, playlists.cover_path, playlists.type, "
+"count(playlist_images.id), playlists.count "
+"from playlists "
+"left outer join playlist_images on "
+"playlist_images.playlist_id = playlists.id "
+"where playlists.type = ? "
+"group by playlists.id order by playlists.name";
 
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
 const char *SQL_REMOVE_PLAYLIST_BY_ID = "delete from playlists where id = ?";
 
 const char *SQL_UPDATE_PLAYLIST_BY_ID =
-    "update playlists "
-    "set name = ?, cover_path = ?, count = ? "
-    "where id = ?";
+"update playlists "
+"set name = ?, cover_path = ?, count = ? "
+"where id = ?";
 
 const char *SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID = "select images.url from images "
-    "left join playlist_images on images.id = playlist_images.image_id "
-    "where playlist_images.playlist_id = ? "
-    "order by images.url";
+"left join playlist_images on images.id = playlist_images.image_id "
+"where playlist_images.playlist_id = ? "
+"order by images.url";
 
 const char *SQL_INSERT_IMAGE = "insert or ignore into images(hash, name, url) values (?, ?, ?)";
 
@@ -57,29 +58,51 @@ const char *SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH = "select rank from image_ranks w
 const char *SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH = "insert or replace into image_ranks (rank, image_hash) values (?, ?)";
 
 const char *SQL_INSERT_PLUGIN_PLAYLIST_PROVIDER =
-        "insert into plugin_playlist_providers(name) values (?)";
+"insert into plugin_playlist_providers(name) values (?)";
 
 const char *SQL_QUERY_PLUGIN_PLAYLIST_PROVIDER =
-        "select rowid, name from plugin_playlist_providers where name = ?";
+"select rowid, name from plugin_playlist_providers where name = ?";
 
 const char *SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION =
-        "insert or replace into task_progresses (task_key, last_time_consumption) values (?, ?)";
+"insert or replace into task_progresses (task_key, last_time_consumption) values (?, ?)";
 
 const char *SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION =
-        "select last_time_consumption from task_progresses where task_key = ?";
+"select last_time_consumption from task_progresses where task_key = ?";
 
-#define OPEN_BACKGROUND_DATABASE(NAME) \
-    QString dbConnName = QStringLiteral(NAME) + QUuid::createUuid().toString(); \
-    bool isMainThread = QThread::currentThread() == QApplication::instance()->thread(); \
-    { \
-        QSqlDatabase db = isMainThread ? m_db : QSqlDatabase::cloneDatabase(m_db, dbConnName); \
-        if (!isMainThread && !db.open()) { \
-            return false; \
+// #define OPEN_BACKGROUND_DATABASE(NAME) \
+//     QString dbConnName = QStringLiteral(NAME) + QUuid::createUuid().toString(); \
+//     bool isMainThread = QThread::currentThread() == QApplication::instance()->thread(); \
+//     { \
+//         QSqlDatabase db = isMainThread ? m_db : QSqlDatabase::cloneDatabase(m_db, dbConnName); \
+//         if (!isMainThread && !db.open()) { \
+//             return false; \
+//         }
+// 
+// #define CLOSE_BACKGROUND_DATABASE \
+//     } \
+//     if (!isMainThread) QSqlDatabase::removeDatabase(dbConnName);
+
+#define OPEN_BACKGROUND_DATABASE                                                                        \
+    QString dbConnName = QStringLiteral("%1_%2").arg(                                                   \
+        __func__, reinterpret_cast<uint64_t>(QThread::currentThreadId()));                              \
+    bool dbCloned = false;                                                                              \
+    do {                                                                                                \
+        QSqlDatabase db = QSqlDatabase::database(dbConnName);                                           \
+        if (!db.isValid()) {                                                                            \
+            dbCloned = true;                                                                            \
+            db = QSqlDatabase::cloneDatabase(m_db, dbConnName);                                         \
+            if (!db.open()) {                                                                           \
+                qWarning() << __func__ << "lastError:" << db.lastError();                               \
+                break;                                                                                  \
+            }                                                                                           \
         }
 
-#define CLOSE_BACKGROUND_DATABASE \
-    } \
-    if (!isMainThread) QSqlDatabase::removeDatabase(dbConnName);
+#define CLOSE_BACKGROUND_DATABASE                                                                       \
+    } while (0);                                                                                        \
+    QSqlDatabase::removeDatabase(dbConnName);
+
+#define LOG_QUERY_ERROR                                                                                 \
+    qWarning() << __func__ << "lastError:" << q.lastError() << "lastQuery:" << q.lastQuery();
 
 SQLiteLocalDatabase::SQLiteLocalDatabase()
 {
@@ -99,56 +122,49 @@ bool SQLiteLocalDatabase::migrate()
     return migration.migrate();
 }
 
-QList<PlayListRecord *> SQLiteLocalDatabase::queryPlayListRecords()
+QList<PlayListEntityData> SQLiteLocalDatabase::queryPlayListEntities(int type)
 {
-    QList<PlayListRecord *> records;
+    QList<PlayListEntityData> lst;
 
-    if (!m_db.isOpen()) {
-        return records;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
+    q.prepare(SQL_QUERY_PLAYLISTS_BY_TYPE);
+    q.addBindValue(type);
+    if (!q.exec()) {
+        LOG_QUERY_ERROR
+        break;
     }
-
-    QSqlQuery q(SQL_QUERY_PLAYLISTS);
     while (q.next()) {
-        int id = q.value(0).toInt();
-        QString name = q.value(1).toString();
-        QString coverPath = q.value(2).toString();
-        int type = q.value(3).toInt();
+        PlayListEntityData data;
+        data.id = q.value(0).toInt();
+        data.name = q.value(1).toString();
+        data.coverPath = q.value(2).toString();
+        data.type = q.value(3).toInt();
         int dbImagesCount = q.value(4).toInt();
         int recordImagesCount = q.value(5).toInt();
-        int count = dbImagesCount > 0 ? dbImagesCount : recordImagesCount;
-
-        PlayListRecordBuilder recordBuilder;
-        recordBuilder
-            .setId(id)
-            .setName(name)
-            .setCoverPath(coverPath)
-            .setType(type)
-            .setCount(count);
-        PlayListRecord *record = recordBuilder.obtain();
-        if (record) {
-            records << record;
-        }
+        data.count = dbImagesCount > 0 ? dbImagesCount : recordImagesCount;
+        lst << data;
     }
 
-    return records;
+    CLOSE_BACKGROUND_DATABASE
+
+    return lst;
 }
 
-QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
+QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListEntity(
     int playListId)
 {
     QList<QUrl> imageUrls;
 
-    if (!m_db.isOpen()) {
-        return imageUrls;
-    }
+    OPEN_BACKGROUND_DATABASE
 
-    QSqlQuery q;
+    QSqlQuery q(db);
     q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
     q.addBindValue(playListId);
     if (!q.exec()) {
-        qWarning() << q.lastError();
-        qWarning() << q.lastQuery();
-        return imageUrls;
+        LOG_QUERY_ERROR
+        break;
     }
 
     while (q.next()) {
@@ -156,59 +172,83 @@ QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListRecord(
         imageUrls << QUrl(imageUrl);
     }
 
+    CLOSE_BACKGROUND_DATABASE
+
     return imageUrls;
 }
 
-bool SQLiteLocalDatabase::insertPlayListRecord(PlayListRecord *playListRecord)
+bool SQLiteLocalDatabase::insertPlayListRecord(const PlayListEntityData &data)
 {
-    if (!m_db.isOpen()) {
-        return false;
-    }
+    bool ret = false;
 
-    int count = 0;
-    if (playListRecord->playList()) {
-        count = playListRecord->playList()->count();
-    }
+    OPEN_BACKGROUND_DATABASE
+
+    // int count = 0;
+    // if (playListRecord->playList()) {
+    //     count = playListRecord->playList()->count();
+    // }
 
     // Insert playlist
-    QSqlQuery qInsertPlayList;
-    qInsertPlayList.prepare(SQL_INSERT_PLAYLIST);
-    qInsertPlayList.addBindValue(playListRecord->name());
-    qInsertPlayList.addBindValue(playListRecord->coverPath());
-    qInsertPlayList.addBindValue(playListRecord->type());
-    qInsertPlayList.addBindValue(count);
-    if (!qInsertPlayList.exec()) {
-        qWarning() << qInsertPlayList.lastError()
-            << qInsertPlayList.lastQuery();
-        return false;
+    QSqlQuery q(db);
+    q.prepare(SQL_INSERT_PLAYLIST);
+    q.addBindValue(data.name);
+    q.addBindValue(data.coverPath);
+    q.addBindValue(data.type);
+    q.addBindValue(data.count);
+    if (!q.exec()) {
+        LOG_QUERY_ERROR
+        break;
     }
-    int playListId = qInsertPlayList.lastInsertId().toInt();
-    playListRecord->setId(playListId);
 
-    return true;
+    // TODO
+    // int playListId = qInsertPlayList.lastInsertId().toInt();
+    // playListRecord->setId(playListId);
+
+    ret = true;
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
-bool SQLiteLocalDatabase::removePlayListRecord(PlayListRecord *playListRecord)
+bool SQLiteLocalDatabase::removePlayListRecord(const PlayListEntityData &data)
 {
-    QSqlQuery q;
+    bool ret = false;
+
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_REMOVE_PLAYLIST_BY_ID);
-    q.addBindValue(playListRecord->id());
-    return q.exec();
+    q.addBindValue(data.id);
+    ret = q.exec();
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
-bool SQLiteLocalDatabase::updatePlayListRecord(PlayListRecord *playListRecord)
+bool SQLiteLocalDatabase::updatePlayListRecord(const PlayListEntityData &data)
 {
-    QSqlQuery q;
+    bool ret = false;
+
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_UPDATE_PLAYLIST_BY_ID);
-    q.addBindValue(playListRecord->name());
-    q.addBindValue(playListRecord->coverPath());
-    q.addBindValue(playListRecord->count());
-    q.addBindValue(playListRecord->id());
-    return q.exec();
+    q.addBindValue(data.name);
+    q.addBindValue(data.coverPath);
+    q.addBindValue(data.count);
+    q.addBindValue(data.id);
+
+    ret = q.exec();
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
-    const PlayListRecord &record, const ImageList &images)
+    const PlayListEntityData &data, const ImageList &images)
 {
     if (images.isEmpty()) {
         return true;
@@ -216,7 +256,7 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
 
     bool ret = false;
 
-    OPEN_BACKGROUND_DATABASE("insertImagesForLocalPlayListProviderAsync")
+    OPEN_BACKGROUND_DATABASE
 
     // Insert relationship records
     QSqlQuery q(db);
@@ -225,7 +265,7 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
     QVariantList playListIds;
     QVariantList imageHashes;
     for (ImagePtr image : images) {
-        playListIds << record.id();
+        playListIds << data.id;
         imageHashes << image->source()->hashStr();
     }
     q.addBindValue(playListIds);
@@ -233,7 +273,8 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
 
     ret = q.execBatch();
     if (!ret) {
-        qWarning() << q.lastError() << q.lastQuery();
+        LOG_QUERY_ERROR
+        break;
     }
 
     CLOSE_BACKGROUND_DATABASE
@@ -242,7 +283,7 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
 }
 
 bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
-    const PlayListRecord &record, const ImageList &images)
+    const PlayListEntityData &data, const ImageList &images)
 {
     if (images.isEmpty()) {
         return true;
@@ -250,7 +291,7 @@ bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
 
     bool ret = false;
 
-    OPEN_BACKGROUND_DATABASE("insertImagesForLocalPlayListProviderAsync")
+    OPEN_BACKGROUND_DATABASE
 
     QSqlQuery q(db);
     q.prepare(SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH);
@@ -258,7 +299,7 @@ bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
     QVariantList plrIds;
     QVariantList imgHashes;
     for (ImagePtr image : images) {
-        plrIds << record.id();
+        plrIds << data.id;
         imgHashes << image->source()->hashStr();
     }
 
@@ -267,9 +308,9 @@ bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
 
     ret = q.execBatch();
     if (!ret) {
-        qWarning() << q.lastError() << q.lastQuery();
+        LOG_QUERY_ERROR
+        break;
     }
-
     CLOSE_BACKGROUND_DATABASE
 
     return ret;
@@ -277,36 +318,47 @@ bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
 
 int SQLiteLocalDatabase::queryImagesCount()
 {
+    int ret = 0;
     if (!m_db.isOpen()) {
-        return 0;
+        return ret;
     }
 
-    QSqlQuery q(SQL_QUERY_IMAGES_COUNT);
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(SQL_QUERY_IMAGES_COUNT, db);
     if (q.first()) {
-        return q.value(0).toInt();
-    } else {
-        return 0;
+        ret = q.value(0).toInt();
     }
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::insertImage(Image *image)
 {
+    bool ret = false;
     if (!m_db.isOpen()) {
-        return false;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_INSERT_IMAGE);
     q.addBindValue(image->source()->hashStr());
     q.addBindValue(image->name());
     q.addBindValue(image->source()->url().toString());
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
+        LOG_QUERY_ERROR
+        break;
     }
+    ret = true;
 
-    return true;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::insertImages(const ImageList &images)
@@ -317,8 +369,7 @@ bool SQLiteLocalDatabase::insertImages(const ImageList &images)
 
     bool ret = false;
 
-    OPEN_BACKGROUND_DATABASE("insertImagesAsync")
-
+    OPEN_BACKGROUND_DATABASE
     QSqlQuery q(db);
     q.prepare(SQL_INSERT_IMAGE);
 
@@ -337,7 +388,8 @@ bool SQLiteLocalDatabase::insertImages(const ImageList &images)
 
     ret = q.execBatch();
     if (!ret) {
-        qWarning() << q.lastError() << q.lastQuery();
+        LOG_QUERY_ERROR
+        break;
     }
 
     CLOSE_BACKGROUND_DATABASE
@@ -347,160 +399,208 @@ bool SQLiteLocalDatabase::insertImages(const ImageList &images)
 
 Image *SQLiteLocalDatabase::queryImageByHashStr(const QString &hashStr)
 {
+    Image *ret = nullptr;
     if (!m_db.isOpen()) {
-        return 0;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_QUERY_IMAGE_BY_HASH);
     q.addBindValue(hashStr);
 
     if (!q.exec() || !q.first()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return 0;
+        LOG_QUERY_ERROR
+        break;
     } else {
         QString urlStr = q.value(0).toString();
-        return new Image(QUrl(urlStr));
+        ret = new Image(QUrl(urlStr));
     }
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::updateImageUrl(const QUrl &oldUrl, const QUrl &newUrl)
 {
+    bool ret = false;
     if (!m_db.isOpen()) {
-        return false;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_UPDATE_IMAGE_URL);
     q.addBindValue(newUrl.toString());
     q.addBindValue(oldUrl.toString());
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
+        LOG_QUERY_ERROR
+        break;
     }
+    ret = true;
 
-    return true;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 int SQLiteLocalDatabase::queryImageRankValue(Image *image)
 {
+    int ret = ImageRank::DEFAULT_VALUE;
     if (!m_db.isOpen() || !image || !image->source()) {
-        return ImageRank::DEFAULT_VALUE;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_QUERY_IMAGE_RANK_BY_IMAGE_HASH);
     q.addBindValue(image->source()->hashStr());
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return ImageRank::DEFAULT_VALUE;
+        LOG_QUERY_ERROR
+        break;
     }
 
     while (q.next()) {
-        return q.value("rank").toInt();
+        ret = q.value("rank").toInt();
     }
 
-    return ImageRank::DEFAULT_VALUE;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::updateImageRank(Image *image, int rank)
 {
+    bool ret = false;
     if (!m_db.isOpen() || image == 0) {
-        return false;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_UPDATE_IMAGE_RANK_BY_IMAGE_HASH);
     q.addBindValue(rank);
     q.addBindValue(image->source()->hashStr());
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
+        LOG_QUERY_ERROR
+        break;
     }
+    ret = true;
 
-    return true;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 int SQLiteLocalDatabase::insertPluginPlayListProviderType(const QString &name)
 {
+    // TODO: const
+    int ret = -1;
     if (!m_db.isOpen()) {
-        return PlayListRecord::UNKNOWN_TYPE;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_INSERT_PLUGIN_PLAYLIST_PROVIDER);
     q.addBindValue(name);
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return PlayListRecord::UNKNOWN_TYPE;
+        LOG_QUERY_ERROR
+        break;
     }
+    ret = q.lastInsertId().toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
 
-    return q.lastInsertId().toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 int SQLiteLocalDatabase::queryPluginPlayListProviderType(const QString &name)
 {
+    // TODO: const
+    int ret = -1;
     if (!m_db.isOpen()) {
-        return PlayListRecord::UNKNOWN_TYPE;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_QUERY_PLUGIN_PLAYLIST_PROVIDER);
     q.addBindValue(name);
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return PlayListRecord::UNKNOWN_TYPE;
+        LOG_QUERY_ERROR
+        break;
     }
 
     while (q.next()) {
-        return q.value("rowid").toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
+        ret = q.value("rowid").toInt() + PLUGIN_PLAYLIST_PROVIDER_TYPE_OFFSET;
     }
 
-    return PlayListRecord::UNKNOWN_TYPE;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 bool SQLiteLocalDatabase::saveTaskProgressTimeConsumption(const QString &key, qint64 timeConsumption)
 {
+    bool ret = false;
     if (!m_db.isOpen() || key.isEmpty()) {
-        return false;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION);
     q.addBindValue(key);
     q.addBindValue(timeConsumption);
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return false;
+        LOG_QUERY_ERROR
+        break;
     }
+    ret = true;
 
-    return true;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }
 
 qint64 SQLiteLocalDatabase::queryTaskProgressTimeConsumption(const QString &key)
 {
+    qint64 ret = 0;
     if (!m_db.isOpen() || key.isEmpty()) {
-        return 0;
+        return ret;
     }
 
-    QSqlQuery q;
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
     q.prepare(SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION);
     q.addBindValue(key);
 
     if (!q.exec()) {
-        qWarning() << q.lastError() << q.lastQuery();
-        return 0;
+        LOG_QUERY_ERROR
+        break;
     }
 
     while (q.next()) {
-        return q.value("last_time_consumption").toInt();
+        ret = q.value("last_time_consumption").toInt();
     }
 
-    return 0;
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
 }

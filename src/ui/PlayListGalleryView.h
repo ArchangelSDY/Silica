@@ -1,8 +1,8 @@
 #ifndef PLAYLISTGALLERYVIEW_H
 #define PLAYLISTGALLERYVIEW_H
 
+#include "playlist/PlayListEntity.h"
 #include "GalleryView.h"
-#include "PlayListRecord.h"
 
 class PlayListGalleryView : public GalleryView
 {
@@ -14,7 +14,7 @@ signals:
     void promptToCreatePlayListRecord(int type);
 
 public slots:
-    void setPlayListRecords(QList<PlayListRecord *> records);
+    void setPlayListEntities(QList<PlayListEntity *> entities);
 
 private slots:
     void renameSelectedItem();

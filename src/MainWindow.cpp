@@ -28,7 +28,9 @@
 #include "navigation/NavigationPlayerManager.h"
 #include "navigation/NormalNavigationPlayer.h"
 #include "playlist/sort/PlayListImageUrlSorter.h"
-#include "playlist/LocalPlayListProviderFactory.h"
+#include "playlist/LocalPlayListProvider.h"
+#include "playlist/PlayListProviderManager.h"
+#include "playlist/PlayListProvider.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
 #include "ui/models/MainGraphicsViewModel.h"
@@ -350,8 +352,16 @@ void MainWindow::setupExtraUi()
     Logger::instance()->addListener(Logger::IMAGE_THUMBNAIL_LOAD_ERROR,
                                     m_imagePathCorrector);
 
-    // TODO: Lazy load here
-    loadSavedPlayLists();
+    connect(&m_playListCreateWatcher, &QFutureWatcher<QSharedPointer<PlayList>>::finished,
+            this, &MainWindow::playListCreated);
+    auto providers = PlayListProviderManager::instance()->instance()->all();
+    for (auto provider : providers) {
+        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
+        connect(provider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
+    }
+    // TODO
+    m_currentPlayListProvider = PlayListProviderManager::instance()->instance()->get(0);
+    loadCurrentPlayListProvider();
 }
 
 void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel)
@@ -383,10 +393,58 @@ void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGra
     *pWidget = mainGraphicsViewWidget;
 }
 
-void MainWindow::loadSavedPlayLists()
+void MainWindow::loadCurrentPlayListProvider()
 {
-    ui->playListGallery->setPlayListRecords(
-        PlayListRecord::all());
+    PlayListProvider *provider = m_currentPlayListProvider;
+    QtConcurrent::run([provider]() {
+        provider->loadEntities();
+    });
+}
+
+void MainWindow::playListProviderEntitiesChanged()
+{
+    auto entities = m_currentPlayListProvider->entities();
+    ui->playListGallery->setPlayListEntities(entities);
+}
+
+void MainWindow::playListTriggered(PlayListEntity *entity)
+{
+    auto future = QtConcurrent::run([entity]() {
+        QSharedPointer<PlayList> playList(entity->createPlayList());
+        return playList;
+    });
+    m_playListCreateWatcher.setFuture(future);
+
+    // Show gallery view
+    m_actToolBarGallery->trigger();
+}
+
+void MainWindow::playListCreated()
+{
+    auto future = m_playListCreateWatcher.future();
+    if (!future.isFinished()) {
+        return;
+    }
+	auto playList = future.result();
+
+    setPrimaryNavigatorPlayList(playList);
+
+    // TODO
+	// // Make cover image of first playlist item selected
+	// PlayListGalleryItem *firstItem =
+	//     static_cast<PlayListGalleryItem *>(selectedItems[0]);
+	// int coverIndex = firstItem->record()->coverIndex();
+
+	// QList<GalleryItem *> items = ui->gallery->galleryItems();
+	// if (coverIndex >= 0 && coverIndex < items.count()) {
+	//     GalleryItem *coverImageItem = items.at(coverIndex);
+	//     ui->gallery->scene()->clearSelection();
+
+	//     // This has to be async because QGraphicsItem::setSelected() will
+	//     // have no effect if item is not visible while our item will remain
+	//     // hide until thumbnail loaded.
+	//     coverImageItem->scheduleSelectedAfterShown();
+	// }
 }
 
 void MainWindow::loadSelectedPlayList()
@@ -402,30 +460,8 @@ void MainWindow::loadSelectedPlayList()
         // a choice?
         PlayListGalleryItem *playListItem =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        QSharedPointer<PlayList> pl = playListItem->record()->playList();
-        setPrimaryNavigatorPlayList(pl);
-
-        // Navigator should take ownership of PlayList in this case
-        // m_navigator->setPlayList(pl, true);
-
-        // Make cover image of first playlist item selected
-        PlayListGalleryItem *firstItem =
-            static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        int coverIndex = firstItem->record()->coverIndex();
-
-        QList<GalleryItem *> items = ui->gallery->galleryItems();
-        if (coverIndex >= 0 && coverIndex < items.count()) {
-            GalleryItem *coverImageItem = items.at(coverIndex);
-            ui->gallery->scene()->clearSelection();
-
-            // This has to be async because QGraphicsItem::setSelected() will
-            // have no effect if item is not visible while our item will remain
-            // hide until thumbnail loaded.
-            coverImageItem->scheduleSelectedAfterShown();
-        }
-
-        // Show gallery view
-        m_actToolBarGallery->trigger();
+        PlayListEntity *entity = playListItem->entity();
+        m_currentPlayListProvider->triggerEntity(entity);
     }
 }
 
@@ -641,63 +677,65 @@ void MainWindow::promptToSaveLocalPlayList()
 
     QString name = dialog.textValue();
     if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
-        QSharedPointer<PlayList> playList = m_navigator->playList();
-        PlayListRecordBuilder plrBuilder;
-        plrBuilder
-            .setName(name)
-            .setCoverPath(image->thumbnailPath())
-            .setPlayList(playList)
-            .setType(LocalPlayListProviderFactory::TYPE);
-        QSharedPointer<PlayListRecord> record(plrBuilder.obtain());
-        if (record->save()) {
-            ImageList images = playList->toImageList();
-            QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>();
-            connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, name]() {
-                if (watcher->result()) {
-                    this->statusBar()->showMessage(QString("PlayList %1 saved!").arg(name), 2000);
+        // TODO
+        // QSharedPointer<PlayList> playList = m_navigator->playList();
+        // PlayListRecordBuilder plrBuilder;
+        // plrBuilder
+        //     .setName(name)
+        //     .setCoverPath(image->thumbnailPath())
+        //     .setPlayList(playList)
+        //     .setType(LocalPlayListProviderFactory::TYPE);
+        // QSharedPointer<PlayListRecord> record(plrBuilder.obtain());
+        // if (record->save()) {
+        //     ImageList images = playList->toImageList();
+        //     QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>();
+        //     connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, name]() {
+        //         if (watcher->result()) {
+        //             this->statusBar()->showMessage(QString("PlayList %1 saved!").arg(name), 2000);
 
-                    // Refresh playlist gallery
-                    this->loadSavedPlayLists();
-                } else {
-                    this->statusBar()->showMessage(
-                        QString("Failed to associate images to playList %1!").arg(name), 2000);
-                }
-                watcher->deleteLater();
-            });
-            watcher->setFuture(QtConcurrent::run([images, record]() {
-                if (!LocalDatabase::instance()->insertImages(images)) {
-                    return false;
-                }
-                return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, images);
-            }));
-        } else {
-            statusBar()->showMessage(
-                QString("Failed to save playList %1!").arg(name), 2000);
-        }
+        //             // Refresh playlist gallery
+        //             this->loadPlayListProviders();
+        //         } else {
+        //             this->statusBar()->showMessage(
+        //                 QString("Failed to associate images to playList %1!").arg(name), 2000);
+        //         }
+        //         watcher->deleteLater();
+        //     });
+        //     watcher->setFuture(QtConcurrent::run([images, record]() {
+        //         if (!LocalDatabase::instance()->insertImages(images)) {
+        //             return false;
+        //         }
+        //         return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, images);
+        //     }));
+        // } else {
+        //     statusBar()->showMessage(
+        //         QString("Failed to save playList %1!").arg(name), 2000);
+        // }
     }
 }
 
 void MainWindow::promptToCreatePlayListRecord(int type)
 {
-    QString name = QInputDialog::getText(this, "New PlayList", "Name");
-    if (!name.isEmpty()) {
-        PlayListRecordBuilder plrBuilder;
-        plrBuilder
-            .setName(name)
-            .setType(type);
-        PlayListRecord *record = plrBuilder.obtain();
-        if (record->save()) {
-            statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
-                                     2000);
+    // TODO
+    // QString name = QInputDialog::getText(this, "New PlayList", "Name");
+    // if (!name.isEmpty()) {
+    //     PlayListRecordBuilder plrBuilder;
+    //     plrBuilder
+    //         .setName(name)
+    //         .setType(type);
+    //     PlayListRecord *record = plrBuilder.obtain();
+    //     if (record->save()) {
+    //         statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
+    //                                  2000);
 
-            // Refresh playlist gallery
-            loadSavedPlayLists();
-        } else {
-            statusBar()->showMessage(
-                QString("Failed to save playList %1!").arg(name), 2000);
-        }
-        delete record;
-    }
+    //         // Refresh playlist gallery
+    //         loadPlayListProviders();
+    //     } else {
+    //         statusBar()->showMessage(
+    //             QString("Failed to save playList %1!").arg(name), 2000);
+    //     }
+    //     delete record;
+    // }
 }
 
 void MainWindow::editImageUrl(QListWidgetItem *item)

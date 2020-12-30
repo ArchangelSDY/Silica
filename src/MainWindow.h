@@ -2,9 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QActionGroup>
+#include <QFutureWatcher>
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QScopedPointer>
+#include <QSharedPointer>
 
 #include "models/BasketModel.h"
 #include "navigation/NavigatorSynchronizer.h"
@@ -22,6 +24,8 @@ class ImagesCache;
 class ImagePathCorrector;
 class GamepadController;
 class MainGraphicsViewModel;
+class PlayListEntity;
+class PlayListProvider;
 
 class MainWindow : public QMainWindow
 {
@@ -41,8 +45,11 @@ private slots:
     void playListChange();
     void playListAppend(int start);
 
+    void playListProviderEntitiesChanged();
+    void playListTriggered(PlayListEntity *entity);
+    void playListCreated();
+
     void imageLoaded(QSharedPointer<ImageData> image);
-    void loadSavedPlayLists();
     void loadSelectedPlayList();
     void loadOrEnterSelectedPath();
     void loadSelectedPath();
@@ -74,7 +81,12 @@ private:
     void toggleSecondaryNavigator();
     void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist);
 
+    void loadCurrentPlayListProvider();
+
     Ui::MainWindow *ui;
+
+    PlayListProvider *m_currentPlayListProvider;
+    QFutureWatcher<QSharedPointer<PlayList>> m_playListCreateWatcher;
 
     QSharedPointer<ImagesCache> m_imagesCache;
 

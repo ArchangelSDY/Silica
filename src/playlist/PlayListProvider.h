@@ -1,13 +1,13 @@
-#ifndef PLAYLISTPROVIDER_H
-#define PLAYLISTPROVIDER_H
+#pragma once
 
+#include <QList>
 #include <QObject>
 #include <QVariantHash>
 
 #include "image/Image.h"
 
+class PlayListEntity;
 class PlayListProviderFactory;
-class PlayListRecord;
 
 class PlayListProvider : public QObject
 {
@@ -16,23 +16,27 @@ public:
     explicit PlayListProvider(QObject *parent = 0) : QObject(parent) {}
 
     virtual ~PlayListProvider() {}
+    virtual int type() const = 0;
+    virtual QString name() const = 0;
+    virtual QList<PlayListEntity *> entities() const = 0;
+    virtual void loadEntities() = 0;
+    virtual void triggerEntity(PlayListEntity *entity) = 0;
 
-    virtual QString typeName() const = 0;
-    virtual bool canContinueProvide() const = 0;
+    // virtual QString typeName() const = 0;
+    // virtual bool canContinueProvide() const = 0;
 
-    virtual void request(const QString &name,
-                         const QVariantHash &extra = QVariantHash()) = 0;
+    // virtual void request(const QString &name,
+    //                      const QVariantHash &extra = QVariantHash()) = 0;
 
-    virtual bool isImagesReadOnly() const { return true; }
-    virtual bool insertImages(const PlayListRecord &record,
-                              const ImageList &images) { return false; }
-    virtual bool removeImages(const PlayListRecord &record,
-                              const ImageList &images) { return false; }
+    // virtual bool isImagesReadOnly() const { return true; }
+    // virtual bool insertImages(const PlayListRecord &record,
+    //                           const ImageList &images) { return false; }
+    // virtual bool removeImages(const PlayListRecord &record,
+    //                           const ImageList &images) { return false; }
 
 signals:
-    void gotItems(const QList<QUrl> &urls,
-                  const QList<QVariantHash> &extraInfos);
-    void itemsCountChanged(int count);
+    void entitiesChanged();
+    void playListTriggered(PlayListEntity *entity);
+//     void gotItems(const QList<QUrl> &urls,
+//                   const QList<QVariantHash> &extraInfos);
 };
-
-#endif // PLAYLISTPROVIDER_H

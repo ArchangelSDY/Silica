@@ -238,15 +238,16 @@ void ImagePathCorrector::applyPatches()
 
 void ImagePathCorrector::reloadPlayList()
 {
-    if (m_navigator) {
-        QSharedPointer<PlayList> pl = m_navigator->playList();
-        if (pl) {
-            PlayListRecord *plr = pl->record();
-            if (plr) {
-                plr->reload();
-            }
-        }
-    }
+    // TODO
+    //if (m_navigator) {
+    //    QSharedPointer<PlayList> pl = m_navigator->playList();
+    //    if (pl) {
+    //        PlayListRecord *plr = pl->record();
+    //        if (plr) {
+    //            plr->reload();
+    //        }
+    //    }
+    //}
 }
 
 void ImagePathCorrector::setTestMode(bool isTestMode)

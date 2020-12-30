@@ -1,5 +1,7 @@
 .moc/
 .obj/
+.vs/
+out/
 .qmake.stash
 .DS_Store
 *.swp
@@ -7,5 +9,7 @@
 *.a
 *.dylib
 *.pro.user
+*.bak
 *CMakeLists.txt.user
+CMakeSettings.json
 Makefile

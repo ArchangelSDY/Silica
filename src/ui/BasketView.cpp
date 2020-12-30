@@ -3,7 +3,6 @@
 #include <QtConcurrent>
 
 #include "models/BasketModel.h"
-#include "playlist/PlayListRecord.h"
 #include "ui/ImageGalleryItem.h"
 
 BasketView::BasketView(QWidget *parent) :
@@ -66,14 +65,16 @@ void BasketView::appendToNavigator()
     if (navPl) {
         navPl->append(basketPl);
 
-        // Sync with record if any
-        PlayListRecord *record = navPl->record();
-        if (record) {
-            ImageList images = basketPl->toImageList();
-            QtConcurrent::run([record, images]() {
-                record->insertImages(images);
-            });
-        }
+        // TODO
+
+        // // Sync with record if any
+        // PlayListRecord *record = navPl->record();
+        // if (record) {
+        //     ImageList images = basketPl->toImageList();
+        //     QtConcurrent::run([record, images]() {
+        //         record->insertImages(images);
+        //     });
+        // }
     }
     m_basket->clear();
 }

@@ -4,23 +4,23 @@
 #include <QFutureWatcher>
 #include <QGraphicsItem>
 
+#include "playlist/PlayListEntity.h"
 #include "AbstractGalleryItemRenderer.h"
 #include "GalleryItem.h"
-#include "PlayListRecord.h"
 
 class PlayListGalleryItem : public GalleryItem
 {
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    explicit PlayListGalleryItem(PlayListRecord *record,
+    explicit PlayListGalleryItem(PlayListEntity *entity,
                                  AbstractRendererFactory *rendererFactory,
                                  QGraphicsItem *parent = 0);
     ~PlayListGalleryItem();
 
     QString name() const;
     QRectF boundingRect() const;
-    PlayListRecord *record() { return m_record; }
+    PlayListEntity *entity() { return m_entity; }
 
     virtual void load() override;
     virtual void createRenderer();
@@ -30,7 +30,7 @@ private slots:
     void onThumbnailLoaded();
 
 private:
-    PlayListRecord *m_record;
+    PlayListEntity *m_entity;
     QFutureWatcher<QSharedPointer<QImage>> m_thumbnailLoader;
 };
 
