@@ -5,8 +5,6 @@
 
 #include "playlist/PlayListEntityOption.h"
 
-class PlayList;
-
 class PlayListEntity
 {
 public:
@@ -15,5 +13,10 @@ public:
     virtual QString name() const = 0;
     virtual bool supportsOption(PlayListEntityOption option) const = 0;
     virtual QImage loadCoverImage() = 0;
-    virtual PlayList *createPlayList() = 0;
+
+    // Load image urls in this playlist
+    //
+    // Note that we should not create PlayList directly here as PlayList must
+    // be created on main thread so we can correctly receive signals there
+    virtual QList<QUrl> loadImageUrls() = 0;
 };

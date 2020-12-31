@@ -38,14 +38,7 @@ QImage LocalPlayListEntity::loadCoverImage()
     return QImage(coverFullPath);
 }
 
-#include <QDebug>
-
-PlayList *LocalPlayListEntity::createPlayList()
+QList<QUrl> LocalPlayListEntity::loadImageUrls()
 {
-    QList<QUrl> imageUrls =
-        LocalDatabase::instance()->queryImageUrlsForLocalPlayListEntity(m_id);
-    for (const auto &url : imageUrls) {
-        qDebug() << url;
-    }
-    return new PlayList(imageUrls);
+    return LocalDatabase::instance()->queryImageUrlsForLocalPlayListEntity(m_id);
 }

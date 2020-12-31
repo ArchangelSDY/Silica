@@ -352,7 +352,7 @@ void MainWindow::setupExtraUi()
     Logger::instance()->addListener(Logger::IMAGE_THUMBNAIL_LOAD_ERROR,
                                     m_imagePathCorrector);
 
-    connect(&m_playListCreateWatcher, &QFutureWatcher<QSharedPointer<PlayList>>::finished,
+    connect(&m_playListCreateWatcher, &QFutureWatcher<QList<QUrl>>::finished,
             this, &MainWindow::playListCreated);
     auto providers = PlayListProviderManager::instance()->instance()->all();
     for (auto provider : providers) {
@@ -410,8 +410,7 @@ void MainWindow::playListProviderEntitiesChanged()
 void MainWindow::playListTriggered(PlayListEntity *entity)
 {
     auto future = QtConcurrent::run([entity]() {
-        QSharedPointer<PlayList> playList(entity->createPlayList());
-        return playList;
+        return entity->loadImageUrls();
     });
     m_playListCreateWatcher.setFuture(future);
 
@@ -425,9 +424,9 @@ void MainWindow::playListCreated()
     if (!future.isFinished()) {
         return;
     }
-	auto playList = future.result();
+    auto imageUrls = future.result();
 
-    setPrimaryNavigatorPlayList(playList);
+    setPrimaryNavigatorPlayList(QSharedPointer<PlayList>::create(imageUrls));
 
     // TODO
 	// // Make cover image of first playlist item selected

@@ -86,7 +86,7 @@ private:
     Ui::MainWindow *ui;
 
     PlayListProvider *m_currentPlayListProvider;
-    QFutureWatcher<QSharedPointer<PlayList>> m_playListCreateWatcher;
+    QFutureWatcher<QList<QUrl>> m_playListCreateWatcher;
 
     QSharedPointer<ImagesCache> m_imagesCache;
 

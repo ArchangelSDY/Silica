@@ -46,10 +46,10 @@ QImage PlayListEntityDelegate::loadCoverImage()
     return QImage(coverFullPath);
 }
 
-PlayList *PlayListEntityDelegate::createPlayList()
+QList<QUrl> PlayListEntityDelegate::loadImageUrls()
 {
     // TODO: Need implementation
-    return nullptr;
+    return {};
     //QVariantHash extras;
     //auto imageUrls = m_provider->request(m_name, extras);
     //return new PlayList(imageUrls);
