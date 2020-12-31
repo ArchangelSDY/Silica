@@ -78,7 +78,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setupExtraUi();
 
-    ui->gallery->setPlayList(m_navigator->playList());
+    // TODO
+    // ui->gallery->setPlayList(m_navigator->playList());
 
     // Side view
     m_sideViewModel.reset(new MainGraphicsViewModel(m_navigator, m_imageEffectManager.data(), nullptr));
@@ -117,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Update gallery
     connect(m_navigator, &Navigator::playListItemChange, ui->gallery, &MainImageGalleryView::playListItemChange);
-    connect(m_navigator, &Navigator::playListChange, ui->gallery, &MainImageGalleryView::playListChange);
+    connect(m_navigator, &Navigator::playListChange, ui->gallery, &MainImageGalleryView::setPlayList);
     connect(m_navigator, &Navigator::playListAppend, ui->gallery, &MainImageGalleryView::playListAppend);
 
     connect(m_navigator, SIGNAL(navigationChange(int)),
@@ -314,7 +315,6 @@ void MainWindow::setupExtraUi()
     ui->pageGallery->layout()->setMargin(0);
     ui->pageGallery->layout()->setSpacing(0);
     ui->sideView->hide();
-    ui->gallery->setNavigator(m_navigator);
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
             m_actToolBarImage, SLOT(trigger()));
     connect(ui->gallery, SIGNAL(keyEnterPressed()),
@@ -333,7 +333,6 @@ void MainWindow::setupExtraUi()
     ui->basketPane->hide();
     ui->basketPane->layout()->setSpacing(0);
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
-    ui->basketView->setNavigator(m_navigator);
     ui->basketView->setBasketModel(&m_basket);
     ui->gallery->setBasketModel(&m_basket);
 
@@ -409,6 +408,8 @@ void MainWindow::playListProviderEntitiesChanged()
 
 void MainWindow::playListTriggered(PlayListEntity *entity)
 {
+    ui->gallery->setPlayListEntity(entity);
+
     auto future = QtConcurrent::run([entity]() {
         return entity->loadImageUrls();
     });

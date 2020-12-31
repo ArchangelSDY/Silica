@@ -17,15 +17,15 @@
 #include "playlist/sort/PlayListImageNameSorter.h"
 #include "playlist/sort/PlayListImageSizeSorter.h"
 #include "playlist/sort/PlayListImageUrlSorter.h"
+#include "playlist/PlayListEntity.h"
+#include "playlist/PlayListProvider.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageGalleryView.h"
 #include "ui/renderers/CompactRendererFactory.h"
 #include "ui/renderers/LooseRendererFactory.h"
-#include "Navigator.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
-    m_navigator(0) ,
     m_playList(0) ,
     m_rankFilterMenuManager(0)
 {
@@ -38,24 +38,24 @@ ImageGalleryView::ImageGalleryView(QWidget *parent) :
 
 ImageGalleryView::~ImageGalleryView()
 {
-    if (m_rankFilterMenuManager) {
-        delete m_rankFilterMenuManager;
-    }
-}
-
-void ImageGalleryView::setNavigator(Navigator *navigator)
-{
-    m_navigator = navigator;
 }
 
 void ImageGalleryView::setPlayList(QSharedPointer<PlayList> playList)
 {
     m_playList = playList;
+    m_rankFilterMenuManager.reset(new RankFilterMenuManager(m_playList));
+    reload();
+}
 
-    if (m_rankFilterMenuManager) {
-        delete m_rankFilterMenuManager;
-    }
-    m_rankFilterMenuManager = new RankFilterMenuManager(m_playList, this);
+void ImageGalleryView::setPlayListEntity(PlayListEntity *playListEntity)
+{
+    m_playListEntity = playListEntity;
+}
+
+void ImageGalleryView::reload()
+{
+    clear();
+    playListAppend(0);
 }
 
 void ImageGalleryView::playListItemChange(int index)
@@ -64,15 +64,15 @@ void ImageGalleryView::playListItemChange(int index)
     scheduleLayout();
 }
 
-void ImageGalleryView::playListChange(QSharedPointer<PlayList> playList)
-{
-    if (playList && playList != m_playList) {
-        setPlayList(playList);
-    }
-
-    clear();
-    playListAppend(0);
-}
+// void ImageGalleryView::playListChange(QSharedPointer<PlayList> playList)
+// {
+//     if (playList && playList != m_playList) {
+//         setPlayList(playList);
+//     }
+// 
+//     clear();
+//     playListAppend(0);
+// }
 
 void ImageGalleryView::playListAppend(int start)
 {
@@ -126,14 +126,13 @@ QMenu *ImageGalleryView::createContextMenu()
 
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
-    // TODO
-    // if (m_playList && m_playList->record()) {
-    //     QAction *actSetAsCover =
-    //         menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
-    //     if (selectedItems.count() == 0) {
-    //         actSetAsCover->setEnabled(false);
-    //     }
-    // }
+    if (m_playListEntity && m_playListEntity->provider()->supportsOption(PlayListProviderOption::UpdateEntity)) {
+        QAction *actSetAsCover =
+            menu->addAction(tr("Set As Cover"), this, SLOT(setAsCover()));
+        if (selectedItems.count() == 0) {
+            actSetAsCover->setEnabled(false);
+        }
+    }
 
     if (!selectedItems.isEmpty()) {
         menu->addAction(tr("Refresh"), this, SLOT(refreshSelected()));
@@ -185,18 +184,16 @@ void ImageGalleryView::sortBySize()
 
 void ImageGalleryView::setAsCover()
 {
-    // TODO
-    // QList<GalleryItem *> selectedItems = selectedGalleryItems();
-    // if (m_playList && selectedItems.count() > 0) {
-    //     ImageGalleryItem *item =
-    //         static_cast<ImageGalleryItem *>(selectedItems[0]);
-    //     PlayListRecord *record = m_playList->record();
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    if (m_playListEntity && selectedItems.count() > 0) {
+        ImageGalleryItem *item = static_cast<ImageGalleryItem *>(selectedItems[0]);
+        m_playListEntity->setCoverImagePath(item->image()->thumbnailPath());
 
-    //     if (record) {
-    //          record->setCoverPath(item->image()->thumbnailPath());
-    //          record->save();
-    //     }
-    // }
+        auto entity = m_playListEntity;
+        QtConcurrent::run([entity]() {
+            entity->provider()->updateEntity(entity);
+        });
+    }
 }
 
 void ImageGalleryView::removeSelected()
@@ -277,16 +274,13 @@ void ImageGalleryView::groupBy(AbstractPlayListGrouper *grouper)
         connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
         QThreadPool::globalInstance()->start(task);
 
-        // TODO
-        // PlayListRecord *plr = m_playList->record();
-        // if (plr) {
-        if (false) {
-            // QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
-            //     .arg(plr->id())
-            //     .arg(QUuid::createUuid().toString());
-            // m_groupingProgress.setKey(key);
-            // m_groupingProgress.setEstimateEnabled(true);
-            // m_groupingProgress.setMaximum(36);
+        if (m_playListEntity) {
+            QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
+                .arg(m_playListEntity->name()) // TODO: It seems we need a unique id here
+                .arg(QUuid::createUuid().toString());
+            m_groupingProgress.setKey(key);
+            m_groupingProgress.setEstimateEnabled(true);
+            m_groupingProgress.setMaximum(36);
         } else {
             m_groupingProgress.setKey(QString());
             m_groupingProgress.setEstimateEnabled(false);

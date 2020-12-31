@@ -13,9 +13,11 @@ public:
     virtual ~LocalPlayListProvider() override;
     virtual int type() const override;
     virtual QString name() const override;
+    virtual bool supportsOption(PlayListProviderOption option) const override;
     virtual QList<PlayListEntity *> entities() const override;
     virtual void loadEntities() override;
     virtual void triggerEntity(PlayListEntity *entity) override;
+    virtual void updateEntity(PlayListEntity *entity) override;
 
     // QString typeName() const;
     // bool canContinueProvide() const;

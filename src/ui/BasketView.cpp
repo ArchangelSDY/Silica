@@ -25,9 +25,7 @@ void BasketView::setBasketModel(BasketModel *basket)
     setPlayList(m_basket->playList());
     connect(m_playList.data(), SIGNAL(itemsAppended(int)),
             this, SLOT(playListAppend(int)));
-    connect(m_playList.data(), &PlayList::itemsChanged, [this]() {
-        this->playListChange(this->m_playList);
-    });
+    connect(m_playList.data(), &PlayList::itemsChanged, this, &BasketView::reload);
 }
 
 QMenu *BasketView::createContextMenu()
@@ -51,30 +49,31 @@ QMenu *BasketView::createContextMenu()
 
 void BasketView::exportToNavigator()
 {
-    QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
-    dupPl->append(m_basket->playList());
-    // TODO: Propagate to Main Window?
-    m_navigator->setPlayList(dupPl);
-    m_basket->clear();
+    // TODO
+    // QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
+    // dupPl->append(m_basket->playList());
+    // // TODO: Propagate to Main Window?
+    // m_navigator->setPlayList(dupPl);
+    // m_basket->clear();
 }
 
 void BasketView::appendToNavigator()
 {
-    QSharedPointer<PlayList> navPl = m_navigator->playList();
-    QSharedPointer<PlayList> basketPl = m_basket->playList();
-    if (navPl) {
-        navPl->append(basketPl);
+    // QSharedPointer<PlayList> navPl = m_navigator->playList();
+    // QSharedPointer<PlayList> basketPl = m_basket->playList();
+    // if (navPl) {
+    //     navPl->append(basketPl);
 
-        // TODO
+    //     // TODO
 
-        // // Sync with record if any
-        // PlayListRecord *record = navPl->record();
-        // if (record) {
-        //     ImageList images = basketPl->toImageList();
-        //     QtConcurrent::run([record, images]() {
-        //         record->insertImages(images);
-        //     });
-        // }
-    }
-    m_basket->clear();
+    //     // // Sync with record if any
+    //     // PlayListRecord *record = navPl->record();
+    //     // if (record) {
+    //     //     ImageList images = basketPl->toImageList();
+    //     //     QtConcurrent::run([record, images]() {
+    //     //         record->insertImages(images);
+    //     //     });
+    //     // }
+    // }
+    // m_basket->clear();
 }

@@ -4,12 +4,12 @@
 
 namespace sapi {
 
-class IPlayListProvider;
+class PlayListProviderDelegate;
 
 class PlayListEntityDelegate : public PlayListEntity
 {
 public:
-    PlayListEntityDelegate(IPlayListProvider *provider,
+    PlayListEntityDelegate(PlayListProviderDelegate *provider,
         const QString &name, int count, const QString &coverPath, bool canContinueProvide);
 
     virtual ~PlayListEntityDelegate() override;
@@ -19,8 +19,9 @@ public:
     virtual QImage loadCoverImage() override;
     virtual QList<QUrl> loadImageUrls() override;
 
+    virtual void setCoverImagePath(const QString &path) override;
+
 private:
-    IPlayListProvider *m_provider;
     QString m_name;
     int m_count;
     QString m_coverPath;

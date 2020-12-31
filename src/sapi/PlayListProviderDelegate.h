@@ -21,11 +21,13 @@ public:
 
     virtual int type() const override;
     virtual QString name() const override;
+    virtual bool supportsOption(PlayListProviderOption option) const override;
     // bool canContinueProvide() const override;
 
     virtual QList<PlayListEntity *> entities() const override;
     virtual void loadEntities() override;
     virtual void triggerEntity(PlayListEntity *entity) override;
+    virtual void updateEntity(PlayListEntity *entity) override;
 
     // void request(const QString &name, const QVariantHash &extra) override;
 

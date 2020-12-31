@@ -27,6 +27,13 @@ QString LocalPlayListProvider::name() const
     return QObject::tr("Local");
 }
 
+bool LocalPlayListProvider::supportsOption(PlayListProviderOption option) const
+{
+    return option == PlayListProviderOption::CreateEntity
+        || option == PlayListProviderOption::UpdateEntity
+        || option == PlayListProviderOption::DeleteEntity;
+}
+
 QList<PlayListEntity*> LocalPlayListProvider::entities() const
 {
     QList<PlayListEntity*> ret;
@@ -42,7 +49,7 @@ void LocalPlayListProvider::loadEntities()
     qDeleteAll(m_entities.begin(), m_entities.end());
     auto items = LocalDatabase::instance()->queryPlayListEntities(LocalPlayListProviderFactory::TYPE);
     for (const auto& item : items) {
-        m_entities << new LocalPlayListEntity(item.type, item.id, item.name, item.count, item.coverPath);
+        m_entities << new LocalPlayListEntity(this, item.type, item.id, item.name, item.count, item.coverPath);
     }
     emit entitiesChanged();
 }
@@ -50,6 +57,20 @@ void LocalPlayListProvider::loadEntities()
 void LocalPlayListProvider::triggerEntity(PlayListEntity *entity)
 {
     emit playListTriggered(entity);
+}
+
+void LocalPlayListProvider::updateEntity(PlayListEntity *entity)
+{
+    LocalPlayListEntity *e = static_cast<LocalPlayListEntity *>(entity);
+
+    PlayListEntityData data;
+    data.id = e->m_id;
+    data.name = e->m_name;
+    data.coverPath = e->m_coverPath;
+    data.count = e->m_count;
+    LocalDatabase::instance()->updatePlayListEntity(data);
+
+    emit entitiesChanged();
 }
 
 // bool LocalPlayListProvider::canContinueProvide() const

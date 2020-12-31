@@ -1,13 +1,14 @@
 #include "sapi/PlayListEntityDelegate.h"
 #include <QHash>
 
-#include "sapi/IPlayListProvider.h"
+#include "sapi/PlayListProviderDelegate.h"
 #include "../GlobalConfig.h"
 
 namespace sapi {
 
-PlayListEntityDelegate::PlayListEntityDelegate(IPlayListProvider *provider, const QString &name, int count, const QString &coverPath, bool canContinueProvide) :
-    m_provider(provider) ,
+PlayListEntityDelegate::PlayListEntityDelegate(sapi::PlayListProviderDelegate *provider,
+        const QString &name, int count, const QString &coverPath, bool canContinueProvide) :
+    PlayListEntity(provider) ,
     m_name(name) ,
     m_count(count) ,
     m_coverPath(coverPath) ,
@@ -53,6 +54,11 @@ QList<QUrl> PlayListEntityDelegate::loadImageUrls()
     //QVariantHash extras;
     //auto imageUrls = m_provider->request(m_name, extras);
     //return new PlayList(imageUrls);
+}
+
+void PlayListEntityDelegate::setCoverImagePath(const QString &path)
+{
+    // TODO: Need implementation
 }
 
 }

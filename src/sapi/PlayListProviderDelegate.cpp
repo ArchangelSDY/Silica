@@ -42,6 +42,12 @@ QString PlayListProviderDelegate::name() const
     return m_displayName;
 }
 
+bool PlayListProviderDelegate::supportsOption(PlayListProviderOption option) const
+{
+    // TODO: Add extensibility
+    return false;
+}
+
 QList<PlayListEntity *> PlayListProviderDelegate::entities() const
 {
     QList<PlayListEntity*> ret;
@@ -63,7 +69,7 @@ void PlayListProviderDelegate::loadEntities()
     auto items = LocalDatabase::instance()->queryPlayListEntities(type);
     qDeleteAll(m_entities.begin(), m_entities.end());
     for (const auto &item : items) {
-        m_entities << new PlayListEntityDelegate(m_provider,
+        m_entities << new PlayListEntityDelegate(this,
             item.name, item.count, item.coverPath, m_canContinueProvide);
     }
     emit entitiesChanged();
@@ -73,6 +79,11 @@ void PlayListProviderDelegate::triggerEntity(PlayListEntity *entity)
 {
     // TODO: Add extensibility
     emit playListTriggered(entity);
+}
+
+void PlayListProviderDelegate::updateEntity(PlayListEntity *entity)
+{
+    // TODO: Add extensibility
 }
 
 // bool PlayListProviderDelegate::canContinueProvide() const

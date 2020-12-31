@@ -18,9 +18,9 @@ public:
 
     virtual QList<PlayListEntityData> queryPlayListEntities(int type) override;
     virtual QList<QUrl> queryImageUrlsForLocalPlayListEntity(int playListId) override;
-    virtual bool insertPlayListRecord(const PlayListEntityData &data) override;
-    virtual bool removePlayListRecord(const PlayListEntityData &data) override;
-    virtual bool updatePlayListRecord(const PlayListEntityData &data) override;
+    virtual bool insertPlayListEntity(PlayListEntityData &data) override;
+    virtual bool removePlayListEntity(const PlayListEntityData &data) override;
+    virtual bool updatePlayListEntity(const PlayListEntityData &data) override;
     virtual bool insertImagesForLocalPlayListProvider(
         const PlayListEntityData &data, const ImageList &images) override;
     virtual bool removeImagesForLocalPlayListProvider(

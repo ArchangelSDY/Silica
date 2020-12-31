@@ -77,6 +77,7 @@ file(GLOB CORE_SRCS
     # "playlist/LocalPlayListProviderFactory.cpp"
     "playlist/MinRankFilter.cpp"
     "playlist/NotEqualRankFilter.cpp"
+    "playlist/PlayListEntity.cpp"
     "playlist/PlayListProvider.h"
     "playlist/PlayListProviderFactory.cpp"
     "playlist/PlayListProviderManager.cpp"

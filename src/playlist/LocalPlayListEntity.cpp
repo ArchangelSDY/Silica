@@ -4,7 +4,9 @@
 #include "../GlobalConfig.h"
 #include "../PlayList.h"
 
-LocalPlayListEntity::LocalPlayListEntity(int type, int id, const QString &name, int count, const QString &coverPath) :
+LocalPlayListEntity::LocalPlayListEntity(LocalPlayListProvider *provider,
+        int type, int id, const QString &name, int count, const QString &coverPath) :
+    PlayListEntity(provider) ,
     m_type(type) ,
     m_id(id) ,
     m_name(name) ,
@@ -41,4 +43,9 @@ QImage LocalPlayListEntity::loadCoverImage()
 QList<QUrl> LocalPlayListEntity::loadImageUrls()
 {
     return LocalDatabase::instance()->queryImageUrlsForLocalPlayListEntity(m_id);
+}
+
+void LocalPlayListEntity::setCoverImagePath(const QString &path)
+{
+    m_coverPath = path;
 }

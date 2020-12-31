@@ -5,6 +5,7 @@
 #include <QVariantHash>
 
 #include "image/Image.h"
+#include "playlist/PlayListProviderOption.h"
 
 class PlayListEntity;
 class PlayListProviderFactory;
@@ -18,9 +19,11 @@ public:
     virtual ~PlayListProvider() {}
     virtual int type() const = 0;
     virtual QString name() const = 0;
+    virtual bool supportsOption(PlayListProviderOption option) const = 0;
     virtual QList<PlayListEntity *> entities() const = 0;
     virtual void loadEntities() = 0;
     virtual void triggerEntity(PlayListEntity *entity) = 0;
+    virtual void updateEntity(PlayListEntity *entity) = 0;
 
     // virtual QString typeName() const = 0;
     // virtual bool canContinueProvide() const = 0;

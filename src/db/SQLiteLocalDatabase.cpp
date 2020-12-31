@@ -69,19 +69,6 @@ const char *SQL_INSERT_OR_REPLACE_TASK_PROGRESS_TIME_CONSUMPTION =
 const char *SQL_QUERY_TASK_PROGRESS_TIME_CONSUMPTION =
 "select last_time_consumption from task_progresses where task_key = ?";
 
-// #define OPEN_BACKGROUND_DATABASE(NAME) \
-//     QString dbConnName = QStringLiteral(NAME) + QUuid::createUuid().toString(); \
-//     bool isMainThread = QThread::currentThread() == QApplication::instance()->thread(); \
-//     { \
-//         QSqlDatabase db = isMainThread ? m_db : QSqlDatabase::cloneDatabase(m_db, dbConnName); \
-//         if (!isMainThread && !db.open()) { \
-//             return false; \
-//         }
-// 
-// #define CLOSE_BACKGROUND_DATABASE \
-//     } \
-//     if (!isMainThread) QSqlDatabase::removeDatabase(dbConnName);
-
 #define OPEN_BACKGROUND_DATABASE                                                                        \
     QString dbConnName = QStringLiteral("%1_%2").arg(                                                   \
         __func__, reinterpret_cast<uint64_t>(QThread::currentThreadId()));                              \
@@ -177,16 +164,11 @@ QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListEntity(
     return imageUrls;
 }
 
-bool SQLiteLocalDatabase::insertPlayListRecord(const PlayListEntityData &data)
+bool SQLiteLocalDatabase::insertPlayListEntity(PlayListEntityData &data)
 {
     bool ret = false;
 
     OPEN_BACKGROUND_DATABASE
-
-    // int count = 0;
-    // if (playListRecord->playList()) {
-    //     count = playListRecord->playList()->count();
-    // }
 
     // Insert playlist
     QSqlQuery q(db);
@@ -200,9 +182,8 @@ bool SQLiteLocalDatabase::insertPlayListRecord(const PlayListEntityData &data)
         break;
     }
 
-    // TODO
-    // int playListId = qInsertPlayList.lastInsertId().toInt();
-    // playListRecord->setId(playListId);
+    int playListId = q.lastInsertId().toInt();
+    data.id = playListId;
 
     ret = true;
 
@@ -211,7 +192,7 @@ bool SQLiteLocalDatabase::insertPlayListRecord(const PlayListEntityData &data)
     return ret;
 }
 
-bool SQLiteLocalDatabase::removePlayListRecord(const PlayListEntityData &data)
+bool SQLiteLocalDatabase::removePlayListEntity(const PlayListEntityData &data)
 {
     bool ret = false;
 
@@ -227,7 +208,7 @@ bool SQLiteLocalDatabase::removePlayListRecord(const PlayListEntityData &data)
     return ret;
 }
 
-bool SQLiteLocalDatabase::updatePlayListRecord(const PlayListEntityData &data)
+bool SQLiteLocalDatabase::updatePlayListEntity(const PlayListEntityData &data)
 {
     bool ret = false;
 

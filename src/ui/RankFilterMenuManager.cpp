@@ -7,10 +7,8 @@ RankFilterMenuManager::RankFilterMenuManager(QSharedPointer<PlayList> playList,
                                              QObject *parent) :
     QObject(parent) ,
     m_playList(playList) ,
-    m_menu(0)
+    m_menu(new QMenu(tr("Rank")))
 {
-    m_menu = new QMenu(tr("Rank"));
-
     for (int i = ImageRank::MIN_VALUE; i <= ImageRank::MAX_VALUE; ++i) {
         QAction *rank = m_menu->addAction(
             QString("Rank %1").arg(i), this, SLOT(selectionChanged(bool)));
@@ -25,14 +23,9 @@ RankFilterMenuManager::RankFilterMenuManager(QSharedPointer<PlayList> playList,
     }
 }
 
-RankFilterMenuManager::~RankFilterMenuManager()
-{
-    delete m_menu;
-}
-
 QMenu *RankFilterMenuManager::menu()
 {
-    return m_menu;
+    return m_menu.data();
 }
 
 void RankFilterMenuManager::selectionChanged(bool selected)
