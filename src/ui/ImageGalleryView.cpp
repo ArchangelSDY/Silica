@@ -26,14 +26,17 @@
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
-    m_playList(0) ,
-    m_rankFilterMenuManager(0)
+    m_playList(nullptr) ,
+    m_playListEntity(nullptr) ,
+    m_rankFilterMenuManager(nullptr)
 {
 #ifdef ENABLE_OPENGL
     m_view->setViewport(new QOpenGLWidget(this));
 #endif
 
     setRendererFactory(new LooseRendererFactory());
+
+    connect(&m_groupByWatcher, &QFutureWatcher<void>::finished, &m_groupingProgress, &TaskProgress::stop);
 }
 
 ImageGalleryView::~ImageGalleryView()
@@ -246,34 +249,11 @@ QString ImageGalleryView::groupForItem(GalleryItem *rawItem)
     }
 }
 
-class BackgroundGroupTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    BackgroundGroupTask(QSharedPointer<PlayList> pl, AbstractPlayListGrouper *grouper) :
-        m_pl(pl),
-        m_grouper(grouper) {}
-
-    void run()
-    {
-        m_pl->groupBy(m_grouper);
-    }
-
-private:
-    QSharedPointer<PlayList> m_pl;
-    AbstractPlayListGrouper *m_grouper;
-};
-
 void ImageGalleryView::groupBy(AbstractPlayListGrouper *grouper)
 {
     enableGrouping();
 
     if (m_playList) {
-        BackgroundGroupTask *task = new BackgroundGroupTask(m_playList, grouper);
-        task->setAutoDelete(true);
-        connect(task, SIGNAL(destroyed()), &m_groupingProgress, SLOT(stop()));
-        QThreadPool::globalInstance()->start(task);
-
         if (m_playListEntity) {
             QString key = QStringLiteral("ImageGalleryView::groupBy_%1_%2")
                 .arg(m_playListEntity->name()) // TODO: It seems we need a unique id here
@@ -289,8 +269,11 @@ void ImageGalleryView::groupBy(AbstractPlayListGrouper *grouper)
 
         m_groupingProgress.reset();
         m_groupingProgress.start();
+
+        auto playList = m_playList;
+        auto future = QtConcurrent::run([playList, grouper]() {
+            playList->groupBy(grouper);
+        });
+        m_groupByWatcher.setFuture(future);
     }
 }
-
-
-#include "ImageGalleryView.moc"

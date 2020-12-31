@@ -1,6 +1,7 @@
 #ifndef IMAGEGALLERYVIEW_H
 #define IMAGEGALLERYVIEW_H
 
+#include <QFutureWatcher>
 #include <QScopedPointer>
 
 #include "AbstractRendererFactory.h"
@@ -46,6 +47,9 @@ protected:
     QScopedPointer<RankFilterMenuManager> m_rankFilterMenuManager;
 
     virtual QString groupForItem(GalleryItem *item) override;
+
+private:
+    QFutureWatcher<void> m_groupByWatcher;
 };
 
 #endif // IMAGEGALLERYVIEW_H
