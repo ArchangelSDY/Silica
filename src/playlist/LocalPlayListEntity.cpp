@@ -30,7 +30,8 @@ QString LocalPlayListEntity::name() const
 
 bool LocalPlayListEntity::supportsOption(PlayListEntityOption option) const
 {
-    return false;
+    return option == PlayListEntityOption::AddImageUrls
+        || option == PlayListEntityOption::RemoveImageUrls;
 }
 
 QImage LocalPlayListEntity::loadCoverImage()
@@ -41,10 +42,15 @@ QImage LocalPlayListEntity::loadCoverImage()
 
 QList<QUrl> LocalPlayListEntity::loadImageUrls()
 {
-    return LocalDatabase::instance()->queryImageUrlsForLocalPlayListEntity(m_id);
+    return LocalDatabase::instance()->queryLocalPlayListEntityImageUrls(m_id);
 }
 
 void LocalPlayListEntity::setCoverImagePath(const QString &path)
 {
     m_coverPath = path;
+}
+
+void LocalPlayListEntity::removeImageUrls(const QList<QUrl> &imageUrls)
+{
+    LocalDatabase::instance()->removeLocalPlayListEntityImageUrls(m_id, imageUrls);
 }

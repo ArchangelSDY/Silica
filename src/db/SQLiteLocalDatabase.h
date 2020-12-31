@@ -17,14 +17,15 @@ public:
     bool migrate();
 
     virtual QList<PlayListEntityData> queryPlayListEntities(int type) override;
-    virtual QList<QUrl> queryImageUrlsForLocalPlayListEntity(int playListId) override;
     virtual bool insertPlayListEntity(PlayListEntityData &data) override;
     virtual bool removePlayListEntity(const PlayListEntityData &data) override;
     virtual bool updatePlayListEntity(const PlayListEntityData &data) override;
-    virtual bool insertImagesForLocalPlayListProvider(
-        const PlayListEntityData &data, const ImageList &images) override;
-    virtual bool removeImagesForLocalPlayListProvider(
-        const PlayListEntityData &data, const ImageList &images) override;
+
+    virtual QList<QUrl> queryLocalPlayListEntityImageUrls(int playListId) override;
+    virtual bool insertLocalPlayListEntityImageUrls(
+        int playListId, const QList<QUrl> &imageUrls) override;
+    virtual bool removeLocalPlayListEntityImageUrls(
+        int playListId, const QList<QUrl> &imageUrls) override;
 
     int queryImagesCount();
     bool insertImage(Image *image);

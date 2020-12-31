@@ -7,6 +7,7 @@
 #include "deps/QtDBMigration/src/QtDBMigration.h"
 #include "image/ImageRank.h"
 #include "image/ImageSource.h"
+#include "image/ImageSourceManager.h"
 #include "GlobalConfig.h"
 #include "../PlayList.h"
 
@@ -139,31 +140,6 @@ QList<PlayListEntityData> SQLiteLocalDatabase::queryPlayListEntities(int type)
     return lst;
 }
 
-QList<QUrl> SQLiteLocalDatabase::queryImageUrlsForLocalPlayListEntity(
-    int playListId)
-{
-    QList<QUrl> imageUrls;
-
-    OPEN_BACKGROUND_DATABASE
-
-    QSqlQuery q(db);
-    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
-    q.addBindValue(playListId);
-    if (!q.exec()) {
-        LOG_QUERY_ERROR
-        break;
-    }
-
-    while (q.next()) {
-        QString imageUrl = q.value(0).toString();
-        imageUrls << QUrl(imageUrl);
-    }
-
-    CLOSE_BACKGROUND_DATABASE
-
-    return imageUrls;
-}
-
 bool SQLiteLocalDatabase::insertPlayListEntity(PlayListEntityData &data)
 {
     bool ret = false;
@@ -228,10 +204,35 @@ bool SQLiteLocalDatabase::updatePlayListEntity(const PlayListEntityData &data)
     return ret;
 }
 
-bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
-    const PlayListEntityData &data, const ImageList &images)
+QList<QUrl> SQLiteLocalDatabase::queryLocalPlayListEntityImageUrls(
+    int playListId)
 {
-    if (images.isEmpty()) {
+    QList<QUrl> imageUrls;
+
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
+    q.prepare(SQL_QUERY_IMAGE_URLS_BY_PLAYLIST_ID);
+    q.addBindValue(playListId);
+    if (!q.exec()) {
+        LOG_QUERY_ERROR
+        break;
+    }
+
+    while (q.next()) {
+        QString imageUrl = q.value(0).toString();
+        imageUrls << QUrl(imageUrl);
+    }
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return imageUrls;
+}
+
+bool SQLiteLocalDatabase::insertLocalPlayListEntityImageUrls(
+    int playListId, const QList<QUrl> &imageUrls)
+{
+    if (imageUrls.isEmpty()) {
         return true;
     }
 
@@ -245,9 +246,10 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
 
     QVariantList playListIds;
     QVariantList imageHashes;
-    for (ImagePtr image : images) {
-        playListIds << data.id;
-        imageHashes << image->source()->hashStr();
+    for (const auto &imageUrl : imageUrls) {
+        playListIds << playListId;
+        auto source = ImageSourceManager::instance()->createSingle(imageUrl);
+        imageHashes << source->hashStr();
     }
     q.addBindValue(playListIds);
     q.addBindValue(imageHashes);
@@ -263,10 +265,10 @@ bool SQLiteLocalDatabase::insertImagesForLocalPlayListProvider(
     return ret;
 }
 
-bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
-    const PlayListEntityData &data, const ImageList &images)
+bool SQLiteLocalDatabase::removeLocalPlayListEntityImageUrls(
+    int playListId, const QList<QUrl> &imageUrls)
 {
-    if (images.isEmpty()) {
+    if (imageUrls.isEmpty()) {
         return true;
     }
 
@@ -277,14 +279,15 @@ bool SQLiteLocalDatabase::removeImagesForLocalPlayListProvider(
     QSqlQuery q(db);
     q.prepare(SQL_REMOVE_PLAYLIST_IMAGE_BY_HASH);
 
-    QVariantList plrIds;
+    QVariantList playListIds;
     QVariantList imgHashes;
-    for (ImagePtr image : images) {
-        plrIds << data.id;
-        imgHashes << image->source()->hashStr();
+    for (const auto &imageUrl : imageUrls) {
+        playListIds << playListId;
+        auto source = ImageSourceManager::instance()->createSingle(imageUrl);
+        imgHashes << source->hashStr();
     }
 
-    q.addBindValue(plrIds);
+    q.addBindValue(playListIds);
     q.addBindValue(imgHashes);
 
     ret = q.execBatch();

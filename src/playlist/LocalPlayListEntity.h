@@ -15,6 +15,7 @@ public:
     virtual QImage loadCoverImage() override;
     virtual QList<QUrl> loadImageUrls() override;
     virtual void setCoverImagePath(const QString &path) override;
+    virtual void removeImageUrls(const QList<QUrl> &imageUrls) override;
 
 private:
     friend void LocalPlayListProvider::insertEntity(PlayListEntity *);

@@ -3,4 +3,6 @@
 enum class PlayListEntityOption
 {
     Continuation,
+    AddImageUrls,
+    RemoveImageUrls,
 };

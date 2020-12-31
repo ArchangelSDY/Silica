@@ -20,6 +20,7 @@ public:
     virtual QList<QUrl> loadImageUrls() override;
 
     virtual void setCoverImagePath(const QString &path) override;
+    virtual void removeImageUrls(const QList<QUrl> &imageUrls) override;
 
 private:
     QString m_name;

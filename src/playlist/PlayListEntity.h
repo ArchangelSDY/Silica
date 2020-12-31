@@ -27,6 +27,7 @@ public:
     virtual QList<QUrl> loadImageUrls() = 0;
 
     virtual void setCoverImagePath(const QString &path) = 0;
+    virtual void removeImageUrls(const QList<QUrl> &imageUrls) = 0;
 
 private:
     PlayListProvider *m_provider;

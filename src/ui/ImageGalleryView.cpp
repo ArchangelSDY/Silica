@@ -11,6 +11,8 @@
 #include <QtConcurrent>
 
 #include "image/metadata/ImageMetadataConstants.h"
+#include "image/Image.h"
+#include "image/ImageSource.h"
 #include "playlist/group/PlayListImageMetadataGrouper.h"
 #include "playlist/group/PlayListImageThumbnailHistogramGrouper.h"
 #include "playlist/sort/PlayListImageAspectRatioSorter.h"
@@ -139,7 +141,10 @@ QMenu *ImageGalleryView::createContextMenu()
 
     if (!selectedItems.isEmpty()) {
         menu->addAction(tr("Refresh"), this, SLOT(refreshSelected()));
-        menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
+        auto removeAct = menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
+        if (m_playListEntity && !m_playListEntity->supportsOption(PlayListEntityOption::RemoveImageUrls)) {
+            removeAct->setEnabled(false);
+        }
     }
 
     return menu;
@@ -206,24 +211,24 @@ void ImageGalleryView::removeSelected()
     QString msg = tr("Remove %1 images?").arg(selectedItems.count());
     if (QMessageBox::question(
             this, tr("Images Remove"), msg) == QMessageBox::Yes) {
-        ImageList toRemoves;
+        QList<QUrl> toRemoveUrls;
         foreach (GalleryItem *item, selectedItems) {
             ImageGalleryItem *galleryItem =
                 static_cast<ImageGalleryItem *>(item);
             ImagePtr toRemove = galleryItem->image();
 
-            toRemoves << toRemove;
+            toRemoveUrls << toRemove->source()->url();
             m_playList->removeOne(toRemove);
         }
 
-        // TODO
-        // // Sync to record if any
-        // PlayListRecord *record = m_playList->record();
-        // if (record && !toRemoves.isEmpty()) {
-        //     QtConcurrent::run([record, toRemoves]() {
-        //         record->removeImages(toRemoves);
-        //     });
-        // }
+        // Sync to entity if any
+        if (m_playListEntity && !toRemoveUrls.isEmpty()) {
+            Q_ASSERT(m_playListEntity->supportsOption(PlayListEntityOption::RemoveImageUrls));
+            auto playListEntity = m_playListEntity;
+            QtConcurrent::run([playListEntity, toRemoveUrls]() {
+                playListEntity->removeImageUrls(toRemoveUrls);
+            });
+        }
     }
 }
 
