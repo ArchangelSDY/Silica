@@ -10,13 +10,11 @@ class PlayListGalleryView : public GalleryView
 public:
     explicit PlayListGalleryView(QWidget *parent = 0);
 
-signals:
-    void promptToCreatePlayListRecord(int type);
-
 public slots:
     void setPlayListEntities(QList<PlayListEntity *> entities);
 
 private slots:
+    void createPlayListEntity(int type);
     void renameSelectedItem();
     void removeSelectedItems();
 

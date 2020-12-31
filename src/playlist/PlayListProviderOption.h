@@ -4,6 +4,6 @@ enum class PlayListProviderOption
 {
     CreateEntity,
     UpdateEntity,
-    DeleteEntity
+    RemoveEntity
 };
 

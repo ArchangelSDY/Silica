@@ -27,7 +27,10 @@ public:
     virtual QList<PlayListEntity *> entities() const override;
     virtual void loadEntities() override;
     virtual void triggerEntity(PlayListEntity *entity) override;
+    virtual PlayListEntity *createEntity(const QString &name) override;
+    virtual void insertEntity(PlayListEntity *entity) override;
     virtual void updateEntity(PlayListEntity *entity) override;
+    virtual void removeEntity(PlayListEntity *entity) override;
 
     // void request(const QString &name, const QVariantHash &extra) override;
 

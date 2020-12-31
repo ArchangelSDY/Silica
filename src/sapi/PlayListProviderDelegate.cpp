@@ -81,7 +81,23 @@ void PlayListProviderDelegate::triggerEntity(PlayListEntity *entity)
     emit playListTriggered(entity);
 }
 
+PlayListEntity *PlayListProviderDelegate::createEntity(const QString &name)
+{
+    // TODO: Add extensibility
+    return nullptr;
+}
+
+void PlayListProviderDelegate::insertEntity(PlayListEntity *entity)
+{
+    // TODO: Add extensibility
+}
+
 void PlayListProviderDelegate::updateEntity(PlayListEntity *entity)
+{
+    // TODO: Add extensibility
+}
+
+void PlayListProviderDelegate::removeEntity(PlayListEntity *entity)
 {
     // TODO: Add extensibility
 }

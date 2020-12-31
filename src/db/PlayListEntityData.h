@@ -5,9 +5,9 @@
 class PlayListEntityData
 {
 public:
-    int type;
-    int id;
+    int type = 0;
+    int id = 0;
     QString name;
-    int count;
+    int count = 0;
     QString coverPath;
 };

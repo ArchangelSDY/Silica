@@ -54,7 +54,6 @@ private slots:
     void loadOrEnterSelectedPath();
     void loadSelectedPath();
 
-    void promptToCreatePlayListRecord(int type);
     void editImageUrl(QListWidgetItem *item);
 
     void fsRootPathChanged();

@@ -5,6 +5,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSignalMapper>
+#include <QtConcurrent>
 
 #include "playlist/PlayListProvider.h"
 #include "playlist/PlayListProviderManager.h"
@@ -13,7 +14,7 @@
 #include "ui/PlayListGalleryItem.h"
 
 static bool playListTypeLessThan(GalleryItem *left,
-                                 GalleryItem *right)
+    GalleryItem *right)
 
 {
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
@@ -35,7 +36,7 @@ static bool playListTypeLessThan(GalleryItem *left,
 }
 
 static bool playListNameLessThan(GalleryItem *left,
-                                 GalleryItem *right)
+    GalleryItem *right)
 
 {
     PlayListGalleryItem *leftItem = static_cast<PlayListGalleryItem *>(left);
@@ -48,7 +49,7 @@ static bool playListNameLessThan(GalleryItem *left,
 }
 
 PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
-    GalleryView(parent) ,
+    GalleryView(parent),
     m_groupLessThan(playListTypeLessThan)
 {
     setRendererFactory(new CompactRendererFactory());
@@ -80,12 +81,13 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     QMenu *menuNew = menu.addMenu(tr("New"));
     QSignalMapper *plrCreatorMap = new QSignalMapper(&menu);
     for (auto provider : PlayListProviderManager::instance()->all()) {
-        QAction *act = menuNew->addAction(provider->name(), plrCreatorMap, SLOT(map()));
-        plrCreatorMap->setMapping(act, provider->type());
-        delete provider;
+        if (provider->supportsOption(PlayListProviderOption::CreateEntity)) {
+            QAction *act = menuNew->addAction(provider->name(), plrCreatorMap, SLOT(map()));
+            plrCreatorMap->setMapping(act, provider->type());
+        }
     }
-    connect(plrCreatorMap, SIGNAL(mapped(int)),
-            this, SIGNAL(promptToCreatePlayListRecord(int)));
+    connect(plrCreatorMap, qOverload<int>(&QSignalMapper::mapped),
+        this, &PlayListGalleryView::createPlayListEntity);
 
     QAction *actRename =
         menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
@@ -93,10 +95,16 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
         actRename->setEnabled(false);
     }
 
-    QAction *actRemove =
-        menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
-    if (selectedItems.count() == 0) {
-        actRemove->setEnabled(false);
+    if (selectedItems.count() > 0) {
+        QAction *actRemove = menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
+        for (GalleryItem *item : selectedItems) {
+            PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(item);
+            auto entity = playListItem->entity();
+            if (!entity->provider()->supportsOption(PlayListProviderOption::RemoveEntity)) {
+                actRemove->setEnabled(false);
+                break;
+            }
+        }
     }
 
     menu.addSeparator();
@@ -122,6 +130,22 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
         m_enableGrouping && m_groupLessThan == playListNameLessThan);
 
     menu.exec(event->globalPos());
+}
+
+void PlayListGalleryView::createPlayListEntity(int type)
+{
+    auto provider = PlayListProviderManager::instance()->get(type);
+    Q_ASSERT(provider);
+    Q_ASSERT(provider->supportsOption(PlayListProviderOption::CreateEntity));
+
+    // TODO: Support custom fields in addition to name
+    QString name = QInputDialog::getText(this, "New PlayList", "Name");
+    if (!name.isEmpty()) {
+        auto entity = provider->createEntity(name);
+        QtConcurrent::run([provider, entity]() {
+            provider->insertEntity(entity);
+        });
+    }
 }
 
 void PlayListGalleryView::renameSelectedItem()
@@ -150,7 +174,7 @@ void PlayListGalleryView::removeSelectedItems()
     if (selectedItems.count() > 0) {
         // Build message with playlists names
         QStringList playListNames;
-        foreach(GalleryItem *item, selectedItems) {
+        foreach(GalleryItem * item, selectedItems) {
             PlayListGalleryItem *playListItem =
                 static_cast<PlayListGalleryItem *>(item);
             playListNames.append(playListItem->entity()->name());
@@ -159,18 +183,17 @@ void PlayListGalleryView::removeSelectedItems()
             .arg(playListNames.count())
             .arg(playListNames.join("\n"));
 
-        // TODO
-        // if (QMessageBox::question(
-        //         this, tr("Remove"), msg) == QMessageBox::Yes) {
-        //     foreach (QGraphicsItem *item, selectedItems) {
-        //         PlayListGalleryItem *playListItem =
-        //             static_cast<PlayListGalleryItem *>(item);
-        //         playListItem->record()->remove();
-        //         scene()->removeItem(item);
-        //     }
-
-        //     scheduleLayout();
-        // }
+        if (QMessageBox::question(
+                this, tr("Remove"), msg) == QMessageBox::Yes) {
+            foreach (QGraphicsItem *item, selectedItems) {
+                PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(item);
+                auto entity = playListItem->entity();
+                QtConcurrent::run([entity]() {
+                    entity->provider()->removeEntity(entity);
+                    delete entity;
+                });
+            }
+        }
     }
 }
 

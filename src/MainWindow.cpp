@@ -324,11 +324,6 @@ void MainWindow::setupExtraUi()
 
     ui->pageImageView->layout()->setMargin(0);
 
-
-    // PlayList gallery
-    connect(ui->playListGallery, SIGNAL(promptToCreatePlayListRecord(int)),
-            this, SLOT(promptToCreatePlayListRecord(int)));
-
     // Init Basket
     ui->basketPane->hide();
     ui->basketPane->layout()->setSpacing(0);
@@ -712,30 +707,6 @@ void MainWindow::promptToSaveLocalPlayList()
         //         QString("Failed to save playList %1!").arg(name), 2000);
         // }
     }
-}
-
-void MainWindow::promptToCreatePlayListRecord(int type)
-{
-    // TODO
-    // QString name = QInputDialog::getText(this, "New PlayList", "Name");
-    // if (!name.isEmpty()) {
-    //     PlayListRecordBuilder plrBuilder;
-    //     plrBuilder
-    //         .setName(name)
-    //         .setType(type);
-    //     PlayListRecord *record = plrBuilder.obtain();
-    //     if (record->save()) {
-    //         statusBar()->showMessage(QString("PlayList %1 saved!").arg(name),
-    //                                  2000);
-
-    //         // Refresh playlist gallery
-    //         loadPlayListProviders();
-    //     } else {
-    //         statusBar()->showMessage(
-    //             QString("Failed to save playList %1!").arg(name), 2000);
-    //     }
-    //     delete record;
-    // }
 }
 
 void MainWindow::editImageUrl(QListWidgetItem *item)

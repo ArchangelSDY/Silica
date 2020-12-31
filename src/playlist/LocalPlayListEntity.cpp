@@ -5,9 +5,8 @@
 #include "../PlayList.h"
 
 LocalPlayListEntity::LocalPlayListEntity(LocalPlayListProvider *provider,
-        int type, int id, const QString &name, int count, const QString &coverPath) :
+        int id, const QString &name, int count, const QString &coverPath) :
     PlayListEntity(provider) ,
-    m_type(type) ,
     m_id(id) ,
     m_name(name) ,
     m_count(count) ,

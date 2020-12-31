@@ -23,7 +23,10 @@ public:
     virtual QList<PlayListEntity *> entities() const = 0;
     virtual void loadEntities() = 0;
     virtual void triggerEntity(PlayListEntity *entity) = 0;
+    virtual PlayListEntity *createEntity(const QString &name) = 0;
+    virtual void insertEntity(PlayListEntity *entity) = 0;
     virtual void updateEntity(PlayListEntity *entity) = 0;
+    virtual void removeEntity(PlayListEntity *entity) = 0;
 
     // virtual QString typeName() const = 0;
     // virtual bool canContinueProvide() const = 0;
