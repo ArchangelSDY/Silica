@@ -50,7 +50,16 @@ void LocalPlayListEntity::setCoverImagePath(const QString &path)
     m_coverPath = path;
 }
 
+void LocalPlayListEntity::addImageUrls(const QList<QUrl> &imageUrls)
+{
+    LocalDatabase::instance()->insertLocalPlayListEntityImageUrls(m_id, imageUrls);
+    m_count += imageUrls.size();
+    m_provider->updateEntity(this);
+}
+
 void LocalPlayListEntity::removeImageUrls(const QList<QUrl> &imageUrls)
 {
     LocalDatabase::instance()->removeLocalPlayListEntityImageUrls(m_id, imageUrls);
+    m_count -= imageUrls.size();
+    m_provider->updateEntity(this);
 }

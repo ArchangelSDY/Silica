@@ -49,6 +49,8 @@ private slots:
     void playListTriggered(PlayListEntity *entity);
     void playListCreated();
 
+    void localPlayListEntityCreated();
+
     void imageLoaded(QSharedPointer<ImageData> image);
     void loadSelectedPlayList();
     void loadOrEnterSelectedPath();
@@ -86,6 +88,7 @@ private:
 
     PlayListProvider *m_currentPlayListProvider;
     QFutureWatcher<QList<QUrl>> m_playListCreateWatcher;
+    QFutureWatcher<QString> m_localPlayListEntityCreateWatcher;
 
     QSharedPointer<ImagesCache> m_imagesCache;
 

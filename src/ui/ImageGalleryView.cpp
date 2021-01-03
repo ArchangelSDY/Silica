@@ -208,9 +208,9 @@ void ImageGalleryView::removeSelected()
 {
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
 
-    QString msg = tr("Remove %1 images?").arg(selectedItems.count());
+    QString msg = tr("Remove %1 images from playlist?").arg(selectedItems.count());
     if (QMessageBox::question(
-            this, tr("Images Remove"), msg) == QMessageBox::Yes) {
+            this, tr("Remove images"), msg) == QMessageBox::Yes) {
         QList<QUrl> toRemoveUrls;
         foreach (GalleryItem *item, selectedItems) {
             ImageGalleryItem *galleryItem =

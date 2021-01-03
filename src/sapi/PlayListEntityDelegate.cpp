@@ -61,6 +61,11 @@ void PlayListEntityDelegate::setCoverImagePath(const QString &path)
     // TODO: Need implementation
 }
 
+void PlayListEntityDelegate::addImageUrls(const QList<QUrl> &imageUrls)
+{
+    // TODO: Need implementation
+}
+
 void PlayListEntityDelegate::removeImageUrls(const QList<QUrl> &imageUrls)
 {
     // TODO: Need implementation

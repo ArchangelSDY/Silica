@@ -356,6 +356,8 @@ void MainWindow::setupExtraUi()
     // TODO
     m_currentPlayListProvider = PlayListProviderManager::instance()->instance()->get(0);
     loadCurrentPlayListProvider();
+
+    connect(&m_localPlayListEntityCreateWatcher, &QFutureWatcher<QString>::finished, this, &MainWindow::localPlayListEntityCreated);
 }
 
 void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel)
@@ -672,41 +674,36 @@ void MainWindow::promptToSaveLocalPlayList()
 
     QString name = dialog.textValue();
     if (dialog.result() == QDialog::Accepted && !name.isEmpty()) {
-        // TODO
-        // QSharedPointer<PlayList> playList = m_navigator->playList();
-        // PlayListRecordBuilder plrBuilder;
-        // plrBuilder
-        //     .setName(name)
-        //     .setCoverPath(image->thumbnailPath())
-        //     .setPlayList(playList)
-        //     .setType(LocalPlayListProviderFactory::TYPE);
-        // QSharedPointer<PlayListRecord> record(plrBuilder.obtain());
-        // if (record->save()) {
-        //     ImageList images = playList->toImageList();
-        //     QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>();
-        //     connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, name]() {
-        //         if (watcher->result()) {
-        //             this->statusBar()->showMessage(QString("PlayList %1 saved!").arg(name), 2000);
+        auto playList = m_navigator->playList();
+        auto coverPath = image->thumbnailPath();
+        m_localPlayListEntityCreateWatcher.setFuture(QtConcurrent::run([name, coverPath, playList]() {
+            // Create and persist an empty entity
+            auto provider = PlayListProviderManager::instance()->get(LocalPlayListProvider::TYPE);
+            auto entity = provider->createEntity(name);
+            entity->setCoverImagePath(coverPath);
+            provider->insertEntity(entity);
 
-        //             // Refresh playlist gallery
-        //             this->loadPlayListProviders();
-        //         } else {
-        //             this->statusBar()->showMessage(
-        //                 QString("Failed to associate images to playList %1!").arg(name), 2000);
-        //         }
-        //         watcher->deleteLater();
-        //     });
-        //     watcher->setFuture(QtConcurrent::run([images, record]() {
-        //         if (!LocalDatabase::instance()->insertImages(images)) {
-        //             return false;
-        //         }
-        //         return LocalDatabase::instance()->insertImagesForLocalPlayListProvider(*record, images);
-        //     }));
-        // } else {
-        //     statusBar()->showMessage(
-        //         QString("Failed to save playList %1!").arg(name), 2000);
-        // }
+            // Persist images to database
+            auto images = playList->toImageList();
+            LocalDatabase::instance()->insertImages(images);
+
+            // Add and persist images urls to the entity
+            QList<QUrl> imageUrls;
+            imageUrls.reserve(images.size());
+            for (auto image : images) {
+                imageUrls.append(image->source()->url());
+            }
+            entity->addImageUrls(imageUrls);
+
+            return name;
+        }));
     }
+}
+
+void MainWindow::localPlayListEntityCreated()
+{
+    auto name = m_localPlayListEntityCreateWatcher.result();
+    statusBar()->showMessage(QStringLiteral("PlayList %1 saved!").arg(name), 2000);
 }
 
 void MainWindow::editImageUrl(QListWidgetItem *item)
