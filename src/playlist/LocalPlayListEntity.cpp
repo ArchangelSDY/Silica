@@ -45,6 +45,11 @@ QList<QUrl> LocalPlayListEntity::loadImageUrls()
     return LocalDatabase::instance()->queryLocalPlayListEntityImageUrls(m_id);
 }
 
+void LocalPlayListEntity::setName(const QString &name)
+{
+    m_name = name;
+}
+
 void LocalPlayListEntity::setCoverImagePath(const QString &path)
 {
     m_coverPath = path;

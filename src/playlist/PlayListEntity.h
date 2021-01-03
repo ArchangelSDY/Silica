@@ -26,6 +26,7 @@ public:
     // be created on main thread so we can correctly receive signals there
     virtual QList<QUrl> loadImageUrls() = 0;
 
+    virtual void setName(const QString &name) = 0;
     virtual void setCoverImagePath(const QString &path) = 0;
     virtual void addImageUrls(const QList<QUrl> &imageUrls) = 0;
     virtual void removeImageUrls(const QList<QUrl> &imageUrls) = 0;

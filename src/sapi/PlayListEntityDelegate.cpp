@@ -56,6 +56,11 @@ QList<QUrl> PlayListEntityDelegate::loadImageUrls()
     //return new PlayList(imageUrls);
 }
 
+void PlayListEntityDelegate::setName(const QString &name)
+{
+    // TODO: Need implementation
+}
+
 void PlayListEntityDelegate::setCoverImagePath(const QString &path)
 {
     // TODO: Need implementation

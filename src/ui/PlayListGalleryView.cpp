@@ -89,17 +89,16 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     connect(plrCreatorMap, qOverload<int>(&QSignalMapper::mapped),
         this, &PlayListGalleryView::createPlayListEntity);
 
-    QAction *actRename =
-        menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
-    if (selectedItems.count() == 0) {
-        actRename->setEnabled(false);
-    }
-
     if (selectedItems.count() > 0) {
+        QAction *actRename = menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
         QAction *actRemove = menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
         for (GalleryItem *item : selectedItems) {
             PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(item);
             auto entity = playListItem->entity();
+            if (!entity->provider()->supportsOption(PlayListProviderOption::UpdateEntity)) {
+                actRename->setEnabled(false);
+                break;
+            }
             if (!entity->provider()->supportsOption(PlayListProviderOption::RemoveEntity)) {
                 actRemove->setEnabled(false);
                 break;
@@ -160,11 +159,10 @@ void PlayListGalleryView::renameSelectedItem()
             0, "Rename PlayList", "New Name",
             QLineEdit::Normal, entity->name());
 
-        // TODO
-        // if (!newName.isEmpty()) {
-        //     record->setName(newName);
-        //     record->save();
-        // }
+         if (!newName.isEmpty()) {
+             entity->setName(newName);
+             entity->provider()->updateEntity(entity);
+         }
     }
 }
 
