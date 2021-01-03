@@ -48,6 +48,7 @@ private slots:
     void playListProviderEntitiesChanged();
     void playListTriggered(PlayListEntity *entity);
     void playListCreated();
+    void playListContinued();
 
     void localPlayListEntityCreated();
 
@@ -80,14 +81,17 @@ private:
     void switchViews();
     void moveCursor(Qt::Key direction);
     void toggleSecondaryNavigator();
-    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist);
+    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, PlayListEntity *playListEntity);
 
     void loadCurrentPlayListProvider();
+    void continuePlayList();
 
     Ui::MainWindow *ui;
 
     PlayListProvider *m_currentPlayListProvider;
+    PlayListEntity *m_currentPlayListEntity;
     QFutureWatcher<QList<QUrl>> m_playListCreateWatcher;
+    QFutureWatcher<QList<QUrl>> m_playListContinueWatcher;
     QFutureWatcher<QString> m_localPlayListEntityCreateWatcher;
 
     QSharedPointer<ImagesCache> m_imagesCache;

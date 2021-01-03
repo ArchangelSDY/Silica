@@ -60,6 +60,8 @@ static const int MAX_CACHE = 2 * Navigator::MAX_PRELOAD + 1;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    m_currentPlayListProvider(nullptr) ,
+    m_currentPlayListEntity(nullptr) ,
     m_imagesCache(new ImagesCache(MAX_CACHE)) ,
     m_navigator(new Navigator(m_imagesCache, LocalDatabase::instance())),
     m_secondaryNavigator(new Navigator(m_imagesCache, LocalDatabase::instance())) ,
@@ -105,6 +107,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_navigator, &Navigator::navigationChange, m_sideViewModel.data(), &MainGraphicsViewModel::reset);
     connect(m_navigator, &Navigator::paint, m_sideViewModel.data(), &MainGraphicsViewModel::setImage);
     connect(m_navigator, &Navigator::paintThumbnail, m_sideViewModel.data(), &MainGraphicsViewModel::setThumbnail);
+
+    connect(m_navigator, &Navigator::continueProvide, this, &MainWindow::continuePlayList);
 
     // StatusBar
     connect(statusBar(), SIGNAL(messageChanged(const QString &)),
@@ -348,6 +352,8 @@ void MainWindow::setupExtraUi()
 
     connect(&m_playListCreateWatcher, &QFutureWatcher<QList<QUrl>>::finished,
             this, &MainWindow::playListCreated);
+    connect(&m_playListContinueWatcher, &QFutureWatcher<QList<QUrl>>::finished,
+            this, &MainWindow::playListContinued);
     auto providers = PlayListProviderManager::instance()->instance()->all();
     for (auto provider : providers) {
         connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
@@ -405,7 +411,7 @@ void MainWindow::playListProviderEntitiesChanged()
 
 void MainWindow::playListTriggered(PlayListEntity *entity)
 {
-    ui->gallery->setPlayListEntity(entity);
+    m_currentPlayListEntity = entity;
 
     auto future = QtConcurrent::run([entity]() {
         return entity->loadImageUrls();
@@ -424,7 +430,7 @@ void MainWindow::playListCreated()
     }
     auto imageUrls = future.result();
 
-    setPrimaryNavigatorPlayList(QSharedPointer<PlayList>::create(imageUrls));
+    setPrimaryNavigatorPlayList(QSharedPointer<PlayList>::create(imageUrls), m_currentPlayListEntity);
 
     // TODO
 	// // Make cover image of first playlist item selected
@@ -442,6 +448,28 @@ void MainWindow::playListCreated()
 	//     // hide until thumbnail loaded.
 	//     coverImageItem->scheduleSelectedAfterShown();
 	// }
+}
+
+void MainWindow::continuePlayList()
+{
+    if (!m_currentPlayListEntity || !m_currentPlayListEntity->supportsOption(PlayListEntityOption::Continuation)) {
+        return;
+    }
+
+    auto playListEntity = m_currentPlayListEntity;
+    m_playListContinueWatcher.setFuture(QtConcurrent::run([playListEntity]() {
+        return playListEntity->loadImageUrls();
+    }));
+}
+
+void MainWindow::playListContinued()
+{
+    auto future = m_playListContinueWatcher.future();
+    if (!future.isFinished()) {
+        return;
+    }
+    auto imageUrls = future.result();
+    m_navigator->playList()->append(QSharedPointer<PlayList>::create(imageUrls));
 }
 
 void MainWindow::loadSelectedPlayList()
@@ -530,7 +558,7 @@ void MainWindow::loadSelectedPath()
         // Sort can be slow so put it into background
         QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
         connect(watcher, &QFutureWatcher<void>::finished, this, [this, pl, watcher]() {
-            this->setPrimaryNavigatorPlayList(pl);
+            this->setPrimaryNavigatorPlayList(pl, nullptr);
             watcher->deleteLater();
         });
         watcher->setFuture(QtConcurrent::run([shouldSortByName, pl]() {
@@ -561,7 +589,7 @@ void MainWindow::processCommandLineOptions()
         }
     }
 
-    setPrimaryNavigatorPlayList(playList);
+    setPrimaryNavigatorPlayList(playList, nullptr);
 }
 
 void MainWindow::promptToOpenImage()
@@ -587,7 +615,7 @@ void MainWindow::promptToOpenImage()
     defaultDir = firstFileInfo.absoluteDir().path();
 
     QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
-    setPrimaryNavigatorPlayList(playList);
+    setPrimaryNavigatorPlayList(playList, nullptr);
 }
 
 void MainWindow::promptToOpenDir()
@@ -613,7 +641,7 @@ void MainWindow::promptToOpenDir()
     }
 
     QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);
-    setPrimaryNavigatorPlayList(playList);
+    setPrimaryNavigatorPlayList(playList, nullptr);
 }
 
 void MainWindow::promptToSaveImage()
@@ -1138,8 +1166,11 @@ void MainWindow::toggleSecondaryNavigator()
     }
 }
 
-void MainWindow::setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist)
+void MainWindow::setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, PlayListEntity *playListEntity)
 {
+    m_currentPlayListEntity = playListEntity;
+    ui->gallery->setPlayListEntity(playListEntity);
+
     m_navigator->setPlayList(playlist);
 
     // Notify to clear image source cache

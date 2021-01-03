@@ -19,7 +19,7 @@ Navigator::Navigator(QSharedPointer<ImagesCache> imagesCache, LocalDatabase *db,
     m_reverseNavigation(false) ,
     m_isLooping(true) ,
     m_cachedImages(imagesCache) ,
-    m_playList(0) ,
+    m_playList(nullptr) ,
     m_db(db) ,
     m_player(nullptr)
 {
@@ -387,9 +387,7 @@ void Navigator::setPlayer(AbstractNavigationPlayer *player)
 
 void Navigator::checkContinueProvide()
 {
-    // TODO
-    //if (m_playList->count() - m_currentIndex <= MAX_PRELOAD
-    //        && m_playList->record()) {
-    //    m_playList->record()->continueProvide();
-    //}
+    if (m_playList->count() - m_currentIndex <= MAX_PRELOAD) {
+        emit continueProvide();
+    }
 }

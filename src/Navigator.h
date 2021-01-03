@@ -1,5 +1,4 @@
-#ifndef NAVIGATOR_H
-#define NAVIGATOR_H
+#pragma once
 
 #include <QObject>
 #include <QSharedPointer>
@@ -12,6 +11,7 @@
 class AbstractNavigationPlayer;
 class ImagesCache;
 class LocalDatabase;
+class PlayListEntity;
 
 class Navigator : public QObject
 {
@@ -62,6 +62,7 @@ signals:
     void playListAppend(int start);
     void navigationChange(int index);
     void focusOnRect(QRectF rect);
+    void continueProvide();
 
 public slots:
     // TODO(sdy): separate `setOwnedPlayList()` out
@@ -115,5 +116,3 @@ private:
 
     QScopedPointer<AbstractNavigationPlayer> m_player;
 };
-
-#endif // NAVIGATOR_H
