@@ -11,6 +11,7 @@
 #include "models/BasketModel.h"
 #include "navigation/NavigatorSynchronizer.h"
 #include "ui/gamepad/GamepadController.h"
+#include "ui/BasketView.h"
 #include "Navigator.h"
 #include "PlayList.h"
 
@@ -60,6 +61,8 @@ private slots:
     void editImageUrl(QListWidgetItem *item);
 
     void fsRootPathChanged();
+
+    void basketCommited(BasketView::CommitOption);
 
 protected:
     virtual void keyPressEvent(QKeyEvent *);

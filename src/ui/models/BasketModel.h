@@ -11,6 +11,7 @@ public:
     BasketModel();
 
     QSharedPointer<PlayList> playList() const;
+    QSharedPointer<PlayList> takePlayList();
 
     void add(ImagePtr image);
     void clear();

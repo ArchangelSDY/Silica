@@ -142,6 +142,15 @@ void PlayList::addMultiplePath(const QUrl &url)
     }
 }
 
+QList<QUrl> PlayList::toImageUrls() const
+{
+    QList<QUrl> imageUrls;
+    for (const auto &image : *this) {
+        imageUrls << image->source()->url();
+    }
+    return imageUrls;
+}
+
 bool PlayList::removeOne(const ImagePtr &val)
 {
     bool ret = m_allImages.removeOne(val);

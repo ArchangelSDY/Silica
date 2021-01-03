@@ -8,13 +8,18 @@ class BasketView : public ImageGalleryView
 {
     Q_OBJECT
 public:
+    enum class CommitOption
+    {
+        Replace,
+        Append,
+    };
+
     explicit BasketView(QWidget *parent = 0);
 
     void setBasketModel(BasketModel *basket);
 
-protected slots:
-    virtual void exportToNavigator();
-    virtual void appendToNavigator();
+signals:
+    void commit(CommitOption option);
 
 protected:
     virtual QMenu *createContextMenu();

@@ -334,6 +334,7 @@ void MainWindow::setupExtraUi()
     ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
     ui->basketView->setBasketModel(&m_basket);
     ui->gallery->setBasketModel(&m_basket);
+    connect(ui->basketView, &BasketView::commit, this, &MainWindow::basketCommited);
 
     // Init image source manager client
     ImageSourceManager::instance()->setClient(
@@ -776,6 +777,38 @@ void MainWindow::editImageUrl(QListWidgetItem *item)
 void MainWindow::fsRootPathChanged()
 {
     ui->fsView->setRootPath(ui->fsEditPath->text());
+}
+
+void MainWindow::basketCommited(BasketView::CommitOption option)
+{
+    switch (option) {
+    case BasketView::CommitOption::Append:
+    {
+        auto playList = m_navigator->playList();
+        auto basketPlayList = m_basket.takePlayList();
+        if (playList) {
+            playList->append(basketPlayList);
+
+            if (m_currentPlayListEntity) {
+                auto images = basketPlayList->toImageUrls();
+                auto currentPlayListEntity = m_currentPlayListEntity;
+                QtConcurrent::run([currentPlayListEntity, images]() {
+                    currentPlayListEntity->addImageUrls(images);
+                });
+            }
+        }
+        m_basket.clear();
+        break;
+    }
+    case BasketView::CommitOption::Replace:
+    {
+        setPrimaryNavigatorPlayList(m_basket.takePlayList(), nullptr);
+        m_basket.clear();
+        break;
+    }
+    default:
+        Q_UNREACHABLE();
+    }
 }
 
 void MainWindow::showAbout()

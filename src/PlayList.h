@@ -83,6 +83,7 @@ public:
     {
         return m_filteredImages;
     }
+    QList<QUrl> toImageUrls() const;
 
     bool removeOne(const ImagePtr &val);
     void removeAt(int index);

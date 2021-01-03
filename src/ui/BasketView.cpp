@@ -32,48 +32,19 @@ QMenu *BasketView::createContextMenu()
 {
     QMenu *menu = ImageGalleryView::createContextMenu();
 
-    QAction *actExport = menu->addAction(
-        tr("Export To Navigator"), this, SLOT(exportToNavigator()));
+    QAction *actExport = menu->addAction(tr("Export To Navigator"), [this]() {
+        emit this->commit(CommitOption::Replace);
+    });
     if (m_playList->count() == 0) {
         actExport->setDisabled(true);
     }
 
-    QAction *actAppend = menu->addAction(
-        tr("Append To Navigator"), this, SLOT(appendToNavigator()));
+    QAction *actAppend = menu->addAction(tr("Append To Navigator"), [this]() {
+        emit this->commit(CommitOption::Append);
+    });
     if (m_playList->count() == 0) {
         actAppend->setDisabled(true);
     }
 
     return menu;
-}
-
-void BasketView::exportToNavigator()
-{
-    // TODO
-    // QSharedPointer<PlayList> dupPl = QSharedPointer<PlayList>::create();
-    // dupPl->append(m_basket->playList());
-    // // TODO: Propagate to Main Window?
-    // m_navigator->setPlayList(dupPl);
-    // m_basket->clear();
-}
-
-void BasketView::appendToNavigator()
-{
-    // QSharedPointer<PlayList> navPl = m_navigator->playList();
-    // QSharedPointer<PlayList> basketPl = m_basket->playList();
-    // if (navPl) {
-    //     navPl->append(basketPl);
-
-    //     // TODO
-
-    //     // // Sync with record if any
-    //     // PlayListRecord *record = navPl->record();
-    //     // if (record) {
-    //     //     ImageList images = basketPl->toImageList();
-    //     //     QtConcurrent::run([record, images]() {
-    //     //         record->insertImages(images);
-    //     //     });
-    //     // }
-    // }
-    // m_basket->clear();
 }

@@ -12,6 +12,13 @@ QSharedPointer<PlayList> BasketModel::playList() const
     return m_playList;
 }
 
+QSharedPointer<PlayList> BasketModel::takePlayList()
+{
+    auto playList = m_playList;
+    m_playList.reset(new PlayList());
+    return playList;
+}
+
 void BasketModel::add(ImagePtr image)
 {
     QUrl imageUrl = image->source()->url();
