@@ -47,10 +47,13 @@ QList<PlayListEntity*> LocalPlayListProvider::entities() const
 void LocalPlayListProvider::loadEntities()
 {
     qDeleteAll(m_entities.begin(), m_entities.end());
+    m_entities.clear();
+
     auto items = LocalDatabase::instance()->queryPlayListEntities(LocalPlayListProviderFactory::TYPE);
     for (const auto& item : items) {
         m_entities << new LocalPlayListEntity(this, item.id, item.name, item.count, item.coverPath);
     }
+
     emit entitiesChanged();
 }
 
