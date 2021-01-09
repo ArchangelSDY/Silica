@@ -86,7 +86,7 @@ private:
     void toggleSecondaryNavigator();
     void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, PlayListEntity *playListEntity);
 
-    void loadCurrentPlayListProvider();
+    void loadSelectedPlayListProvider(int type);
     void continuePlayList();
 
     Ui::MainWindow *ui;

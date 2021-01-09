@@ -357,12 +357,11 @@ void MainWindow::setupExtraUi()
             this, &MainWindow::playListContinued);
     auto providers = PlayListProviderManager::instance()->instance()->all();
     for (auto provider : providers) {
-        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
-        connect(provider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
+        ui->favToolBar->addAction(provider->name(), [this, provider]() {
+            this->loadSelectedPlayListProvider(provider->type());
+        });
     }
-    // TODO
-    m_currentPlayListProvider = PlayListProviderManager::instance()->instance()->get(0);
-    loadCurrentPlayListProvider();
+    loadSelectedPlayListProvider(LocalPlayListProvider::TYPE);
 
     connect(&m_localPlayListEntityCreateWatcher, &QFutureWatcher<QString>::finished, this, &MainWindow::localPlayListEntityCreated);
 }
@@ -396,9 +395,18 @@ void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGra
     *pWidget = mainGraphicsViewWidget;
 }
 
-void MainWindow::loadCurrentPlayListProvider()
+void MainWindow::loadSelectedPlayListProvider(int type)
 {
-    PlayListProvider *provider = m_currentPlayListProvider;
+    PlayListProvider *provider = PlayListProviderManager::instance()->get(type);
+
+    if (m_currentPlayListProvider != provider) {
+        disconnect(m_currentPlayListProvider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
+        disconnect(m_currentPlayListProvider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
+        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
+        connect(provider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
+        m_currentPlayListProvider = provider;
+    }
+
     QtConcurrent::run([provider]() {
         provider->loadEntities();
     });

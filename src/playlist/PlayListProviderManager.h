@@ -1,7 +1,6 @@
-#ifndef PLAYLISTPROVIDERMANAGER_H
-#define PLAYLISTPROVIDERMANAGER_H
+#pragma once
 
-#include <QHash>
+#include <QMap>
 
 class PlayListProvider;
 class PlayListProviderFactory;
@@ -21,7 +20,5 @@ private:
     void registerProvider(int type, PlayListProvider *provider);
 
     static PlayListProviderManager *s_instance;
-    QHash<int, PlayListProvider *> m_providers;
+    QMap<int, PlayListProvider *> m_providers;
 };
-
-#endif // PLAYLISTPROVIDERMANAGER_H

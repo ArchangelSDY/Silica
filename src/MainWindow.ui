@@ -81,8 +81,11 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="pageFav">
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
+       <layout class="QVBoxLayout" name="pageFavLayout">
+        <item>
+          <widget class="QToolBar" name="favToolBar" />
+        </item>
+        <item>
          <widget class="PlayListGalleryView" name="playListGallery"/>
         </item>
        </layout>
