@@ -18,8 +18,7 @@ private slots:
     void renameSelectedItem();
     void removeSelectedItems();
 
-    void groupByType();
-    void groupByName();
+    void groupByNamePrefix();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);
