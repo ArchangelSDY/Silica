@@ -290,6 +290,9 @@ void MainWindow::setupExtraUi()
     connect(ui->playListGallery, SIGNAL(keyEnterPressed()),
             this, SLOT(loadSelectedPlayList()));
 
+    // Fav view
+    ui->pageFav->layout()->setSpacing(15);
+
     // Fils system tab toolbar
     ui->pageFileSystemLayout->setMargin(0);
     ui->pageFileSystemLayout->setSpacing(0);
@@ -356,12 +359,15 @@ void MainWindow::setupExtraUi()
     connect(&m_playListContinueWatcher, &QFutureWatcher<QList<QUrl>>::finished,
             this, &MainWindow::playListContinued);
     auto providers = PlayListProviderManager::instance()->instance()->all();
+    auto providerButtonGroup = new QActionGroup(this);
     for (auto provider : providers) {
-        ui->favToolBar->addAction(provider->name(), [this, provider]() {
+        auto act = ui->favToolBar->addAction(provider->name(), [this, provider]() {
             this->loadSelectedPlayListProvider(provider->type());
         });
+        act->setCheckable(true);
+        providerButtonGroup->addAction(act);
     }
-    loadSelectedPlayListProvider(LocalPlayListProvider::TYPE);
+    providerButtonGroup->actions().first()->trigger();
 
     connect(&m_localPlayListEntityCreateWatcher, &QFutureWatcher<QString>::finished, this, &MainWindow::localPlayListEntityCreated);
 }

@@ -81,12 +81,42 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="pageFav">
+        <property name="styleSheet">
+          <string notr="true">
+            #pageFav {
+              background-color: #323A44;
+            }
+          </string>
+        </property>
        <layout class="QVBoxLayout" name="pageFavLayout">
         <item>
-          <widget class="QToolBar" name="favToolBar" />
+          <widget class="QToolBar" name="favToolBar">
+           <property name="styleSheet">
+             <string notr="true">
+               QToolBar {
+                 color: white;
+                 background-color: #47505A;
+                 padding: 0.5em 0.5em;
+               }
+               QToolButton {
+                 color: white;
+                 border: none;
+                 border-radius: 0.2em;
+                 padding: 0.2em 1em;
+                 margin: 0 0.5em;
+               }
+               QToolButton:hover {
+                 background-color: #59616A;
+               }
+               QToolButton:checked {
+                 background-color: #4C91CA;
+               }
+             </string>
+           </property>
+          </widget>
         </item>
         <item>
-         <widget class="PlayListGalleryView" name="playListGallery"/>
+          <widget class="PlayListGalleryView" name="playListGallery"/>
         </item>
        </layout>
       </widget>
