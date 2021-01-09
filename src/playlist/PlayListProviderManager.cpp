@@ -1,6 +1,7 @@
 #include "PlayListProviderManager.h"
 
 #include "db/LocalDatabase.h"
+#include "playlist/FileSystemPlayListProvider.h"
 #include "playlist/LocalPlayListProvider.h"
 #include "playlist/PlayListProvider.h"
 #include "sapi/IPlayListProviderPlugin.h"
@@ -46,6 +47,7 @@ PlayListProviderManager::PlayListProviderManager()
 
     // Register internal providers
     registerProvider(LocalPlayListProvider::TYPE, new LocalPlayListProvider());
+    registerProvider(FileSystemPlayListProvider::TYPE, new FileSystemPlayListProvider());
 }
 
 PlayListProviderManager::~PlayListProviderManager()
