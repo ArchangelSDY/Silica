@@ -53,41 +53,25 @@ private:
 };
 
 // ---------- Load Image Task ----------
-class LoadImageTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    LoadImageTask(QSharedPointer<ImageSource> imageSource) :
-        QRunnable() ,
-        m_imageSource(imageSource) {}
 
-    void run();
-
-signals:
-    void loaded(QVariantHash metadata, QSharedPointer<ImageData> image);
-
-private:
-    QSharedPointer<ImageSource> m_imageSource;
-};
-
-void LoadImageTask::run()
+static QSharedPointer<ImageData> doLoadImageSync(QSharedPointer<ImageSource> imageSource)
 {
     QList<QImage> frames;
     QList<int> durations;
     QVariantHash metadata;
-    if (!m_imageSource.isNull() && m_imageSource->open()) {
+    if (!imageSource.isNull() && imageSource->open()) {
         // Read metadata
-        metadata = m_imageSource->readMetadata();
+        metadata = imageSource->readMetadata();
 
         // Read frames
         QList<QImage> rawFrames;
-        if (m_imageSource->readFrames(rawFrames, durations)) {
+        if (imageSource->readFrames(rawFrames, durations)) {
             for (const QImage &frame : rawFrames) {
                 frames << frame.convertToFormat(QImage::Format_ARGB32_Premultiplied);
             }
         }
 
-        m_imageSource->close();
+        imageSource->close();
     } else {
         qDebug() << "Unable to open image source";
     }
@@ -102,12 +86,62 @@ void LoadImageTask::run()
     QSharedPointer<ImageData> image = QSharedPointer<ImageData>::create();
     image->frames = frames;
     image->durations = durations;
-    emit loaded(metadata, image);
+    image->metadata = metadata;
+
+    return image;
+}
+
+class LoadImageTask : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    LoadImageTask(QSharedPointer<ImageSource> imageSource) :
+        QRunnable() ,
+        m_imageSource(imageSource) {}
+
+    void run();
+
+signals:
+    void loaded(QSharedPointer<ImageData> image);
+
+private:
+    QSharedPointer<ImageSource> m_imageSource;
+};
+
+void LoadImageTask::run()
+{
+    auto ret = doLoadImageSync(m_imageSource);
+    emit loaded(ret);
 }
 
 // ---------- Load Thumbnail Task ----------
 
-static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath);
+static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath)
+{
+    QFile file(thumbnailFullPath);
+    if (file.exists()) {
+        // Set last access/modified time
+#ifdef Q_OS_UNIX
+        time_t now = time(0);
+        struct utimbuf buf;
+        buf.actime = now;
+        buf.modtime = now;
+        utime(thumbnailFullPath.toUtf8().data(), &buf);
+#endif
+        QSharedPointer<QImage> image =
+            QSharedPointer<QImage>::create(thumbnailFullPath);
+        if (!image->isNull()) {
+            return image;
+        } else {
+            // Broken thumbnail, delete it
+            image.clear();
+            file.remove();
+            return QSharedPointer<QImage>();
+        }
+    } else {
+        return QSharedPointer<QImage>();
+    }
+}
 
 class LoadThumbnailTask : public QObject, public QRunnable
 {
@@ -135,6 +169,27 @@ void LoadThumbnailTask::run()
 }
 
 // ---------- Make Thumbnail Task ----------
+
+static QSharedPointer<QImage> doMakeThumbnailSync(const QString &path, QImage *image)
+{
+    Q_ASSERT(image);
+
+    // Create thumbnail dir
+    QFileInfo pathInfo(path);
+    QString dirPath = pathInfo.absolutePath();
+    QDir dir;
+    dir.mkpath(dirPath);
+
+    int height = qMax<int>(
+        THUMBNAIL_MIN_HEIGHT, image->height() / THUMBNAIL_SCALE_RATIO);
+
+    QSharedPointer<QImage> thumbnail = QSharedPointer<QImage>(
+        new QImage(image->scaledToHeight(height, Qt::SmoothTransformation)));
+    thumbnail->save(path, "JPG");
+
+    return thumbnail;
+}
+
 class MakeThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
@@ -156,20 +211,7 @@ private:
 
 void MakeThumbnailTask::run()
 {
-    Q_ASSERT(m_image);
-
-    // Create thumbnail dir
-    QFileInfo pathInfo(m_path);
-    QString dirPath = pathInfo.absolutePath();
-    QDir dir;
-    dir.mkpath(dirPath);
-
-    int height = qMax<int>(
-        THUMBNAIL_MIN_HEIGHT, m_image->height() / THUMBNAIL_SCALE_RATIO);
-
-    QSharedPointer<QImage> thumbnail = QSharedPointer<QImage>(
-        new QImage(m_image->scaledToHeight(height, Qt::SmoothTransformation)));
-    thumbnail->save(m_path, "JPG");
+    auto thumbnail = doMakeThumbnailSync(m_path, m_image.data());
     emit thumbnailMade(thumbnail);
 }
 
@@ -277,12 +319,12 @@ void Image::load(int priority, bool forceReload)
         priority);
 }
 
-void Image::imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image)
+void Image::imageReaderFinished(QSharedPointer<ImageData> image)
 {
     Q_ASSERT(image->frames.count() > 0);
     Q_ASSERT(image->durations.count() > 0);
 
-    resetMetadata(metadata);
+    resetMetadata(image->metadata);
     m_data = image;
     m_isLoadingImage = false;
 
@@ -349,34 +391,14 @@ QSharedPointer<QImage> Image::loadThumbnailSync()
 {
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
-    return doLoadThumbnailSync(thumbnailFullPath);
-}
-
-static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath)
-{
-    QFile file(thumbnailFullPath);
-    if (file.exists()) {
-        // Set last access/modified time
-#ifdef Q_OS_UNIX
-        time_t now = time(0);
-        struct utimbuf buf;
-        buf.actime = now;
-        buf.modtime = now;
-        utime(thumbnailFullPath.toUtf8().data(), &buf);
-#endif
-        QSharedPointer<QImage> image =
-            QSharedPointer<QImage>::create(thumbnailFullPath);
-        if (!image->isNull()) {
-            return image;
-        } else {
-            // Broken thumbnail, delete it
-            image.clear();
-            file.remove();
-            return QSharedPointer<QImage>();
-        }
-    } else {
-        return QSharedPointer<QImage>();
+    auto thumbnail = doLoadThumbnailSync(thumbnailFullPath);
+    if (thumbnail) {
+        return thumbnail;
     }
+
+    // Thumbnail not found, try to load and make
+    auto imageData = doLoadImageSync(m_imageSource);
+    return doMakeThumbnailSync(thumbnailFullPath, &imageData->defaultFrame());
 }
 
 void Image::makeThumbnail()

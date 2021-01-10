@@ -27,6 +27,7 @@ public:
 
     QList<QImage> frames;
     QList<int> durations;
+    QVariantHash metadata;
 };
 
 class Image : public QObject
@@ -71,7 +72,7 @@ signals:
     void thumbnailLoadFailed();
 
 private slots:
-    void imageReaderFinished(QVariantHash metadata, QSharedPointer<ImageData> image);
+    void imageReaderFinished(QSharedPointer<ImageData> image);
     void thumbnailReaderFinished(QSharedPointer<QImage> thumbnail);
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
