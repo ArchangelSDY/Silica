@@ -11,6 +11,7 @@
 #include "image/Image.h"
 #include "image/ImageSourceManager.h"
 #include "GlobalConfig.h"
+#include "../PlayList.h"
 
 
 static QCache<QString, QImage> g_coverCache(500);
@@ -54,7 +55,7 @@ FileSystemPlayListEntity::~FileSystemPlayListEntity()
 
 int FileSystemPlayListEntity::count() const
 {
-    // TODO
+    Q_UNREACHABLE();
     return 0;
 }
 
@@ -156,8 +157,30 @@ QImage FileSystemPlayListEntity::loadCoverImage()
 
 QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
 {
-    // TODO
-    return {};
+    if (m_fileInfo.isDir()) {
+        Q_UNREACHABLE();
+        return {};
+    }
+
+    PlayList pl;
+    pl.addMultiplePath(m_fileInfo.absoluteFilePath());
+
+    if (pl.count() == 1) {
+        // Add siblings too
+        QDir curDir = m_fileInfo.dir();
+        QFileInfoList entries = curDir.entryInfoList(
+            ImageSourceManager::instance()->nameFilters(),
+            QDir::Files | QDir::NoDotAndDotDot,
+            QDir::Name);
+        for (const QFileInfo &info : entries) {
+            // Avoid duplicate
+            if (info.absoluteFilePath() != m_fileInfo.absoluteFilePath()) {
+                pl.addSinglePath(info.absoluteFilePath());
+            }
+        }
+    }
+
+    return pl.toImageUrls();
 }
 
 void FileSystemPlayListEntity::setName(const QString &name)
