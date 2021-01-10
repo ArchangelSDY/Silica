@@ -83,10 +83,8 @@ if (BUILD_PRODUCTION)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif(BUILD_PRODUCTION)
 
-# Enable C++11 for gcc and clang
-if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang"))
-	set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-endif ()
+# Enable C++17
+set (CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
     # Enable multi-processor compilation

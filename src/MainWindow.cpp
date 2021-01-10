@@ -438,9 +438,7 @@ void MainWindow::playListProviderEntitiesLoaded()
 
 void MainWindow::playListEntityTriggered()
 {
-    auto wr = m_playListEntityTriggerWatcher.result();
-    auto result = wr.first;
-    auto entity = wr.second;
+    auto [result, entity] = m_playListEntityTriggerWatcher.result();
 
     switch (result) {
     case PlayListEntityTriggerResult::LoadPlayList:
