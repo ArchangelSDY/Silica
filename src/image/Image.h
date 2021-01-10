@@ -1,5 +1,4 @@
-#ifndef IMAGE_H
-#define IMAGE_H
+#pragma once
 
 #include <QImage>
 #include <QObject>
@@ -88,6 +87,7 @@ private:
     void resetMetadata(const QVariantHash &metadata);
 
     QUuid m_uuid;
+    QSharedPointer<bool> m_liveness;
     QSharedPointer<ImageSource> m_imageSource;
     QWeakPointer<QImage> m_thumbnail;
     QWeakPointer<ImageData> m_data;
@@ -106,5 +106,3 @@ private:
 
 typedef QList<QSharedPointer<Image> > ImageList;
 typedef QSharedPointer<Image> ImagePtr;
-
-#endif // IMAGE_H

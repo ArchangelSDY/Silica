@@ -22,36 +22,6 @@
 static const int THUMBNAIL_MIN_HEIGHT = 480;
 static const int THUMBNAIL_SCALE_RATIO = 8;
 
-static ConcurrentHash<QUuid, bool> s_liveImages;
-
-class LiveImageRunnable : public QRunnable
-{
-public:
-    LiveImageRunnable(const QUuid &uuid, QRunnable *wrapped) :
-        m_uuid(uuid) ,
-        m_wrapped(wrapped)
-    {
-    }
-
-    ~LiveImageRunnable()
-    {
-        if (m_wrapped) {
-            delete m_wrapped;
-        }
-    }
-
-    void run()
-    {
-        if (m_wrapped && s_liveImages.contains(m_uuid)) {
-            m_wrapped->run();
-        }
-    }
-
-private:
-    QUuid m_uuid;
-    QRunnable *m_wrapped;
-};
-
 // ---------- Load Image Task ----------
 
 static QSharedPointer<ImageData> doLoadImageSync(QSharedPointer<ImageSource> imageSource)
@@ -95,8 +65,9 @@ class LoadImageTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadImageTask(QSharedPointer<ImageSource> imageSource) :
+    LoadImageTask(QWeakPointer<bool> liveness, QSharedPointer<ImageSource> imageSource) :
         QRunnable() ,
+        m_liveness(liveness) ,
         m_imageSource(imageSource) {}
 
     void run();
@@ -105,13 +76,16 @@ signals:
     void loaded(QSharedPointer<ImageData> image);
 
 private:
+    QWeakPointer<bool> m_liveness;
     QSharedPointer<ImageSource> m_imageSource;
 };
 
 void LoadImageTask::run()
 {
-    auto ret = doLoadImageSync(m_imageSource);
-    emit loaded(ret);
+    if (m_liveness.toStrongRef()) {
+        auto ret = doLoadImageSync(m_imageSource);
+        emit loaded(ret);
+    }
 }
 
 // ---------- Load Thumbnail Task ----------
@@ -147,8 +121,9 @@ class LoadThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    LoadThumbnailTask(const QString &thumbnailPath) :
+    LoadThumbnailTask(QWeakPointer<bool> liveness, const QString &thumbnailPath) :
         QRunnable(),
+        m_liveness(liveness) ,
         m_thumbnailPath(thumbnailPath)
     {
     }
@@ -159,13 +134,16 @@ signals:
     void loaded(QSharedPointer<QImage> thumbnail);
 
 private:
+    QWeakPointer<bool> m_liveness;
     QString m_thumbnailPath;
 };
 
 void LoadThumbnailTask::run()
 {
-    QSharedPointer<QImage> thumbnail = doLoadThumbnailSync(m_thumbnailPath);
-    emit loaded(thumbnail);
+    if (m_liveness.toStrongRef()) {
+        QSharedPointer<QImage> thumbnail = doLoadThumbnailSync(m_thumbnailPath);
+        emit loaded(thumbnail);
+    }
 }
 
 // ---------- Make Thumbnail Task ----------
@@ -194,8 +172,9 @@ class MakeThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    MakeThumbnailTask(QImage *image, const QString &path) :
+    MakeThumbnailTask(QWeakPointer<bool> liveness, QImage *image, const QString &path) :
         QRunnable() ,
+        m_liveness(liveness) ,
         m_image(image) ,
         m_path(path) {}
 
@@ -205,14 +184,17 @@ signals:
     void thumbnailMade(QSharedPointer<QImage> thumbnail);
 
 private:
-      QScopedPointer<QImage> m_image;
-      QString m_path;
+    QWeakPointer<bool> m_liveness;
+    QScopedPointer<QImage> m_image;
+    QString m_path;
 };
 
 void MakeThumbnailTask::run()
 {
-    auto thumbnail = doMakeThumbnailSync(m_path, m_image.data());
-    emit thumbnailMade(thumbnail);
+    if (m_liveness.toStrongRef()) {
+        auto thumbnail = doMakeThumbnailSync(m_path, m_image.data());
+        emit thumbnailMade(thumbnail);
+    }
 }
 
 // ---------- Thread Pool ----------
@@ -229,6 +211,7 @@ static QThreadPool *threadPool()
 Image::Image(const QString &path, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
+    m_liveness(QSharedPointer<bool>::create(true)) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(path)) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -236,8 +219,6 @@ Image::Image(const QString &path, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false)
 {
-    s_liveImages.insert(m_uuid, true);
-
     computeThumbnailPath();
 
     connect(this, &Image::loaded,
@@ -249,6 +230,7 @@ Image::Image(const QString &path, QObject *parent) :
 Image::Image(const QUrl &url, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
+    m_liveness(QSharedPointer<bool>::create(true)) ,
     m_imageSource(ImageSourceManager::instance()->createSingle(url)) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -256,8 +238,6 @@ Image::Image(const QUrl &url, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false)
 {
-    s_liveImages.insert(m_uuid, true);
-
     computeThumbnailPath();
 
     connect(this, &Image::loaded,
@@ -269,6 +249,7 @@ Image::Image(const QUrl &url, QObject *parent) :
 Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     QObject(parent) ,
     m_uuid(QUuid::createUuid()) ,
+    m_liveness(QSharedPointer<bool>::create(true)) ,
     m_imageSource(imageSource) ,
     m_isLoadingImage(false) ,
     m_isLoadingThumbnail(false) ,
@@ -276,8 +257,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
     m_isError(false) ,
     m_needMakeThumbnail(false)
 {
-    s_liveImages.insert(m_uuid, true);
-
     computeThumbnailPath();
 
     connect(this, &Image::loaded,
@@ -288,8 +267,6 @@ Image::Image(QSharedPointer<ImageSource> imageSource, QObject *parent) :
 
 Image::~Image()
 {
-    s_liveImages.remove(m_uuid);
-
     m_imageSource.clear();
 }
 
@@ -309,14 +286,12 @@ void Image::load(int priority, bool forceReload)
 
     m_isLoadingImage = true;
 
-    LoadImageTask *loadImageTask = new LoadImageTask(m_imageSource);
+    LoadImageTask *loadImageTask = new LoadImageTask(m_liveness.toWeakRef(), m_imageSource);
     connect(loadImageTask,
             &LoadImageTask::loaded,
             this,
             &Image::imageReaderFinished);
-    threadPool()->start(
-        new LiveImageRunnable(m_uuid, loadImageTask),
-        priority);
+    threadPool()->start(loadImageTask, priority);
 }
 
 void Image::imageReaderFinished(QSharedPointer<ImageData> image)
@@ -378,13 +353,10 @@ void Image::loadThumbnail()
 
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
-    LoadThumbnailTask *loadThumbnailTask =
-        new LoadThumbnailTask(thumbnailFullPath);
+    LoadThumbnailTask *loadThumbnailTask = new LoadThumbnailTask(m_liveness.toWeakRef(), thumbnailFullPath);
     connect(loadThumbnailTask, &LoadThumbnailTask::loaded, this, &Image::thumbnailReaderFinished);
     // Thumbnail loading should be low priority
-    threadPool()->start(
-        new LiveImageRunnable(m_uuid, loadThumbnailTask),
-        LowPriority);
+    threadPool()->start(loadThumbnailTask, LowPriority);
 }
 
 QSharedPointer<QImage> Image::loadThumbnailSync()
@@ -424,11 +396,10 @@ void Image::makeThumbnail(QSharedPointer<ImageData> image)
     QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
         "/" + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
-        new MakeThumbnailTask(new QImage(frame), thumbnailFullPath);
+        new MakeThumbnailTask(m_liveness.toWeakRef(), new QImage(frame), thumbnailFullPath);
     connect(makeThumbnailTask, &MakeThumbnailTask::thumbnailMade,
             this, &Image::thumbnailMade);
-    threadPool()->start(
-        new LiveImageRunnable(m_uuid, makeThumbnailTask));
+    threadPool()->start(makeThumbnailTask);
 }
 
 void Image::thumbnailMade(QSharedPointer<QImage> thumbnail)
