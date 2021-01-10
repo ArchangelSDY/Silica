@@ -30,7 +30,8 @@ QString LocalPlayListEntity::name() const
 
 bool LocalPlayListEntity::supportsOption(PlayListEntityOption option) const
 {
-    return option == PlayListEntityOption::AddImageUrls
+    return option == PlayListEntityOption::Count
+        || option == PlayListEntityOption::AddImageUrls
         || option == PlayListEntityOption::RemoveImageUrls;
 }
 

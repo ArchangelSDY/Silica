@@ -10,7 +10,7 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForImag
 }
 
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForPlayListGallery(
-    const QString &, const int)
+    const QString &, std::optional<int>)
 {
     return new LooseImageBackgroundRenderer(new LooseImageRenderer());
 }

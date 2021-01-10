@@ -8,7 +8,7 @@ class CompactRendererFactory : public AbstractRendererFactory
 public:
     AbstractGalleryItemRenderer *createItemRendererForImageGallery();
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
-        const QString &title, const int count);
+        const QString &title, std::optional<int> count);
     AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
         const QFileInfo &pathInfo, bool useDefaultFolderCover);
 };

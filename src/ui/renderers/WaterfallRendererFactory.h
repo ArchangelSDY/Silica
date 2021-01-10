@@ -8,7 +8,7 @@ class WaterfallRendererFactory : public AbstractRendererFactory
 public:
     virtual AbstractGalleryItemRenderer *createItemRendererForImageGallery();
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
-        const QString &title, const int count);
+        const QString &title, std::optional<int> count);
     virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
         const QFileInfo &, bool);
 

@@ -8,7 +8,7 @@ class LooseRendererFactory : public AbstractRendererFactory
 public:
     AbstractGalleryItemRenderer *createItemRendererForImageGallery();
     AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
-        const QString &, const int);
+        const QString &, std::optional<int>);
     AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
         const QFileInfo &, bool);
 };

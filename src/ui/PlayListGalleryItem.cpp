@@ -59,8 +59,11 @@ void PlayListGalleryItem::onThumbnailLoaded()
 
 void PlayListGalleryItem::createRenderer()
 {
+    auto count = m_entity->supportsOption(PlayListEntityOption::Count) ?
+        m_entity->count() :
+        std::optional<int>();
     setRenderer(m_rendererFactory->createItemRendererForPlayListGallery(
-        m_entity->name(), m_entity->count()));
+        m_entity->name(), count));
 }
 
 QString PlayListGalleryItem::name() const

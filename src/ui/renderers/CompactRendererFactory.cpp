@@ -13,11 +13,15 @@ AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForImageG
 }
 
 AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForPlayListGallery(
-    const QString &title, const int count)
+    const QString &title, std::optional<int> count)
 {
-    return new CompactCountRenderer(count,
-        new CompactTitleRenderer(title,
-        new CompactImageRenderer()));
+    auto renderer = new CompactTitleRenderer(title,
+        new CompactImageRenderer());
+    if (count.has_value()) {
+        return new CompactCountRenderer(count.value(), renderer);
+    } else {
+        return renderer;
+    }
 }
 
 AbstractGalleryItemRenderer *CompactRendererFactory::createItemRendererForFileSystemView(
