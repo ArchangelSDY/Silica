@@ -12,6 +12,7 @@
 #include "navigation/NavigatorSynchronizer.h"
 #include "playlist/PlayListEntityTriggerResult.h"
 #include "ui/gamepad/GamepadController.h"
+#include "ui/playlist/PlayListProviderViewManager.h"
 #include "ui/BasketView.h"
 #include "Navigator.h"
 #include "PlayList.h"
@@ -93,6 +94,7 @@ private:
 
     Ui::MainWindow *ui;
 
+    PlayListProviderViewManager m_playListProviderViewManager;
     PlayListProvider *m_currentPlayListProvider;
     QSharedPointer<PlayListEntity> m_currentPlayListEntity;
     QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;

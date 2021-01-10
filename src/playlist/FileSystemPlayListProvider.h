@@ -6,6 +6,7 @@ class FileSystemPlayListEntity;
 
 class FileSystemPlayListProvider : public PlayListProvider
 {
+    Q_OBJECT
 public:
     static const int TYPE = 1;
 
@@ -21,7 +22,12 @@ public:
     virtual void updateEntity(PlayListEntity *entity) override;
     virtual void removeEntity(PlayListEntity *entity) override;
 
+    QString rootPath() const;
     void setRootPath(const QString &path);
+
+signals:
+    void rootPathChanged(const QString &rootPath);
+
 private:
     QString m_rootPath;
 };

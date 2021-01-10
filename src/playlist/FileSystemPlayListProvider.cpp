@@ -56,6 +56,7 @@ PlayListEntityTriggerResult FileSystemPlayListProvider::triggerEntity(PlayListEn
     FileSystemPlayListEntity *fsEntity = static_cast<FileSystemPlayListEntity *>(entity);
     if (fsEntity->fileInfo().isDir()) {
         m_rootPath = fsEntity->fileInfo().absoluteFilePath();
+        emit rootPathChanged(m_rootPath);
         emit entitiesChanged();
         return PlayListEntityTriggerResult::None;
     } else {
@@ -80,4 +81,18 @@ void FileSystemPlayListProvider::updateEntity(PlayListEntity *entity)
 
 void FileSystemPlayListProvider::removeEntity(PlayListEntity *entity)
 {
+}
+
+QString FileSystemPlayListProvider::rootPath() const
+{
+    return m_rootPath;
+}
+
+void FileSystemPlayListProvider::setRootPath(const QString &path)
+{
+    if (m_rootPath != path) {
+        m_rootPath = path;
+        emit rootPathChanged(m_rootPath);
+        emit entitiesChanged();
+    }
 }

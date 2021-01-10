@@ -25,6 +25,8 @@ set(SILICA_UI_SRCS
     "ui/ViewStateManager.cpp"
     "ui/gamepad/GamepadAxisScroller.cpp"
     "ui/gamepad/GamepadController.cpp"
+    "ui/playlist/FileSystemPlayListProviderView.cpp"
+    "ui/playlist/PlayListProviderViewManager.cpp"
     "ui/renderers/AbstractGalleryItemRenderer.cpp"
     "ui/renderers/AbstractGalleryViewRenderer.cpp"
     "ui/renderers/AbstractRendererFactory.cpp"

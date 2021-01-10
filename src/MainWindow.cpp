@@ -28,12 +28,15 @@
 #include "navigation/NavigationPlayerManager.h"
 #include "navigation/NormalNavigationPlayer.h"
 #include "playlist/sort/PlayListImageUrlSorter.h"
+#include "playlist/FileSystemPlayListProvider.h"
 #include "playlist/LocalPlayListProvider.h"
 #include "playlist/PlayListProviderManager.h"
 #include "playlist/PlayListProvider.h"
 #include "sapi/LoadingIndicatorDelegate.h"
 #include "share/SharerManager.h"
 #include "ui/models/MainGraphicsViewModel.h"
+#include "ui/playList/FileSystemPlayListProviderView.h"
+#include "ui/playList/PlayListProviderViewManager.h"
 #include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImagePathCorrectorClientImpl.h"
@@ -362,13 +365,16 @@ void MainWindow::setupExtraUi()
     auto providers = PlayListProviderManager::instance()->instance()->all();
     auto providerButtonGroup = new QActionGroup(this);
     for (auto provider : providers) {
-        auto act = ui->favToolBar->addAction(provider->name(), [this, provider]() {
+        auto act = ui->playListProvidersToolBar->addAction(provider->name(), [this, provider]() {
             this->loadSelectedPlayListProvider(provider->type());
         });
         act->setCheckable(true);
         providerButtonGroup->addAction(act);
     }
     providerButtonGroup->actions().first()->trigger();
+
+    auto fsPlayListProvider = static_cast<FileSystemPlayListProvider *>(PlayListProviderManager::instance()->get(FileSystemPlayListProvider::TYPE));
+    fsPlayListProvider->setRootPath(fsRootPath);
 
     connect(&m_localPlayListEntityCreateWatcher, &QFutureWatcher<QString>::finished, this, &MainWindow::localPlayListEntityCreated);
 }
@@ -411,6 +417,16 @@ void MainWindow::loadSelectedPlayListProvider(int type)
         }
         connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
         m_currentPlayListProvider = provider;
+
+        auto playListProviderToolBarActions = ui->playListProviderToolBar->actions();
+        ui->playListProviderToolBar->clear();
+        for (auto action : playListProviderToolBarActions) {
+            action->deleteLater();
+        }
+        auto view = m_playListProviderViewManager.get(provider->type());
+        if (view) {
+            view->setupToolBar(ui->playListProviderToolBar);
+        }
     }
 
     loadCurrentPlayListProvider();
