@@ -14,8 +14,9 @@
 #include "../PlayList.h"
 
 
+// TODO: Investigate NPE during destruction
 static QCache<QString, QImage> g_coverCache(500);
-static QCache<QString, bool> g_isDefaultFolderCover(500);
+static QCache<QString, bool> g_folderCover(500);
 static QReadWriteLock g_coverCacheLock;
 
 static QString getCoverCacheKey(const QFileInfo &pathInfo)
@@ -91,7 +92,7 @@ QImage FileSystemPlayListEntity::loadCoverImage()
         return image;
     }
 
-    bool *isDefaultFolderCover = g_isDefaultFolderCover[cacheKey];
+    bool *isDefaultFolderCover = g_folderCover[cacheKey];
     if (isDefaultFolderCover) {
         g_coverCacheLock.unlock();
         return QImage(":/res/folder.png");
@@ -130,7 +131,7 @@ QImage FileSystemPlayListEntity::loadCoverImage()
 
         // No suitable image found.
         g_coverCacheLock.lockForWrite();
-        g_isDefaultFolderCover.insert(cacheKey, new bool(true));
+        g_folderCover.insert(cacheKey, new bool(true));
         g_coverCacheLock.unlock();
         return QImage(":/res/folder.png");
     } else {
