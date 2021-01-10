@@ -9,7 +9,7 @@
 #include "LooseImageBackgroundRenderer.h"
 #include "PlayListGalleryItem.h"
 
-PlayListGalleryItem::PlayListGalleryItem(PlayListEntity *entity,
+PlayListGalleryItem::PlayListGalleryItem(QSharedPointer<PlayListEntity> entity,
                                          AbstractRendererFactory *rendererFactory,
                                          QGraphicsItem *parent) :
     GalleryItem(rendererFactory, parent) ,
@@ -39,7 +39,7 @@ void PlayListGalleryItem::loadThumbnail()
         return;
     }
 
-    PlayListEntity *entity = m_entity;
+    auto entity = m_entity;
     m_thumbnailLoader.setFuture(QtConcurrent::run([entity]() -> QSharedPointer<QImage> {
         QSharedPointer<QImage> thumbnail(new QImage(std::move(entity->loadCoverImage())));
         if (thumbnail->isNull()) {

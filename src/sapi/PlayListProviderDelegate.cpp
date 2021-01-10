@@ -28,7 +28,6 @@ PlayListProviderDelegate::~PlayListProviderDelegate()
     //            this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
     // disconnect(m_provider, SIGNAL(itemsCountChanged(int)),
     //            this, SIGNAL(itemsCountChanged(int)));
-    qDeleteAll(m_entities.begin(), m_entities.end());
     m_plugin->destroy(m_provider);
 }
 
@@ -48,37 +47,29 @@ bool PlayListProviderDelegate::supportsOption(PlayListProviderOption option) con
     return false;
 }
 
-QList<PlayListEntity *> PlayListProviderDelegate::entities() const
+QList<PlayListEntity *> PlayListProviderDelegate::loadEntities()
 {
-    QList<PlayListEntity*> ret;
-    ret.reserve(m_entities.count());
-    for (auto entity : m_entities) {
-        ret.push_back(entity);
-    }
-    return ret;
-}
+    QList<PlayListEntity *> entities;
 
-void PlayListProviderDelegate::loadEntities()
-{
     int type = LocalDatabase::instance()->queryPluginPlayListProviderType(m_name);
     // TODO: Replace with named constant
     if (type == -1) {
-        return;
+        return entities;
     }
 
     auto items = LocalDatabase::instance()->queryPlayListEntities(type);
-    qDeleteAll(m_entities.begin(), m_entities.end());
     for (const auto &item : items) {
-        m_entities << new PlayListEntityDelegate(this,
+        entities << new PlayListEntityDelegate(this,
             item.name, item.count, item.coverPath, m_canContinueProvide);
     }
-    emit entitiesChanged();
+
+    return entities;
 }
 
-void PlayListProviderDelegate::triggerEntity(PlayListEntity *entity)
+PlayListEntityTriggerResult PlayListProviderDelegate::triggerEntity(PlayListEntity *entity)
 {
     // TODO: Add extensibility
-    emit playListTriggered(entity);
+    return PlayListEntityTriggerResult::LoadPlayList;
 }
 
 PlayListEntity *PlayListProviderDelegate::createEntity(const QString &name)

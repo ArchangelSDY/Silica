@@ -17,7 +17,6 @@ FileSystemPlayListProvider::FileSystemPlayListProvider(QObject *parent) :
 
 FileSystemPlayListProvider::~FileSystemPlayListProvider()
 {
-    qDeleteAll(m_entities.begin(), m_entities.end());
 }
 
 int FileSystemPlayListProvider::type() const
@@ -38,41 +37,29 @@ bool FileSystemPlayListProvider::supportsOption(PlayListProviderOption option) c
     //     || option == PlayListProviderOption::RemoveEntity;
 }
 
-QList<PlayListEntity*> FileSystemPlayListProvider::entities() const
+QList<PlayListEntity *> FileSystemPlayListProvider::loadEntities()
 {
-    QList<PlayListEntity*> ret;
-    ret.reserve(m_entities.count());
-    for (auto entity : m_entities) {
-        ret.push_back(entity);
-    }
-    return ret;
-}
-
-void FileSystemPlayListProvider::loadEntities()
-{
-    qDeleteAll(m_entities.begin(), m_entities.end());
-    m_entities.clear();
+    QList<PlayListEntity *> entities;
 
     QDirIterator iter(
         m_rootPath, ImageSourceManager::instance()->nameFilters(),
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     while (iter.hasNext()) {
-        m_entities << new FileSystemPlayListEntity(this, iter.next());
+        entities << new FileSystemPlayListEntity(this, iter.next());
     }
 
-    emit entitiesChanged();
+    return entities;
 }
 
-void FileSystemPlayListProvider::triggerEntity(PlayListEntity *entity)
+PlayListEntityTriggerResult FileSystemPlayListProvider::triggerEntity(PlayListEntity *entity)
 {
     FileSystemPlayListEntity *fsEntity = static_cast<FileSystemPlayListEntity *>(entity);
     if (fsEntity->fileInfo().isDir()) {
         m_rootPath = fsEntity->fileInfo().absoluteFilePath();
-        QtConcurrent::run([this]() {
-            this->loadEntities();
-        });
+        emit entitiesChanged();
+        return PlayListEntityTriggerResult::None;
     } else {
-        emit playListTriggered(entity);
+        return PlayListEntityTriggerResult::LoadPlayList;
     }
 }
 

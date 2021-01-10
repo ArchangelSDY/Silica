@@ -14,7 +14,6 @@ LocalPlayListProvider::LocalPlayListProvider(QObject *parent) :
 
 LocalPlayListProvider::~LocalPlayListProvider()
 {
-    qDeleteAll(m_entities.begin(), m_entities.end());
 }
 
 int LocalPlayListProvider::type() const
@@ -34,32 +33,21 @@ bool LocalPlayListProvider::supportsOption(PlayListProviderOption option) const
         || option == PlayListProviderOption::RemoveEntity;
 }
 
-QList<PlayListEntity*> LocalPlayListProvider::entities() const
+QList<PlayListEntity *> LocalPlayListProvider::loadEntities()
 {
-    QList<PlayListEntity*> ret;
-    ret.reserve(m_entities.count());
-    for (auto entity : m_entities) {
-        ret.push_back(entity);
-    }
-    return ret;
-}
-
-void LocalPlayListProvider::loadEntities()
-{
-    qDeleteAll(m_entities.begin(), m_entities.end());
-    m_entities.clear();
+    QList<PlayListEntity *> entities;
 
     auto items = LocalDatabase::instance()->queryPlayListEntities(LocalPlayListProviderFactory::TYPE);
     for (const auto& item : items) {
-        m_entities << new LocalPlayListEntity(this, item.id, item.name, item.count, item.coverPath);
+        entities << new LocalPlayListEntity(this, item.id, item.name, item.count, item.coverPath);
     }
 
-    emit entitiesChanged();
+    return entities;
 }
 
-void LocalPlayListProvider::triggerEntity(PlayListEntity *entity)
+PlayListEntityTriggerResult LocalPlayListProvider::triggerEntity(PlayListEntity *entity)
 {
-    emit playListTriggered(entity);
+    return PlayListEntityTriggerResult::LoadPlayList;
 }
 
 PlayListEntity *LocalPlayListProvider::createEntity(const QString &name)
@@ -76,8 +64,6 @@ void LocalPlayListProvider::insertEntity(PlayListEntity *entity)
     data.type = LocalPlayListProvider::TYPE;
     LocalDatabase::instance()->insertPlayListEntity(data);
     e->m_id = data.id;
-
-    m_entities << e;
 
     emit entitiesChanged();
 }
@@ -103,8 +89,6 @@ void LocalPlayListProvider::removeEntity(PlayListEntity *entity)
     PlayListEntityData data;
     data.id = e->m_id;
     LocalDatabase::instance()->removePlayListEntity(data);
-
-    m_entities.removeOne(e);
 
     emit entitiesChanged();
 }

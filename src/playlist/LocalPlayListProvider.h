@@ -14,22 +14,10 @@ public:
     virtual int type() const override;
     virtual QString name() const override;
     virtual bool supportsOption(PlayListProviderOption option) const override;
-    virtual QList<PlayListEntity *> entities() const override;
-    virtual void loadEntities() override;
-    virtual void triggerEntity(PlayListEntity *entity) override;
+    virtual QList<PlayListEntity *> loadEntities() override;
+    virtual PlayListEntityTriggerResult triggerEntity(PlayListEntity *entity) override;
     virtual PlayListEntity *createEntity(const QString &name) override;
     virtual void insertEntity(PlayListEntity *entity) override;
     virtual void updateEntity(PlayListEntity *entity) override;
     virtual void removeEntity(PlayListEntity *entity) override;
-
-    // QString typeName() const;
-    // bool canContinueProvide() const;
-
-    // void request(const QString &name, const QVariantHash &extra);
-
-    // bool isImagesReadOnly() const;
-    // bool insertImages(const PlayListRecord &record, const ImageList &images);
-    // bool removeImages(const PlayListRecord &record, const ImageList &images);
-private:
-    QList<LocalPlayListEntity *> m_entities; 
 };

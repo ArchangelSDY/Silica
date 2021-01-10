@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
+#include <QPair>
 #include <QSettings>
 #include <QSharedPointer>
 #include <QTextCodec>
@@ -11,6 +12,8 @@
 #include <QVariantHash>
 
 #include "image/ImageSource.h"
+#include "playlist/PlayListEntity.h"
+#include "playlist/PlayListEntityTriggerResult.h"
 #include "Definitions.h"
 #include "GlobalConfig.h"
 #include "PlayList.h"
@@ -118,13 +121,16 @@ void GlobalConfig::load()
     qRegisterMetaType<QList<int> >("QList<int>");
     qRegisterMetaType<QSharedPointer<QImage> >("QSharedPointer<QImage>");
     qRegisterMetaType<QList<QSharedPointer<QImage> > >("QList<QSharedPointer<QImage> >");
+    qRegisterMetaType<QList<QSharedPointer<PlayListEntity> > >("QList<QSharedPointer<PlayListEntity> >");
     qRegisterMetaType<QList<QUrl> >("QList<QUrl>");
     qRegisterMetaType<QList<QVariantHash> >("QList<QVariantHash>");
     qRegisterMetaType<ImageList>("ImageList");
     qRegisterMetaType<ImagePtr>("ImagePtr");
     qRegisterMetaType<QSharedPointer<PlayList> >("QSharedPointer<PlayList>");
+    qRegisterMetaType<QSharedPointer<PlayListEntity> >("QSharedPointer<PlayListEntity>");
     qRegisterMetaType<QSharedPointer<ImageSource> >("QSharedPointer<ImageSource>");
     qRegisterMetaType<QSharedPointer<ImageData> >("QSharedPointer<ImageData>");
+    qRegisterMetaType<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > >("QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> >");
 
     // Set plugin path
     QCoreApplication::addLibraryPath(qApp->applicationDirPath() + "/plugins");

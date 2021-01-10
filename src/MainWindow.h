@@ -10,6 +10,7 @@
 
 #include "models/BasketModel.h"
 #include "navigation/NavigatorSynchronizer.h"
+#include "playlist/PlayListEntityTriggerResult.h"
 #include "ui/gamepad/GamepadController.h"
 #include "ui/BasketView.h"
 #include "Navigator.h"
@@ -46,8 +47,9 @@ private slots:
     void playListChange();
     void playListAppend(int start);
 
-    void playListProviderEntitiesChanged();
-    void playListTriggered(PlayListEntity *entity);
+    void loadCurrentPlayListProvider();
+    void playListProviderEntitiesLoaded();
+    void playListEntityTriggered();
     void playListCreated();
     void playListContinued();
 
@@ -84,7 +86,7 @@ private:
     void switchViews();
     void moveCursor(Qt::Key direction);
     void toggleSecondaryNavigator();
-    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, PlayListEntity *playListEntity);
+    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, QSharedPointer<PlayListEntity> playListEntity);
 
     void loadSelectedPlayListProvider(int type);
     void continuePlayList();
@@ -92,7 +94,9 @@ private:
     Ui::MainWindow *ui;
 
     PlayListProvider *m_currentPlayListProvider;
-    PlayListEntity *m_currentPlayListEntity;
+    QSharedPointer<PlayListEntity> m_currentPlayListEntity;
+    QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;
+    QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > > m_playListEntityTriggerWatcher;
     QFutureWatcher<QList<QUrl>> m_playListCreateWatcher;
     QFutureWatcher<QList<QUrl>> m_playListContinueWatcher;
     QFutureWatcher<QString> m_localPlayListEntityCreateWatcher;

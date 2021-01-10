@@ -340,24 +340,25 @@ void MainWindow::setupExtraUi()
     connect(ui->basketView, &BasketView::commit, this, &MainWindow::basketCommited);
 
     // Init image source manager client
-    ImageSourceManager::instance()->setClient(
-        new ImageSourceManagerClientImpl(this));
+    ImageSourceManager::instance()->setClient(new ImageSourceManagerClientImpl(this));
 
     // Init image path corrector client
-    ImagePathCorrector::PromptClient *imagePathCorrectorClientImpl =
-        new ImagePathCorrectorClientImpl(this);
-    m_imagePathCorrector =
-        new ImagePathCorrector(GlobalConfig::instance()->searchDirs(),
-                               m_navigator, imagePathCorrectorClientImpl);
+    ImagePathCorrector::PromptClient *imagePathCorrectorClientImpl = new ImagePathCorrectorClientImpl(this);
+    m_imagePathCorrector = new ImagePathCorrector(GlobalConfig::instance()->searchDirs(),
+        m_navigator, imagePathCorrectorClientImpl);
     Logger::instance()->addListener(Logger::IMAGE_LOAD_ERROR,
-                                    m_imagePathCorrector);
+        m_imagePathCorrector);
     Logger::instance()->addListener(Logger::IMAGE_THUMBNAIL_LOAD_ERROR,
-                                    m_imagePathCorrector);
+        m_imagePathCorrector);
 
+    connect(&m_playListEntitiesLoadWatcher, &QFutureWatcher<QList<QSharedPointer<PlayListEntity> > >::finished,
+        this, &MainWindow::playListProviderEntitiesLoaded);
+    connect(&m_playListEntityTriggerWatcher, &QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > >::finished,
+        this, &MainWindow::playListEntityTriggered);
     connect(&m_playListCreateWatcher, &QFutureWatcher<QList<QUrl>>::finished,
-            this, &MainWindow::playListCreated);
+        this, &MainWindow::playListCreated);
     connect(&m_playListContinueWatcher, &QFutureWatcher<QList<QUrl>>::finished,
-            this, &MainWindow::playListContinued);
+        this, &MainWindow::playListContinued);
     auto providers = PlayListProviderManager::instance()->instance()->all();
     auto providerButtonGroup = new QActionGroup(this);
     for (auto provider : providers) {
@@ -381,8 +382,7 @@ void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGra
         mainGraphicsView->setModel(viewModel);
         viewModel->setView(mainGraphicsView);
         mainGraphicsViewWidget = mainGraphicsView;
-    }
-    catch (const DX::Exception &ex) {
+    } catch (const DX::Exception &ex) {
         qDebug() << "Fail to create D2DMainGraphicsWidget due to" << ex.result;
 
         // Fall back if fail to initialize D2D
@@ -406,35 +406,62 @@ void MainWindow::loadSelectedPlayListProvider(int type)
     PlayListProvider *provider = PlayListProviderManager::instance()->get(type);
 
     if (m_currentPlayListProvider != provider) {
-        disconnect(m_currentPlayListProvider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
-        disconnect(m_currentPlayListProvider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
-        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::playListProviderEntitiesChanged);
-        connect(provider, &PlayListProvider::playListTriggered, this, &MainWindow::playListTriggered);
+        if (m_currentPlayListProvider) {
+            disconnect(m_currentPlayListProvider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
+        }
+        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
         m_currentPlayListProvider = provider;
     }
 
-    QtConcurrent::run([provider]() {
-        provider->loadEntities();
-    });
+    loadCurrentPlayListProvider();
 }
 
-void MainWindow::playListProviderEntitiesChanged()
+void MainWindow::loadCurrentPlayListProvider()
 {
-    auto entities = m_currentPlayListProvider->entities();
+    auto provider = m_currentPlayListProvider;
+    m_playListEntitiesLoadWatcher.setFuture(QtConcurrent::run([provider]() {
+        auto entities = provider->loadEntities();
+        QList<QSharedPointer<PlayListEntity> > sharedEntities;
+        sharedEntities.reserve(entities.count());
+        while (!entities.isEmpty()) {
+            sharedEntities << QSharedPointer<PlayListEntity>(entities.takeFirst());
+        }
+        return sharedEntities;
+    }));
+}
+
+void MainWindow::playListProviderEntitiesLoaded()
+{
+    auto entities = m_playListEntitiesLoadWatcher.result();
     ui->playListGallery->setPlayListEntities(entities);
 }
 
-void MainWindow::playListTriggered(PlayListEntity *entity)
+void MainWindow::playListEntityTriggered()
 {
-    m_currentPlayListEntity = entity;
+    auto wr = m_playListEntityTriggerWatcher.result();
+    auto result = wr.first;
+    auto entity = wr.second;
 
-    auto future = QtConcurrent::run([entity]() {
-        return entity->loadImageUrls();
-    });
-    m_playListCreateWatcher.setFuture(future);
+    switch (result) {
+    case PlayListEntityTriggerResult::LoadPlayList:
+    {
+        m_currentPlayListEntity = entity;
 
-    // Show gallery view
-    m_actToolBarGallery->trigger();
+        auto future = QtConcurrent::run([entity]() {
+            return entity->loadImageUrls();
+        });
+        m_playListCreateWatcher.setFuture(future);
+
+        // Show gallery view
+        m_actToolBarGallery->trigger();
+
+        return;
+    }
+    case PlayListEntityTriggerResult::None:
+        return;
+    default:
+        Q_UNREACHABLE();
+    }
 }
 
 void MainWindow::playListCreated()
@@ -500,8 +527,12 @@ void MainWindow::loadSelectedPlayList()
         // a choice?
         PlayListGalleryItem *playListItem =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        PlayListEntity *entity = playListItem->entity();
-        m_currentPlayListProvider->triggerEntity(entity);
+        auto provider = m_currentPlayListProvider;
+        auto entity = playListItem->entity();
+        m_playListEntityTriggerWatcher.setFuture(QtConcurrent::run([provider, entity]() {
+            auto result = provider->triggerEntity(entity.data());
+            return QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> >{ result, entity };
+        }));
     }
 }
 
@@ -1213,7 +1244,7 @@ void MainWindow::toggleSecondaryNavigator()
     }
 }
 
-void MainWindow::setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, PlayListEntity *playListEntity)
+void MainWindow::setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, QSharedPointer<PlayListEntity> playListEntity)
 {
     m_currentPlayListEntity = playListEntity;
     ui->gallery->setPlayListEntity(playListEntity);

@@ -11,7 +11,7 @@ public:
     explicit PlayListGalleryView(QWidget *parent = 0);
 
 public slots:
-    void setPlayListEntities(QList<PlayListEntity *> entities);
+    void setPlayListEntities(QList<QSharedPointer<PlayListEntity> > entities);
 
 private slots:
     void createPlayListEntity(int type);

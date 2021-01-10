@@ -52,7 +52,7 @@ void ImageGalleryView::setPlayList(QSharedPointer<PlayList> playList)
     reload();
 }
 
-void ImageGalleryView::setPlayListEntity(PlayListEntity *playListEntity)
+void ImageGalleryView::setPlayListEntity(QSharedPointer<PlayListEntity> playListEntity)
 {
     m_playListEntity = playListEntity;
 }
@@ -199,7 +199,7 @@ void ImageGalleryView::setAsCover()
 
         auto entity = m_playListEntity;
         QtConcurrent::run([entity]() {
-            entity->provider()->updateEntity(entity);
+            entity->provider()->updateEntity(entity.data());
         });
     }
 }

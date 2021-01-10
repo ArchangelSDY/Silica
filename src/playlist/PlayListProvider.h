@@ -5,6 +5,7 @@
 #include <QVariantHash>
 
 #include "image/Image.h"
+#include "playlist/PlayListEntityTriggerResult.h"
 #include "playlist/PlayListProviderOption.h"
 
 class PlayListEntity;
@@ -20,9 +21,8 @@ public:
     virtual int type() const = 0;
     virtual QString name() const = 0;
     virtual bool supportsOption(PlayListProviderOption option) const = 0;
-    virtual QList<PlayListEntity *> entities() const = 0;
-    virtual void loadEntities() = 0;
-    virtual void triggerEntity(PlayListEntity *entity) = 0;
+    virtual QList<PlayListEntity *> loadEntities() = 0;
+    virtual PlayListEntityTriggerResult triggerEntity(PlayListEntity *entity) = 0;
     virtual PlayListEntity *createEntity(const QString &name) = 0;
     virtual void insertEntity(PlayListEntity *entity) = 0;
     virtual void updateEntity(PlayListEntity *entity) = 0;
@@ -42,7 +42,4 @@ public:
 
 signals:
     void entitiesChanged();
-    void playListTriggered(PlayListEntity *entity);
-//     void gotItems(const QList<QUrl> &urls,
-//                   const QList<QVariantHash> &extraInfos);
 };

@@ -19,7 +19,7 @@ public:
 
 public slots:
     void setPlayList(QSharedPointer<PlayList> playList);
-    void setPlayListEntity(PlayListEntity *playListEntity);
+    void setPlayListEntity(QSharedPointer<PlayListEntity> playListEntity);
     void reload();
 
     void playListItemChange(int index);
@@ -43,7 +43,7 @@ protected:
     void groupBy(AbstractPlayListGrouper *grouper);
 
     QSharedPointer<PlayList> m_playList;
-    PlayListEntity *m_playListEntity;
+    QSharedPointer<PlayListEntity> m_playListEntity;
     QScopedPointer<RankFilterMenuManager> m_rankFilterMenuManager;
 
     virtual QString groupForItem(GalleryItem *item) override;

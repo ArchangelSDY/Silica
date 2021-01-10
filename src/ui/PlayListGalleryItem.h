@@ -13,14 +13,14 @@ class PlayListGalleryItem : public GalleryItem
     Q_OBJECT
     Q_INTERFACES(QGraphicsItem)
 public:
-    explicit PlayListGalleryItem(PlayListEntity *entity,
+    explicit PlayListGalleryItem(QSharedPointer<PlayListEntity> entity,
                                  AbstractRendererFactory *rendererFactory,
                                  QGraphicsItem *parent = 0);
     ~PlayListGalleryItem();
 
     QString name() const;
     QRectF boundingRect() const;
-    PlayListEntity *entity() { return m_entity; }
+    QSharedPointer<PlayListEntity> entity() { return m_entity; }
 
     virtual void load() override;
     virtual void createRenderer();
@@ -30,7 +30,7 @@ private slots:
     void onThumbnailLoaded();
 
 private:
-    PlayListEntity *m_entity;
+    QSharedPointer<PlayListEntity> m_entity;
     QFutureWatcher<QSharedPointer<QImage>> m_thumbnailLoader;
 };
 

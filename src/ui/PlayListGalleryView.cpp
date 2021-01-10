@@ -33,7 +33,7 @@ PlayListGalleryView::PlayListGalleryView(QWidget *parent) :
     setRendererFactory(new CompactRendererFactory());
 }
 
-void PlayListGalleryView::setPlayListEntities(QList<PlayListEntity *> entities)
+void PlayListGalleryView::setPlayListEntities(QList<QSharedPointer<PlayListEntity> > entities)
 {
     clear();
 
@@ -123,7 +123,7 @@ void PlayListGalleryView::renameSelectedItem()
     if (selectedItems.count() > 0) {
         PlayListGalleryItem *item =
             static_cast<PlayListGalleryItem *>(selectedItems[0]);
-        PlayListEntity *entity = item->entity();
+        auto entity = item->entity();
 
         QString newName = QInputDialog::getText(
             0, "Rename PlayList", "New Name",
@@ -131,7 +131,7 @@ void PlayListGalleryView::renameSelectedItem()
 
          if (!newName.isEmpty()) {
              entity->setName(newName);
-             entity->provider()->updateEntity(entity);
+             entity->provider()->updateEntity(entity.data());
          }
     }
 }
@@ -157,8 +157,7 @@ void PlayListGalleryView::removeSelectedItems()
                 PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(item);
                 auto entity = playListItem->entity();
                 QtConcurrent::run([entity]() {
-                    entity->provider()->removeEntity(entity);
-                    delete entity;
+                    entity->provider()->removeEntity(entity.data());
                 });
             }
         }

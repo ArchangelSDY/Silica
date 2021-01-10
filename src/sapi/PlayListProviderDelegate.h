@@ -22,18 +22,13 @@ public:
     virtual int type() const override;
     virtual QString name() const override;
     virtual bool supportsOption(PlayListProviderOption option) const override;
-    // bool canContinueProvide() const override;
 
-    virtual QList<PlayListEntity *> entities() const override;
-    virtual void loadEntities() override;
-    virtual void triggerEntity(PlayListEntity *entity) override;
+    virtual QList<PlayListEntity *> loadEntities() override;
+    virtual PlayListEntityTriggerResult triggerEntity(PlayListEntity *entity) override;
     virtual PlayListEntity *createEntity(const QString &name) override;
     virtual void insertEntity(PlayListEntity *entity) override;
     virtual void updateEntity(PlayListEntity *entity) override;
     virtual void removeEntity(PlayListEntity *entity) override;
-
-    // void request(const QString &name, const QVariantHash &extra) override;
-
 
 private:
     IPlayListProviderPlugin *m_plugin;
@@ -41,7 +36,6 @@ private:
     int m_type;
     QString m_name;
     QString m_displayName;
-    QList<PlayListEntityDelegate *> m_entities;
     bool m_canContinueProvide;
 };
 
