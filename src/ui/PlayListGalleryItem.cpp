@@ -39,8 +39,12 @@ void PlayListGalleryItem::loadThumbnail()
         return;
     }
 
-    auto entity = m_entity;
-    m_thumbnailLoader.setFuture(QtConcurrent::run([entity]() -> QSharedPointer<QImage> {
+    auto entityRef = m_entity.toWeakRef();
+    m_thumbnailLoader.setFuture(QtConcurrent::run([entityRef]() -> QSharedPointer<QImage> {
+        auto entity = entityRef.toStrongRef();
+        if (!entity) {
+            return {};
+        }
         QSharedPointer<QImage> thumbnail(new QImage(std::move(entity->loadCoverImage())));
         if (thumbnail->isNull()) {
             thumbnail->load(":/res/playlist.png");
