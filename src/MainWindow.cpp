@@ -414,18 +414,19 @@ void MainWindow::loadSelectedPlayListProvider(int type)
     if (m_currentPlayListProvider != provider) {
         if (m_currentPlayListProvider) {
             disconnect(m_currentPlayListProvider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
-        }
-        connect(provider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
-        m_currentPlayListProvider = provider;
 
-        auto playListProviderToolBarActions = ui->playListProviderToolBar->actions();
-        ui->playListProviderToolBar->clear();
-        for (auto action : playListProviderToolBarActions) {
-            action->deleteLater();
+            auto view = m_playListProviderViewManager.get(m_currentPlayListProvider->type());
+            if (view) {
+                view->tearDownToolBar(ui->playListProviderToolBar);
+            }
         }
-        auto view = m_playListProviderViewManager.get(provider->type());
+
+        m_currentPlayListProvider = provider;
+        connect(m_currentPlayListProvider, &PlayListProvider::entitiesChanged, this, &MainWindow::loadCurrentPlayListProvider);
+
+        auto view = m_playListProviderViewManager.get(m_currentPlayListProvider->type());
         if (view) {
-            view->setupToolBar(ui->playListProviderToolBar);
+            view->setUpToolBar(ui->playListProviderToolBar);
         }
     }
 
