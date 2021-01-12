@@ -6,7 +6,7 @@
 #include <QDirIterator>
 #include <QEventLoop>
 #include <QFileInfo>
-#include <QReadWriteLock>
+#include <QMutex>
 #include <QSet>
 
 #include "image/Image.h"
@@ -15,10 +15,10 @@
 #include "../PlayList.h"
 
 
-// TODO: Investigate NPE during destruction
 static QCache<QString, QImage> g_coverCache(500);
 static QCache<QString, bool> g_folderCover(500);
-static QReadWriteLock g_coverCacheLock;
+// QCache is not thread-safe for either read or write
+static QMutex g_coverCacheLock;
 
 static QString getCoverCacheKey(const QFileInfo &pathInfo)
 {
@@ -85,7 +85,7 @@ bool FileSystemPlayListEntity::supportsOption(PlayListEntityOption option) const
 QImage FileSystemPlayListEntity::loadCoverImage()
 {
     QString cacheKey = getCoverCacheKey(m_fileInfo);
-    g_coverCacheLock.lockForRead();
+    g_coverCacheLock.lock();
     QImage *cachedImage = g_coverCache[cacheKey];
     if (cachedImage) {
         QImage image(*cachedImage);
@@ -124,7 +124,7 @@ QImage FileSystemPlayListEntity::loadCoverImage()
                 Image image(src);
                 QSharedPointer<QImage> thumbnail = image.loadThumbnailSync();
                 if (thumbnail) {
-                    g_coverCacheLock.lockForWrite();
+                    g_coverCacheLock.lock();
                     g_coverCache.insert(cacheKey, new QImage(*thumbnail));
                     g_coverCacheLock.unlock();
                     return *thumbnail;
@@ -134,7 +134,7 @@ QImage FileSystemPlayListEntity::loadCoverImage()
         }
 
         // No suitable image found.
-        g_coverCacheLock.lockForWrite();
+        g_coverCacheLock.lock();
         g_folderCover.insert(cacheKey, new bool(true));
         g_coverCacheLock.unlock();
         return QImage(":/res/folder.png");
@@ -148,7 +148,7 @@ QImage FileSystemPlayListEntity::loadCoverImage()
             QSharedPointer<QImage> thumbnail = image.loadThumbnailSync();
 
             if (thumbnail) {
-                g_coverCacheLock.lockForWrite();
+                g_coverCacheLock.lock();
                 g_coverCache.insert(cacheKey, new QImage(*thumbnail));
                 g_coverCacheLock.unlock();
                 return *thumbnail;
