@@ -118,11 +118,18 @@ QString ImageSourceManager::fileDialogFilters() const
     for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         ImageSourceFactory *factory = it.value();
+
+        QStringList nameSuffixes = factory->fileNameSuffixes();
+        QStringList patterns;
+        patterns.reserve(nameSuffixes.count());
+        for (const auto &nameSuffix : nameSuffixes) {
+            patterns << QStringLiteral("*.%1").arg(nameSuffix);
+        }
         QString filterPart = QString("%1 (%2)").arg(factory->name(),
-                                                    factory->fileNamePattern());
+                                                    patterns.join(" "));
         parts << filterPart;
 
-        fileNamePatterns << factory->fileNamePattern();
+        fileNamePatterns << patterns.join(" ");
     }
 
     QString partForAll = QString("All (%1)").arg(fileNamePatterns.join(" "));
@@ -131,15 +138,15 @@ QString ImageSourceManager::fileDialogFilters() const
     return parts.join(";;");
 }
 
-QStringList ImageSourceManager::nameFilters() const
+QStringList ImageSourceManager::nameSuffixes() const
 {
-    QStringList filters;
+    QStringList suffixes;
     for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         ImageSourceFactory *factory = it.value();
-        filters << factory->fileNamePattern().split(" ");
+        suffixes.append(factory->fileNameSuffixes());
     }
-    return filters;
+    return suffixes;
 }
 
 void ImageSourceManager::clearCache()

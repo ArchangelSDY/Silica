@@ -4,6 +4,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QList>
+#include <QSet>
 #include <QUrl>
 #include <QtConcurrent>
 
@@ -41,11 +42,16 @@ QList<PlayListEntity *> FileSystemPlayListProvider::loadEntities()
 {
     QList<PlayListEntity *> entities;
 
+    QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
     QDirIterator iter(
-        m_rootPath, ImageSourceManager::instance()->nameFilters(),
+        m_rootPath,
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     while (iter.hasNext()) {
-        entities << new FileSystemPlayListEntity(this, iter.next());
+        QString path = iter.next();
+        if (iter.fileInfo().isFile() && !validNameSuffixes.contains(iter.fileInfo().suffix())) {
+            continue;
+        }
+        entities << new FileSystemPlayListEntity(this, path);
     }
 
     return entities;

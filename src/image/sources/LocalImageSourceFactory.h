@@ -11,7 +11,7 @@ public:
     LocalImageSourceFactory(ImageSourceManager *mgr);
 
     QString name() const;
-    QString fileNamePattern() const;
+    QStringList fileNameSuffixes() const;
     QString urlScheme() const;
     ImageSource *createSingle(const QUrl &url);
     ImageSource *createSingle(const QString &path);

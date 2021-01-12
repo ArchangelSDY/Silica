@@ -17,7 +17,7 @@ public:
     SevenzImageSourceFactory(ImageSourceManager *mgr);
 
     QString name() const;
-    QString fileNamePattern() const;
+    QStringList fileNameSuffixes() const;
     QString urlScheme() const;
     ImageSource *createSingle(const QUrl &url);
     ImageSource *createSingle(const QUrl &url, const QString &password);

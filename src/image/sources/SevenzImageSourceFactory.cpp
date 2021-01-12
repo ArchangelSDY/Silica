@@ -54,9 +54,9 @@ QString SevenzImageSourceFactory::name() const
     return "7z";
 }
 
-QString SevenzImageSourceFactory::fileNamePattern() const
+QStringList SevenzImageSourceFactory::fileNameSuffixes() const
 {
-    return "*.7z";
+    return { "7z" };
 }
 
 QString SevenzImageSourceFactory::urlScheme() const

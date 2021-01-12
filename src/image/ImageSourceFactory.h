@@ -15,7 +15,7 @@ public:
     explicit ImageSourceFactory(ImageSourceManager *m_mgr, QObject *parent = 0);
 
     virtual QString name() const = 0;
-    virtual QString fileNamePattern() const = 0;
+    virtual QStringList fileNameSuffixes() const = 0;
     virtual QString urlScheme() const = 0;
     virtual ImageSource *createSingle(const QUrl &url) = 0;
     virtual ImageSource *createSingle(const QString &path) = 0;

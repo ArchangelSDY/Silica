@@ -26,9 +26,9 @@ QString ImageSourceFactoryDelegate::name() const
     return m_factory->name();
 }
 
-QString ImageSourceFactoryDelegate::fileNamePattern() const
+QStringList ImageSourceFactoryDelegate::fileNameSuffixes() const
 {
-    return m_factory->fileNamePattern();
+    return m_factory->fileNameSuffixes();
 }
 
 QString ImageSourceFactoryDelegate::urlScheme() const

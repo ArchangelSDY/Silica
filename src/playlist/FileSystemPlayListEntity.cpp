@@ -7,6 +7,7 @@
 #include <QEventLoop>
 #include <QFileInfo>
 #include <QReadWriteLock>
+#include <QSet>
 
 #include "image/Image.h"
 #include "image/ImageSourceManager.h"
@@ -109,12 +110,15 @@ QImage FileSystemPlayListEntity::loadCoverImage()
 
     if (m_fileInfo.isDir()) {
         // For directory, try to use first image inside as cover
+        QSet<QString> validSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
         QDirIterator dirIter(m_fileInfo.absoluteFilePath(),
-                             ImageSourceManager::instance()->nameFilters(),
                              QDir::Files);
         bool found = false;
         while (dirIter.hasNext()) {
             QString path = dirIter.next();
+            if (!validSuffixes.contains(dirIter.fileInfo().suffix())) {
+                continue;
+            }
             QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(path));
             if (src) {
                 Image image(src);
@@ -168,12 +172,16 @@ QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
 
     if (pl.count() == 1) {
         // Add siblings too
+        QSet<QString> validSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
         QDir curDir = m_fileInfo.dir();
         QFileInfoList entries = curDir.entryInfoList(
-            ImageSourceManager::instance()->nameFilters(),
             QDir::Files | QDir::NoDotAndDotDot,
             QDir::Name);
         for (const QFileInfo &info : entries) {
+            if (!validSuffixes.contains(info.suffix())) {
+                continue;
+            }
+
             // Avoid duplicate
             if (info.absoluteFilePath() != m_fileInfo.absoluteFilePath()) {
                 pl.addSinglePath(info.absoluteFilePath());
@@ -186,12 +194,12 @@ QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
 
 void FileSystemPlayListEntity::setName(const QString &name)
 {
-    // TODO
+    Q_UNREACHABLE();
 }
 
 void FileSystemPlayListEntity::setCoverImagePath(const QString &path)
 {
-    // TODO
+    Q_UNREACHABLE();
 }
 
 void FileSystemPlayListEntity::addImageUrls(const QList<QUrl> &imageUrls)

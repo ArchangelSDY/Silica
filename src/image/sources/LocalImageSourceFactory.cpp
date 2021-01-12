@@ -1,6 +1,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QSet>
 #include <QUrl>
 
 #include "LocalImageSource.h"
@@ -16,9 +17,9 @@ QString LocalImageSourceFactory::name() const
     return "Images";
 }
 
-QString LocalImageSourceFactory::fileNamePattern() const
+QStringList LocalImageSourceFactory::fileNameSuffixes() const
 {
-    return "*.png *.jpg *.bmp *.gif *.webp";
+    return { "png", "jpg", "bmp", "gif", "webp" };
 }
 
 QString LocalImageSourceFactory::urlScheme() const
@@ -59,11 +60,15 @@ QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path
     }
 
     if (file.isDir()) {
-        QStringList filters = fileNamePattern().split(" ");
-        QDirIterator dirIter(path, filters, QDir::Files, QDirIterator::Subdirectories);
+        QSet<QString> validSuffixes = QSet<QString>::fromList(fileNameSuffixes());
+        QDirIterator dirIter(path, QDir::Files, QDirIterator::Subdirectories);
 
         while (dirIter.hasNext()) {
-            ImageSource *source = createSingle(dirIter.next());
+            QString path = dirIter.next();
+            if (!validSuffixes.contains(dirIter.fileInfo().suffix())) {
+                continue;
+            }
+            ImageSource *source = createSingle(path);
             if (source) {
                 imageSources << source;
             }

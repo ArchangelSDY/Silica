@@ -17,9 +17,9 @@ QString RARImageSourceFactory::name() const
     return "RAR";
 }
 
-QString RARImageSourceFactory::fileNamePattern() const
+QStringList RARImageSourceFactory::fileNameSuffixes() const
 {
-    return "*.rar";
+    return { "rar" };
 }
 
 QString RARImageSourceFactory::urlScheme() const

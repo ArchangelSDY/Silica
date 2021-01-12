@@ -15,9 +15,9 @@ QString PdfImageSourceFactory::name() const
     return "Pdf";
 }
 
-QString PdfImageSourceFactory::fileNamePattern() const
+QStringList PdfImageSourceFactory::fileNameSuffixes() const
 {
-    return "*.pdf";
+    return { "pdf" };
 }
 
 QString PdfImageSourceFactory::urlScheme() const

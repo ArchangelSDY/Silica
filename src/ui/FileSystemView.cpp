@@ -101,9 +101,9 @@ class FileSystemView::DirIterThread : public QThread
 {
     Q_OBJECT
 public:
-    DirIterThread(const QString &rootPath, const QStringList &nameFilters, QDir::Filters filters, QDir::SortFlags sortFlags) :
+    DirIterThread(const QString &rootPath, const QStringList &nameSuffixes, QDir::Filters filters, QDir::SortFlags sortFlags) :
         m_rootPath(rootPath) ,
-        m_nameFilters(nameFilters) ,
+        m_nameSuffixes(QSet<QString>::fromList(nameSuffixes)),
         m_filters(filters) ,
         m_sortFlags(sortFlags)
     {
@@ -111,17 +111,20 @@ public:
 
     void run() override
     {
-        QDirIterator iter(m_rootPath, m_nameFilters, m_filters);
+        QDirIterator iter(m_rootPath, m_filters);
         QList<QFileInfo> itemInfos;
         bool needSort = ((m_sortFlags & QDir::SortByMask) != QDir::Unsorted);
 
         while (iter.hasNext() && !isInterruptionRequested()) {
+            QString path = iter.next();
+            if (iter.fileInfo().isFile() && !m_nameSuffixes.contains(iter.fileInfo().suffix())) {
+                continue;
+            }
             // Emit item at once if sorting is not needed, otherwise hold and
             // sort after all items found
             if (!needSort) {
-                emit gotItem(m_rootPath, iter.next());
+                emit gotItem(m_rootPath, path);
             } else {
-                iter.next();
                 itemInfos.append(iter.fileInfo());
             }
         }
@@ -145,7 +148,7 @@ signals:
 
 private:
     QString m_rootPath;
-    QStringList m_nameFilters;
+    QSet<QString> m_nameSuffixes;
     QDir::Filters m_filters;
     QDir::SortFlags m_sortFlags;
 };
@@ -263,7 +266,7 @@ void FileSystemView::refreshView()
 
     m_dirIterThread.reset(new DirIterThread(
         m_rootPath,
-        ImageSourceManager::instance()->nameFilters(),
+        ImageSourceManager::instance()->nameSuffixes(),
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
         m_sortFlags
     ));

@@ -14,7 +14,7 @@ public:
     virtual ~ImageSourceFactoryDelegate();
 
     virtual QString name() const;
-    virtual QString fileNamePattern() const;
+    virtual QStringList fileNameSuffixes() const;
     virtual QString urlScheme() const;
     virtual ImageSource *createSingle(const QUrl &url);
     virtual ImageSource *createSingle(const QString &path);

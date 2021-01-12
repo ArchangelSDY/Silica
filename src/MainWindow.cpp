@@ -586,12 +586,15 @@ void MainWindow::loadSelectedPath()
         if (selectedItems.count() == 1 && pl->count() == 1) {
             FileSystemItem *fsItem =
                 static_cast<FileSystemItem *>(selectedItems[0]);
+            QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
             QDir curDir = fsItem->fileInfo().dir();
             QFileInfoList entries = curDir.entryInfoList(
-                ImageSourceManager::instance()->nameFilters(),
                 QDir::Files | QDir::NoDotAndDotDot,
                 QDir::Name);
-            foreach (const QFileInfo &info, entries) {
+            for (const QFileInfo &info : entries) {
+                if (!validNameSuffixes.contains(info.suffix())) {
+                    continue;
+                }
                 // Avoid duplicate
                 if (info.absoluteFilePath() != fsItem->path()) {
                     pl->addSinglePath(info.absoluteFilePath());
@@ -694,11 +697,15 @@ void MainWindow::promptToOpenDir()
     lastDir.cdUp();
     lastParentDir = lastDir.absolutePath();
 
+    QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
     QStringList images;
-    QDirIterator iter(dir, ImageSourceManager::instance()->nameFilters(),
-                   QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator iter(dir, QDir::Files, QDirIterator::Subdirectories);
     while (iter.hasNext()) {
-        images << iter.next();
+        QString path = iter.next();
+        if (!validNameSuffixes.contains(iter.fileInfo().suffix())) {
+            continue;
+        }
+        images << path;
     }
 
     QSharedPointer<PlayList> playList = QSharedPointer<PlayList>::create(images);

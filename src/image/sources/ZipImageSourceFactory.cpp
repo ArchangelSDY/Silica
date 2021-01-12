@@ -17,9 +17,9 @@ QString ZipImageSourceFactory::name() const
     return "Zip";
 }
 
-QString ZipImageSourceFactory::fileNamePattern() const
+QStringList ZipImageSourceFactory::fileNameSuffixes() const
 {
-    return "*.zip";
+    return { "zip" };
 }
 
 QString ZipImageSourceFactory::urlScheme() const
