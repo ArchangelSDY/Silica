@@ -32,6 +32,15 @@ const char *SQL_QUERY_PLAYLISTS_BY_TYPE =
 "where playlists.type = ? "
 "group by playlists.id order by playlists.name";
 
+const char *SQL_QUERY_PLAYLIST_BY_ID =
+"select "
+"playlists.id, playlists.name, playlists.cover_path, playlists.type, "
+"count(playlist_images.id), playlists.count "
+"from playlists "
+"left outer join playlist_images on "
+"playlist_images.playlist_id = playlists.id "
+"where playlists.id = ? limit 1";
+
 const char *SQL_QUERY_PLAYLIST_ID_BY_NAME = "select id, name from playlists where name = ?";
 
 const char *SQL_REMOVE_PLAYLIST_BY_ID = "delete from playlists where id = ?";
@@ -140,6 +149,34 @@ QList<PlayListEntityData> SQLiteLocalDatabase::queryPlayListEntities(int type)
     return lst;
 }
 
+PlayListEntityData SQLiteLocalDatabase::queryPlayListEntity(int playListId)
+{
+    PlayListEntityData ret;
+
+    OPEN_BACKGROUND_DATABASE
+
+    QSqlQuery q(db);
+    q.prepare(SQL_QUERY_PLAYLIST_BY_ID);
+    q.addBindValue(playListId);
+    if (!q.exec()) {
+        LOG_QUERY_ERROR
+        break;
+    }
+    if (q.next()) {
+        ret.id = q.value(0).toInt();
+        ret.name = q.value(1).toString();
+        ret.coverPath = q.value(2).toString();
+        ret.type = q.value(3).toInt();
+        int dbImagesCount = q.value(4).toInt();
+        int recordImagesCount = q.value(5).toInt();
+        ret.count = dbImagesCount > 0 ? dbImagesCount : recordImagesCount;
+    }
+
+    CLOSE_BACKGROUND_DATABASE
+
+    return ret;
+}
+
 bool SQLiteLocalDatabase::insertPlayListEntity(PlayListEntityData &data)
 {
     bool ret = false;
@@ -168,7 +205,7 @@ bool SQLiteLocalDatabase::insertPlayListEntity(PlayListEntityData &data)
     return ret;
 }
 
-bool SQLiteLocalDatabase::removePlayListEntity(const PlayListEntityData &data)
+bool SQLiteLocalDatabase::removePlayListEntity(int playListId)
 {
     bool ret = false;
 
@@ -176,7 +213,7 @@ bool SQLiteLocalDatabase::removePlayListEntity(const PlayListEntityData &data)
 
     QSqlQuery q(db);
     q.prepare(SQL_REMOVE_PLAYLIST_BY_ID);
-    q.addBindValue(data.id);
+    q.addBindValue(playListId);
     ret = q.exec();
 
     CLOSE_BACKGROUND_DATABASE

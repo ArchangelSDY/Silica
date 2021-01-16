@@ -69,3 +69,8 @@ void LocalPlayListEntity::removeImageUrls(const QList<QUrl> &imageUrls)
     m_count -= imageUrls.size();
     m_provider->updateEntity(this);
 }
+
+int LocalPlayListEntity::id() const
+{
+    return m_id;
+}

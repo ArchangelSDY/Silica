@@ -17,8 +17,9 @@ public:
     bool migrate();
 
     virtual QList<PlayListEntityData> queryPlayListEntities(int type) override;
+    virtual PlayListEntityData queryPlayListEntity(int playListId) override;
     virtual bool insertPlayListEntity(PlayListEntityData &data) override;
-    virtual bool removePlayListEntity(const PlayListEntityData &data) override;
+    virtual bool removePlayListEntity(int playListId) override;
     virtual bool updatePlayListEntity(const PlayListEntityData &data) override;
 
     virtual QList<QUrl> queryLocalPlayListEntityImageUrls(int playListId) override;

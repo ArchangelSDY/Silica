@@ -15,13 +15,15 @@ class MockLocalDatabase : public LocalDatabase
 public:
     MOCK_METHOD0(migrate, bool());
 
-    MOCK_METHOD0(queryPlayListRecords, QList<PlayListRecord *>());
-    MOCK_METHOD1(queryImageUrlsForLocalPlayListRecord, QList<QUrl>(int playListId));
-    MOCK_METHOD1(insertPlayListRecord, bool(PlayListRecord *playListRecord));
-    MOCK_METHOD1(removePlayListRecord, bool(PlayListRecord *playListRecord));
-    MOCK_METHOD1(updatePlayListRecord, bool(PlayListRecord *playListRecord));
-    MOCK_METHOD2(insertImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
-    MOCK_METHOD2(removeImagesForLocalPlayListProvider, bool(const PlayListRecord &record, const ImageList &images));
+    MOCK_METHOD1(queryPlayListEntities, QList<PlayListEntityData>(int type));
+    MOCK_METHOD1(queryPlayListEntity, PlayListEntityData(int playListId));
+    MOCK_METHOD1(insertPlayListEntity, bool(PlayListEntityData &data));
+    MOCK_METHOD1(removePlayListEntity, bool(int playListId));
+    MOCK_METHOD1(updatePlayListEntity, bool(const PlayListEntityData &data));
+
+    MOCK_METHOD1(queryLocalPlayListEntityImageUrls, QList<QUrl>(int playListId));
+    MOCK_METHOD2(insertLocalPlayListEntityImageUrls, bool(int playListId, const QList<QUrl> &images));
+    MOCK_METHOD2(removeLocalPlayListEntityImageUrls, bool(int playListId, const QList<QUrl> &images));
 
     MOCK_METHOD0(queryImagesCount, int());
     MOCK_METHOD1(insertImage, bool(Image *image));

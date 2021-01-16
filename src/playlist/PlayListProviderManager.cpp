@@ -46,7 +46,7 @@ PlayListProviderManager::PlayListProviderManager()
     sapi::loadPlugins("playlistproviders", callback);
 
     // Register internal providers
-    registerProvider(LocalPlayListProvider::TYPE, new LocalPlayListProvider());
+    registerProvider(LocalPlayListProvider::TYPE, new LocalPlayListProvider(LocalDatabase::instance()));
     registerProvider(FileSystemPlayListProvider::TYPE, new FileSystemPlayListProvider());
 }
 

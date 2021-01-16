@@ -2,6 +2,7 @@
 
 #include "playlist/PlayListProvider.h"
 
+class LocalDatabase;
 class LocalPlayListEntity;
 
 class LocalPlayListProvider : public PlayListProvider
@@ -9,7 +10,7 @@ class LocalPlayListProvider : public PlayListProvider
 public:
     static const int TYPE = 0;
 
-    LocalPlayListProvider(QObject *parent = nullptr);
+    LocalPlayListProvider(LocalDatabase *db, QObject *parent = nullptr);
     virtual ~LocalPlayListProvider() override;
     virtual int type() const override;
     virtual QString name() const override;
@@ -20,4 +21,7 @@ public:
     virtual void insertEntity(PlayListEntity *entity) override;
     virtual void updateEntity(PlayListEntity *entity) override;
     virtual void removeEntity(PlayListEntity *entity) override;
+
+private:
+    LocalDatabase *m_db;
 };

@@ -10,4 +10,6 @@ public:
     QString name;
     int count = 0;
     QString coverPath;
+
+    bool isValid() const { return id != 0; }
 };

@@ -19,6 +19,8 @@ public:
     virtual void addImageUrls(const QList<QUrl> &imageUrls) override;
     virtual void removeImageUrls(const QList<QUrl> &imageUrls) override;
 
+    int id() const;
+
 private:
     friend void LocalPlayListProvider::insertEntity(PlayListEntity *);
     friend void LocalPlayListProvider::updateEntity(PlayListEntity *);
