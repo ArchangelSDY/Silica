@@ -63,6 +63,7 @@ void LocalPlayListProvider::insertEntity(PlayListEntity *entity)
     PlayListEntityData data;
     data.name = e->m_name;
     data.type = LocalPlayListProvider::TYPE;
+    data.coverPath = e->m_coverPath;
     m_db->insertPlayListEntity(data);
     e->m_id = data.id;
 
