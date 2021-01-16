@@ -346,4 +346,4 @@ void TestPlayList::setFilter_data()
 }
 
 QTEST_MAIN(TestPlayList)
- #include "PlayList_Tests.moc"
+#include "PlayList_Tests.moc"

@@ -61,9 +61,8 @@ PlayListEntityTriggerResult FileSystemPlayListProvider::triggerEntity(PlayListEn
 {
     FileSystemPlayListEntity *fsEntity = static_cast<FileSystemPlayListEntity *>(entity);
     if (fsEntity->fileInfo().isDir()) {
-        m_rootPath = fsEntity->fileInfo().absoluteFilePath();
-        emit rootPathChanged(m_rootPath);
-        emit entitiesChanged();
+        auto rootPath = fsEntity->fileInfo().absoluteFilePath();
+        setRootPath(rootPath);
         return PlayListEntityTriggerResult::None;
     } else {
         return PlayListEntityTriggerResult::LoadPlayList;

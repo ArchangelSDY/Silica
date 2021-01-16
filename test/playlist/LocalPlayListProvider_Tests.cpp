@@ -13,6 +13,7 @@ class TestLocalPlayListProvider : public STestCase
     Q_OBJECT
 private slots:
     void loadEntities();
+    void triggerEntity();
     void createEntity();
     void insertEntity();
     void updateEntity();
@@ -71,6 +72,12 @@ void TestLocalPlayListProvider::insertEntity()
     provider.insertEntity(entity.data());
     QCOMPARE(spy.count(), 1);
     QCOMPARE(entity->id(), 1);
+}
+
+void TestLocalPlayListProvider::triggerEntity()
+{
+    LocalPlayListProvider provider(nullptr);
+    QCOMPARE(provider.triggerEntity(nullptr), PlayListEntityTriggerResult::LoadPlayList);
 }
 
 void TestLocalPlayListProvider::updateEntity()
