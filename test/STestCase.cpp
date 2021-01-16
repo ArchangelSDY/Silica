@@ -13,6 +13,12 @@ void STestCase::initTestCase()
     GlobalConfig::create();
     QVERIFY2(LocalDatabase::instance()->migrate(),
              "Fail to migrate database");
+    QDir d;
+    d.mkpath(GlobalConfig::instance()->thumbnailPath());
+}
+
+void STestCase::cleanupTestCase()
+{
     QDir thumbnailDir(GlobalConfig::instance()->thumbnailPath());
     thumbnailDir.removeRecursively();
 }

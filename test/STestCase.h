@@ -8,6 +8,7 @@ class STestCase : public QObject
     Q_OBJECT
 protected slots:
     virtual void initTestCase();
+    virtual void cleanupTestCase();
 };
 
 #endif // STESTCASE_H

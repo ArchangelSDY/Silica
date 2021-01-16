@@ -4,9 +4,10 @@
 #include "../GlobalConfig.h"
 #include "../PlayList.h"
 
-LocalPlayListEntity::LocalPlayListEntity(LocalPlayListProvider *provider,
+LocalPlayListEntity::LocalPlayListEntity(LocalPlayListProvider *provider, LocalDatabase *db,
         int id, const QString &name, int count, const QString &coverPath) :
     PlayListEntity(provider) ,
+    m_db(db) ,
     m_id(id) ,
     m_name(name) ,
     m_count(count) ,
@@ -43,7 +44,7 @@ QImage LocalPlayListEntity::loadCoverImage()
 
 QList<QUrl> LocalPlayListEntity::loadImageUrls()
 {
-    return LocalDatabase::instance()->queryLocalPlayListEntityImageUrls(m_id);
+    return m_db->queryLocalPlayListEntityImageUrls(m_id);
 }
 
 void LocalPlayListEntity::setName(const QString &name)
@@ -58,14 +59,14 @@ void LocalPlayListEntity::setCoverImagePath(const QString &path)
 
 void LocalPlayListEntity::addImageUrls(const QList<QUrl> &imageUrls)
 {
-    LocalDatabase::instance()->insertLocalPlayListEntityImageUrls(m_id, imageUrls);
+    m_db->insertLocalPlayListEntityImageUrls(m_id, imageUrls);
     m_count += imageUrls.size();
     m_provider->updateEntity(this);
 }
 
 void LocalPlayListEntity::removeImageUrls(const QList<QUrl> &imageUrls)
 {
-    LocalDatabase::instance()->removeLocalPlayListEntityImageUrls(m_id, imageUrls);
+    m_db->removeLocalPlayListEntityImageUrls(m_id, imageUrls);
     m_count -= imageUrls.size();
     m_provider->updateEntity(this);
 }
@@ -73,4 +74,9 @@ void LocalPlayListEntity::removeImageUrls(const QList<QUrl> &imageUrls)
 int LocalPlayListEntity::id() const
 {
     return m_id;
+}
+
+QString LocalPlayListEntity::coverImagePath() const
+{
+    return m_coverPath;
 }

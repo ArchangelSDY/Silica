@@ -3,13 +3,9 @@
 #include <QTest>
 
 #include "STestCase.h"
-#include "../src/db/LocalDatabase.h"
-#include "../src/image/ImageSource.h"
-#include "../src/image/ImageSourceManager.h"
 #include "../src/playlist/LocalPlayListEntity.h"
 #include "../src/playlist/LocalPlayListProvider.h"
 #include "../src/playlist/PlayListEntity.h"
-#include "../src/GlobalConfig.h"
 #include "db/MockLocalDatabase.h"
 
 class TestLocalPlayListProvider : public STestCase
@@ -88,7 +84,7 @@ void TestLocalPlayListProvider::updateEntity()
         .Times(1);
 
     LocalPlayListProvider provider(&db);
-    QScopedPointer<LocalPlayListEntity> entity(new LocalPlayListEntity(&provider, 1, "name1", 1, "c:/cover1.png"));
+    QScopedPointer<LocalPlayListEntity> entity(new LocalPlayListEntity(&provider, &db, 1, "name1", 1, "c:/cover1.png"));
 
     QSignalSpy spy(&provider, &LocalPlayListProvider::entitiesChanged);
     provider.updateEntity(entity.data());
@@ -102,7 +98,7 @@ void TestLocalPlayListProvider::removeEntity()
         .Times(1);
 
     LocalPlayListProvider provider(&db);
-    QScopedPointer<LocalPlayListEntity> entity(new LocalPlayListEntity(&provider, 1, "name", 0, "c:/cover.png"));
+    QScopedPointer<LocalPlayListEntity> entity(new LocalPlayListEntity(&provider, &db, 1, "name", 0, "c:/cover.png"));
 
     QSignalSpy spy(&provider, &LocalPlayListProvider::entitiesChanged);
     provider.removeEntity(entity.data());
