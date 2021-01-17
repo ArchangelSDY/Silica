@@ -1,79 +1,66 @@
 #include "sapi/PlayListEntityDelegate.h"
 #include <QHash>
 
+#include "sapi/IPlayListEntity.h"
 #include "sapi/PlayListProviderDelegate.h"
 #include "../GlobalConfig.h"
 
 namespace sapi {
 
-PlayListEntityDelegate::PlayListEntityDelegate(sapi::PlayListProviderDelegate *provider,
-        const QString &name, int count, const QString &coverPath, bool canContinueProvide) :
+PlayListEntityDelegate::PlayListEntityDelegate(sapi::PlayListProviderDelegate *provider, sapi::IPlayListEntity *entity) :
     PlayListEntity(provider) ,
-    m_name(name) ,
-    m_count(count) ,
-    m_coverPath(coverPath) ,
-    m_canContinueProvide(canContinueProvide)
-{
-}
-
-PlayListEntityDelegate::~PlayListEntityDelegate()
+    m_entity(entity)
 {
 }
 
 int PlayListEntityDelegate::count() const
 {
-    return m_count;
+    return m_entity->count();
 }
 
 QString PlayListEntityDelegate::name() const
 {
-    return m_name;
+    return m_entity->name();
 }
 
-bool PlayListEntityDelegate::supportsOption(PlayListEntityOption option) const
+bool PlayListEntityDelegate::supportsOption(::PlayListEntityOption option) const
 {
-    switch (option)
-    {
-    case PlayListEntityOption::Continuation:
-        return m_canContinueProvide;
-    default:
-        return false;
-    }
+    return m_entity->supportsOption((sapi::PlayListEntityOption)option);
 }
 
 QImage PlayListEntityDelegate::loadCoverImage()
 {
-    QString coverFullPath = GlobalConfig::instance()->thumbnailPath() + "/" + m_coverPath;
-    return QImage(coverFullPath);
+    return m_entity->loadCoverImage();
 }
 
 QList<QUrl> PlayListEntityDelegate::loadImageUrls()
 {
-    // TODO: Need implementation
-    return {};
-    //QVariantHash extras;
-    //auto imageUrls = m_provider->request(m_name, extras);
-    //return new PlayList(imageUrls);
+    return m_entity->loadImageUrls();
 }
 
 void PlayListEntityDelegate::setName(const QString &name)
 {
-    // TODO: Need implementation
+    m_entity->setName(name);
 }
 
 void PlayListEntityDelegate::setCoverImagePath(const QString &path)
 {
-    // TODO: Need implementation
+    m_entity->setCoverImagePath(path);
 }
 
 void PlayListEntityDelegate::addImageUrls(const QList<QUrl> &imageUrls)
 {
-    // TODO: Need implementation
+    m_entity->addImageUrls(imageUrls);
 }
 
 void PlayListEntityDelegate::removeImageUrls(const QList<QUrl> &imageUrls)
 {
-    // TODO: Need implementation
+    m_entity->removeImageUrls(imageUrls);
+}
+
+IPlayListEntity *PlayListEntityDelegate::entity() const
+{
+    return m_entity;
 }
 
 }

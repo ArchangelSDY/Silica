@@ -4,18 +4,17 @@
 
 namespace sapi {
 
+class IPlayListEntity;
 class PlayListProviderDelegate;
 
-class PlayListEntityDelegate : public PlayListEntity
+class PlayListEntityDelegate : public ::PlayListEntity
 {
 public:
-    PlayListEntityDelegate(PlayListProviderDelegate *provider,
-        const QString &name, int count, const QString &coverPath, bool canContinueProvide);
+    PlayListEntityDelegate(PlayListProviderDelegate *provider, IPlayListEntity *entity);
 
-    virtual ~PlayListEntityDelegate() override;
     virtual int count() const override;
     virtual QString name() const override;
-    virtual bool supportsOption(PlayListEntityOption option) const override;
+    virtual bool supportsOption(::PlayListEntityOption option) const override;
     virtual QImage loadCoverImage() override;
     virtual QList<QUrl> loadImageUrls() override;
 
@@ -24,11 +23,10 @@ public:
     virtual void addImageUrls(const QList<QUrl> &imageUrls) override;
     virtual void removeImageUrls(const QList<QUrl> &imageUrls) override;
 
+    IPlayListEntity *entity() const;
+
 private:
-    QString m_name;
-    int m_count;
-    QString m_coverPath;
-    bool m_canContinueProvide;
+    IPlayListEntity *m_entity;
 };
 
 }

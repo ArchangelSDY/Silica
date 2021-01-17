@@ -8,26 +8,19 @@ namespace sapi {
 
 PlayListProviderDelegate::PlayListProviderDelegate(
         IPlayListProviderPlugin *plugin, IPlayListProvider *provider,
-        int type, const QString &name, const QString &displayName, bool canContinueProvide) :
+        int type, const QString &name, const QString &displayName) :
     m_plugin(plugin) ,
     m_provider(provider) ,
     m_type(type) ,
     m_name(name) ,
-    m_displayName(displayName) ,
-    m_canContinueProvide(canContinueProvide)
+    m_displayName(displayName)
 {
-    // connect(m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
-    //         this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
-    // connect(m_provider, SIGNAL(itemsCountChanged(int)),
-    //         this, SIGNAL(itemsCountChanged(int)));
+    connect(m_provider, &IPlayListProvider::entitiesChanged, this, &PlayListProviderDelegate::entitiesChanged);
 }
 
 PlayListProviderDelegate::~PlayListProviderDelegate()
 {
-    // disconnect(m_provider, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)),
-    //            this, SIGNAL(gotItems(QList<QUrl>,QList<QVariantHash>)));
-    // disconnect(m_provider, SIGNAL(itemsCountChanged(int)),
-    //            this, SIGNAL(itemsCountChanged(int)));
+    disconnect(m_provider, &IPlayListProvider::entitiesChanged, this, &PlayListProviderDelegate::entitiesChanged);
     m_plugin->destroy(m_provider);
 }
 
@@ -41,67 +34,52 @@ QString PlayListProviderDelegate::name() const
     return m_displayName;
 }
 
-bool PlayListProviderDelegate::supportsOption(PlayListProviderOption option) const
+bool PlayListProviderDelegate::supportsOption(::PlayListProviderOption option) const
 {
-    // TODO: Add extensibility
-    return false;
+    return m_provider->supportsOption((sapi::PlayListProviderOption)option);
 }
 
-QList<PlayListEntity *> PlayListProviderDelegate::loadEntities()
+QList<::PlayListEntity *> PlayListProviderDelegate::loadEntities()
 {
-    QList<PlayListEntity *> entities;
+    QList<::PlayListEntity *> delegates;
 
-    int type = LocalDatabase::instance()->queryPluginPlayListProviderType(m_name);
-    // TODO: Replace with named constant
-    if (type == -1) {
-        return entities;
+    auto entities = m_provider->loadEntities();
+    delegates.reserve(entities.count());
+
+    for (auto entity : entities) {
+        delegates << new PlayListEntityDelegate(this, entity);
     }
 
-    auto items = LocalDatabase::instance()->queryPlayListEntities(type);
-    for (const auto &item : items) {
-        entities << new PlayListEntityDelegate(this,
-            item.name, item.count, item.coverPath, m_canContinueProvide);
-    }
-
-    return entities;
+    return delegates;
 }
 
-PlayListEntityTriggerResult PlayListProviderDelegate::triggerEntity(PlayListEntity *entity)
+::PlayListEntityTriggerResult PlayListProviderDelegate::triggerEntity(::PlayListEntity *entity)
 {
-    // TODO: Add extensibility
-    return PlayListEntityTriggerResult::LoadPlayList;
+    auto ientity = static_cast<PlayListEntityDelegate *>(entity);
+    return (::PlayListEntityTriggerResult)(m_provider->triggerEntity(ientity->entity()));
 }
 
 PlayListEntity *PlayListProviderDelegate::createEntity(const QString &name)
 {
-    // TODO: Add extensibility
-    return nullptr;
+    return new PlayListEntityDelegate(this, m_provider->createEntity(name));
 }
 
 void PlayListProviderDelegate::insertEntity(PlayListEntity *entity)
 {
-    // TODO: Add extensibility
+    auto ientity = static_cast<PlayListEntityDelegate *>(entity);
+    m_provider->insertEntity(ientity->entity());
 }
 
 void PlayListProviderDelegate::updateEntity(PlayListEntity *entity)
 {
-    // TODO: Add extensibility
+    auto ientity = static_cast<PlayListEntityDelegate *>(entity);
+    m_provider->updateEntity(ientity->entity());
 }
 
 void PlayListProviderDelegate::removeEntity(PlayListEntity *entity)
 {
-    // TODO: Add extensibility
+    auto ientity = static_cast<PlayListEntityDelegate *>(entity);
+    m_provider->removeEntity(ientity->entity());
 }
-
-// bool PlayListProviderDelegate::canContinueProvide() const
-// {
-//     return m_canContinueProvide;
-// }
-
-// void PlayListProviderDelegate::request(const QString &name,
-//                                        const QVariantHash &extras)
-// {
-//     return m_provider->request(name, extras);
-// }
 
 }

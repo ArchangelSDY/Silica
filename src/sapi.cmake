@@ -6,6 +6,7 @@ set(SAPI_SRCS
     "sapi/IImageSourcePlugin.cpp"
     "sapi/INavigationPlayer.cpp"
     "sapi/INavigationPlayerPlugin.cpp"
+    "sapi/IPlayListEntity.cpp"
     "sapi/IPlayListProvider.cpp"
     "sapi/IPlayListProviderPlugin.cpp"
     "sapi/ISharerPlugin.cpp"
@@ -37,6 +38,7 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSourcePlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/INavigationPlayer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/INavigationPlayerPlugin.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListEntity.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ISharerPlugin.h"
@@ -44,6 +46,9 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Logging.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/Message.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/NavigatorResource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/PlayListEntityOption.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/PlayListEntityTriggerResult.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/PlayListProviderOption.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/sapi_global.h"
 )
 install(FILES ${SAPI_PUBLIC_HEADERS} DESTINATION "include/sapi" COMPONENT sdk)

@@ -35,11 +35,10 @@ PlayListProviderManager::PlayListProviderManager()
         }
 
         auto provider = new sapi::PlayListProviderDelegate(
-			plugin, plugin->create(),
+            plugin, plugin->create(),
             typeId,
-			meta["name"].toString(),
-			meta["displayName"].toString(),
-			meta["canContinueProvide"].toBool(false));
+            meta["name"].toString(),
+            meta["displayName"].toString());
         this->registerProvider(typeId, provider);
     };
 
