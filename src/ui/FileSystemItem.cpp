@@ -132,13 +132,12 @@ void FileSystemItem::load()
 
         if (pathInfo.isDir()) {
             // For directory, try to use first image inside as cover
-            QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
             QDirIterator dirIter(pathInfo.absoluteFilePath(),
                                  QDir::Files);
             bool found = false;
             while (dirIter.hasNext()) {
                 QString path = dirIter.next();
-                if (!validNameSuffixes.contains(dirIter.fileInfo().suffix())) {
+                if (!ImageSourceManager::instance()->isValidNameSuffix(dirIter.fileInfo().suffix())) {
                     continue;
                 }
                 QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(path));

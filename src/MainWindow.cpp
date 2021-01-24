@@ -586,13 +586,12 @@ void MainWindow::loadSelectedPath()
         if (selectedItems.count() == 1 && pl->count() == 1) {
             FileSystemItem *fsItem =
                 static_cast<FileSystemItem *>(selectedItems[0]);
-            QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
             QDir curDir = fsItem->fileInfo().dir();
             QFileInfoList entries = curDir.entryInfoList(
                 QDir::Files | QDir::NoDotAndDotDot,
                 QDir::Name);
             for (const QFileInfo &info : entries) {
-                if (!validNameSuffixes.contains(info.suffix())) {
+                if (!ImageSourceManager::instance()->isValidNameSuffix(info.suffix())) {
                     continue;
                 }
                 // Avoid duplicate
@@ -697,12 +696,11 @@ void MainWindow::promptToOpenDir()
     lastDir.cdUp();
     lastParentDir = lastDir.absolutePath();
 
-    QSet<QString> validNameSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
     QStringList images;
     QDirIterator iter(dir, QDir::Files, QDirIterator::Subdirectories);
     while (iter.hasNext()) {
         QString path = iter.next();
-        if (!validNameSuffixes.contains(iter.fileInfo().suffix())) {
+        if (!ImageSourceManager::instance()->isValidNameSuffix(iter.fileInfo().suffix())) {
             continue;
         }
         images << path;

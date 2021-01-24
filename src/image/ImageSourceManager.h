@@ -26,7 +26,7 @@ public:
 
     QStringList urlPatterns() const;
     QString fileDialogFilters() const;
-    QStringList nameSuffixes() const;
+    bool isValidNameSuffix(const QString &suffix) const;
 
     void clearCache();
 

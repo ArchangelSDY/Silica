@@ -75,7 +75,7 @@ ImageSource *SevenzImageSourceFactory::createSingle(const QUrl &url, const QStri
         QString imageName = url.fragment();
         QFileInfo imageFile(imageName);
         if (QImageReader::supportedImageFormats().contains(
-                imageFile.suffix().toUtf8())) {
+                imageFile.suffix().toUtf8().toLower())) {
             QUrl sevenzUrl = url;
             sevenzUrl.setScheme("file");
             sevenzUrl.setFragment("");

@@ -7,7 +7,6 @@
 #include <QEventLoop>
 #include <QFileInfo>
 #include <QMutex>
-#include <QSet>
 
 #include "image/Image.h"
 #include "image/ImageSourceManager.h"
@@ -110,13 +109,12 @@ QImage FileSystemPlayListEntity::loadCoverImage()
 
     if (m_fileInfo.isDir()) {
         // For directory, try to use first image inside as cover
-        QSet<QString> validSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
         QDirIterator dirIter(m_fileInfo.absoluteFilePath(),
                              QDir::Files);
         bool found = false;
         while (dirIter.hasNext()) {
             QString path = dirIter.next();
-            if (!validSuffixes.contains(dirIter.fileInfo().suffix())) {
+            if (!ImageSourceManager::instance()->isValidNameSuffix(dirIter.fileInfo().suffix())) {
                 continue;
             }
             QSharedPointer<ImageSource> src(ImageSourceManager::instance()->createSingle(path));
@@ -172,13 +170,12 @@ QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
 
     if (pl.count() == 1) {
         // Add siblings too
-        QSet<QString> validSuffixes = QSet<QString>::fromList(ImageSourceManager::instance()->nameSuffixes());
         QDir curDir = m_fileInfo.dir();
         QFileInfoList entries = curDir.entryInfoList(
             QDir::Files | QDir::NoDotAndDotDot,
             QDir::Name);
         for (const QFileInfo &info : entries) {
-            if (!validSuffixes.contains(info.suffix())) {
+            if (!ImageSourceManager::instance()->isValidNameSuffix(info.suffix())) {
                 continue;
             }
 

@@ -39,7 +39,7 @@ ImageSource *RARImageSourceFactory::createSingle(const QUrl &url,
         QString imageName = url.fragment();
         QFileInfo imageFile(imageName);
         if (QImageReader::supportedImageFormats().contains(
-                imageFile.suffix().toUtf8())) {
+                imageFile.suffix().toUtf8().toLower())) {
             QUrl rarUrl = url;
             rarUrl.setScheme("file");
             rarUrl.setFragment("");
@@ -79,7 +79,7 @@ ImageSource *RARImageSourceFactory::createSingle(const QString &packagePath)
     QStringList fileNameList = rar.fileNameList();
     foreach(const QString &imageName, fileNameList) {
         QFileInfo nameInfo(imageName);
-        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8().toLower())) {
             return new RARImageSource(this, realPackagePath, imageName, QByteArray());
         }
     }

@@ -101,9 +101,8 @@ class FileSystemView::DirIterThread : public QThread
 {
     Q_OBJECT
 public:
-    DirIterThread(const QString &rootPath, const QStringList &nameSuffixes, QDir::Filters filters, QDir::SortFlags sortFlags) :
+    DirIterThread(const QString &rootPath, QDir::Filters filters, QDir::SortFlags sortFlags) :
         m_rootPath(rootPath) ,
-        m_nameSuffixes(QSet<QString>::fromList(nameSuffixes)),
         m_filters(filters) ,
         m_sortFlags(sortFlags)
     {
@@ -117,7 +116,7 @@ public:
 
         while (iter.hasNext() && !isInterruptionRequested()) {
             QString path = iter.next();
-            if (iter.fileInfo().isFile() && !m_nameSuffixes.contains(iter.fileInfo().suffix())) {
+            if (iter.fileInfo().isFile() && !ImageSourceManager::instance()->isValidNameSuffix(iter.fileInfo().suffix())) {
                 continue;
             }
             // Emit item at once if sorting is not needed, otherwise hold and
@@ -148,7 +147,6 @@ signals:
 
 private:
     QString m_rootPath;
-    QSet<QString> m_nameSuffixes;
     QDir::Filters m_filters;
     QDir::SortFlags m_sortFlags;
 };
@@ -266,7 +264,6 @@ void FileSystemView::refreshView()
 
     m_dirIterThread.reset(new DirIterThread(
         m_rootPath,
-        ImageSourceManager::instance()->nameSuffixes(),
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
         m_sortFlags
     ));

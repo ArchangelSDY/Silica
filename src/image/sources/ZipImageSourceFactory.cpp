@@ -33,7 +33,7 @@ ImageSource *ZipImageSourceFactory::createSingle(const QUrl &url)
         QString imageName = url.fragment(QUrl::FullyDecoded);
         QFileInfo imageFile(imageName);
         if (QImageReader::supportedImageFormats().contains(
-                imageFile.suffix().toUtf8())) {
+                imageFile.suffix().toUtf8().toLower())) {
             QUrl zipUrl = url;
             zipUrl.setScheme("file");
             zipUrl.setFragment("");
@@ -71,7 +71,7 @@ ImageSource *ZipImageSourceFactory::createSingle(const QString &packagePath)
 
     foreach(const QString &imageName, fileNameList) {
         QFileInfo nameInfo(imageName);
-        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+        if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8().toLower())) {
             return new ZipImageSource(this, packagePath, imageName);
         }
     }
@@ -107,7 +107,7 @@ QList<ImageSource *> ZipImageSourceFactory::createMultiple(const QUrl &url)
 
             foreach(const QString &name, fileNameList) {
                 QFileInfo nameInfo(name);
-                if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8())) {
+                if (QImageReader::supportedImageFormats().contains(nameInfo.suffix().toUtf8().toLower())) {
                     imageSources << new ZipImageSource(this, realPackagePath, name);
                 }
             }

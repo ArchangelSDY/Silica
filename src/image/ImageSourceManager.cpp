@@ -138,15 +138,15 @@ QString ImageSourceManager::fileDialogFilters() const
     return parts.join(";;");
 }
 
-QStringList ImageSourceManager::nameSuffixes() const
+bool ImageSourceManager::isValidNameSuffix(const QString &suffix) const
 {
-    QStringList suffixes;
+    QSet<QString> suffixes;
     for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         ImageSourceFactory *factory = it.value();
-        suffixes.append(factory->fileNameSuffixes());
+        suffixes += QSet<QString>::fromList(factory->fileNameSuffixes());
     }
-    return suffixes;
+    return suffixes.contains(suffix.toLower());
 }
 
 void ImageSourceManager::clearCache()
