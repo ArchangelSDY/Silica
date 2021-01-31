@@ -351,9 +351,7 @@ void Image::loadThumbnail()
 
     m_isLoadingThumbnail = true;
 
-    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
-        "/" + m_thumbnailPath;
-    LoadThumbnailTask *loadThumbnailTask = new LoadThumbnailTask(m_liveness.toWeakRef(), thumbnailFullPath);
+    LoadThumbnailTask *loadThumbnailTask = new LoadThumbnailTask(m_liveness.toWeakRef(), m_thumbnailPath);
     connect(loadThumbnailTask, &LoadThumbnailTask::loaded, this, &Image::thumbnailReaderFinished);
     // Thumbnail loading should be low priority
     threadPool()->start(loadThumbnailTask, LowPriority);
@@ -361,16 +359,14 @@ void Image::loadThumbnail()
 
 QSharedPointer<QImage> Image::loadThumbnailSync()
 {
-    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
-        "/" + m_thumbnailPath;
-    auto thumbnail = doLoadThumbnailSync(thumbnailFullPath);
+    auto thumbnail = doLoadThumbnailSync(m_thumbnailPath);
     if (thumbnail) {
         return thumbnail;
     }
 
     // Thumbnail not found, try to load and make
     auto imageData = doLoadImageSync(m_imageSource);
-    return doMakeThumbnailSync(thumbnailFullPath, &imageData->defaultFrame());
+    return doMakeThumbnailSync(m_thumbnailPath, &imageData->defaultFrame());
 }
 
 void Image::makeThumbnail()
@@ -393,10 +389,8 @@ void Image::makeThumbnail(QSharedPointer<ImageData> image)
 
     m_isMakingThumbnail = true;
 
-    QString thumbnailFullPath = GlobalConfig::instance()->thumbnailPath() +
-        "/" + m_thumbnailPath;
     MakeThumbnailTask *makeThumbnailTask =
-        new MakeThumbnailTask(m_liveness.toWeakRef(), new QImage(frame), thumbnailFullPath);
+        new MakeThumbnailTask(m_liveness.toWeakRef(), new QImage(frame), m_thumbnailPath);
     connect(makeThumbnailTask, &MakeThumbnailTask::thumbnailMade,
             this, &Image::thumbnailMade);
     threadPool()->start(makeThumbnailTask);
@@ -424,7 +418,7 @@ void Image::computeThumbnailPath()
         QString name = hash.mid(2);
 
         QStringList pathParts = QStringList() << sub << name;
-        m_thumbnailPath = pathParts.join("/");
+        m_thumbnailPath = GlobalConfig::instance()->thumbnailPath() + "/" + pathParts.join("/");
     }
 }
 

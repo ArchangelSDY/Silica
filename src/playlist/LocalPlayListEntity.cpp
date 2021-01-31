@@ -54,7 +54,12 @@ void LocalPlayListEntity::setName(const QString &name)
 
 void LocalPlayListEntity::setCoverImagePath(const QString &path)
 {
-    m_coverPath = path;
+    QString dirPrefix = GlobalConfig::instance()->thumbnailPath() + "/";
+    if (path.startsWith(dirPrefix)) {
+        m_coverPath = path.mid(dirPrefix.count());
+    } else {
+        m_coverPath = path;
+    }
 }
 
 void LocalPlayListEntity::addImageUrls(const QList<QUrl> &imageUrls)
