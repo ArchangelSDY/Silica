@@ -26,12 +26,6 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
     m_rendererFactory(rendererFactory) ,
     m_renderer(0) ,
     m_thumbnailScaled(nullptr) ,
-    // Hide until thumbnail is ready.
-    // It will show during next view layout after thumbnail is loaded
-    //
-    // This strategy is to hide the crazy rapid layout procedure when loading
-    // remote gallery in waterfall mode.
-    m_isVisible(false) ,
     m_isReadyToShow(false) ,
     m_isInsideViewportPreload(false) ,
     m_selectedAfterShownScheduled(false)
@@ -137,15 +131,13 @@ void GalleryItem::scheduleSelectedAfterShown()
 
 void GalleryItem::show()
 {
-    m_isVisible = true;
-    onVisibilityChanged(m_isVisible);
+    onVisibilityChanged(true);
     update(boundingRect());
 }
 
 void GalleryItem::hide()
 {
-    m_isVisible = false;
-    onVisibilityChanged(m_isVisible);
+    onVisibilityChanged(false);
     update(boundingRect());
 }
 
@@ -178,9 +170,6 @@ void GalleryItem::paint(QPainter *painter,
     // Clear painter first
     painter->eraseRect(boundingRect());
 
-    if (!m_isVisible) {
-        return;
-    }
 
     // Render
     m_renderer->paint(painter);
