@@ -69,6 +69,12 @@ static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> 
     return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
 }
 
+static bool thumbnailNeedResize(const QSize &thumbnailSize, const QSize &targetSize)
+{
+    return thumbnailSize.width() > targetSize.width() * 2 || thumbnailSize.height() > targetSize.height() * 2
+        || targetSize.width() > thumbnailSize.width() * 2 || targetSize.height() > thumbnailSize.height() * 2;
+}
+
 void GalleryItem::setThumbnail(QSharedPointer<QImage> thumbnail)
 {
     if (thumbnail) {
@@ -77,14 +83,20 @@ void GalleryItem::setThumbnail(QSharedPointer<QImage> thumbnail)
         m_renderer->setImageSize(thumbnail->size());
         m_renderer->layout();
 
-        auto scaleFuture = QtConcurrent::run(
-            gScaleThumbnailThreads(),
-            scaleThumbnailAtBackground,
-            thumbnail,
-            boundingRect().size().toSize(),
-            m_renderer->aspectRatioMode()
-        );
-        m_thumbnailScaleWatcher.setFuture(scaleFuture);
+        auto boundingSize = boundingRect().size().toSize();
+        if (thumbnailNeedResize(thumbnail->size(), boundingSize)) {
+            auto scaleFuture = QtConcurrent::run(
+                // gScaleThumbnailThreads(),
+                scaleThumbnailAtBackground,
+                thumbnail,
+                boundingRect().size().toSize(),
+                m_renderer->aspectRatioMode()
+            );
+            m_thumbnailScaleWatcher.setFuture(scaleFuture);
+        } else {
+            setScaledThumbnail(thumbnail);
+        }
+
     } else {
         resetThumbnail();
     }
@@ -92,7 +104,12 @@ void GalleryItem::setThumbnail(QSharedPointer<QImage> thumbnail)
 
 void GalleryItem::onThumbnailScaled()
 {
-    m_thumbnailScaled.reset(new QImage(*m_thumbnailScaleWatcher.result()));
+    setScaledThumbnail(m_thumbnailScaleWatcher.result());
+}
+
+void GalleryItem::setScaledThumbnail(QSharedPointer<QImage> thumbnailScaled)
+{
+    m_thumbnailScaled = thumbnailScaled;
     m_thumbnailSize = m_thumbnailScaled->size();
 
     // Layout again using scaled thumbnail size
@@ -190,18 +207,18 @@ void GalleryItem::onVisibilityChanged(bool isVisible)
 
 void GalleryItem::setIsInsideViewportPreload(bool isInside)
 {
-    m_isInsideViewportPreload = isInside;
-
-    // if (m_isInsideViewportPreload && !isInside) {
-    if (!isInside) {
+    // From inside to outside
+    if (m_isInsideViewportPreload && !isInside) {
         // Unload thumbnail
         resetThumbnail();
     }
 
-    // if (!m_isInsideViewportPreload && isInside) {
-    if (isInside) {
+    // From outside to inside
+     if (!m_isInsideViewportPreload && isInside && !m_thumbnailScaled) {
         load();
     }
+
+    m_isInsideViewportPreload = isInside;
 }
 
 void GalleryItem::resetThumbnail()

@@ -67,10 +67,11 @@ private slots:
     void onThumbnailScaled();
 
 private:
+    void setScaledThumbnail(QSharedPointer<QImage>);
     void resetThumbnail();
     void onVisibilityChanged(bool isVisible);
 
-    QScopedPointer<QImage> m_thumbnailScaled;
+    QSharedPointer<QImage> m_thumbnailScaled;
     QFutureWatcher<QSharedPointer<QImage> > m_thumbnailScaleWatcher;
     QSize m_thumbnailSize;
     bool m_isVisible;
