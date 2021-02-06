@@ -66,7 +66,7 @@ static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> 
                                                           const QSize &size,
                                                           Qt::AspectRatioMode aspectRatioMode)
 {
-    return QSharedPointer<QImage>::create(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation));
+    return QSharedPointer<QImage>::create(std::move(thumbnail->scaled(size, aspectRatioMode, Qt::SmoothTransformation)));
 }
 
 static bool thumbnailNeedResize(const QSize &thumbnailSize, const QSize &targetSize)
