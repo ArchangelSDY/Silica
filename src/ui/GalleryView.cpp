@@ -355,11 +355,11 @@ void GalleryView::markItemsInsideViewportPreload()
     QMatrix mat = m_view->matrix().inverted();
     QRectF visibleArea = mat.mapRect(QRectF(tl, br));
 
-    // Enlarge by 9 times
-    QRectF preloadArea = QRectF(visibleArea.left() - visibleArea.width(),
-                                visibleArea.top() - visibleArea.height(),
-                                visibleArea.right() + visibleArea.width(),
-                                visibleArea.bottom() + visibleArea.height());
+    // Enlarge by 25 times
+    QRectF preloadArea = QRectF(visibleArea.left() - visibleArea.width() * 2,
+                                visibleArea.top() - visibleArea.height() * 2,
+                                visibleArea.width() * 5,
+                                visibleArea.height() * 5);
 
     QList<QGraphicsItem *> newPreloadItemsList = m_scene->items(preloadArea);
     QSet<QGraphicsItem *> newPreloadItems;
