@@ -42,10 +42,9 @@ private:
 GalleryView::GalleryView(QWidget *parent) :
     QWidget(parent) ,
     m_view(new GraphicsView(this)) ,
-    m_scene(new QGraphicsScene) ,
+    m_scene(new QGraphicsScene(m_view)) ,
     m_searchBox(new QLineEdit()) ,
-    m_enableGrouping(false) ,
-    m_rendererFactory(0)
+    m_enableGrouping(false)
 {
 #ifdef ENABLE_OPENGL
     auto glWidget = new QOpenGLWidget(this);
@@ -89,13 +88,6 @@ GalleryView::GalleryView(QWidget *parent) :
 
     m_layoutTimer.setSingleShot(true);
     connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
-}
-
-GalleryView::~GalleryView()
-{
-    m_scene->deleteLater();
-    m_view->deleteLater();
-    delete m_rendererFactory;
 }
 
 QGraphicsScene *GalleryView::scene() const
@@ -289,19 +281,16 @@ void GalleryView::setupItem(GalleryItem *item)
 
 AbstractRendererFactory *GalleryView::rendererFactory()
 {
-    return m_rendererFactory;
+    return m_rendererFactory.data();
 }
 
 void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
 {
-    if (m_rendererFactory) {
-        delete m_rendererFactory;
-    }
-    m_rendererFactory = factory;
+    m_rendererFactory.reset(factory);
 
     // Update renderers for each item
     foreach (GalleryItem *item, galleryItems()) {
-        item->setRendererFactory(m_rendererFactory);
+        item->setRendererFactory(m_rendererFactory.data());
     }
 
     scheduleLayout();

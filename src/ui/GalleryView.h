@@ -19,7 +19,7 @@ class GalleryView : public QWidget
     friend class AbstractGalleryViewRenderer;
 public:
     explicit GalleryView(QWidget *parent = 0);
-    ~GalleryView();
+    virtual ~GalleryView() {}
 
     QGraphicsScene *scene() const;
     const QList<GalleryItem *> &galleryItems() const;
@@ -101,7 +101,7 @@ private:
     void setupItem(GalleryItem *item);
 
     QList<GalleryItem *> m_galleryItems;
-    AbstractRendererFactory *m_rendererFactory;
+    QScopedPointer<AbstractRendererFactory> m_rendererFactory;
     QList<QGraphicsItem *> m_itemGroupTitles;
     QSet<QGraphicsItem *> m_viewportPreloadItems;
 };
