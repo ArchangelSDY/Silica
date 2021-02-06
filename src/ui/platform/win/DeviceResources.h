@@ -11,6 +11,8 @@
 
 #pragma once
 
+#if !defined(ENABLE_OPENGL)
+
 #include <QSize>
 
 #include <d2d1_3.h>
@@ -117,3 +119,5 @@ namespace DX
         IDeviceNotify*                                  m_deviceNotify;
     };
 }
+
+#endif

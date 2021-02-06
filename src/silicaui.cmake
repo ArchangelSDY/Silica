@@ -47,7 +47,7 @@ set(SILICA_UI_SRCS
     "MainWindow.cpp"
 )
 
-if (WIN32)
+if (WIN32 AND NOT ENABLE_OPENGL)
     set(SILICA_UI_SRCS ${SILICA_UI_SRCS}
         "ui/platform/win/D2DMainGraphicsWidget.cpp"
         "ui/platform/win/DeviceResources.cpp"
@@ -69,7 +69,12 @@ set(SILICA_UI_LIBS
     Qt5::Gamepad
 )
 
-if (WIN32)
+if (ENABLE_OPENGL)
+    set(SILICA_UI_LIBS ${SILICA_UI_LIBS} Qt5::OpenGL)
+endif()
+
+
+if (WIN32 AND NOT ENABLE_OPENGL)
     find_library(D2D1_LIB "d2d1" ${WINDOWSSDK_LIB_DIRS})
     find_library(D3D11_LIB "d3d11" ${WINDOWSSDK_LIB_DIRS})
     find_library(DXGUID_LIB "dxguid" ${WINDOWSSDK_LIB_DIRS})

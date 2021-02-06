@@ -11,6 +11,8 @@
 
 #pragma once
 
+#if !defined(ENABLE_OPENGL)
+
 #include <ppltasks.h>
 #include <wrl.h>
 
@@ -97,3 +99,5 @@ namespace DX
     }
 #endif
 }
+
+#endif

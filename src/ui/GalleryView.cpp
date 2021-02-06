@@ -7,6 +7,10 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 
+#ifdef ENABLE_OPENGL
+#include <QOpenGLWidget>
+#endif
+
 #include "ui/renderers/AbstractGalleryViewRenderer.h"
 #include "ui/renderers/CompactRendererFactory.h"
 #include "ui/renderers/LooseRendererFactory.h"
@@ -44,6 +48,14 @@ GalleryView::GalleryView(QWidget *parent) :
     m_layoutNeeded(true) ,
     m_rendererFactory(0)
 {
+#ifdef ENABLE_OPENGL
+    auto glWidget = new QOpenGLWidget(this);
+    QSurfaceFormat surfaceFormat;
+    surfaceFormat.setSamples(16);
+    glWidget->setFormat(surfaceFormat);
+    m_view->setViewport(glWidget);
+#endif
+
     QLayout *layout = new QVBoxLayout(this);
     layout->setMargin(0);
     layout->setSpacing(0);

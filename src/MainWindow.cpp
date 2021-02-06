@@ -50,6 +50,12 @@
 
 #include "ui_MainWindow.h"
 
+#ifdef ENABLE_OPENGL
+#include <QOpenGLWidget>
+#include <QOpenGLFunctions>
+#include <QOpenGLExtraFunctions>
+#endif
+
 #ifdef Q_OS_WIN32
 #include "ui/platform/win/D2DMainGraphicsWidget.h"
 #include "ui/platform/win/DirectXHelper.h"
@@ -382,7 +388,7 @@ void MainWindow::setupExtraUi()
 void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGraphicsViewModel *viewModel)
 {
     QWidget *mainGraphicsViewWidget = nullptr;
-#ifdef Q_OS_WIN32
+#if defined(Q_OS_WIN32) && !defined(ENABLE_OPENGL)
     try {
         D2DMainGraphicsWidget *mainGraphicsView = new D2DMainGraphicsWidget(parent);
         mainGraphicsView->setModel(viewModel);
@@ -399,6 +405,13 @@ void MainWindow::createMainImageView(QWidget **pWidget, QWidget *parent, MainGra
     }
 #else
     MainGraphicsView *mainGraphicsView = new MainGraphicsView(parent);
+#ifdef ENABLE_OPENGL
+    auto mainGraphicsGLWidget = new QOpenGLWidget(mainGraphicsView);
+    QSurfaceFormat mainGraphicsSurfaceFormat;
+    mainGraphicsSurfaceFormat.setSamples(16);
+    mainGraphicsGLWidget->setFormat(mainGraphicsSurfaceFormat);
+    mainGraphicsView->setViewport(mainGraphicsGLWidget);
+#endif
     mainGraphicsView->setModel(viewModel);
     viewModel->setView(mainGraphicsView);
     mainGraphicsViewWidget = mainGraphicsView;

@@ -1,5 +1,6 @@
-#ifndef D2DMAINGRAPHICSWIDGET_H
-#define D2DMAINGRAPHICSWIDGET_H
+#pragma once
+
+#if !defined(ENABLE_OPENGL)
 
 #include <QSharedPointer>
 #include <QWidget>
@@ -72,4 +73,4 @@ private:
     Microsoft::WRL::ComPtr<ID2D1Effect>  m_outputEffect;
 };
 
-#endif // D2DMAINGRAPHICSWIDGET_H
+#endif

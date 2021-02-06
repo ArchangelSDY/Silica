@@ -53,14 +53,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 # OpenGL support
 option(ENABLE_OPENGL "Enable OpenGL" OFF)
 if(ENABLE_OPENGL)
-    if (NOT WIN32)
-        add_definitions(-DENABLE_OPENGL)
-        find_package(Qt5OpenGL REQUIRED)
-        include_directories(${Qt5OpenGL_INCLUDE_DIRS})
-	else()
-        message(WARNING "OpenGL cannot be enabled on Windows because we use DirectX for hardware acceleration.")
-        set(ENABLE_OPENGL OFF)
-    endif()
+	add_definitions(-DENABLE_OPENGL)
+	find_package(Qt5OpenGL REQUIRED)
+	include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 endif(ENABLE_OPENGL)
 
 # DirectX support
