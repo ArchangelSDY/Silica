@@ -43,6 +43,7 @@ steps:
   inputs:
    testResultsFormat: CTest
    testResultsFiles: build/Testing/**/Test.xml
+   failTaskOnFailedTests: true
    buildConfiguration: ${Configuration}      
 
 - publish: drop/
