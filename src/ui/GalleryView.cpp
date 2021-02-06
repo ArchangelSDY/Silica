@@ -18,7 +18,7 @@
 #include "ui/GalleryItem.h"
 #include "GlobalConfig.h"
 
-const int GalleryView::LAYOUT_INTERVAL = 10;
+const int GalleryView::LAYOUT_INTERVAL = 50;
 
 class GalleryView::GraphicsView : public QGraphicsView
 {
@@ -45,7 +45,6 @@ GalleryView::GalleryView(QWidget *parent) :
     m_scene(new QGraphicsScene) ,
     m_searchBox(new QLineEdit()) ,
     m_enableGrouping(false) ,
-    m_layoutNeeded(true) ,
     m_rendererFactory(0)
 {
 #ifdef ENABLE_OPENGL
@@ -88,9 +87,8 @@ GalleryView::GalleryView(QWidget *parent) :
     connect(m_searchBox, SIGNAL(textEdited(QString)),
             this, SLOT(setNameFilter(QString)));
 
-    m_layoutTimer.setSingleShot(false);
+    m_layoutTimer.setSingleShot(true);
     connect(&m_layoutTimer, SIGNAL(timeout()), this, SLOT(layout()));
-    m_layoutTimer.start(GalleryView::LAYOUT_INTERVAL);
 }
 
 GalleryView::~GalleryView()
@@ -146,7 +144,7 @@ void GalleryView::clear()
 
 void GalleryView::layout()
 {
-    if (!m_layoutNeeded || !isVisible()) {
+    if (!isVisible()) {
         return;
     }
 
@@ -186,16 +184,14 @@ void GalleryView::layout()
     renderer->layout(items, itemGroups, geometry());
     delete renderer;
 
-    m_layoutNeeded = false;
-    m_layoutTimer.stop();
-
     markItemsInsideViewportPreload();
 }
 
 void GalleryView::scheduleLayout()
 {
-    m_layoutNeeded = true;
-    m_layoutTimer.start();
+    if (!m_layoutTimer.isActive()) {
+        m_layoutTimer.start(LAYOUT_INTERVAL);
+    }
 }
 
 void GalleryView::setNameFilter(const QString &nameFilter)

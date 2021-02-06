@@ -87,7 +87,6 @@ protected:
     QGraphicsScene *m_scene;
     QLineEdit *m_searchBox;
     bool m_enableGrouping;
-    bool m_layoutNeeded;
     QTimer m_layoutTimer;
     QString m_nameFilter;
 
