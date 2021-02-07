@@ -12,6 +12,8 @@ public:
     virtual void layout();
     virtual void paint(QPainter *painter);
 
+    int columnsSpan() const;
+
 private:
     static const int PADDING;
     static const int BORDER;

@@ -62,6 +62,11 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
     load();
 }
 
+AbstractGalleryItemRenderer *GalleryItem::renderer() const
+{
+    return m_renderer;
+}
+
 static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> thumbnail,
                                                           const QSize &size,
                                                           Qt::AspectRatioMode aspectRatioMode)

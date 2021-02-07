@@ -22,6 +22,7 @@ public:
 
     virtual void load() = 0;
     void setRendererFactory(AbstractRendererFactory *factory);
+    AbstractGalleryItemRenderer *renderer() const;
 
     // Have to implement our own visibility system as QGraphicsScene will always
     // ignore hidden items when selecting by rect

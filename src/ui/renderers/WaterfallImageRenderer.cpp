@@ -21,7 +21,7 @@ void WaterfallImageRenderer::layout()
     }
 
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-    qreal imageWidth = itemSize.width() - 2 * WaterfallImageRenderer::PADDING;
+    qreal imageWidth = itemSize.width() * columnsSpan() - 2 * WaterfallImageRenderer::PADDING;
     qreal factor = imageWidth / m_imageSize.width();
     qreal imageHeight = m_imageSize.height() * factor;
     m_imageRect.setSize(QSize(imageWidth, imageHeight));
@@ -60,4 +60,9 @@ void WaterfallImageRenderer::paint(QPainter *painter)
 
     // Image
     painter->drawImage(m_imageRect, *m_image);
+}
+
+int WaterfallImageRenderer::columnsSpan() const
+{
+    return m_imageSize.height() > m_imageSize.width() ? 1 : 2;
 }
