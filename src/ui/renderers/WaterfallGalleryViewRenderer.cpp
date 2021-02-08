@@ -8,15 +8,54 @@
 #include "GlobalConfig.h"
 #include "WaterfallGalleryViewRenderer.h"
 
-static const int SPAN_LEVEL_THRESHOLD = 50;
-
-WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
-    GalleryView *galleryView) :
-    AbstractGalleryViewRenderer(galleryView)
+class WaterfallGalleryViewLayoutHelper
 {
+public:
+    WaterfallGalleryViewLayoutHelper(int itemWidth, int maxColumns);
+
+    qreal width() const;
+    qreal height() const;
+    void tryLayoutItem(GalleryItem *item);
+    void tryLayoutPendingItems();
+    void forceLayoutPendingItems();
+    void addGroupBreak();
+
+private:
+    bool tryLayoutItemOnLevelSpan(GalleryItem *item, qreal &x, qreal &y);
+    void forceLayoutItemOnLowestSpan(GalleryItem *item, qreal &x, qreal &y);
+    void setItemPos(GalleryItem *item, qreal x, qreal y);
+    bool isLevel(int minHeight, int maxHeight);
+
+    static const int SPAN_LEVEL_THRESHOLD = 50;
+    static const int GROUP_MARGIN = 25;
+
+    int m_itemWidth;
+    int m_maxColumns;
+    QList<qreal> m_columnHeights;
+    QQueue<GalleryItem *> m_pendingItems;
+};
+
+WaterfallGalleryViewLayoutHelper::WaterfallGalleryViewLayoutHelper(int _itemWidth, int _maxColumns)
+    : m_itemWidth(_itemWidth)
+    , m_maxColumns(_maxColumns)
+{
+    m_columnHeights.reserve(m_maxColumns);
+    for (int i = 0; i < m_maxColumns; i++) {
+        m_columnHeights << 0;
+    }
 }
 
-static void setItemPos(GalleryItem *item, qreal x, qreal y)
+qreal WaterfallGalleryViewLayoutHelper::width() const
+{
+    return (qreal)m_maxColumns * (qreal)m_itemWidth;
+}
+
+qreal WaterfallGalleryViewLayoutHelper::height() const
+{
+    return *std::max_element(m_columnHeights.constBegin(), m_columnHeights.constEnd());
+}
+
+void WaterfallGalleryViewLayoutHelper::setItemPos(GalleryItem *item, qreal x, qreal y)
 {
     item->setPos(x, y);
     if (item->isReadyToShow()) {
@@ -24,30 +63,40 @@ static void setItemPos(GalleryItem *item, qreal x, qreal y)
     }
 }
 
-static bool isLevel(int minHeight, int maxHeight)
+bool WaterfallGalleryViewLayoutHelper::isLevel(int minHeight, int maxHeight)
 {
     return maxHeight - minHeight < SPAN_LEVEL_THRESHOLD;
 }
 
-static bool tryLayoutItemOnLevelSpan(int itemWidth, int maxColumns, QList<qreal> &columnHeights, GalleryItem *item, qreal &x, qreal &y)
+void WaterfallGalleryViewLayoutHelper::tryLayoutItem(GalleryItem *item)
+{
+    qreal x, y;
+    if (tryLayoutItemOnLevelSpan(item, x, y)) {
+        setItemPos(item, x, y);
+    } else {
+        m_pendingItems.enqueue(item);
+    }
+}
+
+bool WaterfallGalleryViewLayoutHelper::tryLayoutItemOnLevelSpan(GalleryItem *item, qreal &x, qreal &y)
 {
     WaterfallImageRenderer *renderer = static_cast<WaterfallImageRenderer *>(item->renderer());
     int columnsSpan = renderer->columnsSpan();
 
-    auto minHeightIter = std::min_element(columnHeights.constBegin(), columnHeights.constEnd());
-    int columnIndex = minHeightIter - columnHeights.constBegin();
+    auto minHeightIter = std::min_element(m_columnHeights.constBegin(), m_columnHeights.constEnd());
+    int columnIndex = minHeightIter - m_columnHeights.constBegin();
 
     // Try all possible spans with `columnIndex` inside
     int leftBound = std::max(columnIndex - columnsSpan + 1, 0);
-    int rightBound = std::min(columnIndex + columnsSpan - 1, maxColumns - 1);
+    int rightBound = std::min(columnIndex + columnsSpan - 1, m_maxColumns - 1);
 
     for (int i = leftBound; i <= rightBound - columnsSpan + 1; i++) {
         // Check if the span is "level". In other words, column height differences are within a certain range
-        auto [minIter, maxIter] = std::minmax_element(columnHeights.constBegin() + i, columnHeights.constBegin() + i + columnsSpan);
+        auto [minIter, maxIter] = std::minmax_element(m_columnHeights.constBegin() + i, m_columnHeights.constBegin() + i + columnsSpan);
         if (isLevel(*minIter, *maxIter)) {
-            x = (qreal)i * (qreal)itemWidth;
+            x = (qreal)i * (qreal)m_itemWidth;
             y = *maxIter;
-            for (auto it = columnHeights.begin() + i; it != columnHeights.begin() + i + columnsSpan; it++) {
+            for (auto it = m_columnHeights.begin() + i; it != m_columnHeights.begin() + i + columnsSpan; it++) {
                 *it = y + item->boundingRect().height();
             }
             return true;
@@ -58,21 +107,21 @@ static bool tryLayoutItemOnLevelSpan(int itemWidth, int maxColumns, QList<qreal>
     return false;
 }
 
-static void tryLayoutPendingMultiColumnItems(int itemWidth, int maxColumns, QList<qreal> &columnHeights, QQueue<GalleryItem *> &pendingMultiColumnItems)
+void WaterfallGalleryViewLayoutHelper::tryLayoutPendingItems()
 {
-    while (pendingMultiColumnItems.count() > 0) {
+    while (m_pendingItems.count() > 0) {
         qreal x, y;
-        GalleryItem *item = pendingMultiColumnItems.head();
-        if (tryLayoutItemOnLevelSpan(itemWidth, maxColumns, columnHeights, item, x, y)) {
+        GalleryItem *item = m_pendingItems.head();
+        if (tryLayoutItemOnLevelSpan(item, x, y)) {
             setItemPos(item, x, y);
-            pendingMultiColumnItems.dequeue();
+            m_pendingItems.dequeue();
         } else {
             return;
         }
     }
 }
 
-static void forceLayoutItemOnLowestSpan(int itemWidth, int maxColumns, QList<qreal> &columnHeights, GalleryItem *item, qreal &x, qreal &y)
+void WaterfallGalleryViewLayoutHelper::forceLayoutItemOnLowestSpan(GalleryItem *item, qreal &x, qreal &y)
 {
     WaterfallImageRenderer *renderer = static_cast<WaterfallImageRenderer *>(item->renderer());
     int columnsSpan = renderer->columnsSpan();
@@ -80,29 +129,47 @@ static void forceLayoutItemOnLowestSpan(int itemWidth, int maxColumns, QList<qre
     // Find a span with minimum height
     int columnIndex = 0;
     qreal minHeight = std::numeric_limits<qreal>::max();
-    for (int i = 0; i <= maxColumns - columnsSpan; i++) {
+    for (int i = 0; i <= m_maxColumns - columnsSpan; i++) {
         // Span height is the max column height within span
-        qreal height = *std::max_element(columnHeights.constBegin() + i, columnHeights.constBegin() + i + columnsSpan);
+        qreal height = *std::max_element(m_columnHeights.constBegin() + i, m_columnHeights.constBegin() + i + columnsSpan);
         if (height < minHeight) {
             minHeight = height;
             columnIndex = i;
         }
     }
-    x = (qreal)columnIndex * (qreal)itemWidth;
+    x = (qreal)columnIndex * (qreal)m_itemWidth;
     y = minHeight;
-    for (auto &it = columnHeights.begin() + columnIndex; it != columnHeights.begin() + columnIndex + columnsSpan; it++) {
+    for (auto &it = m_columnHeights.begin() + columnIndex; it != m_columnHeights.begin() + columnIndex + columnsSpan; it++) {
         *it = y + item->boundingRect().height();
     }
 }
 
-static void forceLayoutPendingMultiColumnItems(int itemWidth, int maxColumns, QList<qreal> &columnHeights, QQueue<GalleryItem *> &pendingMultiColumnItems)
+void WaterfallGalleryViewLayoutHelper::forceLayoutPendingItems()
 {
-    while (pendingMultiColumnItems.count() > 0) {
-        GalleryItem *item = pendingMultiColumnItems.dequeue();
+    while (m_pendingItems.count() > 0) {
+        GalleryItem *item = m_pendingItems.dequeue();
         qreal x, y;
-        forceLayoutItemOnLowestSpan(itemWidth, maxColumns, columnHeights, item, x, y);
+        forceLayoutItemOnLowestSpan(item, x, y);
         setItemPos(item, x, y);
     }
+}
+
+void WaterfallGalleryViewLayoutHelper::addGroupBreak()
+{
+    // Layout all pending multi items above group break
+    forceLayoutPendingItems();
+
+    qreal h = height();
+    for (int i = 0; i < m_columnHeights.length(); ++i) {
+        m_columnHeights[i] = h + GROUP_MARGIN;
+    }
+}
+
+
+WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
+    GalleryView *galleryView) :
+    AbstractGalleryViewRenderer(galleryView)
+{
 }
 
 void WaterfallGalleryViewRenderer::layout(
@@ -117,11 +184,7 @@ void WaterfallGalleryViewRenderer::layout(
         return;
     }
 
-    QList<qreal> columnHeights;
-    QQueue<GalleryItem *> pendingMultiColumnItems;
-    for (int i = 0; i < maxColumns; ++i) {
-        columnHeights << 0;
-    }
+    WaterfallGalleryViewLayoutHelper helper(galleryItemSize.width(), maxColumns);
 
     QString curGroup;
     if (isGroupingEnabled) {
@@ -129,7 +192,7 @@ void WaterfallGalleryViewRenderer::layout(
     }
 
     for (int i = 0; i < items.length(); ++i) {
-        tryLayoutPendingMultiColumnItems(galleryItemSize.width(), maxColumns, columnHeights, pendingMultiColumnItems);
+        helper.tryLayoutPendingItems();
 
         GalleryItem *item = items[i];
 
@@ -137,35 +200,19 @@ void WaterfallGalleryViewRenderer::layout(
         if (isGroupingEnabled) {
             if (itemGroups[i] != curGroup) {
                 // Group changed
-
-                // Layout all pending multi items above group break
-                forceLayoutPendingMultiColumnItems(galleryItemSize.width(), maxColumns, columnHeights, pendingMultiColumnItems);
-
-                qreal maxHeight = *std::max_element(columnHeights.constBegin(), columnHeights.constEnd());
-                for (int i = 0; i < columnHeights.length(); ++i) {
-                    columnHeights[i] = maxHeight + WaterfallGalleryViewRenderer::GROUP_MARGIN;
-                }
+                helper.addGroupBreak();
             }
-
             curGroup = itemGroups[i];
         }
 
         WaterfallImageRenderer *itemRenderer = static_cast<WaterfallImageRenderer *>(item->renderer());
-        qreal x, y;
-        if (tryLayoutItemOnLevelSpan(galleryItemSize.width(), maxColumns, columnHeights, item, x, y)) {
-            setItemPos(item, x, y);
-        } else {
-            pendingMultiColumnItems.enqueue(item);
-        }
+        helper.tryLayoutItem(item);
     }
 
-    tryLayoutPendingMultiColumnItems(galleryItemSize.width(), maxColumns, columnHeights, pendingMultiColumnItems);
-    forceLayoutPendingMultiColumnItems(galleryItemSize.width(), maxColumns, columnHeights, pendingMultiColumnItems);
+    helper.tryLayoutPendingItems();
+    helper.forceLayoutPendingItems();
 
-    qreal maxColumnHeight = *std::max_element(columnHeights.constBegin(), columnHeights.constEnd());
-
-    QSizeF newSceneSize((qreal)maxColumns * (qreal)galleryItemSize.width(),
-                        maxColumnHeight);
+    QSizeF newSceneSize(helper.width(), helper.height());
     newSceneSize = newSceneSize.expandedTo(QSize(0, viewGeometry.height()));
     QRectF newSceneRect(QPointF(0, 0), newSceneSize);
     scene()->setSceneRect(newSceneRect);

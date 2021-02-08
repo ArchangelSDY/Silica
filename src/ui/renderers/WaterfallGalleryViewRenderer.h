@@ -11,9 +11,6 @@ public:
     void layout(QList<GalleryItem *> &items,
                 const QStringList &itemGroups,
                 const QRect &viewGeometry);
-
-private:
-    static const int GROUP_MARGIN = 25;
 };
 
 #endif // WATERFALLGALLERYVIEWRENDERER_H
