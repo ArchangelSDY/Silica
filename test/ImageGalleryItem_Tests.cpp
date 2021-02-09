@@ -49,7 +49,7 @@ void TestImageGalleryItem::load_data()
         << static_cast<AbstractRendererFactory *>(new CompactRendererFactory())
         << ":/assets/silica.png";
     QTest::newRow("Waterfall")
-        << static_cast<AbstractRendererFactory *>(new WaterfallRendererFactory())
+        << static_cast<AbstractRendererFactory *>(new WaterfallRendererFactory(200))
         << ":/assets/silica.png";
 }
 
