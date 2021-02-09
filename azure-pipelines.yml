@@ -30,7 +30,7 @@ steps:
       call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
       mkdir build
       cd build
-      cmake -G "Visual Studio 16 2019" -DOpenCV_DIR=C:\BuildTools\OpenCV -DOpenCV_STATIC=true ..
+      cmake -G "Visual Studio 16 2019" -DOpenCV_DIR=C:\BuildTools\OpenCV -DOpenCV_STATIC=true -DBUILD_PRODUCTION=%BUILD_PRODUCTION% ..
       cmake --build . --config %CONFIGURATION%
       cpack -C %CONFIGURATION% --config ./CPackConfig.cmake
       ctest -C %CONFIGURATION% -T Test --no-compress-output -E "KeyChain"
