@@ -118,7 +118,7 @@ void GalleryItem::setScaledThumbnail(QSharedPointer<QImage> thumbnailScaled)
     m_thumbnailSize = m_thumbnailScaled->size();
 
     // Layout again using scaled thumbnail size
-    m_renderer->setImage(m_thumbnailScaled.data());
+    m_renderer->setImage(m_thumbnailScaled);
     m_renderer->setImageSize(m_thumbnailSize);
     m_renderer->layout();
 

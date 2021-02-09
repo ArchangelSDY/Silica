@@ -2,9 +2,7 @@
 
 AbstractGalleryItemRenderer::AbstractGalleryItemRenderer(
     AbstractGalleryItemRenderer *parentRenderer) :
-    m_parentRenderer(parentRenderer) ,
-    m_image(0) ,
-    m_isOwnImage(false)
+    m_parentRenderer(parentRenderer)
 {
 }
 
@@ -13,21 +11,11 @@ AbstractGalleryItemRenderer::~AbstractGalleryItemRenderer()
     if (m_parentRenderer) {
         delete m_parentRenderer;
     }
-    if (m_isOwnImage && m_image) {
-        delete m_image;
-    }
 }
 
-void AbstractGalleryItemRenderer::setImage(const QImage *image,
-                                           bool isOwnImage)
+void AbstractGalleryItemRenderer::setImage(QSharedPointer<QImage> image)
 {
-    // Should always set new image here to be consistent with
-    // GalleryItem::setThumbnail(), which always deletes the old one.
-    if (m_image && m_isOwnImage) {
-        delete m_image;
-    }
     m_image = image;
-    m_isOwnImage = isOwnImage;
     if (m_image) {
         m_imageSize = m_image->size();
     }

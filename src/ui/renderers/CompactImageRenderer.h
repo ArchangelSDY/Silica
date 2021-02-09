@@ -9,7 +9,7 @@ class CompactImageRenderer : public AbstractGalleryItemRenderer
 public:
     CompactImageRenderer(
         AbstractGalleryItemRenderer *parentRenderer = 0,
-        QImage *image = 0,
+        QSharedPointer<QImage> image = {},
         const QRect &boundingRect = QRect(
             QPoint(0, 0), GlobalConfig::instance()->galleryItemSize()));
 
