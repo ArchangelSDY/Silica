@@ -1,19 +1,21 @@
-#ifndef WATERFALLRENDERERFACTORY_H
-#define WATERFALLRENDERERFACTORY_H
+#pragma once
 
 #include "AbstractRendererFactory.h"
 
 class WaterfallRendererFactory : public AbstractRendererFactory
 {
 public:
-    virtual AbstractGalleryItemRenderer *createItemRendererForImageGallery();
+    WaterfallRendererFactory(int itemWidth);
+
+    virtual AbstractGalleryItemRenderer *createItemRendererForImageGallery() override;
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
-        const QString &title, std::optional<int> count);
+        const QString &title, std::optional<int> count) override;
     virtual AbstractGalleryItemRenderer *createItemRendererForFileSystemView(
-        const QFileInfo &, bool);
+        const QFileInfo &, bool) override;
 
     virtual AbstractGalleryViewRenderer *createViewRenderer(
-        GalleryView *galleryView);
-};
+        GalleryView *galleryView) override;
 
-#endif // WATERFALLRENDERERFACTORY_H
+private:
+    int m_itemWidth;
+};

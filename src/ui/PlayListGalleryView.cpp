@@ -84,8 +84,12 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
     menu.addSeparator();
 
     QMenu *renderers = menu.addMenu(tr("Layout"));
-    renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
-    renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
+    renderers->addAction(tr("Loose"), [this]() {
+        this->setRendererFactory(new LooseRendererFactory());
+    });
+    renderers->addAction(tr("Compact"), [this]() {
+        this->setRendererFactory(new CompactRendererFactory());
+    });
 
     QMenu *groups = menu.addMenu(tr("Group By"));
     QAction *actDisableGrouping =

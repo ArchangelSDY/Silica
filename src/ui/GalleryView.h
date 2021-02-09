@@ -41,10 +41,6 @@ public slots:
 protected slots:
     void itemMouseDoubleClicked();
 
-    void setLooseRenderer();
-    void setCompactRenderer();
-    void setWaterfallRenderer();
-
     void enableGrouping();
     void disableGrouping();
 

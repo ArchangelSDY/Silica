@@ -4,9 +4,14 @@
 #include "WaterfallGalleryViewRenderer.h"
 #include "WaterfallRendererFactory.h"
 
+WaterfallRendererFactory::WaterfallRendererFactory(int itemWidth) :
+    m_itemWidth(itemWidth)
+{
+}
+
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForImageGallery()
 {
-    return new WaterfallImageRenderer();
+    return new WaterfallImageRenderer(m_itemWidth);
 }
 
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForPlayListGallery(
@@ -24,5 +29,5 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForFile
 AbstractGalleryViewRenderer *WaterfallRendererFactory::createViewRenderer(
     GalleryView *galleryView)
 {
-    return new WaterfallGalleryViewRenderer(galleryView);
+    return new WaterfallGalleryViewRenderer(galleryView, m_itemWidth);
 }

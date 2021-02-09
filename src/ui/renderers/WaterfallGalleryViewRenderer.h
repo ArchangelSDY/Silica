@@ -1,16 +1,16 @@
-#ifndef WATERFALLGALLERYVIEWRENDERER_H
-#define WATERFALLGALLERYVIEWRENDERER_H
+#pragma once
 
 #include "AbstractGalleryViewRenderer.h"
 
 class WaterfallGalleryViewRenderer : public AbstractGalleryViewRenderer
 {
 public:
-    WaterfallGalleryViewRenderer(GalleryView *galleryView);
+    WaterfallGalleryViewRenderer(GalleryView *galleryView, int itemWidth);
 
     void layout(QList<GalleryItem *> &items,
                 const QStringList &itemGroups,
                 const QRect &viewGeometry);
-};
 
-#endif // WATERFALLGALLERYVIEWRENDERER_H
+private:
+    int m_itemWidth;
+};

@@ -1,12 +1,11 @@
-#ifndef WATERFALLIMAGERENDERER_H
-#define WATERFALLIMAGERENDERER_H
+#pragma once
 
 #include "AbstractGalleryItemRenderer.h"
 
 class WaterfallImageRenderer : public AbstractGalleryItemRenderer
 {
 public:
-    WaterfallImageRenderer();
+    WaterfallImageRenderer(int itemWidth);
 
     virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual void layout();
@@ -18,8 +17,7 @@ private:
     static const int PADDING;
     static const int BORDER;
 
+    int m_itemWidth;
     QRect m_imageRect;
     QRect m_borderRect;
 };
-
-#endif // WATERFALLIMAGERENDERER_H

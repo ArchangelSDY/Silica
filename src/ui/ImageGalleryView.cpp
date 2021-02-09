@@ -25,6 +25,8 @@
 #include "ui/ImageGalleryView.h"
 #include "ui/renderers/CompactRendererFactory.h"
 #include "ui/renderers/LooseRendererFactory.h"
+#include "ui/renderers/WaterfallRendererFactory.h"
+#include "GlobalConfig.h"
 
 ImageGalleryView::ImageGalleryView(QWidget *parent) :
     GalleryView(parent) ,
@@ -125,9 +127,18 @@ QMenu *ImageGalleryView::createContextMenu()
     menu->addMenu(m_rankFilterMenuManager->menu());
 
     QMenu *renderers = menu->addMenu(tr("Layout"));
-    renderers->addAction(tr("Loose"), this, SLOT(setLooseRenderer()));
-    renderers->addAction(tr("Compact"), this, SLOT(setCompactRenderer()));
-    renderers->addAction(tr("Waterfall"), this, SLOT(setWaterfallRenderer()));
+    renderers->addAction(tr("Loose"), [this]() {
+        this->setRendererFactory(new LooseRendererFactory());
+    });
+    renderers->addAction(tr("Compact"), [this]() {
+        this->setRendererFactory(new CompactRendererFactory());
+    });
+    renderers->addAction(tr("Waterfall"), [this]() {
+        this->setRendererFactory(new WaterfallRendererFactory(GlobalConfig::instance()->galleryItemSize().width()));
+    });
+    renderers->addAction(tr("Waterfall Large"), [this]() {
+        this->setRendererFactory(new WaterfallRendererFactory(GlobalConfig::instance()->galleryItemSize().width() * 2));
+    });
 
     QList<GalleryItem *> selectedItems = selectedGalleryItems();
 

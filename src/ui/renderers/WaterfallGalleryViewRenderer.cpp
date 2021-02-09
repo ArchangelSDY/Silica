@@ -5,7 +5,6 @@
 #include <QQueue>
 
 #include "GalleryItem.h"
-#include "GlobalConfig.h"
 #include "WaterfallGalleryViewRenderer.h"
 
 class WaterfallGalleryViewLayoutHelper
@@ -167,8 +166,9 @@ void WaterfallGalleryViewLayoutHelper::addGroupBreak()
 
 
 WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
-    GalleryView *galleryView) :
-    AbstractGalleryViewRenderer(galleryView)
+    GalleryView *galleryView, int itemWidth) :
+    AbstractGalleryViewRenderer(galleryView) ,
+    m_itemWidth(itemWidth)
 {
 }
 
@@ -178,13 +178,12 @@ void WaterfallGalleryViewRenderer::layout(
 {
     bool isGroupingEnabled = !itemGroups.isEmpty();
 
-    const QSize &galleryItemSize = GlobalConfig::instance()->galleryItemSize();
-    int maxColumns = viewGeometry.width() / galleryItemSize.width();
+    int maxColumns = viewGeometry.width() / m_itemWidth;
     if (maxColumns <= 1) {
         return;
     }
 
-    WaterfallGalleryViewLayoutHelper helper(galleryItemSize.width(), maxColumns);
+    WaterfallGalleryViewLayoutHelper helper(m_itemWidth, maxColumns);
 
     QString curGroup;
     if (isGroupingEnabled) {

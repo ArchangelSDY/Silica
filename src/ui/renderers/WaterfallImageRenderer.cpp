@@ -1,11 +1,11 @@
-#include "GlobalConfig.h"
 #include "WaterfallImageRenderer.h"
 
 const int WaterfallImageRenderer::PADDING = 10;
 const int WaterfallImageRenderer::BORDER = 5;
 
-WaterfallImageRenderer::WaterfallImageRenderer() :
-    AbstractGalleryItemRenderer()
+WaterfallImageRenderer::WaterfallImageRenderer(int itemWidth) :
+    AbstractGalleryItemRenderer() ,
+    m_itemWidth(itemWidth)
 {
 }
 
@@ -20,8 +20,7 @@ void WaterfallImageRenderer::layout()
         return;
     }
 
-    const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
-    qreal imageWidth = (qreal)itemSize.width() * columnsSpan() - 2 * (qreal)WaterfallImageRenderer::PADDING;
+    qreal imageWidth = (qreal)m_itemWidth * columnsSpan() - 2 * (qreal)WaterfallImageRenderer::PADDING;
     qreal factor = imageWidth / m_imageSize.width();
     qreal imageHeight = m_imageSize.height() * factor;
     m_imageRect.setSize(QSize(imageWidth, imageHeight));

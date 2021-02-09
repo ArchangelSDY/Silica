@@ -295,21 +295,6 @@ void GalleryView::setRendererFactory(AbstractRendererFactory *factory)
     m_view->viewport()->update();
 }
 
-void GalleryView::setLooseRenderer()
-{
-    setRendererFactory(new LooseRendererFactory());
-}
-
-void GalleryView::setCompactRenderer()
-{
-    setRendererFactory(new CompactRendererFactory());
-}
-
-void GalleryView::setWaterfallRenderer()
-{
-    setRendererFactory(new WaterfallRendererFactory());
-}
-
 void GalleryView::enableGrouping()
 {
     m_enableGrouping = true;
