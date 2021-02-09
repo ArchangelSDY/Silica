@@ -212,18 +212,15 @@ void GalleryItem::onVisibilityChanged(bool isVisible)
 
 void GalleryItem::setIsInsideViewportPreload(bool isInside)
 {
-    // From inside to outside
-    if (m_isInsideViewportPreload && !isInside) {
-        // Unload thumbnail
-        resetThumbnail();
+    if (m_isInsideViewportPreload != isInside) {
+        // Must be assigned before `load()` as `load()` might be a sync call if thumbnail doesn't need scale
+        m_isInsideViewportPreload = isInside;
+        if (!m_isInsideViewportPreload) {
+            resetThumbnail();
+        } else {
+            load();
+        }
     }
-
-    // From outside to inside
-     if (!m_isInsideViewportPreload && isInside && !m_thumbnailScaled) {
-        load();
-    }
-
-    m_isInsideViewportPreload = isInside;
 }
 
 void GalleryItem::resetThumbnail()
