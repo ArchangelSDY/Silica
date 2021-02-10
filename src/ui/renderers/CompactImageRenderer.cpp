@@ -4,7 +4,7 @@
 
 CompactImageRenderer::CompactImageRenderer(
         AbstractGalleryItemRenderer *parentRenderer,
-        QSharedPointer<QImage> image, const QRect &boundingRect) :
+        const QRect &boundingRect) :
     AbstractGalleryItemRenderer(parentRenderer) ,
     m_border(1) ,
     m_borderColor(Qt::transparent) ,
@@ -13,7 +13,6 @@ CompactImageRenderer::CompactImageRenderer(
     m_translateX(0) ,
     m_translateY(0)
 {
-    m_image = image;
     m_boundingRect = boundingRect;
 }
 

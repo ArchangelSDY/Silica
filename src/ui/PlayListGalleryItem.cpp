@@ -56,9 +56,6 @@ void PlayListGalleryItem::loadThumbnail()
 void PlayListGalleryItem::onThumbnailLoaded()
 {
     setThumbnail(m_thumbnailLoader.result());
-
-    // Replace with new render since cover image has changed
-    createRenderer();
 }
 
 void PlayListGalleryItem::createRenderer()
