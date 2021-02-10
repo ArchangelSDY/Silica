@@ -155,8 +155,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    auto fsProvider = static_cast<FileSystemPlayListProvider *>(PlayListProviderManager::instance()->get(FileSystemPlayListProvider::TYPE));
     QSettings setting;
-    setting.setValue("LAST_FILE_SYSTEM_PATH", ui->fsView->rootPath());
+    setting.setValue("LAST_FILE_SYSTEM_PATH", fsProvider->rootPath());
 
     Logger::instance()->removeListener(m_imagePathCorrector);
     delete m_imagePathCorrector;
