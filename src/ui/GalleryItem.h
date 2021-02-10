@@ -61,7 +61,7 @@ protected:
 
     // TODO: should not be accessed by derived classes directly
     AbstractRendererFactory *m_rendererFactory;
-    AbstractGalleryItemRenderer *m_renderer;
+    QScopedPointer<AbstractGalleryItemRenderer> m_renderer;
     bool m_selectedAfterShownScheduled;
 
 private slots:

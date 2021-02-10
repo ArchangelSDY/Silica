@@ -36,9 +36,6 @@ GalleryItem::GalleryItem(AbstractRendererFactory *rendererFactory,
 
 GalleryItem::~GalleryItem()
 {
-    if (m_renderer) {
-        delete m_renderer;
-    }
 }
 
 QString GalleryItem::name() const
@@ -48,8 +45,7 @@ QString GalleryItem::name() const
 
 void GalleryItem::setRenderer(AbstractGalleryItemRenderer *renderer)
 {
-    delete m_renderer;
-    m_renderer = renderer;
+    m_renderer.reset(renderer);
 
     // Hide until thumbnail scaled and ready to paint.
     hide();
@@ -64,7 +60,7 @@ void GalleryItem::setRendererFactory(AbstractRendererFactory *factory)
 
 AbstractGalleryItemRenderer *GalleryItem::renderer() const
 {
-    return m_renderer;
+    return m_renderer.data();
 }
 
 static QSharedPointer<QImage> scaleThumbnailAtBackground(QSharedPointer<QImage> thumbnail,
