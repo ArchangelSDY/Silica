@@ -1,5 +1,4 @@
-#ifndef GALLERYVIEW_H
-#define GALLERYVIEW_H
+#pragma once
 
 #include <QGraphicsView>
 #include <QSet>
@@ -101,5 +100,3 @@ private:
     QList<QGraphicsItem *> m_itemGroupTitles;
     QSet<QGraphicsItem *> m_viewportPreloadItems;
 };
-
-#endif // GALLERYVIEW_H

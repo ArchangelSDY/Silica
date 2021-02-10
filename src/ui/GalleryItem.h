@@ -1,5 +1,4 @@
-#ifndef GALLERYITEM_H
-#define GALLERYITEM_H
+#pragma once
 
 #include <QColor>
 #include <QFutureWatcher>
@@ -75,9 +74,6 @@ private:
     QSharedPointer<QImage> m_thumbnailScaled;
     QFutureWatcher<QSharedPointer<QImage> > m_thumbnailScaleWatcher;
     QSize m_thumbnailSize;
-    bool m_isVisible;
     bool m_isReadyToShow;
     bool m_isInsideViewportPreload;
 };
-
-#endif // GALLERYITEM_H
