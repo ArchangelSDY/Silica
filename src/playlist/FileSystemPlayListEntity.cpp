@@ -8,11 +8,8 @@
 #include <QFileInfo>
 #include <QMutex>
 
-#include "image/Image.h"
 #include "image/ImageSourceManager.h"
 #include "GlobalConfig.h"
-#include "../PlayList.h"
-
 
 static QCache<QString, QImage> g_coverCache(500);
 static QCache<QString, bool> g_folderCover(500);
@@ -165,28 +162,25 @@ QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
         return {};
     }
 
-    PlayList pl;
-    pl.addMultiplePath(m_fileInfo.absoluteFilePath());
-
-    if (pl.count() == 1) {
-        // Add siblings too
-        QDir curDir = m_fileInfo.dir();
-        QFileInfoList entries = curDir.entryInfoList(
+    auto imageSources = ImageSourceManager::instance()->createMultiple(m_fileInfo.absoluteFilePath());
+    if (imageSources.count() == 1) {
+        qDeleteAll(imageSources);
+        // Load all siblings if we only get one
+        QFileInfoList entries = m_fileInfo.dir().entryInfoList(
             QDir::Files | QDir::NoDotAndDotDot,
             QDir::Name);
+        QList<QUrl> imageUrls;
         for (const QFileInfo &info : entries) {
-            if (!ImageSourceManager::instance()->isValidNameSuffix(info.suffix())) {
-                continue;
-            }
-
-            // Avoid duplicate
-            if (info.absoluteFilePath() != m_fileInfo.absoluteFilePath()) {
-                pl.addSinglePath(info.absoluteFilePath());
+            if (ImageSourceManager::instance()->isValidNameSuffix(info.suffix())) {
+                imageUrls << QUrl::fromLocalFile(info.absoluteFilePath());
             }
         }
+        return imageUrls;
+    } else {
+        qDeleteAll(imageSources);
+        // Do not use expanded urls. We should always pass around original url to batch create `ImageSource` efficiently
+        return { QUrl::fromLocalFile(m_fileInfo.absoluteFilePath()) };
     }
-
-    return pl.toImageUrls();
 }
 
 void FileSystemPlayListEntity::setName(const QString &name)

@@ -124,6 +124,7 @@ void GlobalConfig::load()
     qRegisterMetaType<QList<QSharedPointer<PlayListEntity> > >("QList<QSharedPointer<PlayListEntity> >");
     qRegisterMetaType<QList<QUrl> >("QList<QUrl>");
     qRegisterMetaType<QList<QVariantHash> >("QList<QVariantHash>");
+    qRegisterMetaType<QList<QSharedPointer<ImageSource> > >("QList<QSharedPointer<ImageSource> >");
     qRegisterMetaType<ImageList>("ImageList");
     qRegisterMetaType<ImagePtr>("ImagePtr");
     qRegisterMetaType<QSharedPointer<PlayList> >("QSharedPointer<PlayList>");

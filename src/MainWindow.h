@@ -99,7 +99,7 @@ private:
     QSharedPointer<PlayListEntity> m_currentPlayListEntity;
     QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;
     QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > > m_playListEntityTriggerWatcher;
-    QFutureWatcher<QList<QUrl>> m_playListCreateWatcher;
+    QFutureWatcher<QList<QSharedPointer<ImageSource>>> m_playListCreateWatcher;
     QFutureWatcher<QList<QUrl>> m_playListContinueWatcher;
     QFutureWatcher<QString> m_localPlayListEntityCreateWatcher;
 

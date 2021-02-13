@@ -477,7 +477,18 @@ void MainWindow::playListEntityTriggered()
         m_currentPlayListEntity = entity;
 
         auto future = QtConcurrent::run([entity]() {
-            return entity->loadImageUrls();
+            auto imageUrls = entity->loadImageUrls();
+            QList<QSharedPointer<ImageSource>> imageSources;
+            for (const auto &url : imageUrls) {
+                // This can be slow so we put it at background
+                auto rawImageSources = url.isLocalFile() ?
+                    ImageSourceManager::instance()->createMultiple(url.toLocalFile()) :
+                    ImageSourceManager::instance()->createMultiple(url);
+                for (ImageSource *imageSource : rawImageSources) {
+                    imageSources << QSharedPointer<ImageSource>(imageSource);
+                }
+            }
+            return imageSources;
         });
         m_playListCreateWatcher.setFuture(future);
 
@@ -499,9 +510,13 @@ void MainWindow::playListCreated()
     if (!future.isFinished()) {
         return;
     }
-    auto imageUrls = future.result();
+    auto imageSources = future.result();
 
-    setPrimaryNavigatorPlayList(QSharedPointer<PlayList>::create(imageUrls), m_currentPlayListEntity);
+    auto playList = QSharedPointer<PlayList>::create();
+    for (auto imageSource : imageSources) {
+        *playList << QSharedPointer<Image>::create(imageSource);
+    }
+    setPrimaryNavigatorPlayList(playList, m_currentPlayListEntity);
 
     // TODO
 	// // Make cover image of first playlist item selected
