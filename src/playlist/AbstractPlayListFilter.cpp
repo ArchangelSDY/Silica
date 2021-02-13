@@ -1,7 +1,7 @@
 #include "image/ImageRank.h"
 
 #include "AbstractPlayListFilter.h"
-#include "NotEqualRankFilter.h"
+#include "DoNothingFilter.h"
 
 AbstractPlayListFilter::AbstractPlayListFilter(
         AbstractPlayListFilter *parentFilter) :
@@ -11,18 +11,11 @@ AbstractPlayListFilter::AbstractPlayListFilter(
 
 AbstractPlayListFilter::~AbstractPlayListFilter()
 {
-    if (m_parentFilter) {
-        delete m_parentFilter;
-    }
 }
 
 AbstractPlayListFilter *AbstractPlayListFilter::defaultFilter()
 {
-    AbstractPlayListFilter *filter = 0;
-    for (int i = ImageRank::MIN_VALUE; i < ImageRank::MIN_SHOWN_VALUE; ++i) {
-        filter = new NotEqualRankFilter(i, filter);
-    }
-    return filter;
+    return new DoNothingFilter();
 }
 
 ImageList AbstractPlayListFilter::filtered(const ImageList &images)

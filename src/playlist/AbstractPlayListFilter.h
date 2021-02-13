@@ -1,5 +1,6 @@
-#ifndef ABSTRACTPLAYLISTFILTER_H
-#define ABSTRACTPLAYLISTFILTER_H
+#pragma once
+
+#include <QScopedPointer>
 
 #include "image/Image.h"
 
@@ -15,7 +16,5 @@ public:
     static AbstractPlayListFilter *defaultFilter();
 
 protected:
-    AbstractPlayListFilter *m_parentFilter;
+    QScopedPointer<AbstractPlayListFilter> m_parentFilter;
 };
-
-#endif // ABSTRACTPLAYLISTFILTER_H
