@@ -1,5 +1,6 @@
-#ifndef SHARERPLUGINDELEGATE_H
-#define SHARERPLUGINDELEGATE_H
+#pragma once
+
+#include <QScopedPointer>
 
 #include "sapi/ISharerPlugin.h"
 #include "share/Sharer.h"
@@ -11,14 +12,11 @@ class SharerPluginDelegate : public Sharer
     Q_OBJECT
 public:
     SharerPluginDelegate(ISharerPlugin *sharer);
-    ~SharerPluginDelegate();
 
     bool share(QSharedPointer<Image> image) override;
 
 private:
-    ISharerPlugin *m_sharer;
+    QScopedPointer<ISharerPlugin> m_sharer;
 };
 
 }
-
-#endif // SHARERPLUGINDELEGATE_H

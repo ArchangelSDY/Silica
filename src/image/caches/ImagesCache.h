@@ -2,6 +2,7 @@
 #define IMAGESCACHE_H
 
 #include <QObject>
+#include <QScopedPointer>
 
 #include "AbstractImagesCacheStrategy.h"
 #include "../Image.h"
@@ -29,7 +30,7 @@ private:
 
     int m_capacity;
     QMap<int, QSharedPointer<ImageData>> m_images;
-    AbstractImagesCacheStrategy *m_strategy;
+    QScopedPointer<AbstractImagesCacheStrategy> m_strategy;
 };
 
 #endif // IMAGESCACHE_H

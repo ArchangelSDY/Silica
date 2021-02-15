@@ -14,7 +14,6 @@ ImagesCache::ImagesCache(int capacity, QObject *parent) :
 ImagesCache::~ImagesCache()
 {
     clear();
-    delete m_strategy;
 }
 
 void ImagesCache::insert(int index, QSharedPointer<ImageData> image)
@@ -47,6 +46,5 @@ void ImagesCache::trim(int index)
 
 void ImagesCache::setStrategy(AbstractImagesCacheStrategy *strategy)
 {
-    delete m_strategy;
-    m_strategy = strategy;
+    m_strategy.reset(strategy);
 }

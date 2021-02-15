@@ -1,5 +1,4 @@
-#ifndef SAPI_PLUGINLOGGINGDELEGATE_H
-#define SAPI_PLUGINLOGGINGDELEGATE_H
+#pragma once
 
 #include <QDebug>
 
@@ -21,10 +20,8 @@ private:
     static PluginLoggingDelegate *s_instance;
 
     PluginLoggingDelegate();
-    QDebug *m_dbg;
+    QScopedPointer<QDebug> m_dbg;
     QIODevice *m_device;
 };
 
 }
-
-#endif // SAPI_PLUGINLOGGINGDELEGATE_H

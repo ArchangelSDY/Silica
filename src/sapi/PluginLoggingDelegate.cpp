@@ -18,21 +18,15 @@ PluginLoggingDelegate::PluginLoggingDelegate() :
     setLoggingDebugImpl(debug());
 }
 
-PluginLoggingDelegate::~PluginLoggingDelegate()
-{
-    delete m_dbg;
-}
-
 QDebug *PluginLoggingDelegate::debug()
 {
-    return m_dbg;
+    return m_dbg.data();
 }
 
 void PluginLoggingDelegate::setDevice(QIODevice *device)
 {
     m_device = device;
-    delete m_dbg;
-    m_dbg = new QDebug(m_device);
+    m_dbg.reset(new QDebug(m_device));
     setLoggingDebugImpl(debug());
 }
 

@@ -1,7 +1,7 @@
-#ifndef PLAYLISTPROVIDERFACTORYDELEGATE_H
-#define PLAYLISTPROVIDERFACTORYDELEGATE_H
+#pragma once
 
 #include <QJsonObject>
+#include <QScopedPointer>
 #include <QString>
 
 #include "playlist/PlayListProviderFactory.h"
@@ -15,16 +15,13 @@ class PlayListProviderFactoryDelegate : public PlayListProviderFactory
 public:
     PlayListProviderFactoryDelegate(IPlayListProviderPlugin *plugin,
                                     const QJsonObject &meta);
-    ~PlayListProviderFactoryDelegate();
 
     // PlayListProviderFactory interface
     PlayListProvider *create();
 
 private:
-    IPlayListProviderPlugin *m_plugin;
+    QScopedPointer<IPlayListProviderPlugin> m_plugin;
     QJsonObject m_meta;
 };
 
 }
-
-#endif // PLAYLISTPROVIDERFACTORYDELEGATE_H

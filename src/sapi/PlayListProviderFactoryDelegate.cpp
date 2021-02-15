@@ -12,11 +12,6 @@ PlayListProviderFactoryDelegate::PlayListProviderFactoryDelegate(
 {
 }
 
-PlayListProviderFactoryDelegate::~PlayListProviderFactoryDelegate()
-{
-    delete m_plugin;
-}
-
 PlayListProvider *PlayListProviderFactoryDelegate::create()
 {
     return new PlayListProviderDelegate(
