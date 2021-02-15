@@ -317,10 +317,12 @@ void GalleryView::itemReadyToShow()
 
 void GalleryView::incrItemsToLoad(int count)
 {
-    m_loadProgress.setMaximum(m_loadProgress.maximum() + count);
-    if (!m_loadProgress.isRunning()
-            && m_loadProgress.maximum() > m_loadProgress.minimum()) {
-        m_loadProgress.start();
+    if (count > 0) {
+        m_loadProgress.setMaximum(m_loadProgress.maximum() + count);
+        if (!m_loadProgress.isRunning()
+                && m_loadProgress.maximum() > m_loadProgress.minimum()) {
+            m_loadProgress.start();
+        }
     }
 }
 
