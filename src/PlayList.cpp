@@ -4,18 +4,15 @@
 #include "image/ImageSourceManager.h"
 #include "playlist/AbstractPlayListFilter.h"
 #include "playlist/DoNothingFilter.h"
-//#include "playlist/PlayListRecord.h"
 #include "playlist/sort/Utils.h"
 #include "PlayList.h"
 
 PlayList::PlayList() :
-    //m_record(0) ,
     m_filter(AbstractPlayListFilter::defaultFilter())
 {
 }
 
 PlayList::PlayList(const QList<QUrl> &imageUrls) :
-    //m_record(0) ,
     m_filter(AbstractPlayListFilter::defaultFilter())
 {
     foreach(const QUrl &imageUrl, imageUrls) {
@@ -24,7 +21,6 @@ PlayList::PlayList(const QList<QUrl> &imageUrls) :
 }
 
 PlayList::PlayList(const QStringList &imagePaths) :
-    //m_record(0) ,
     m_filter(AbstractPlayListFilter::defaultFilter())
 {
     foreach(const QString &imagePath, imagePaths) {

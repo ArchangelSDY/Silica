@@ -19,8 +19,6 @@ PlayListGalleryItem::PlayListGalleryItem(QSharedPointer<PlayListEntity> entity,
     setToolTip(m_entity->name());
     createRenderer();
 
-    // TODO
-    // connect(m_record, SIGNAL(saved()), this, SLOT(loadThumbnail()));
     connect(&m_thumbnailLoader, &QFutureWatcher<QImage>::finished, this, &PlayListGalleryItem::onThumbnailLoaded);
 }
 

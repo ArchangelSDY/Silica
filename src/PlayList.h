@@ -18,9 +18,6 @@ public:
     PlayList(const QStringList &imagePaths);
     ~PlayList();
 
-    //PlayListRecord *record() { return m_record; }
-    //void setRecord(PlayListRecord *record) { m_record = record; }
-
     ImagePtr addSinglePath(const QString &);
     ImagePtr addSinglePath(const QUrl &);
     void addMultiplePath(const QString &);
@@ -98,7 +95,6 @@ private:
 
     ImageList m_allImages;
     ImageList m_filteredImages;
-    //PlayListRecord *m_record;
     QScopedPointer<AbstractPlayListFilter> m_filter;   // Should never be 0
     QScopedPointer<AbstractPlayListGrouper> m_grouper;
 };

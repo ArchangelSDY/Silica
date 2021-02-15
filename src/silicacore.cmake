@@ -26,7 +26,6 @@ file(GLOB CORE_SRCS
     "Navigator.cpp"
     "db/LocalDatabase.cpp"
     "db/SQLiteLocalDatabase.cpp"
-    # "db/LocalPlayListRecord.cpp"
     "image/Image.cpp"
     "image/ImageHistogram.cpp"
     "image/ImageRank.cpp"
