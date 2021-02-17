@@ -19,8 +19,7 @@
 #include "util/ConcurrentHash.h"
 #include "GlobalConfig.h"
 
-static const int THUMBNAIL_MIN_HEIGHT = 480;
-static const int THUMBNAIL_SCALE_RATIO = 8;
+static const int THUMBNAIL_MIN_EDGE = 480;
 
 // ---------- Load Image Task ----------
 
@@ -90,6 +89,19 @@ void LoadImageTask::run()
 
 // ---------- Load Thumbnail Task ----------
 
+static bool isThumbnailOutDated(QSharedPointer<QImage> image)
+{
+    if (image->isNull()) {
+        return true;
+    }
+
+    if (image->width() < THUMBNAIL_MIN_EDGE || image->height() < THUMBNAIL_MIN_EDGE) {
+        return true;
+    }
+
+    return false;
+}
+
 static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPath)
 {
     QFile file(thumbnailFullPath);
@@ -104,10 +116,10 @@ static QSharedPointer<QImage> doLoadThumbnailSync(const QString &thumbnailFullPa
 #endif
         QSharedPointer<QImage> image =
             QSharedPointer<QImage>::create(thumbnailFullPath);
-        if (!image->isNull()) {
+        if (!isThumbnailOutDated(image)) {
             return image;
         } else {
-            // Broken thumbnail, delete it
+            // Broken/outdated thumbnail, delete it
             image.clear();
             file.remove();
             return QSharedPointer<QImage>();
@@ -158,12 +170,9 @@ static QSharedPointer<QImage> doMakeThumbnailSync(const QString &path, QImage *i
     QDir dir;
     dir.mkpath(dirPath);
 
-    int height = qMax<int>(
-        THUMBNAIL_MIN_HEIGHT, image->height() / THUMBNAIL_SCALE_RATIO);
-
-    QSharedPointer<QImage> thumbnail = QSharedPointer<QImage>(
-        new QImage(image->scaledToHeight(height, Qt::SmoothTransformation)));
-    thumbnail->save(path, "JPG");
+    QSharedPointer<QImage> thumbnail = QSharedPointer<QImage>::create(
+        std::move(image->scaled(THUMBNAIL_MIN_EDGE, THUMBNAIL_MIN_EDGE, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation)));
+    thumbnail->save(path, "PNG");
 
     return thumbnail;
 }
