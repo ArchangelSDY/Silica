@@ -160,9 +160,9 @@ void LoadThumbnailTask::run()
 
 // ---------- Make Thumbnail Task ----------
 
-static QSharedPointer<QImage> doMakeThumbnailSync(const QString &path, QImage *image)
+static QSharedPointer<QImage> doMakeThumbnailSync(const QString &path, QSharedPointer<QImage> image)
 {
-    Q_ASSERT(image);
+    Q_ASSERT(!image.isNull());
 
     // Create thumbnail dir
     QFileInfo pathInfo(path);
@@ -181,7 +181,7 @@ class MakeThumbnailTask : public QObject, public QRunnable
 {
     Q_OBJECT
 public:
-    MakeThumbnailTask(QWeakPointer<bool> liveness, QImage *image, const QString &path) :
+    MakeThumbnailTask(QWeakPointer<bool> liveness, QSharedPointer<QImage> image, const QString &path) :
         QRunnable() ,
         m_liveness(liveness) ,
         m_image(image) ,
@@ -194,14 +194,14 @@ signals:
 
 private:
     QWeakPointer<bool> m_liveness;
-    QScopedPointer<QImage> m_image;
+    QSharedPointer<QImage> m_image;
     QString m_path;
 };
 
 void MakeThumbnailTask::run()
 {
     if (m_liveness.toStrongRef()) {
-        auto thumbnail = doMakeThumbnailSync(m_path, m_image.data());
+        auto thumbnail = doMakeThumbnailSync(m_path, m_image);
         emit thumbnailMade(thumbnail);
     }
 }
@@ -375,7 +375,7 @@ QSharedPointer<QImage> Image::loadThumbnailSync()
 
     // Thumbnail not found, try to load and make
     auto imageData = doLoadImageSync(m_imageSource);
-    return doMakeThumbnailSync(m_thumbnailPath, &imageData->defaultFrame());
+    return doMakeThumbnailSync(m_thumbnailPath, QSharedPointer<QImage>::create(std::move(imageData->defaultFrame())));
 }
 
 void Image::makeThumbnail()
@@ -399,7 +399,7 @@ void Image::makeThumbnail(QSharedPointer<ImageData> image)
     m_isMakingThumbnail = true;
 
     MakeThumbnailTask *makeThumbnailTask =
-        new MakeThumbnailTask(m_liveness.toWeakRef(), new QImage(frame), m_thumbnailPath);
+        new MakeThumbnailTask(m_liveness.toWeakRef(), QSharedPointer<QImage>::create(std::move(frame)), m_thumbnailPath);
     connect(makeThumbnailTask, &MakeThumbnailTask::thumbnailMade,
             this, &Image::thumbnailMade);
     threadPool()->start(makeThumbnailTask);
