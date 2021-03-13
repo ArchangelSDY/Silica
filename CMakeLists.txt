@@ -64,6 +64,9 @@ if (WIN32)
     get_windowssdk_include_dirs(${WINDOWSSDK_LATEST_DIR} WINDOWSSDK_INCLUDE_DIRS)
     get_windowssdk_library_dirs(${WINDOWSSDK_LATEST_DIR} WINDOWSSDK_LIB_DIRS)
 
+    if ("${WINDOWSSDK_INCLUDE_DIRS}" STREQUAL "NOTFOUND")
+        message(FATAL_ERROR "Windows SDK not found")
+    endif()
     include_directories(${WINDOWSSDK_INCLUDE_DIRS})
 endif()
 
