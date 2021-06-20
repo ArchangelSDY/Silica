@@ -31,10 +31,8 @@ QString FileSystemPlayListProvider::name() const
 
 bool FileSystemPlayListProvider::supportsOption(PlayListProviderOption option) const
 {
-    return false;
-    // TODO: Support renaming and removing
-    // return option == PlayListProviderOption::UpdateEntity
-    //     || option == PlayListProviderOption::RemoveEntity;
+    // TODO: Support renaming
+    return option == PlayListProviderOption::RemoveEntity;
 }
 
 QList<PlayListEntity *> FileSystemPlayListProvider::loadEntities()
@@ -84,6 +82,10 @@ void FileSystemPlayListProvider::updateEntity(PlayListEntity *entity)
 
 void FileSystemPlayListProvider::removeEntity(PlayListEntity *entity)
 {
+    FileSystemPlayListEntity *fsEntity = static_cast<FileSystemPlayListEntity *>(entity);
+    QFileInfo fileInfo = fsEntity->fileInfo();
+    QFile::moveToTrash(fileInfo.absoluteFilePath());
+    emit entitiesChanged();
 }
 
 QString FileSystemPlayListProvider::rootPath() const

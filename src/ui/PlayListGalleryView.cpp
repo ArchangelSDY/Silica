@@ -72,11 +72,9 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
             auto entity = playListItem->entity();
             if (!entity->provider()->supportsOption(PlayListProviderOption::UpdateEntity)) {
                 actRename->setEnabled(false);
-                break;
             }
             if (!entity->provider()->supportsOption(PlayListProviderOption::RemoveEntity)) {
                 actRemove->setEnabled(false);
-                break;
             }
         }
     }
