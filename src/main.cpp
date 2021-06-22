@@ -33,24 +33,27 @@ int main(int argc, char *argv[])
     crashHandlerProc.setProgram("crashhandler.exe");
     crashHandlerProc.setArguments(crashHandlerArgs);
     crashHandlerProc.start(QIODevice::ReadOnly);
-    crashHandlerProc.waitForReadyRead();
-    if (crashHandlerProc.read(1) != QByteArray("0")) {
-        qWarning() << "Fail to initiate crash handler";
-    }
-    crashHandlerProc.closeReadChannel(QProcess::StandardOutput);
-    crashHandlerProc.closeReadChannel(QProcess::StandardError);
-    crashHandlerProc.closeWriteChannel();
 
-    QScopedPointer<google_breakpad::ExceptionHandler> exHandler(new google_breakpad::ExceptionHandler(
-        crashDumpPath.toStdWString(),
-        nullptr,
-        nullptr,
-        nullptr,
-        google_breakpad::ExceptionHandler::HANDLER_ALL,
-        MiniDumpNormal,
-        crashHandlerPipe.toStdWString().data(),
-        nullptr
-    ));
+    QScopedPointer<google_breakpad::ExceptionHandler> exHandler;
+    QObject::connect(&crashHandlerProc, &QProcess::readyReadStandardOutput, [&crashHandlerProc, &exHandler, &crashHandlerPipe, &crashDumpPath] {
+        if (crashHandlerProc.read(1) != QByteArray("0")) {
+            qWarning() << "Fail to initiate crash handler";
+        }
+        crashHandlerProc.closeReadChannel(QProcess::StandardOutput);
+        crashHandlerProc.closeReadChannel(QProcess::StandardError);
+        crashHandlerProc.closeWriteChannel();
+
+        exHandler.reset(new google_breakpad::ExceptionHandler(
+            crashDumpPath.toStdWString(),
+            nullptr,
+            nullptr,
+            nullptr,
+            google_breakpad::ExceptionHandler::HANDLER_ALL,
+            MiniDumpNormal,
+            crashHandlerPipe.toStdWString().data(),
+            nullptr
+        ));
+    });
 #endif
 
     if (!LocalDatabase::instance()->migrate()) {
