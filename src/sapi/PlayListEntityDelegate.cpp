@@ -44,10 +44,14 @@ PlayListEntityLoadContext* PlayListEntityDelegate::createLoadContext()
     }
 }
 
-QList<QUrl> PlayListEntityDelegate::loadImageUrls(PlayListEntityLoadContext *ctx)
+QList<QUrl> PlayListEntityDelegate::loadImageUrls(PlayListEntityLoadContext *rawCtx)
 {
-    auto d = static_cast<PlayListEntityLoadContextDelegate *>(ctx);
-    return m_entity->loadImageUrls(d->context());
+    if (rawCtx) {
+        auto d = static_cast<PlayListEntityLoadContextDelegate *>(rawCtx);
+        return m_entity->loadImageUrls(d->context());
+    } else {
+        return m_entity->loadImageUrls(nullptr);
+    }
 }
 
 void PlayListEntityDelegate::setName(const QString &name)
