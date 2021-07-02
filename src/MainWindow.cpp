@@ -475,9 +475,10 @@ void MainWindow::playListEntityTriggered()
     case PlayListEntityTriggerResult::LoadPlayList:
     {
         m_currentPlayListEntity = entity;
+        m_currentPlayListEntityLoadContext.reset(entity->createLoadContext());
 
-        auto future = QtConcurrent::run([entity]() {
-            auto imageUrls = entity->loadImageUrls();
+        auto future = QtConcurrent::run([this]() {
+            auto imageUrls = this->m_currentPlayListEntity->loadImageUrls(this->m_currentPlayListEntityLoadContext.data());
             QList<QSharedPointer<ImageSource>> imageSources;
             for (const auto &url : imageUrls) {
                 // This can be slow so we put it at background
@@ -543,8 +544,9 @@ void MainWindow::continuePlayList()
     }
 
     auto playListEntity = m_currentPlayListEntity;
-    m_playListContinueWatcher.setFuture(QtConcurrent::run([playListEntity]() {
-        return playListEntity->loadImageUrls();
+    auto playListEntityLoadContext = m_currentPlayListEntityLoadContext.data();
+    m_playListContinueWatcher.setFuture(QtConcurrent::run([playListEntity, playListEntityLoadContext]() {
+        return playListEntity->loadImageUrls(playListEntityLoadContext);
     }));
 }
 

@@ -92,6 +92,7 @@ file(GLOB CORE_SRCS
     "sapi/NavigatorDelegate.cpp"
     "sapi/NavigationPlayerDelegate.cpp"
     "sapi/PlayListEntityDelegate.cpp"
+    "sapi/PlayListEntityLoadContextDelegate.cpp"
     "sapi/PlayListProviderDelegate.cpp"
     # "sapi/PlayListProviderFactoryDelegate.cpp"
     "sapi/PluginLoggingDelegate.cpp"

@@ -10,6 +10,7 @@
 
 #include "models/BasketModel.h"
 #include "navigation/NavigatorSynchronizer.h"
+#include "playlist/PlayListEntityLoadContext.h"
 #include "playlist/PlayListEntityTriggerResult.h"
 #include "ui/gamepad/GamepadController.h"
 #include "ui/playlist/PlayListProviderViewManager.h"
@@ -97,6 +98,7 @@ private:
     PlayListProviderViewManager m_playListProviderViewManager;
     PlayListProvider *m_currentPlayListProvider;
     QSharedPointer<PlayListEntity> m_currentPlayListEntity;
+    QScopedPointer<PlayListEntityLoadContext, ScopedPointerPlayListEntityLoadContextDeleter> m_currentPlayListEntityLoadContext;
     QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;
     QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > > m_playListEntityTriggerWatcher;
     QFutureWatcher<QList<QSharedPointer<ImageSource>>> m_playListCreateWatcher;

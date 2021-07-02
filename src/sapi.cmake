@@ -39,6 +39,7 @@ set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/INavigationPlayer.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/INavigationPlayerPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListEntity.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListEntityLoadContext.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProvider.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IPlayListProviderPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ISharerPlugin.h"

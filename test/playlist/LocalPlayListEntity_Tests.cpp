@@ -132,7 +132,7 @@ void TestLocalPlayListEntity::loadImageUrls()
         .WillOnce(::testing::Return(imageUrls));
 
     LocalPlayListEntity entity(nullptr, &db, 1, "name", 1, m_coverPath);
-    auto loadedImageUrls = entity.loadImageUrls();
+    auto loadedImageUrls = entity.loadImageUrls(nullptr);
     QCOMPARE(loadedImageUrls.count(), 1);
     QCOMPARE(loadedImageUrls[0].toLocalFile(), "c:/image.png");
 }

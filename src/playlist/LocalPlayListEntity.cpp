@@ -42,7 +42,12 @@ QImage LocalPlayListEntity::loadCoverImage()
     return QImage(coverFullPath);
 }
 
-QList<QUrl> LocalPlayListEntity::loadImageUrls()
+PlayListEntityLoadContext* LocalPlayListEntity::createLoadContext()
+{
+    return nullptr;
+}
+
+QList<QUrl> LocalPlayListEntity::loadImageUrls(PlayListEntityLoadContext *)
 {
     return m_db->queryLocalPlayListEntityImageUrls(m_id);
 }

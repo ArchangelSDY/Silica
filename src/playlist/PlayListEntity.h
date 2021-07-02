@@ -5,6 +5,7 @@
 #include <QString>
 #include <QUrl>
 
+#include "playlist/PlayListEntityLoadContext.h"
 #include "playlist/PlayListEntityOption.h"
 #include "playlist/PlayListProvider.h"
 
@@ -20,11 +21,13 @@ public:
     virtual bool supportsOption(PlayListEntityOption option) const = 0;
     virtual QImage loadCoverImage() = 0;
 
+    virtual PlayListEntityLoadContext *createLoadContext() = 0;
+
     // Load image urls in this playlist
     //
     // Note that we should not create PlayList directly here as PlayList must
     // be created on main thread so we can correctly receive signals there
-    virtual QList<QUrl> loadImageUrls() = 0;
+    virtual QList<QUrl> loadImageUrls(PlayListEntityLoadContext *ctx) = 0;
 
     virtual void setName(const QString &name) = 0;
     virtual void setCoverImagePath(const QString &path) = 0;

@@ -2,6 +2,7 @@
 #include <QHash>
 
 #include "sapi/IPlayListEntity.h"
+#include "sapi/PlayListEntityLoadContextDelegate.h"
 #include "sapi/PlayListProviderDelegate.h"
 #include "../GlobalConfig.h"
 
@@ -33,9 +34,15 @@ QImage PlayListEntityDelegate::loadCoverImage()
     return m_entity->loadCoverImage();
 }
 
-QList<QUrl> PlayListEntityDelegate::loadImageUrls()
+PlayListEntityLoadContext* PlayListEntityDelegate::createLoadContext()
 {
-    return m_entity->loadImageUrls();
+    return new PlayListEntityLoadContextDelegate(m_entity->createLoadContext());
+}
+
+QList<QUrl> PlayListEntityDelegate::loadImageUrls(PlayListEntityLoadContext *ctx)
+{
+    auto d = static_cast<PlayListEntityLoadContextDelegate *>(ctx);
+    return m_entity->loadImageUrls(d->context());
 }
 
 void PlayListEntityDelegate::setName(const QString &name)

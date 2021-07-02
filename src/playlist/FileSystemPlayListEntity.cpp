@@ -155,7 +155,12 @@ QImage FileSystemPlayListEntity::loadCoverImage()
     }
 }
 
-QList<QUrl> FileSystemPlayListEntity::loadImageUrls()
+PlayListEntityLoadContext* FileSystemPlayListEntity::createLoadContext()
+{
+    return nullptr;
+}
+
+QList<QUrl> FileSystemPlayListEntity::loadImageUrls(PlayListEntityLoadContext *)
 {
     if (m_fileInfo.isDir()) {
         Q_UNREACHABLE();

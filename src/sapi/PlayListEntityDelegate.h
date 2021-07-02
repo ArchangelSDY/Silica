@@ -16,7 +16,8 @@ public:
     virtual QString name() const override;
     virtual bool supportsOption(::PlayListEntityOption option) const override;
     virtual QImage loadCoverImage() override;
-    virtual QList<QUrl> loadImageUrls() override;
+    virtual PlayListEntityLoadContext* createLoadContext() override;
+    virtual QList<QUrl> loadImageUrls(PlayListEntityLoadContext *ctx) override;
 
     virtual void setName(const QString &name) override;
     virtual void setCoverImagePath(const QString &path) override;
