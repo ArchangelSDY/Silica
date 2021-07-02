@@ -11,7 +11,8 @@ PlayListEntityLoadContextDelegate::PlayListEntityLoadContextDelegate(sapi::IPlay
 
 void PlayListEntityLoadContextDelegate::destroy()
 {
-   m_ctx->destroy();
+    Q_ASSERT(m_ctx);
+    m_ctx->destroy();
 }
 
 IPlayListEntityLoadContext *PlayListEntityLoadContextDelegate::context() const

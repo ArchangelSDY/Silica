@@ -36,7 +36,12 @@ QImage PlayListEntityDelegate::loadCoverImage()
 
 PlayListEntityLoadContext* PlayListEntityDelegate::createLoadContext()
 {
-    return new PlayListEntityLoadContextDelegate(m_entity->createLoadContext());
+    auto ctx = m_entity->createLoadContext();
+    if (ctx) {
+        return new PlayListEntityLoadContextDelegate(ctx);
+    } else {
+        return nullptr;
+    }
 }
 
 QList<QUrl> PlayListEntityDelegate::loadImageUrls(PlayListEntityLoadContext *ctx)
