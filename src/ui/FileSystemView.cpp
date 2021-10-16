@@ -1,5 +1,6 @@
 #include "ui/FileSystemView.h"
 
+#include <QActionGroup>
 #include <QContextMenuEvent>
 #include <QDir>
 #include <QDirIterator>

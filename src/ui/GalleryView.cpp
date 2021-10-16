@@ -55,7 +55,6 @@ GalleryView::GalleryView(QWidget *parent) :
 #endif
 
     QLayout *layout = new QVBoxLayout(this);
-    layout->setMargin(0);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_view);
@@ -68,10 +67,10 @@ GalleryView::GalleryView(QWidget *parent) :
     m_view->setScene(m_scene);
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QColor("#323A44"));
-    palette.setBrush(QPalette::Foreground, QColor("#71929E"));
+    palette.setBrush(QPalette::Window, QColor("#323A44"));
+    palette.setBrush(QPalette::WindowText, QColor("#71929E"));
     m_scene->setPalette(palette);
-    m_scene->setBackgroundBrush(palette.background());
+    m_scene->setBackgroundBrush(palette.window());
 
     // Disable index to speed up adding items
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -337,7 +336,7 @@ void GalleryView::markItemsInsideViewportPreload()
     // Compute visible area
     QPointF tl(m_view->horizontalScrollBar()->value(), m_view->verticalScrollBar()->value());
     QPointF br = tl + m_view->viewport()->rect().bottomRight();
-    QMatrix mat = m_view->matrix().inverted();
+    QTransform mat = m_view->transform().inverted();
     QRectF visibleArea = mat.mapRect(QRectF(tl, br));
 
     // Enlarge by 25 times

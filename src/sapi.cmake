@@ -22,7 +22,7 @@ target_compile_definitions(sapi PRIVATE -DSAPI_LIBRARY)
 
 target_link_libraries(sapi
     ${ZLIB_LIBRARIES}
-    Qt5::Core
+    Qt::Core
 )
 
 set_target_properties(sapi PROPERTIES

@@ -43,11 +43,11 @@ QList<PlayListEntity *> FileSystemPlayListProvider::loadEntities()
         m_rootPath,
         QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
     while (iter.hasNext()) {
-        QString path = iter.next();
+        iter.next();
         if (iter.fileInfo().isFile() && !ImageSourceManager::instance()->isValidNameSuffix(iter.fileInfo().suffix())) {
             continue;
         }
-        entities << new FileSystemPlayListEntity(this, path);
+        entities << new FileSystemPlayListEntity(this, iter.fileInfo());
     }
 
     return entities;

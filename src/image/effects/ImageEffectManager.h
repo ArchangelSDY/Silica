@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QVector>
+#include <QList>
+#include <QScopedPointer>
 
 #include "ImageEffect.h"
 
@@ -15,5 +16,5 @@ public:
     QImage process(QSharedPointer<Image> image, const QImage &frame);
 
 private:
-    QVector<ImageEffect *> m_effects;
+    QList<ImageEffect *> m_effects;
 };

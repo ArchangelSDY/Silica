@@ -138,7 +138,7 @@ void WaterfallGalleryViewLayoutHelper::forceLayoutItemOnLowestSpan(GalleryItem *
     }
     x = (qreal)columnIndex * (qreal)m_itemWidth;
     y = minHeight;
-    for (auto &it = m_columnHeights.begin() + columnIndex; it != m_columnHeights.begin() + columnIndex + columnsSpan; it++) {
+    for (auto it = m_columnHeights.begin() + columnIndex; it != m_columnHeights.begin() + columnIndex + columnsSpan; it++) {
         *it = y + item->boundingRect().height();
     }
 }

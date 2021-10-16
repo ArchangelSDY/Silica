@@ -5,7 +5,7 @@
 #include <QUrl>
 
 #include "image/sources/LocalImageSourceFactory.h"
-#include "image/sources/PdfImageSourceFactory.h"
+// #include "image/sources/PdfImageSourceFactory.h"
 #include "image/sources/RARImageSourceFactory.h"
 #include "image/sources/SevenzImageSourceFactory.h"
 #include "image/sources/ZipImageSourceFactory.h"
@@ -20,7 +20,7 @@ ImageSourceManager::ImageSourceManager(QObject *parent) :
     m_client(0)
 {
     registerFactory(new LocalImageSourceFactory(this));
-    registerFactory(new PdfImageSourceFactory(this));
+    // registerFactory(new PdfImageSourceFactory(this));
     registerFactory(new RARImageSourceFactory(this));
     registerFactory(new SevenzImageSourceFactory(this));
     registerFactory(new ZipImageSourceFactory(this));
@@ -144,7 +144,8 @@ bool ImageSourceManager::isValidNameSuffix(const QString &suffix) const
     for (QHash<QString, ImageSourceFactory *>::const_iterator it = m_factories.begin();
          it != m_factories.end(); ++it) {
         ImageSourceFactory *factory = it.value();
-        suffixes += QSet<QString>::fromList(factory->fileNameSuffixes());
+        auto fileNameSuffixes = factory->fileNameSuffixes();
+        suffixes += QSet<QString>(fileNameSuffixes.begin(), fileNameSuffixes.end());
     }
     return suffixes.contains(suffix.toLower());
 }

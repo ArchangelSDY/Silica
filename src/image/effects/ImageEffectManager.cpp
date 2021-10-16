@@ -8,7 +8,7 @@ ImageEffectManager::ImageEffectManager()
 {
     sapi::PluginLoadCallback<sapi::IImageEffectPlugin> callback = [this](sapi::IImageEffectPlugin *plugin, const QJsonObject &meta) {
         sapi::ImageEffectDelegate *effect = new sapi::ImageEffectDelegate(plugin);
-        this->m_effects << effect;
+        this->m_effects.append(effect);
     };
 
     sapi::loadPlugins("imageeffects", callback);

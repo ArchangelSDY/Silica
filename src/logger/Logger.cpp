@@ -24,7 +24,7 @@ Logger::Logger()
 
 void Logger::addListener(int type, LogListener *listener)
 {
-    m_listeners.insertMulti(type, listener);
+    m_listeners.insert(type, listener);
 }
 
 void Logger::removeListener(LogListener *listener)

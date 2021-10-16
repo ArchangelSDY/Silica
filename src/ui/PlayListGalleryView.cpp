@@ -61,7 +61,7 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
             plrCreatorMap->setMapping(act, provider->type());
         }
     }
-    connect(plrCreatorMap, qOverload<int>(&QSignalMapper::mapped),
+    connect(plrCreatorMap, &QSignalMapper::mappedInt,
         this, &PlayListGalleryView::createPlayListEntity);
 
     if (selectedItems.count() > 0) {
@@ -178,7 +178,7 @@ QString PlayListGalleryView::groupForItem(GalleryItem *rawItem)
 
 void PlayListGalleryView::sortItemByGroup(QList<GalleryItem *> *items)
 {
-    qSort(items->begin(), items->end(), m_groupLessThan);
+    std::sort(items->begin(), items->end(), m_groupLessThan);
 }
 
 void PlayListGalleryView::groupByNamePrefix()

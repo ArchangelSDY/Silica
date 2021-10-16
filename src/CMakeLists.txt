@@ -23,6 +23,7 @@ add_definitions(-DQTRAR_STATIC)
 add_definitions(-DQT7Z_STATIC)
 
 set(QTRAR_NO_TEST TRUE)
+set(QUAZIP_QT_MAJOR_VERSION 6)
 set(BUILD_SHARED_LIBS FALSE)
 add_subdirectory(deps/breakpad)
 add_subdirectory(deps/quazip)

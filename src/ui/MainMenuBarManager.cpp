@@ -1,5 +1,6 @@
 #include "MainMenuBarManager.h"
 
+#include <QActionGroup>
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QSignalMapper>
@@ -134,9 +135,9 @@ void MainMenuBarManager::createMenuNavigationAutoSpeed(QMenu *parentMenu)
     int currentNavInterval = m_primaryNavigator->autoNavigationInterval();
     QMenu *autoNavMenu = parentMenu->addMenu(tr("Auto Speed"));
     QActionGroup *autoNavGrp = new QActionGroup(autoNavMenu);
-    QSignalMapper *autoNavSigMap = new QSignalMapper(autoNavMenu);
-    connect(autoNavSigMap, SIGNAL(mapped(int)),
-            m_primaryNavigator, SLOT(setAutoNavigationInterval(int)));
+    QSignalMapper* autoNavSigMap = new QSignalMapper(autoNavMenu);
+    connect(autoNavSigMap, &QSignalMapper::mappedInt,
+            m_primaryNavigator, &Navigator::setAutoNavigationInterval);
 
     QAction *fastAutoNav = autoNavMenu->addAction(
         tr("Fast"), autoNavSigMap, SLOT(map()));

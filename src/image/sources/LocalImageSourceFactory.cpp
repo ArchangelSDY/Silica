@@ -60,7 +60,8 @@ QList<ImageSource *> LocalImageSourceFactory::createMultiple(const QString &path
     }
 
     if (file.isDir()) {
-        QSet<QString> validSuffixes = QSet<QString>::fromList(fileNameSuffixes());
+        auto suffixes = fileNameSuffixes();
+        QSet<QString> validSuffixes(suffixes.begin(), suffixes.end());
         QDirIterator dirIter(path, QDir::Files, QDirIterator::Subdirectories);
         while (dirIter.hasNext()) {
             QString path = dirIter.next();

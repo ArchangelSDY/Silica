@@ -36,8 +36,8 @@ file(GLOB TEST_COMMON_RESOURCES
     "*.qrc"
 )
 
-qt5_wrap_ui(TEST_COMMON_FORMS_HEADERS ${TEST_COMMON_FORMS})
-qt5_add_resources(TEST_COMMON_RESOURCES_RCC ${TEST_COMMON_RESOURCES})
+qt_wrap_ui(TEST_COMMON_FORMS_HEADERS ${TEST_COMMON_FORMS})
+qt_add_resources(TEST_COMMON_RESOURCES_RCC ${TEST_COMMON_RESOURCES})
 set(TEST_COMMON_SRCS ${TEST_COMMON_SRCS} ${TEST_COMMON_FORMS_HEADERS} ${TEST_COMMON_RESOURCES_RCC})
 
 
@@ -47,7 +47,7 @@ set(SILICA_TEST_COMMON_LINK_LIBRARIES
     silicaui
     qtmockwebserver
     gmock_main
-    Qt5::Test
+    Qt::Test
 )
 add_library(silicatestcommon ${TEST_COMMON_SRCS})
 target_link_libraries(silicatestcommon ${SILICA_TEST_COMMON_LINK_LIBRARIES})
@@ -92,6 +92,6 @@ foreach(TEST_FILE ${TEST_FILES})
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_TARGET} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     if(WIN32)
-        set_property(TEST ${TEST_NAME} PROPERTY ENVIRONMENT "PATH=%PATH%\;${QT_ROOT}bin")
+        set_property(TEST ${TEST_NAME} PROPERTY ENVIRONMENT "PATH=%PATH%\;$<TARGET_FILE_DIR:Qt6::Core>")
     endif(WIN32)
 endforeach(TEST_FILE)

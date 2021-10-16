@@ -4,7 +4,7 @@
 
 void PlayListImageSizeSorter::sort(ImageList::iterator begin, ImageList::iterator end)
 {
-    qSort(begin, end, [](const ImagePtr &left, const ImagePtr &right) -> bool {
+    std::sort(begin, end, [](const ImagePtr &left, const ImagePtr &right) -> bool {
         const QSize leftSize = left->size();
         const QSize rightSize = right->size();
 

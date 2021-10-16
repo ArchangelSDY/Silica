@@ -182,8 +182,8 @@ void GalleryItem::paint(QPainter *painter,
     painter->setRenderHints(
         QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter->setPen(Qt::NoPen);
-    painter->setBackground(scene()->palette().background());
-    painter->setBrush(scene()->palette().foreground());
+    painter->setBackground(scene()->palette().window());
+    painter->setBrush(scene()->palette().windowText());
 
     // Clear painter first
     painter->eraseRect(boundingRect());

@@ -19,7 +19,7 @@ NotificationWidget::NotificationWidget(QWidget *relativeWidget) :
     setAttribute(Qt::WA_ShowWithoutActivating);
 
     QPalette pal = palette();
-    pal.setColor(QPalette::Background, QColor("#58B6BF"));
+    pal.setColor(QPalette::Window, QColor("#58B6BF"));
     pal.setColor(QPalette::Text, QColor("#FFFFFF"));
     setPalette(pal);
 
@@ -68,19 +68,19 @@ void NotificationWidget::setTheme(Theme theme) {
 
     switch (theme) {
     case ThemeSuccess:
-        pal.setColor(QPalette::Background, QColor("#71C341"));
+        pal.setColor(QPalette::Window, QColor("#71C341"));
         break;
     case ThemeWarning:
-        pal.setColor(QPalette::Background, QColor("#F83"));
+        pal.setColor(QPalette::Window, QColor("#F83"));
         break;
     case ThemeInfo:
-        pal.setColor(QPalette::Background, QColor("#58B6BF"));
+        pal.setColor(QPalette::Window, QColor("#58B6BF"));
         break;
     case ThemeMessage:
-        pal.setColor(QPalette::Background, QColor("#05B2D2"));
+        pal.setColor(QPalette::Window, QColor("#05B2D2"));
         break;
     default:
-        pal.setColor(QPalette::Background, QColor("#58B6BF"));
+        pal.setColor(QPalette::Window, QColor("#58B6BF"));
         break;
     }
 
@@ -106,7 +106,7 @@ void NotificationWidget::paintEvent(QPaintEvent *)
 
     // Paint background
     painter.setPen(Qt::NoPen);
-    QColor bgColor = palette().color(QPalette::Background);
+    QColor bgColor = palette().color(QPalette::Window);
     bgColor.setAlpha(m_transparency);
     painter.setBrush(bgColor);
     painter.drawRoundedRect(rect(), 5, 5);

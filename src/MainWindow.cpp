@@ -1,10 +1,9 @@
 #include <QCompleter>
-#include <QDesktopWidget>
 #include <QDir>
-#include <QDirModel>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFileSystemModel>
 #include <QFutureWatcher>
 #include <QGraphicsPixmapItem>
 #include <QGridLayout>
@@ -101,8 +100,9 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->hide();
 
     // Move to screen center
-    const QRect screen = QApplication::desktop()->screenGeometry();
-    move(screen.center() - rect().center());
+    QScreen *primaryScreen = QApplication::primaryScreen();
+    QRect primaryScreenRect = primaryScreen->geometry();
+    move(primaryScreenRect.center() - rect().center());
 
     // Maximize on start
     showMaximized();
@@ -147,8 +147,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
 
-    // Gamepad
-    m_gamepadController.reset(new GamepadController(this));
+    // // Gamepad
+    // m_gamepadController.reset(new GamepadController(this));
 
     processCommandLineOptions();
 }
@@ -223,8 +223,8 @@ void MainWindow::setupExtraUi()
 
     m_toolBarActs = new QActionGroup(this);
     QSignalMapper *toolBarSigMapper = new QSignalMapper(this);
-    connect(toolBarSigMapper, SIGNAL(mapped(int)),
-            ui->stackedViews, SLOT(setCurrentIndex(int)));
+    connect(toolBarSigMapper, &QSignalMapper::mappedInt,
+            ui->stackedViews, &QStackedWidget::setCurrentIndex);
 
     // Fav icon
     QIcon toolBarFavIcon(":/res/toolbar/fav.png");
@@ -294,7 +294,7 @@ void MainWindow::setupExtraUi()
     loadInd->addTaskProgress(ui->fsView->loadProgress());
 
     // Stacked views
-    ui->pageFav->layout()->setMargin(0);
+    ui->pageFav->layout()->setContentsMargins(0, 0, 0, 0);
     connect(ui->playListGallery, SIGNAL(mouseDoubleClicked()),
             this, SLOT(loadSelectedPlayList()));
     connect(ui->playListGallery, SIGNAL(keyEnterPressed()),
@@ -304,7 +304,7 @@ void MainWindow::setupExtraUi()
     ui->pageFav->layout()->setSpacing(15);
 
     // Fils system tab toolbar
-    ui->pageFileSystemLayout->setMargin(0);
+    ui->pageFileSystemLayout->setContentsMargins(0, 0, 0, 0);
     ui->pageFileSystemLayout->setSpacing(0);
     ui->fsToolBar->layout()->setSpacing(15);
     ui->fsToolBar->layout()->setAlignment(Qt::AlignLeft);
@@ -321,7 +321,7 @@ void MainWindow::setupExtraUi()
     connect(ui->fsView, SIGNAL(rootPathChanged(QString)),
             ui->fsEditPath, SLOT(setText(QString)));
     QCompleter *fsEditPathComp = new QCompleter(ui->fsEditPath);
-    fsEditPathComp->setModel(new QDirModel(fsEditPathComp));
+    fsEditPathComp->setModel(new QFileSystemModel(fsEditPathComp));
     fsEditPathComp->setCaseSensitivity(Qt::CaseInsensitive);
     ui->fsEditPath->setCompleter(fsEditPathComp);
     QSettings setting;
@@ -329,7 +329,7 @@ void MainWindow::setupExtraUi()
                                        QDir::homePath()).toString();
     ui->fsView->setRootPath(fsRootPath);
 
-    ui->pageGallery->layout()->setMargin(0);
+    ui->pageGallery->layout()->setContentsMargins(0, 0, 0, 0);
     ui->pageGallery->layout()->setSpacing(0);
     ui->sideView->hide();
     connect(ui->gallery, SIGNAL(mouseDoubleClicked()),
@@ -339,12 +339,12 @@ void MainWindow::setupExtraUi()
     connect(m_mainGraphicsViewModel.data(), SIGNAL(mouseDoubleClicked()),
             m_actToolBarGallery, SLOT(trigger()));
 
-    ui->pageImageView->layout()->setMargin(0);
+    ui->pageImageView->layout()->setContentsMargins(0, 0, 0, 0);
 
     // Init Basket
     ui->basketPane->hide();
     ui->basketPane->layout()->setSpacing(0);
-    ui->basketPane->setMaximumHeight(qApp->desktop()->geometry().height() / 3);
+    ui->basketPane->setMaximumHeight(qApp->primaryScreen()->geometry().height() / 3);
     ui->basketView->setBasketModel(&m_basket);
     ui->gallery->setBasketModel(&m_basket);
     connect(ui->basketView, &BasketView::commit, this, &MainWindow::basketCommited);

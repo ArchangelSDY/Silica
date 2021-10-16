@@ -233,8 +233,7 @@ void MainGraphicsViewModel::contextMenuEvent(QContextMenuEvent *event)
     QMenu *shareMenu = menu->addMenu("Share");
     QStringList sharerNames = SharerManager::instance()->sharerNames();
     QSignalMapper *shareSigMap = new QSignalMapper(shareMenu);
-    connect(shareSigMap, static_cast<void (QSignalMapper::*)(int)>(&QSignalMapper::mapped),
-            [this](int index) {
+    connect(shareSigMap, &QSignalMapper::mappedInt, [this](int index) {
         SharerManager::instance()->share(index, this->m_navigator->currentImage());
     });
 

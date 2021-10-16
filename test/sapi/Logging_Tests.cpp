@@ -18,7 +18,7 @@ void TestLogging::debug()
     QBuffer buf;
     QVERIFY(buf.open(QIODevice::ReadWrite));
     sapi::PluginLoggingDelegate::instance()->setDevice(&buf);
-    sapi::debug() << text << flush;
+    sapi::debug() << text << Qt::flush;
     QCOMPARE(QString(buf.data()), QString("\"%1\" ").arg(text));
 }
 

@@ -1,8 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <QHash>
 #include <QList>
+#include <QMultiHash>
 
 #include "logger/LogBuilder.h"
 #include "logger/LogRecord.h"
@@ -33,7 +33,7 @@ private:
     void insert(const LogRecord &record);
 
     static Logger *m_instance;
-    QHash<int, LogListener *> m_listeners;
+    QMultiHash<int, LogListener *> m_listeners;
 };
 
 #endif // LOGGER_H

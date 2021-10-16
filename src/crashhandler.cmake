@@ -7,7 +7,7 @@ if (WIN32)
         "crashhandler/CrashHandlerDialog.cpp"
     )
 
-    qt5_wrap_ui(CRASHHANDER_UI_HEADERS
+    qt_wrap_ui(CRASHHANDER_UI_HEADERS
         "crashhandler/CrashHandlerDialog.ui"
     )
 
@@ -18,10 +18,10 @@ if (WIN32)
 
     target_link_libraries(crashhandler
         breakpad
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Network
-        Qt5::Widgets
+        Qt::Core
+        Qt::Gui
+        Qt::Network
+        Qt::Widgets
     )
 
     install(TARGETS crashhandler RUNTIME DESTINATION . COMPONENT applications)

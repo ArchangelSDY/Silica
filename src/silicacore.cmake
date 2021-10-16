@@ -40,8 +40,8 @@ file(GLOB CORE_SRCS
     "image/metadata/ImageMetadataConstants.cpp"
     "image/sources/LocalImageSource.cpp"
     "image/sources/LocalImageSourceFactory.cpp"
-    "image/sources/PdfImageSource.cpp"
-    "image/sources/PdfImageSourceFactory.cpp"
+    # "image/sources/PdfImageSource.cpp"
+    # "image/sources/PdfImageSourceFactory.cpp"
     "image/sources/RARImageSource.cpp"
     "image/sources/RARImageSourceFactory.cpp"
     "image/sources/SevenzImageSource.cpp"
@@ -113,7 +113,7 @@ else()
     )
 endif()
 
-qt5_wrap_ui(CORE_UI_HEADERS
+qt_wrap_ui(CORE_UI_HEADERS
     "navigation/FixedRegionConfDialog.ui"
 )
 
@@ -126,12 +126,12 @@ set(CORE_LINK_LIBS
     qtrar
     qtdbmigration
     QuaZip
-    Qt5::Concurrent
-    Qt5::Core
-    Qt5::Network
-    Qt5::Pdf
-    Qt5::Sql
-    Qt5::Widgets
+    Qt::Concurrent
+    Qt::Core
+    Qt::Network
+    # Qt::Pdf
+    Qt::Sql
+    Qt::Widgets
 )
 
 if(ENABLE_OPENGL)

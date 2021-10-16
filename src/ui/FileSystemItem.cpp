@@ -243,7 +243,7 @@ void FileSystemItem::coverThumbnailLoadFailed()
 
 void FileSystemItem::refresh()
 {
-    QFile::remove(computeThumbnailPath(path()));
+    QFile::remove(computeThumbnailPath(fileInfo()));
     g_coverCache.remove(coverCacheKey());
     load();
 }

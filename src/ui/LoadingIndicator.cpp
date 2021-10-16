@@ -77,8 +77,7 @@ void LoadingIndicator::paintEvent(QPaintEvent *)
     }
 
     QPainter painter(this);
-    painter.setRenderHints(
-        QPainter::Antialiasing | QPainter::HighQualityAntialiasing);
+    painter.setRenderHints(QPainter::Antialiasing);
 
     #ifdef ENABLE_OPENGL
         painter.fillRect(rect(), QColor("#3C414C"));

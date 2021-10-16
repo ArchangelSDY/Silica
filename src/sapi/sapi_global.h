@@ -2,6 +2,7 @@
 #define SAPI_GLOBAL_H
 
 #include <QtCore/QtGlobal>
+#include <QtPlugin>
 
 #if defined(SAPI_LIBRARY)
 #define SAPI_EXPORT Q_DECL_EXPORT

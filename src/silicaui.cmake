@@ -23,8 +23,8 @@ set(SILICA_UI_SRCS
     "ui/RemoteWallpapersManager.cpp"
     "ui/ViewState.cpp"
     "ui/ViewStateManager.cpp"
-    "ui/gamepad/GamepadAxisScroller.cpp"
-    "ui/gamepad/GamepadController.cpp"
+    # "ui/gamepad/GamepadAxisScroller.cpp"
+    # "ui/gamepad/GamepadController.cpp"
     "ui/playlist/FileSystemPlayListProviderView.cpp"
     "ui/playlist/PlayListProviderViewManager.cpp"
     "ui/renderers/AbstractGalleryItemRenderer.cpp"
@@ -60,17 +60,17 @@ set(SILICA_UIS
     "ui/NotificationWidget.ui"
     "ui/PluginLogsDialog.ui"
 )
-qt5_wrap_ui(SILICA_UI_HEADERS ${SILICA_UIS})
+qt_wrap_ui(SILICA_UI_HEADERS ${SILICA_UIS})
 
 set(SILICA_UI_SRCS ${SILICA_UI_SRCS} ${SILICA_UI_HEADERS} ${DEFINITION_SRCS})
 set(SILICA_UI_LIBS
     sapi
     silicacoreobjs
-    Qt5::Gamepad
+    # Qt::Gamepad
 )
 
 if (ENABLE_OPENGL)
-    set(SILICA_UI_LIBS ${SILICA_UI_LIBS} Qt5::OpenGL)
+    set(SILICA_UI_LIBS ${SILICA_UI_LIBS} Qt::OpenGL)
 endif()
 
 

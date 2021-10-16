@@ -1,5 +1,5 @@
 file(GLOB SILICA_RESOURCES "*.qrc")
-qt5_add_resources(SILICA_RESOURCES_RCC ${SILICA_RESOURCES})
+qt_add_resources(SILICA_RESOURCES_RCC ${SILICA_RESOURCES})
 
 set(SILICA_SRCS
     ${SILICA_RESOURCES_RCC}
@@ -61,14 +61,14 @@ elseif (WIN32)
 
     install(TARGETS silica RUNTIME DESTINATION . COMPONENT applications)
 
-    install(FILES "${QT_ROOT}/bin/Qt5Concurrent.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Core.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Gamepad.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Gui.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Network.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Pdf.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Sql.dll" DESTINATION . COMPONENT applications)
-    install(FILES "${QT_ROOT}/bin/Qt5Widgets.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Concurrent.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Core.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Gamepad.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Gui.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Network.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Pdf.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Sql.dll" DESTINATION . COMPONENT applications)
+    install(FILES "${QT_ROOT}/bin/Qt6Widgets.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/bin/libEGL.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/bin/libGLESv2.dll" DESTINATION . COMPONENT applications)
     install(FILES "${QT_ROOT}/plugins/gamepads/xinputgamepad.dll" DESTINATION "plugins/gamepads" COMPONENT applications)
@@ -85,7 +85,7 @@ elseif (WIN32)
     install(FILES "${QT_ROOT}/plugins/styles/qwindowsvistastyle.dll" DESTINATION "plugins/styles" COMPONENT applications)
 
     if (ENABLE_OPENGL)
-        install(FILES "${QT_ROOT}/bin/Qt5OpenGL.dll" DESTINATION . COMPONENT applications)
+        install(FILES "${QT_ROOT}/bin/Qt6OpenGL.dll" DESTINATION . COMPONENT applications)
     endif()
 
 else ()

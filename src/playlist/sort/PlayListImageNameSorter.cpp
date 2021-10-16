@@ -4,7 +4,7 @@
 
 void PlayListImageNameSorter::sort(ImageList::iterator begin, ImageList::iterator end)
 {
-    qSort(begin, end, [](const ImagePtr &left, const ImagePtr &right) -> bool {
+    std::sort(begin, end, [](const auto &left, const auto &right) -> bool {
         return ImageNameLessThan(left->name(), right->name());
     });
 }

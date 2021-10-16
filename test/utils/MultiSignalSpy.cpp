@@ -1,5 +1,5 @@
 #include <QSignalSpy>
-#include <QTime>
+#include <QElapsedTimer>
 
 #include "MultiSignalSpy.h"
 
@@ -11,7 +11,7 @@ MultiSignalSpy::MultiSignalSpy(const QObject *sender, const char *signal) :
 
 bool MultiSignalSpy::wait(int targetCount, int timeout)
 {
-    QTime time;
+    QElapsedTimer time;
     time.start();
 
     int curCount = 0;

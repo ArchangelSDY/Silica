@@ -51,7 +51,7 @@ void FixedRegionConfDialog::addCenter()
 {
     qreal center = ui->spnCenter->value() / 100.0;
     m_centers.append(center);
-    qSort(m_centers.begin(), m_centers.end());
+    std::sort(m_centers.begin(), m_centers.end());
     resetModel();
 }
 
