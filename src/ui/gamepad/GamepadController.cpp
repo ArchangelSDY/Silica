@@ -4,6 +4,10 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#ifdef Q_OS_WIN
+#include "ui/gamepad/XInputGamepadBackend.h"
+#endif
+
 GamepadController::GamepadController(MainWindow *mainWindow) :
     m_mainWindow(mainWindow) ,
     m_gamepadLastL2(QTime::currentTime()) ,
@@ -11,25 +15,97 @@ GamepadController::GamepadController(MainWindow *mainWindow) :
     m_axisLeftScroller(new GamepadAxisScroller()) ,
     m_axisRightScroller(new GamepadAxisScroller())
 {
-    connect(&m_gamepad, &QGamepad::buttonR1Changed, this, &GamepadController::buttonR1Changed);
-    connect(&m_gamepad, &QGamepad::buttonL2Changed, this, &GamepadController::buttonL2Changed);
-    connect(&m_gamepad, &QGamepad::buttonR2Changed, this, &GamepadController::buttonR2Changed);
-    connect(&m_gamepad, &QGamepad::buttonXChanged, this, &GamepadController::buttonXChanged);
-    connect(&m_gamepad, &QGamepad::buttonYChanged, this, &GamepadController::buttonYChanged);
-    connect(&m_gamepad, &QGamepad::buttonAChanged, this, &GamepadController::buttonAChanged);
-    connect(&m_gamepad, &QGamepad::buttonBChanged, this, &GamepadController::buttonBChanged);
-    connect(&m_gamepad, &QGamepad::buttonLeftChanged, this, &GamepadController::buttonLeftChanged);
-    connect(&m_gamepad, &QGamepad::buttonRightChanged, this, &GamepadController::buttonRightChanged);
-    connect(&m_gamepad, &QGamepad::buttonUpChanged, this, &GamepadController::buttonUpChanged);
-    connect(&m_gamepad, &QGamepad::buttonDownChanged, this, &GamepadController::buttonDownChanged);
-    connect(&m_gamepad, &QGamepad::buttonSelectChanged, this, &GamepadController::buttonSelectChanged);
+#ifdef Q_OS_WIN
+    m_backend.reset(new XInputGamepadBackend());
+#endif
 
-    connect(&m_gamepad, &QGamepad::axisLeftXChanged, m_axisLeftScroller.data(), &GamepadAxisScroller::setAxisXValue);
-    connect(&m_gamepad, &QGamepad::axisLeftYChanged, m_axisLeftScroller.data(), &GamepadAxisScroller::setAxisYValue);
-    connect(m_axisLeftScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisLeftScroll);
-    connect(&m_gamepad, &QGamepad::axisRightXChanged, m_axisRightScroller.data(), &GamepadAxisScroller::setAxisXValue);
-    connect(&m_gamepad, &QGamepad::axisRightYChanged, m_axisRightScroller.data(), &GamepadAxisScroller::setAxisYValue);
-    connect(m_axisRightScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisRightScroll);
+    if (m_backend) {
+        connect(m_backend.data(), &GamepadBackend::buttonPressed, [this](int index, GamepadBackend::Button button, double val) {
+            this->buttonChanged(button, true);
+        });
+        connect(m_backend.data(), &GamepadBackend::buttonReleased, [this](int index, GamepadBackend::Button button) {
+            this->buttonChanged(button, false);
+        });
+        connect(m_backend.data(), &GamepadBackend::axisMoved, [this](int index, GamepadBackend::Axis axis, double val) {
+            this->axisMoved(axis, false);
+        });
+        connect(m_axisLeftScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisLeftScroll);
+        connect(m_axisRightScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisRightScroll);
+    }
+}
+
+void GamepadController::buttonChanged(GamepadBackend::Button button, bool pressed)
+{
+    switch (button) {
+    case GamepadBackend::Button::R1:
+        buttonR1Changed(pressed);
+        break;
+
+    case GamepadBackend::Button::L2:
+        buttonL2Changed(pressed);
+        break;
+
+    case GamepadBackend::Button::R2:
+        buttonR2Changed(pressed);
+        break;
+
+    case GamepadBackend::Button::X:
+        buttonXChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Y:
+        buttonXChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::A:
+        buttonXChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::B:
+        buttonXChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Left:
+        buttonLeftChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Right:
+        buttonRightChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Up:
+        buttonUpChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Down:
+        buttonDownChanged(pressed);
+        break;
+
+    case GamepadBackend::Button::Select:
+        buttonSelectChanged(pressed);
+        break;
+    }
+}
+
+void GamepadController::axisMoved(GamepadBackend::Axis axis, double val)
+{
+    switch (axis) {
+    case GamepadBackend::Axis::LeftX:
+        m_axisLeftScroller->setAxisXValue(val);
+        break;
+
+    case GamepadBackend::Axis::LeftY:
+        m_axisLeftScroller->setAxisYValue(val);
+        break;
+
+    case GamepadBackend::Axis::RightX:
+        m_axisRightScroller->setAxisXValue(val);
+        break;
+
+    case GamepadBackend::Axis::RightY:
+        m_axisRightScroller->setAxisYValue(val);
+        break;
+    }
 }
 
 void GamepadController::buttonR1Changed(bool pressed)

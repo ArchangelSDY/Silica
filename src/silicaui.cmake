@@ -23,8 +23,9 @@ set(SILICA_UI_SRCS
     "ui/RemoteWallpapersManager.cpp"
     "ui/ViewState.cpp"
     "ui/ViewStateManager.cpp"
-    # "ui/gamepad/GamepadAxisScroller.cpp"
-    # "ui/gamepad/GamepadController.cpp"
+    "ui/gamepad/GamepadAxisScroller.cpp"
+    "ui/gamepad/GamepadBackend.cpp"
+    "ui/gamepad/GamepadController.cpp"
     "ui/playlist/FileSystemPlayListProviderView.cpp"
     "ui/playlist/PlayListProviderViewManager.cpp"
     "ui/renderers/AbstractGalleryItemRenderer.cpp"
@@ -47,6 +48,12 @@ set(SILICA_UI_SRCS
     "MainWindow.cpp"
 )
 
+if (WIN32)
+    set(SILICA_UI_SRCS ${SILICA_UI_SRCS}
+        "ui/gamepad/XInputGamepadBackend.cpp"
+    )
+endif()
+
 if (WIN32 AND NOT ENABLE_OPENGL)
     set(SILICA_UI_SRCS ${SILICA_UI_SRCS}
         "ui/platform/win/D2DMainGraphicsWidget.cpp"
@@ -66,7 +73,6 @@ set(SILICA_UI_SRCS ${SILICA_UI_SRCS} ${SILICA_UI_HEADERS} ${DEFINITION_SRCS})
 set(SILICA_UI_LIBS
     sapi
     silicacoreobjs
-    # Qt::Gamepad
 )
 
 if (ENABLE_OPENGL)

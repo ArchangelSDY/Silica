@@ -12,7 +12,7 @@
 #include "navigation/NavigatorSynchronizer.h"
 #include "playlist/PlayListEntityLoadContext.h"
 #include "playlist/PlayListEntityTriggerResult.h"
-// #include "ui/gamepad/GamepadController.h"
+#include "ui/gamepad/GamepadController.h"
 #include "ui/playlist/PlayListProviderViewManager.h"
 #include "ui/BasketView.h"
 #include "Navigator.h"
@@ -26,7 +26,7 @@ class QListWidgetItem;
 class ImageEffectManager;
 class ImagesCache;
 class ImagePathCorrector;
-// class GamepadController;
+class GamepadController;
 class MainGraphicsViewModel;
 class PlayListEntity;
 class PlayListProvider;
@@ -34,7 +34,7 @@ class PlayListProvider;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    // friend class GamepadController;
+    friend class GamepadController;
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -136,7 +136,7 @@ private:
     };
     KeyState m_keyState;
 
-    // QScopedPointer<GamepadController> m_gamepadController;
+    QScopedPointer<GamepadController> m_gamepadController;
 };
 
 #endif // MAINWINDOW_H
