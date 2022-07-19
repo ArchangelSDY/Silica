@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0042 NEW)   # Set MACOSX_RPATH default to ON
 cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
+include(ExternalProject)
 
 project (silica VERSION 3.1.0)
 
@@ -23,15 +24,16 @@ if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${Qt6Core_DIR}/../../../)
 endif()
 
-if (UNIX)
+if (WIN32)
+    ExternalProject_add(ext_zlib
+                        GIT_REPOSITORY "https://github.com/madler/zlib/"
+                        GIT_TAG "v1.2.12"
+                        CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/src/deps/zlib")
+    set(ZLIB_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/src/deps/zlib/include")
+    set(ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/src/deps/zlib/lib")
+else (WIN32)
     find_package(ZLIB REQUIRED)
-else (UNIX)
-    set(ZLIB_INCLUDE_DIRS "${QT_ROOT}/include/QtZlib" CACHE STRING "Path to ZLIB headers of Qt")
-    set(ZLIB_LIBRARIES "")
-    if(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
-        message(FATAL_ERROR "Please specify a valid zlib include dir")
-    endif(NOT EXISTS "${ZLIB_INCLUDE_DIRS}/zlib.h")
-endif (UNIX)
+endif (WIN32)
 
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${Qt6Concurrent_INCLUDE_DIRS})
