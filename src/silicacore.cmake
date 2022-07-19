@@ -40,8 +40,8 @@ file(GLOB CORE_SRCS
     "image/metadata/ImageMetadataConstants.cpp"
     "image/sources/LocalImageSource.cpp"
     "image/sources/LocalImageSourceFactory.cpp"
-    # "image/sources/PdfImageSource.cpp"
-    # "image/sources/PdfImageSourceFactory.cpp"
+    "image/sources/PdfImageSource.cpp"
+    "image/sources/PdfImageSourceFactory.cpp"
     "image/sources/RARImageSource.cpp"
     "image/sources/RARImageSourceFactory.cpp"
     "image/sources/SevenzImageSource.cpp"
@@ -129,7 +129,7 @@ set(CORE_LINK_LIBS
     Qt::Concurrent
     Qt::Core
     Qt::Network
-    # Qt::Pdf
+    Qt::Pdf
     Qt::Sql
     Qt::Widgets
 )
