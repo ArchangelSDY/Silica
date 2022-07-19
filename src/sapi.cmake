@@ -21,7 +21,7 @@ add_library(sapi SHARED ${SAPI_SRCS})
 target_compile_definitions(sapi PRIVATE -DSAPI_LIBRARY)
 
 target_link_libraries(sapi
-    ${ZLIB_LIBRARIES}
+    ZLIB::ZLIB
     Qt::Core
 )
 

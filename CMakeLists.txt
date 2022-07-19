@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0042 NEW)   # Set MACOSX_RPATH default to ON
 cmake_policy(SET CMP0048 NEW)   # Set PROJECT_VERSION properly
-include(ExternalProject)
 
 project (silica VERSION 3.1.0)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+find_package(ZLIB REQUIRED)
 find_package(Threads)
 find_package(Qt6Concurrent REQUIRED)
 find_package(Qt6Core REQUIRED)
@@ -22,17 +22,6 @@ set(QTCORE_LIBRARIES ${Qt6Core_LIBRARIES})
 if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${Qt6Core_DIR}/../../../)
 endif()
-
-if (WIN32)
-    ExternalProject_add(ext_zlib
-                        GIT_REPOSITORY "https://github.com/madler/zlib/"
-                        GIT_TAG "v1.2.12"
-                        CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/src/deps/zlib")
-    set(ZLIB_INCLUDE_DIRS "${CMAKE_BINARY_DIR}/src/deps/zlib/include")
-    set(ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/src/deps/zlib/lib")
-else (WIN32)
-    find_package(ZLIB REQUIRED)
-endif (WIN32)
 
 include_directories(${ZLIB_INCLUDE_DIRS})
 include_directories(${Qt6Concurrent_INCLUDE_DIRS})

@@ -120,7 +120,6 @@ qt_wrap_ui(CORE_UI_HEADERS
 set(CORE_LINK_LIBS
     sapi
     ${CMAKE_THREAD_LIBS_INIT}
-    ${ZLIB_LIBRARIES}
     ${OpenCV_LIBS}
     qt7z
     qtrar
@@ -142,7 +141,6 @@ add_library(silicacoreobjs STATIC
     ${CORE_SRCS}
     ${CORE_UI_HEADERS}
 )
-add_dependencies(silicacoreobjs ext_zlib)
 target_link_libraries(silicacoreobjs ${CORE_LINK_LIBS})
 
 add_library(silicacore STATIC
