@@ -58,9 +58,7 @@ else()
 	message(FATAL_ERROR "Qt version ${QUAZIP_QT_MAJOR_VERSION} is not supported")
 endif()
 
-if (NOT WIN32)
-	find_package(ZLIB REQUIRED)
-endif()
+find_package(ZLIB REQUIRED)
 
 add_subdirectory(quazip)
 
