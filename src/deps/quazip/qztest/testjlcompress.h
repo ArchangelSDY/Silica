@@ -25,10 +25,11 @@ Original ZIP package is copyrighted by Gilles Vollant and contributors,
 see quazip/(un)zip.h files for details. Basically it's the zlib license.
 */
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #ifdef Q_OS_UNIX
 #define QUAZIP_SYMLINK_TEST
+#define QUAZIP_EXTRACT_TO_ROOT_TEST
 #endif
 
 #ifdef Q_OS_WIN

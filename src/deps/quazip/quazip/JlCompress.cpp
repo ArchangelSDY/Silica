@@ -25,7 +25,7 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 
 #include "JlCompress.h"
 
-static bool copyData(QIODevice &inFile, QIODevice &outFile)
+bool JlCompress::copyData(QIODevice &inFile, QIODevice &outFile)
 {
     while (!inFile.atEnd()) {
         char buf[4096];
@@ -384,6 +384,8 @@ QStringList JlCompress::extractDir(QuaZip &zip, const QString &dir)
     QString cleanDir = QDir::cleanPath(dir);
     QDir directory(cleanDir);
     QString absCleanDir = directory.absolutePath();
+    if (!absCleanDir.endsWith('/')) // It only ends with / if it's the FS root.
+        absCleanDir += '/';
     QStringList extracted;
     if (!zip.goToFirstFile()) {
         return QStringList();
@@ -392,7 +394,7 @@ QStringList JlCompress::extractDir(QuaZip &zip, const QString &dir)
         QString name = zip.getCurrentFileName();
         QString absFilePath = directory.absoluteFilePath(name);
         QString absCleanPath = QDir::cleanPath(absFilePath);
-        if (!absCleanPath.startsWith(absCleanDir + QLatin1String("/")))
+        if (!absCleanPath.startsWith(absCleanDir))
             continue;
         if (!extractFile(&zip, QLatin1String(""), absFilePath)) {
             removeFile(extracted);
