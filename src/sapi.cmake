@@ -23,6 +23,7 @@ target_compile_definitions(sapi PRIVATE -DSAPI_LIBRARY)
 target_link_libraries(sapi
     ZLIB::ZLIB
     Qt::Core
+    Qt::Gui
 )
 
 set_target_properties(sapi PROPERTIES

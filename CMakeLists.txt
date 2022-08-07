@@ -23,16 +23,6 @@ if ("${QT_ROOT}" STREQUAL "")
     set(QT_ROOT ${Qt6Core_DIR}/../../../)
 endif()
 
-include_directories(${ZLIB_INCLUDE_DIRS})
-include_directories(${Qt6Concurrent_INCLUDE_DIRS})
-include_directories(${Qt6Core_INCLUDE_DIRS})
-include_directories(${Qt6Network_INCLUDE_DIRS})
-include_directories(${Qt6Pdf_INCLUDE_DIRS})
-include_directories(${Qt6Sql_INCLUDE_DIRS})
-include_directories(${Qt6Test_INCLUDE_DIRS})
-include_directories(${Qt6Widgets_INCLUDE_DIRS})
-include_directories(${OpenCV_INCLUDE_DIRS})
-
 # All build libraries are moved to this directory
 # SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 #
@@ -44,7 +34,6 @@ option(ENABLE_OPENGL "Enable OpenGL" OFF)
 if(ENABLE_OPENGL)
 	add_definitions(-DENABLE_OPENGL)
 	find_package(Qt6OpenGL REQUIRED)
-	include_directories(${Qt6OpenGL_INCLUDE_DIRS})
 endif(ENABLE_OPENGL)
 
 # DirectX support
