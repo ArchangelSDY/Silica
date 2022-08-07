@@ -55,7 +55,7 @@ void Navigator::preload()
         if (!m_cachedImages->contains(index)) {
             connect(image.data(), &Image::loaded, this, [index, cachedImages = m_cachedImages](QSharedPointer<ImageData> imageData) {
                 cachedImages->insert(index, imageData);
-            }, Qt::UniqueConnection);
+            });
 
             image->load(Image::LoadPriority::NormalPriority);
         }
