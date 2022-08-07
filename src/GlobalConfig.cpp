@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
+#include <QImageReader>
 #include <QPair>
 #include <QSettings>
 #include <QSharedPointer>
@@ -143,6 +144,9 @@ void GlobalConfig::load()
 
     // For high dpi icons
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+
+    // Set image allocation limit to 4GB
+    QImageReader::setAllocationLimit(4 * 1024);
 }
 
 QString GlobalConfig::crashHandlerPipe() const
