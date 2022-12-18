@@ -1,5 +1,4 @@
 #ifdef ENABLE_OPENGL
-#include <QGL>
 #include <QOpenGLWidget>
 #endif
 

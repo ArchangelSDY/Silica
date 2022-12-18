@@ -76,7 +76,7 @@ set(SILICA_UI_LIBS
 )
 
 if (ENABLE_OPENGL)
-    set(SILICA_UI_LIBS ${SILICA_UI_LIBS} Qt::OpenGL)
+    set(SILICA_UI_LIBS ${SILICA_UI_LIBS} Qt::OpenGL Qt::OpenGLWidgets)
 endif()
 
 

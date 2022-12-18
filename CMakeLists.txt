@@ -34,6 +34,7 @@ option(ENABLE_OPENGL "Enable OpenGL" OFF)
 if(ENABLE_OPENGL)
 	add_definitions(-DENABLE_OPENGL)
 	find_package(Qt6OpenGL REQUIRED)
+	find_package(Qt6OpenGLWidgets REQUIRED)
 endif(ENABLE_OPENGL)
 
 # DirectX support

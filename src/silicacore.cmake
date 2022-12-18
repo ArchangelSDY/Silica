@@ -134,7 +134,7 @@ set(CORE_LINK_LIBS
 )
 
 if(ENABLE_OPENGL)
-    set(CORE_LINK_LIBS ${CORE_LINK_LIBS} Qt5::OpenGL)
+    set(CORE_LINK_LIBS ${CORE_LINK_LIBS} Qt::OpenGL)
 endif(ENABLE_OPENGL)
 
 add_library(silicacoreobjs STATIC
