@@ -18,6 +18,9 @@ MainGraphicsView::MainGraphicsView(QWidget *parent) :
     m_imageItem->setTransformationMode(Qt::SmoothTransformation);
 
     setMouseTracking(true);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     setScene(m_scene);
 }
@@ -100,28 +103,31 @@ void MainGraphicsView::resizeEvent(QResizeEvent *ev)
 void MainGraphicsView::keyPressEvent(QKeyEvent *ev)
 {
     m_model->keyPressEvent(ev);
-
-    if (!ev->isAccepted()) {
-        QGraphicsView::keyPressEvent(ev);
+    if (ev->isAccepted()) {
+        return;
     }
+
+    QGraphicsView::keyPressEvent(ev);
 }
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *ev)
 {
     m_model->mouseMoveEvent(ev);
-
-    if (!ev->isAccepted()) {
-        QGraphicsView::mouseMoveEvent(ev);
+    if (ev->isAccepted()) {
+        return;
     }
+
+    QGraphicsView::mouseMoveEvent(ev);
 }
 
 void MainGraphicsView::mousePressEvent(QMouseEvent *ev)
 {
     m_model->mousePressEvent(ev);
-
-    if (!ev->isAccepted()) {
-        QGraphicsView::mousePressEvent(ev);
+    if (ev->isAccepted()) {
+        return;
     }
+
+    QGraphicsView::mousePressEvent(ev);
 }
 
 void MainGraphicsView::mouseDoubleClickEvent(QMouseEvent *ev)
