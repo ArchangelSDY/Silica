@@ -191,6 +191,7 @@ void MainWindow::setupExtraUi()
     m_imagesCache->setStrategy(new LoopImagesCacheStrategy(m_imagesCache.data(), m_navigator));
 
     // Main menu bar
+    menuBar()->setVisible(false);
     MainMenuBarManager::Context menuBarCtx;
     menuBarCtx.menuBar = menuBar();
     menuBarCtx.primaryNavigator = m_navigator;
@@ -1179,6 +1180,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
         }
 
         ev->accept();
+    } else if (ev->modifiers() == Qt::AltModifier) {
+        menuBar()->setVisible(!menuBar()->isVisible());
     }
 }
 
