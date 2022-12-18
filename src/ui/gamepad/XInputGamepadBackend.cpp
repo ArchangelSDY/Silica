@@ -243,8 +243,9 @@ void XInputThread::run()
     }
 }
 
-XInputGamepadBackend::XInputGamepadBackend()
-    : m_thread(0)
+XInputGamepadBackend::XInputGamepadBackend(QObject *parent)
+    : GamepadBackend(parent)
+    , m_thread(0)
 {
 }
 

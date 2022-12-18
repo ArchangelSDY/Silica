@@ -16,21 +16,22 @@ GamepadController::GamepadController(MainWindow *mainWindow) :
     m_axisRightScroller(new GamepadAxisScroller())
 {
 #ifdef Q_OS_WIN
-    m_backend.reset(new XInputGamepadBackend());
+    m_backend.reset(new XInputGamepadBackend(this));
 #endif
 
     if (m_backend) {
-        connect(m_backend.data(), &GamepadBackend::buttonPressed, [this](int index, GamepadBackend::Button button, double val) {
+        connect(m_backend.data(), &GamepadBackend::buttonPressed, this, [this](int index, GamepadBackend::Button button, double val) {
             this->buttonChanged(button, true);
         });
-        connect(m_backend.data(), &GamepadBackend::buttonReleased, [this](int index, GamepadBackend::Button button) {
+        connect(m_backend.data(), &GamepadBackend::buttonReleased, this, [this](int index, GamepadBackend::Button button) {
             this->buttonChanged(button, false);
         });
-        connect(m_backend.data(), &GamepadBackend::axisMoved, [this](int index, GamepadBackend::Axis axis, double val) {
-            this->axisMoved(axis, false);
+        connect(m_backend.data(), &GamepadBackend::axisMoved, this, [this](int index, GamepadBackend::Axis axis, double val) {
+            this->axisMoved(axis, val);
         });
         connect(m_axisLeftScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisLeftScroll);
         connect(m_axisRightScroller.data(), &GamepadAxisScroller::scroll, this, &GamepadController::axisRightScroll);
+        m_backend->start();
     }
 }
 
@@ -54,15 +55,15 @@ void GamepadController::buttonChanged(GamepadBackend::Button button, bool presse
         break;
 
     case GamepadBackend::Button::Y:
-        buttonXChanged(pressed);
+        buttonYChanged(pressed);
         break;
 
     case GamepadBackend::Button::A:
-        buttonXChanged(pressed);
+        buttonAChanged(pressed);
         break;
 
     case GamepadBackend::Button::B:
-        buttonXChanged(pressed);
+        buttonBChanged(pressed);
         break;
 
     case GamepadBackend::Button::Left:

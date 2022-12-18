@@ -6,6 +6,7 @@ class GamepadBackend : public QObject
 {
     Q_OBJECT
 public:
+    GamepadBackend(QObject* parent = nullptr);
     virtual ~GamepadBackend();
 
     virtual bool start() = 0;

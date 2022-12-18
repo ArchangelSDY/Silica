@@ -47,7 +47,7 @@ class XInputGamepadBackend : public GamepadBackend
 {
     Q_OBJECT
 public:
-    XInputGamepadBackend();
+    XInputGamepadBackend(QObject *parent = nullptr);
     bool start() override;
     void stop() override;
 

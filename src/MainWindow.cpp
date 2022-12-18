@@ -147,8 +147,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->gallery->scene(), SIGNAL(selectionChanged()),
             this, SLOT(gallerySelectionChanged()));
 
-    // // Gamepad
-    // m_gamepadController.reset(new GamepadController(this));
+    // Gamepad
+    m_gamepadController.reset(new GamepadController(this));
 
     processCommandLineOptions();
 }

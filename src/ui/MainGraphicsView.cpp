@@ -2,6 +2,7 @@
 
 #include <QGraphicsItem>
 #include <QPixmap>
+#include <QScrollBar>
 
 #include "ui/models/MainGraphicsViewModel.h"
 
@@ -53,7 +54,8 @@ void MainGraphicsView::setFitInView(const QRectF &rect, Qt::AspectRatioMode aspe
 
 void MainGraphicsView::scroll(int dx, int dy)
 {
-    QGraphicsView::scroll(dx, dy);
+    horizontalScrollBar()->setValue(horizontalScrollBar()->value() - dx);
+    verticalScrollBar()->setValue(verticalScrollBar()->value() - dy);
 }
 
 bool MainGraphicsView::isVisible() const
