@@ -19,15 +19,18 @@ steps:
       (new-object net.webclient).DownloadFile(${env:Qt_URL}, 'C:/BuildTools/Download/Qt.7z')
       7z x C:\BuildTools\Download\Qt.7z -oC:\BuildTools\Qt
 
+      (new-object net.webclient).DownloadFile(${env:Zlib_URL}, 'C:/BuildTools/Download/Zlib.7z')
+      7z x C:\BuildTools\Download\Zlib.7z -oC:\BuildTools\Zlib
+
 - task: CmdLine@2
   displayName: Build
   inputs:
     script: |
       git submodule update --init --recursive
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+      call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
       mkdir build
       cd build
-      cmake -G "Visual Studio 16 2019" -DOpenCV_DIR=C:\BuildTools\OpenCV -DOpenCV_STATIC=true -DBUILD_PRODUCTION=ON .. || exit /b
+      cmake -G "Visual Studio 17 2022" -DOpenCV_DIR=C:\BuildTools\OpenCV -DZLIB_ROOT=C:\BuildTools\Zlib -DOpenCV_STATIC=false -DENABLE_OPENGL=ON -DBUILD_PRODUCTION=ON .. || exit /b
       cmake --build . --config %CONFIGURATION% || exit /b
       cpack -C %CONFIGURATION% --config ./CPackConfig.cmake || exit /b
       cd ..
