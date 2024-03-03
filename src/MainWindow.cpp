@@ -36,7 +36,6 @@
 #include "ui/models/MainGraphicsViewModel.h"
 #include "ui/playList/FileSystemPlayListProviderView.h"
 #include "ui/playList/PlayListProviderViewManager.h"
-#include "ui/FileSystemItem.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImagePathCorrectorClientImpl.h"
 #include "ui/ImageSourceManagerClientImpl.h"
@@ -243,17 +242,6 @@ void MainWindow::setupExtraUi()
     m_toolBarActs->addAction(m_actToolBarFav);
     toolBarSigMapper->setMapping(m_actToolBarFav, 0);
 
-    // File system icon
-    QIcon toolbarFSIcon(":/res/toolbar/fs.png");
-    toolbarFSIcon.addFile(":/res/toolbar/fs-active.png",
-                          QSize(), QIcon::Active, QIcon::On);
-    m_actToolBarFS = m_toolBar->addAction(
-        toolbarFSIcon, tr("File System"), toolBarSigMapper, SLOT(map()));
-    m_actToolBarFS->setCheckable(true);
-    m_actToolBarFS->setShortcut(Qt::CTRL + Qt::Key_2);
-    m_toolBarActs->addAction(m_actToolBarFS);
-    toolBarSigMapper->setMapping(m_actToolBarFS, 1);
-
     // Gallery icon
     QIcon toolBarGalleryIcon(":/res/toolbar/gallery.png");
     toolBarGalleryIcon.addFile(":/res/toolbar/gallery-active.png",
@@ -261,9 +249,9 @@ void MainWindow::setupExtraUi()
     m_actToolBarGallery = m_toolBar->addAction(
         toolBarGalleryIcon, tr("Gallery"), toolBarSigMapper, SLOT(map()));
     m_actToolBarGallery->setCheckable(true);
-    m_actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_3);
+    m_actToolBarGallery->setShortcut(Qt::CTRL + Qt::Key_2);
     m_toolBarActs->addAction(m_actToolBarGallery);
-    toolBarSigMapper->setMapping(m_actToolBarGallery, 2);
+    toolBarSigMapper->setMapping(m_actToolBarGallery, 1);
 
     // Image icon
     QIcon toolBarImageIcon(":/res/toolbar/image-view.png");
@@ -271,10 +259,10 @@ void MainWindow::setupExtraUi()
                              QSize(), QIcon::Active, QIcon::On);
     m_actToolBarImage = m_toolBar->addAction(
         toolBarImageIcon, tr("Image"), toolBarSigMapper, SLOT(map()));
-    m_actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_4);
+    m_actToolBarImage->setShortcut(Qt::CTRL + Qt::Key_3);
     m_actToolBarImage->setCheckable(true);
     m_toolBarActs->addAction(m_actToolBarImage);
-    toolBarSigMapper->setMapping(m_actToolBarImage, 3);
+    toolBarSigMapper->setMapping(m_actToolBarImage, 2);
 
     // Fav view is the default
     m_actToolBarFav->setChecked(true);
@@ -297,7 +285,6 @@ void MainWindow::setupExtraUi()
     m_toolBar->addWidget(loadIndWrapper);
     loadInd->addTaskProgress(ui->gallery->loadProgress());
     loadInd->addTaskProgress(ui->gallery->groupingProgress());
-    loadInd->addTaskProgress(ui->fsView->loadProgress());
 
     // Stacked views
     ui->pageFav->layout()->setContentsMargins(0, 0, 0, 0);
@@ -308,32 +295,6 @@ void MainWindow::setupExtraUi()
 
     // Fav view
     ui->pageFav->layout()->setSpacing(15);
-
-    // Fils system tab toolbar
-    ui->pageFileSystemLayout->setContentsMargins(0, 0, 0, 0);
-    ui->pageFileSystemLayout->setSpacing(0);
-    ui->fsToolBar->layout()->setSpacing(15);
-    ui->fsToolBar->layout()->setAlignment(Qt::AlignLeft);
-    connect(ui->fsBtnCdUp, SIGNAL(clicked()),
-            ui->fsView, SLOT(cdUp()));
-    connect(ui->fsEditPath, SIGNAL(editingFinished()),
-            this, SLOT(fsRootPathChanged()));
-
-    // File system view
-    connect(ui->fsView, SIGNAL(mouseDoubleClicked()),
-            this, SLOT(loadOrEnterSelectedPath()));
-    connect(ui->fsView, SIGNAL(keyEnterPressed()),
-            this, SLOT(loadSelectedPath()));
-    connect(ui->fsView, SIGNAL(rootPathChanged(QString)),
-            ui->fsEditPath, SLOT(setText(QString)));
-    QCompleter *fsEditPathComp = new QCompleter(ui->fsEditPath);
-    fsEditPathComp->setModel(new QFileSystemModel(fsEditPathComp));
-    fsEditPathComp->setCaseSensitivity(Qt::CaseInsensitive);
-    ui->fsEditPath->setCompleter(fsEditPathComp);
-    QSettings setting;
-    QString fsRootPath = setting.value("LAST_FILE_SYSTEM_PATH",
-                                       QDir::homePath()).toString();
-    ui->fsView->setRootPath(fsRootPath);
 
     ui->pageGallery->layout()->setContentsMargins(0, 0, 0, 0);
     ui->pageGallery->layout()->setSpacing(0);
@@ -386,6 +347,8 @@ void MainWindow::setupExtraUi()
     }
     providerButtonGroup->actions().first()->trigger();
 
+    QSettings setting;
+    QString fsRootPath = setting.value("LAST_FILE_SYSTEM_PATH", QDir::homePath()).toString();
     auto fsPlayListProvider = static_cast<FileSystemPlayListProvider *>(PlayListProviderManager::instance()->get(FileSystemPlayListProvider::TYPE));
     fsPlayListProvider->setRootPath(fsRootPath);
 
@@ -585,88 +548,6 @@ void MainWindow::loadSelectedPlayList()
         m_playListEntityTriggerWatcher.setFuture(QtConcurrent::mapped(entities, [provider](auto entity) {
             auto result = provider->triggerEntity(entity.data());
             return QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> >{ result, entity };
-        }));
-    }
-}
-
-void MainWindow::loadOrEnterSelectedPath()
-{
-    QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
-    if (selectedItems.count() > 0) {
-        FileSystemItem *firstItem =
-            static_cast<FileSystemItem *>(selectedItems[0]);
-        if (firstItem->fileInfo().isDir()) {
-            // If first selected item is a directory, navigate into it
-            ui->fsView->setRootPath(firstItem->path());
-        } else {
-            // Load all selected items
-            loadSelectedPath();
-        }
-    }
-}
-
-void MainWindow::loadSelectedPath()
-{
-    QList<GalleryItem *> selectedItems = ui->fsView->selectedGalleryItems();
-
-    if (selectedItems.count() > 0) {
-        QSharedPointer<PlayList> pl = QSharedPointer<PlayList>::create();
-
-        foreach (GalleryItem *item, selectedItems) {
-            FileSystemItem *fsItem = static_cast<FileSystemItem *>(item);
-            pl->addMultiplePath(fsItem->path());
-        }
-
-        bool shouldSortByName = false;
-
-        // If only one item selected and only one image in playlist,
-        // add siblings too
-        if (selectedItems.count() == 1 && pl->count() == 1) {
-            FileSystemItem *fsItem =
-                static_cast<FileSystemItem *>(selectedItems[0]);
-            QDir curDir = fsItem->fileInfo().dir();
-            QFileInfoList entries = curDir.entryInfoList(
-                QDir::Files | QDir::NoDotAndDotDot,
-                QDir::Name);
-            for (const QFileInfo &info : entries) {
-                if (!ImageSourceManager::instance()->isValidNameSuffix(info.suffix())) {
-                    continue;
-                }
-                // Avoid duplicate
-                if (info.absoluteFilePath() != fsItem->path()) {
-                    pl->addSinglePath(info.absoluteFilePath());
-                }
-            }
-
-            shouldSortByName = false;
-        } else {
-            shouldSortByName = true;
-        }
-
-        // Empty playlist will not be loaded
-        if (pl->count() == 0) {
-            return;
-        }
-
-        if (selectedItems.count() > 1) {
-            // Show gallery view
-            m_actToolBarGallery->trigger();
-        } else {
-            // Show image view
-            m_actToolBarImage->trigger();
-        }
-
-        // Sort can be slow so put it into background
-        QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-        connect(watcher, &QFutureWatcher<void>::finished, this, [this, pl, watcher]() {
-            this->setPrimaryNavigatorPlayList(pl);
-            watcher->deleteLater();
-        });
-        watcher->setFuture(QtConcurrent::run([shouldSortByName, pl]() {
-            if (shouldSortByName) {
-                PlayListImageUrlSorter sorter;
-                pl->sortBy(&sorter);
-            }
         }));
     }
 }
@@ -875,11 +756,6 @@ void MainWindow::editImageUrl(QListWidgetItem *item)
     playList->replace(index, newImage);
     m_navigator->goIndex(index, true);
     item->setText(newImage->name());
-}
-
-void MainWindow::fsRootPathChanged()
-{
-    ui->fsView->setRootPath(ui->fsEditPath->text());
 }
 
 void MainWindow::basketCommited(BasketView::CommitOption option)
@@ -1209,11 +1085,6 @@ void MainWindow::moveCursor(Qt::Key direction)
         galleryView = ui->playListGallery;
         static const int PLAY_LIST_MOVE_OFFSET[] = { 50, 1, 50, 1 };
         moveOffset = PLAY_LIST_MOVE_OFFSET;
-    } else if (ui->stackedViews->currentWidget() == ui->pageFileSystem) {
-        // File system view
-        galleryView = ui->fsView;
-        static const int FILE_SYSTEM_MOVE_OFFSET[] = { 1, 1, 1, 1 };
-        moveOffset = FILE_SYSTEM_MOVE_OFFSET;
     } else if (ui->stackedViews->currentWidget() == ui->pageGallery) {
         // Gallery view
         galleryView = ui->gallery;

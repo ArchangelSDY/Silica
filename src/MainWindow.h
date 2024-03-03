@@ -70,12 +70,8 @@ private slots:
 
     void imageLoaded(QSharedPointer<ImageData> image);
     void loadSelectedPlayList();
-    void loadOrEnterSelectedPath();
-    void loadSelectedPath();
 
     void editImageUrl(QListWidgetItem *item);
-
-    void fsRootPathChanged();
 
     void basketCommited(BasketView::CommitOption);
 
@@ -108,8 +104,6 @@ private:
 
     PlayListProviderViewManager m_playListProviderViewManager;
     PlayListProvider *m_currentPlayListProvider;
-    //QSharedPointer<PlayListEntity> m_currentPlayListEntity;
-    //QScopedPointer<PlayListEntityLoadContext, ScopedPointerPlayListEntityLoadContextDeleter> m_currentPlayListEntityLoadContext;
     QList<CurrentPlayListEntityState> m_currentPlayListEntityStates;
     QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;
     QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > > m_playListEntityTriggerWatcher;

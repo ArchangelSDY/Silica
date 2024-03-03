@@ -1,7 +1,5 @@
 set(SILICA_UI_SRCS
     "ui/BasketView.cpp"
-    "ui/FileSystemItem.cpp"
-    "ui/FileSystemView.cpp"
     "ui/GalleryItem.cpp"
     "ui/GalleryView.cpp"
     "ui/ImageGalleryItem.cpp"

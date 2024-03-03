@@ -210,8 +210,6 @@ void GamepadController::buttonAChanged(bool pressed)
         QWidget *currentWidget = ui->stackedViews->currentWidget();
         if (currentWidget == ui->pageFav) {
             m_mainWindow->loadSelectedPlayList();
-        } else if (currentWidget == ui->pageFileSystem) {
-            m_mainWindow->loadOrEnterSelectedPath();
         } else if (currentWidget == ui->pageGallery) {
             m_mainWindow->m_actToolBarImage->trigger();
         } else if (currentWidget == ui->pageImageView) {
