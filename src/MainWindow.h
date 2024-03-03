@@ -31,6 +31,17 @@ class MainGraphicsViewModel;
 class PlayListEntity;
 class PlayListProvider;
 
+class CurrentPlayListEntityState
+{
+public:
+    QSharedPointer<PlayListEntity> entity;
+    QSharedPointer<PlayListEntityLoadContext> loadContext;
+
+    CurrentPlayListEntityState(
+        QSharedPointer<PlayListEntity> e,
+        QSharedPointer<PlayListEntityLoadContext> c);
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -88,7 +99,7 @@ private:
     void switchViews();
     void moveCursor(Qt::Key direction);
     void toggleSecondaryNavigator();
-    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist, QSharedPointer<PlayListEntity> playListEntity);
+    void setPrimaryNavigatorPlayList(QSharedPointer<PlayList> playlist);
 
     void loadSelectedPlayListProvider(int type);
     void continuePlayList();
@@ -97,8 +108,9 @@ private:
 
     PlayListProviderViewManager m_playListProviderViewManager;
     PlayListProvider *m_currentPlayListProvider;
-    QSharedPointer<PlayListEntity> m_currentPlayListEntity;
-    QScopedPointer<PlayListEntityLoadContext, ScopedPointerPlayListEntityLoadContextDeleter> m_currentPlayListEntityLoadContext;
+    //QSharedPointer<PlayListEntity> m_currentPlayListEntity;
+    //QScopedPointer<PlayListEntityLoadContext, ScopedPointerPlayListEntityLoadContextDeleter> m_currentPlayListEntityLoadContext;
+    QList<CurrentPlayListEntityState> m_currentPlayListEntityStates;
     QFutureWatcher<QList<QSharedPointer<PlayListEntity>>> m_playListEntitiesLoadWatcher;
     QFutureWatcher<QPair<PlayListEntityTriggerResult, QSharedPointer<PlayListEntity> > > m_playListEntityTriggerWatcher;
     QFutureWatcher<QList<QSharedPointer<ImageSource>>> m_playListCreateWatcher;
