@@ -218,10 +218,14 @@ void GalleryView::keyPressEvent(QKeyEvent *event)
 
         event->accept();
         emit keyEnterPressed();
+    } else if (event->key() == Qt::Key_Escape) {
+        scene()->clearSelection();
+        event->accept();
     } else if (event->key() == Qt::Key_A && event->modifiers().testFlag(Qt::ControlModifier)) {
         QPainterPath path;
         path.addRect(scene()->sceneRect());
         scene()->setSelectionArea(path);
+        event->accept();
     } else if (event->key() == Qt::Key_Slash) {
         enterSearch();
         event->accept();
