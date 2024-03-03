@@ -45,14 +45,16 @@
 #  FindPackageHandleStandardArgs (known included with CMake >=2.6.2)
 #
 # Original Author:
-# 2012 Ryan Pavlik <rpavlik@iastate.edu> <abiryan@ryand.net>
-# http://academic.cleardefinition.com
+# 2012 Rylie Pavlik <rylie@ryliepavlik.com>
+# https://ryliepavlik.com/
 # Iowa State University HCI Graduate Program/VRAC
 #
 # Copyright 2012, Iowa State University
+#
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
+#
 # SPDX-License-Identifier: BSL-1.0
 
 set(_preferred_sdk_dirs) # pre-output
@@ -77,6 +79,9 @@ endmacro()
 # although version numbers listed on that page don't necessarily match the directory
 # used by the installer.
 set(_winsdk_win10vers
+	10.0.22000.0
+	10.0.20348.0
+	10.0.19041.0
 	10.0.18362.0 # Win10 1903 "19H1"
 	10.0.17763.0 # Win10 1809 "October 2018 Update"
 	10.0.17134.0 # Redstone 4 aka Win10 1803 "April 2018 Update"
