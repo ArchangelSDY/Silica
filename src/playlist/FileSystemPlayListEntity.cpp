@@ -190,7 +190,14 @@ QList<QUrl> FileSystemPlayListEntity::loadImageUrls(PlayListEntityLoadContext *)
 
 void FileSystemPlayListEntity::setName(const QString &name)
 {
-    Q_UNREACHABLE();
+    QDir dir = m_fileInfo.absoluteDir();
+    QFileInfo newFileInfo(dir, name);
+
+    if (QFile::rename(m_fileInfo.absoluteFilePath(), newFileInfo.absoluteFilePath())) {
+        m_fileInfo = newFileInfo;
+    } else {
+        qWarning() << "Fail to rename file" << m_fileInfo.absoluteFilePath() << " to " << newFileInfo.absoluteFilePath();
+    }
 }
 
 void FileSystemPlayListEntity::setCoverImagePath(const QString &path)

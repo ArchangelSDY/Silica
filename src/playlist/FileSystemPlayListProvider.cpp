@@ -31,8 +31,7 @@ QString FileSystemPlayListProvider::name() const
 
 bool FileSystemPlayListProvider::supportsOption(PlayListProviderOption option) const
 {
-    // TODO: Support renaming
-    return option == PlayListProviderOption::RemoveEntity;
+    return option == PlayListProviderOption::UpdateEntity || option == PlayListProviderOption::RemoveEntity;
 }
 
 QList<PlayListEntity *> FileSystemPlayListProvider::loadEntities()
@@ -78,6 +77,7 @@ void FileSystemPlayListProvider::insertEntity(PlayListEntity *entity)
 
 void FileSystemPlayListProvider::updateEntity(PlayListEntity *entity)
 {
+    emit entitiesChanged();
 }
 
 void FileSystemPlayListProvider::removeEntity(PlayListEntity *entity)
