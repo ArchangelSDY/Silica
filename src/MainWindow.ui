@@ -261,11 +261,6 @@
    <header>ui/MainImageGalleryView.h</header>
   </customwidget>
   <customwidget>
-   <class>FileSystemView</class>
-   <extends>QWidget</extends>
-   <header>ui/FileSystemView.h</header>
-  </customwidget>
-  <customwidget>
    <class>BasketView</class>
    <extends>QWidget</extends>
    <header>ui/BasketView.h</header>
