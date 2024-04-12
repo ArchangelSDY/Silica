@@ -9,6 +9,7 @@ class Sharer : public QObject
 {
     Q_OBJECT
 public:
+    virtual ~Sharer() {}
     virtual bool share(QSharedPointer<Image> image) = 0;
 
 signals:

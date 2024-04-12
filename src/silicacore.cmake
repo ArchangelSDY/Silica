@@ -82,6 +82,7 @@ file(GLOB CORE_SRCS
     "playlist/PlayListProvider.h"
     "playlist/PlayListProviderFactory.cpp"
     "playlist/PlayListProviderManager.cpp"
+    "share/SaveToSharer.cpp"
     "share/Sharer.h"
     "share/SharerManager.cpp"
     "sapi/ImageDelegate.cpp"
