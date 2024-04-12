@@ -15,6 +15,7 @@ public slots:
 
 private slots:
     void createPlayListEntity(int type);
+    void copyNameSelectedItem();
     void renameSelectedItem();
     void removeSelectedItems();
 

@@ -1,6 +1,8 @@
 #include "PlayListGalleryView.h"
 
+#include <QClipboard>
 #include <QContextMenuEvent>
+#include <QGuiApplication>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -65,8 +67,13 @@ void PlayListGalleryView::contextMenuEvent(QContextMenuEvent *event)
         this, &PlayListGalleryView::createPlayListEntity);
 
     if (selectedItems.count() > 0) {
+        if (selectedItems.count() == 1) {
+            QAction *actCopyName = menu.addAction(tr("Copy Name"), this, SLOT(copyNameSelectedItem()));
+        }
+
         QAction *actRename = menu.addAction(tr("Rename"), this, SLOT(renameSelectedItem()));
         QAction *actRemove = menu.addAction(tr("Remove"), this, SLOT(removeSelectedItems()));
+
         for (GalleryItem *item : selectedItems) {
             PlayListGalleryItem *playListItem = static_cast<PlayListGalleryItem *>(item);
             auto entity = playListItem->entity();
@@ -116,6 +123,20 @@ void PlayListGalleryView::createPlayListEntity(int type)
         QtConcurrent::run([provider, entity]() {
             provider->insertEntity(entity);
         });
+    }
+}
+
+void PlayListGalleryView::copyNameSelectedItem()
+{
+    QList<GalleryItem *> selectedItems = selectedGalleryItems();
+    if (selectedItems.count() > 0) {
+        PlayListGalleryItem *item =
+            static_cast<PlayListGalleryItem *>(selectedItems[0]);
+        auto entity = item->entity();
+        auto name = entity->name();
+
+        auto clipboard = QGuiApplication::clipboard();
+        clipboard->setText(name);
     }
 }
 
