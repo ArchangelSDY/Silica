@@ -21,9 +21,9 @@ Qt::AspectRatioMode CompactImageRenderer::aspectRatioMode() const
     return Qt::KeepAspectRatioByExpanding;
 }
 
-void CompactImageRenderer::layout()
+void CompactImageRenderer::layout(const QRect &viewGeometry)
 {
-    AbstractGalleryItemRenderer::layout();
+    AbstractGalleryItemRenderer::layout(viewGeometry);
 
     QSize sourcePaintSize = m_boundingRect.size().scaled(
         m_imageSize, Qt::KeepAspectRatio);

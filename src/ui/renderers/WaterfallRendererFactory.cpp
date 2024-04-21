@@ -4,14 +4,13 @@
 #include "WaterfallGalleryViewRenderer.h"
 #include "WaterfallRendererFactory.h"
 
-WaterfallRendererFactory::WaterfallRendererFactory(int itemWidth) :
-    m_itemWidth(itemWidth)
+WaterfallRendererFactory::WaterfallRendererFactory(int maxColumns) : m_maxColumns(maxColumns)
 {
 }
 
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForImageGallery()
 {
-    return new WaterfallImageRenderer(m_itemWidth);
+    return new WaterfallImageRenderer(m_maxColumns);
 }
 
 AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForPlayListGallery(
@@ -29,5 +28,5 @@ AbstractGalleryItemRenderer *WaterfallRendererFactory::createItemRendererForFile
 AbstractGalleryViewRenderer *WaterfallRendererFactory::createViewRenderer(
     GalleryView *galleryView)
 {
-    return new WaterfallGalleryViewRenderer(galleryView, m_itemWidth);
+    return new WaterfallGalleryViewRenderer(galleryView, m_maxColumns);
 }

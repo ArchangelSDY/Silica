@@ -6,13 +6,13 @@ LooseImageBackgroundRenderer::LooseImageBackgroundRenderer(
 {
 }
 
-void LooseImageBackgroundRenderer::layout()
+void LooseImageBackgroundRenderer::layout(const QRect &viewGeometry)
 {
     if (!m_parentRenderer) {
         return;
     }
 
-    m_parentRenderer->layout();
+    m_parentRenderer->layout(viewGeometry);
 }
 
 void LooseImageBackgroundRenderer::paint(QPainter *painter)

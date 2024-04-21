@@ -8,8 +8,8 @@ class LooseImageBackgroundRenderer : public AbstractGalleryItemRenderer
 public:
     LooseImageBackgroundRenderer(AbstractGalleryItemRenderer *parentRenderer);
 
-    virtual void layout();
-    virtual void paint(QPainter *painter);
+    virtual void layout(const QRect &viewGeometry) override;
+    virtual void paint(QPainter *painter) override;
 
 private:
     static const int ANGLE = 3;

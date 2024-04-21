@@ -133,10 +133,16 @@ QMenu *ImageGalleryView::createContextMenu()
         this->setRendererFactory(new CompactRendererFactory());
     });
     renderers->addAction(tr("Waterfall"), [this]() {
-        this->setRendererFactory(new WaterfallRendererFactory(GlobalConfig::instance()->galleryItemSize().width()));
+        this->setRendererFactory(new WaterfallRendererFactory(6));
+    });
+    renderers->addAction(tr("Waterfall Medium"), [this]() {
+        this->setRendererFactory(new WaterfallRendererFactory(4));
     });
     renderers->addAction(tr("Waterfall Large"), [this]() {
-        this->setRendererFactory(new WaterfallRendererFactory(GlobalConfig::instance()->galleryItemSize().width() * 2));
+        this->setRendererFactory(new WaterfallRendererFactory(3));
+    });
+    renderers->addAction(tr("Waterfall Extra Large"), [this]() {
+        this->setRendererFactory(new WaterfallRendererFactory(2));
     });
 
     QList<GalleryItem *> selectedItems = selectedGalleryItems();

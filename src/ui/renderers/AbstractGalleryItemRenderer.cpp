@@ -46,10 +46,10 @@ QRect AbstractGalleryItemRenderer::boundingRect() const
     }
 }
 
-void AbstractGalleryItemRenderer::layout()
+void AbstractGalleryItemRenderer::layout(const QRect &viewGeometry)
 {
     if (m_parentRenderer) {
-        m_parentRenderer->layout();
+        m_parentRenderer->layout(viewGeometry);
     }
 }
 

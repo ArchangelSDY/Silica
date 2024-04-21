@@ -166,9 +166,9 @@ void WaterfallGalleryViewLayoutHelper::addGroupBreak()
 
 
 WaterfallGalleryViewRenderer::WaterfallGalleryViewRenderer(
-    GalleryView *galleryView, int itemWidth) :
+    GalleryView *galleryView, int maxColumns) :
     AbstractGalleryViewRenderer(galleryView) ,
-    m_itemWidth(itemWidth)
+    m_maxColumns(maxColumns)
 {
 }
 
@@ -178,12 +178,8 @@ void WaterfallGalleryViewRenderer::layout(
 {
     bool isGroupingEnabled = !itemGroups.isEmpty();
 
-    int maxColumns = viewGeometry.width() / m_itemWidth;
-    if (maxColumns <= 1) {
-        return;
-    }
-
-    WaterfallGalleryViewLayoutHelper helper(m_itemWidth, maxColumns);
+    int itemWidth = viewGeometry.width() / m_maxColumns;
+    WaterfallGalleryViewLayoutHelper helper(itemWidth, m_maxColumns);
 
     QString curGroup;
     if (isGroupingEnabled) {

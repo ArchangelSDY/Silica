@@ -5,7 +5,7 @@
 class WaterfallRendererFactory : public AbstractRendererFactory
 {
 public:
-    WaterfallRendererFactory(int itemWidth);
+    WaterfallRendererFactory(int maxColumns);
 
     virtual AbstractGalleryItemRenderer *createItemRendererForImageGallery() override;
     virtual AbstractGalleryItemRenderer *createItemRendererForPlayListGallery(
@@ -17,5 +17,5 @@ public:
         GalleryView *galleryView) override;
 
 private:
-    int m_itemWidth;
+    int m_maxColumns;
 };

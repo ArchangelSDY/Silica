@@ -12,7 +12,7 @@ public:
 
     virtual Qt::AspectRatioMode aspectRatioMode() const;
     virtual QRect boundingRect() const;
-    virtual void layout();
+    virtual void layout(const QRect &viewGeometry);
     virtual void paint(QPainter *painter);
 
 protected:

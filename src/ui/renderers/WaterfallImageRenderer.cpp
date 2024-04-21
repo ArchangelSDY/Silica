@@ -3,9 +3,9 @@
 const int WaterfallImageRenderer::PADDING = 10;
 const int WaterfallImageRenderer::BORDER = 5;
 
-WaterfallImageRenderer::WaterfallImageRenderer(int itemWidth) :
-    AbstractGalleryItemRenderer() ,
-    m_itemWidth(itemWidth)
+WaterfallImageRenderer::WaterfallImageRenderer(int maxColumns) :
+    AbstractGalleryItemRenderer(),
+    m_maxColumns(maxColumns)
 {
 }
 
@@ -14,13 +14,14 @@ Qt::AspectRatioMode WaterfallImageRenderer::aspectRatioMode() const
     return Qt::KeepAspectRatioByExpanding;
 }
 
-void WaterfallImageRenderer::layout()
+void WaterfallImageRenderer::layout(const QRect &viewGeometry)
 {
     if (m_imageSize.isEmpty()) {
         return;
     }
 
-    qreal imageWidth = (qreal)m_itemWidth * columnsSpan() - 2 * (qreal)WaterfallImageRenderer::PADDING;
+    qreal itemWidth = (qreal)viewGeometry.width() / m_maxColumns;
+    qreal imageWidth = (qreal)itemWidth * columnsSpan() - 2 * (qreal)WaterfallImageRenderer::PADDING;
     qreal factor = imageWidth / m_imageSize.width();
     qreal imageHeight = m_imageSize.height() * factor;
     m_imageRect.setSize(QSize(imageWidth, imageHeight));

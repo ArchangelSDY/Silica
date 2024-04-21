@@ -14,7 +14,7 @@ Qt::AspectRatioMode LooseImageRenderer::aspectRatioMode() const
     return Qt::KeepAspectRatio;
 }
 
-void LooseImageRenderer::layout()
+void LooseImageRenderer::layout(const QRect &viewGeometry)
 {
     const QSize &itemSize = GlobalConfig::instance()->galleryItemSize();
     QSize sizeWithoutPadding(

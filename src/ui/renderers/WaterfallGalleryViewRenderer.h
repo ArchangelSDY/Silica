@@ -5,12 +5,12 @@
 class WaterfallGalleryViewRenderer : public AbstractGalleryViewRenderer
 {
 public:
-    WaterfallGalleryViewRenderer(GalleryView *galleryView, int itemWidth);
+    WaterfallGalleryViewRenderer(GalleryView *galleryView, int maxColumns);
 
     void layout(QList<GalleryItem *> &items,
                 const QStringList &itemGroups,
                 const QRect &viewGeometry);
 
 private:
-    int m_itemWidth;
+    int m_maxColumns;
 };

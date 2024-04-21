@@ -9,8 +9,8 @@ public:
     CompactTitleRenderer(const QString &title,
                          AbstractGalleryItemRenderer *parentRenderer);
 
-    virtual void layout();
-    virtual void paint(QPainter *painter);
+    virtual void layout(const QRect &viewGeometry) override;
+    virtual void paint(QPainter *painter) override;
 
     static const int TITLE_HEIGHT;
 

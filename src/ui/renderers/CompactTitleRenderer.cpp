@@ -10,13 +10,13 @@ CompactTitleRenderer::CompactTitleRenderer(
 {
 }
 
-void CompactTitleRenderer::layout()
+void CompactTitleRenderer::layout(const QRect &viewGeometry)
 {
     if (!m_parentRenderer) {
         return;
     }
 
-    m_parentRenderer->layout();
+    m_parentRenderer->layout(viewGeometry);
 
     const QRect &parentBoundingRect = m_parentRenderer->boundingRect();
     int top = parentBoundingRect.y() + parentBoundingRect.height() -
