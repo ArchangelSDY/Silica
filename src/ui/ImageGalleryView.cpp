@@ -132,16 +132,16 @@ QMenu *ImageGalleryView::createContextMenu()
     renderers->addAction(tr("Compact"), [this]() {
         this->setRendererFactory(new CompactRendererFactory());
     });
-    renderers->addAction(tr("Waterfall"), [this]() {
+    renderers->addAction(tr("Waterfall (6)"), [this]() {
         this->setRendererFactory(new WaterfallRendererFactory(6));
     });
-    renderers->addAction(tr("Waterfall Medium"), [this]() {
+    renderers->addAction(tr("Waterfall (4)"), [this]() {
         this->setRendererFactory(new WaterfallRendererFactory(4));
     });
-    renderers->addAction(tr("Waterfall Large"), [this]() {
+    renderers->addAction(tr("Waterfall (3)"), [this]() {
         this->setRendererFactory(new WaterfallRendererFactory(3));
     });
-    renderers->addAction(tr("Waterfall Extra Large"), [this]() {
+    renderers->addAction(tr("Waterfall (2)"), [this]() {
         this->setRendererFactory(new WaterfallRendererFactory(2));
     });
 

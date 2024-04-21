@@ -153,6 +153,8 @@ void GalleryView::layout()
             item->hide();
             iter = items.erase(iter);
         } else {
+            auto itemRenderer = item->renderer();
+            itemRenderer->layout(m_scene->sceneRect().toRect());
             ++iter;
         }
     }
@@ -195,6 +197,7 @@ void GalleryView::setNameFilter(const QString &nameFilter)
 
 void GalleryView::resizeEvent(QResizeEvent *)
 {
+    m_scene->setSceneRect(rect());
     scheduleLayout();
 }
 
