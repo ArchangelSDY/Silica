@@ -234,7 +234,8 @@ void MainGraphicsViewModel::contextMenuEvent(QContextMenuEvent *event)
     QStringList sharerNames = SharerManager::instance()->sharerNames();
     QSignalMapper *shareSigMap = new QSignalMapper(shareMenu);
     connect(shareSigMap, &QSignalMapper::mappedInt, [this](int index) {
-        SharerManager::instance()->share(index, this->m_navigator->currentImage());
+        QList<QSharedPointer<Image>> images { this->m_navigator->currentImage() };
+        SharerManager::instance()->share(index, images);
     });
 
     for (int i = 0; i < sharerNames.count(); ++i) {

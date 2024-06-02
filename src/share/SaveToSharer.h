@@ -9,5 +9,5 @@ class SaveToSharer : public Sharer
     Q_OBJECT
 public:
     ~SaveToSharer() {}
-    virtual bool share(QSharedPointer<Image> image) override;
+    virtual bool share(const QList<QSharedPointer<Image>> &images) override;
 };

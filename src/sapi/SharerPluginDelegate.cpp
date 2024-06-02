@@ -11,10 +11,13 @@ SharerPluginDelegate::SharerPluginDelegate(ISharerPlugin *sharer) :
             this, SIGNAL(finished(bool)));
 }
 
-bool SharerPluginDelegate::share(QSharedPointer<Image> image)
+bool SharerPluginDelegate::share(const QList<QSharedPointer<Image>> &images)
 {
-    ImageDelegate imageDelegate(image);
-    return m_sharer->share(imageDelegate);
+    QList<QSharedPointer<ImageResource>> delegates;
+    for (auto image : images) {
+        delegates << QSharedPointer<ImageDelegate>::create(image);
+    }
+    return m_sharer->share(delegates);
 }
 
 }

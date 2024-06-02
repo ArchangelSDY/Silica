@@ -922,7 +922,8 @@ void MainWindow::keyPressEvent(QKeyEvent *ev)
     if (m_keyState == KEY_STATE_SHARE) {
         if (ev->key() >= Qt::Key_1 && ev->key() <= Qt::Key_9) {
             int sharerIdx = ev->key() - Qt::Key_1;
-            SharerManager::instance()->share(sharerIdx, m_navigator->currentImage());
+            QList<QSharedPointer<Image>> images { m_navigator->currentImage() };
+            SharerManager::instance()->share(sharerIdx, images);
             m_keyState = KEY_STATE_NORMAL;
             return;
         } else {

@@ -1,6 +1,7 @@
 #ifndef ISHARERPLUGIN_H
 #define ISHARERPLUGIN_H
 
+#include <QSharedPointer>
 #include <QObject>
 
 #include "sapi/ImageResource.h"
@@ -13,7 +14,7 @@ class SAPI_EXPORT ISharerPlugin : public QObject
     Q_OBJECT
 public:
     virtual ~ISharerPlugin();
-    virtual bool share(const sapi::ImageResource &image) = 0;
+    virtual bool share(const QList<QSharedPointer<sapi::ImageResource>> &images) = 0;
 
 signals:
     void finished(bool success);

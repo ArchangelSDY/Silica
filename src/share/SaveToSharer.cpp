@@ -7,7 +7,7 @@
 #include "image/ImageSource.h"
 #include "GlobalConfig.h"
 
-bool SaveToSharer::share(QSharedPointer<Image> image)
+bool SaveToSharer::share(const QList<QSharedPointer<Image>> &images)
 {
     QString destDir = QFileDialog::getExistingDirectory(
         nullptr, "Save to", GlobalConfig::instance()->wallpaperDir());
@@ -16,8 +16,14 @@ bool SaveToSharer::share(QSharedPointer<Image> image)
         return false;
     }
 
-    QFileInfo imageFile(image->name()); // Remove dir in image name
-    QString destPath = destDir + "/" +
-        imageFile.fileName();
-    return image->source()->copy(destPath);
+    for (auto image : images) {
+        QFileInfo imageFile(image->name()); // Remove dir in image name
+        QString destPath = destDir + "/" +
+            imageFile.fileName();
+        if (!image->source()->copy(destPath)) {
+            return false;
+        }
+    }
+
+    return true;
 }

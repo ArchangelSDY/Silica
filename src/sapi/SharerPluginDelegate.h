@@ -13,7 +13,7 @@ class SharerPluginDelegate : public Sharer
 public:
     SharerPluginDelegate(ISharerPlugin *sharer);
 
-    bool share(QSharedPointer<Image> image) override;
+    bool share(const QList<QSharedPointer<Image>> &images) override;
 
 private:
     QScopedPointer<ISharerPlugin> m_sharer;

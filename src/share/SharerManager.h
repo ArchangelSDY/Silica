@@ -14,7 +14,7 @@ public:
     ~SharerManager();
 
     QStringList sharerNames() const;
-    bool share(int index, QSharedPointer<Image> image);
+    bool share(int index, const QList<QSharedPointer<Image>> &images);
 
 private:
     SharerManager();
