@@ -20,6 +20,7 @@
 #include "playlist/sort/PlayListImageUrlSorter.h"
 #include "playlist/PlayListEntity.h"
 #include "playlist/PlayListProvider.h"
+#include "share/SharerManager.h"
 #include "ui/ImageGalleryItem.h"
 #include "ui/ImageGalleryView.h"
 #include "ui/renderers/CompactRendererFactory.h"
@@ -160,6 +161,20 @@ QMenu *ImageGalleryView::createContextMenu()
         auto removeAct = menu->addAction(tr("Remove"), this, SLOT(removeSelected()));
         if (m_playListEntity && !m_playListEntity->supportsOption(PlayListEntityOption::RemoveImageUrls)) {
             removeAct->setEnabled(false);
+        }
+
+        ImageList images;
+        for (auto item : selectedItems) {
+            ImageGalleryItem* imageItem = static_cast<ImageGalleryItem*>(item);
+            images << imageItem->image();
+        }
+
+        QMenu *sharers = menu->addMenu(tr("Share"));
+        auto sharerNames = SharerManager::instance()->sharerNames();
+        for (int i = 0; i < sharerNames.count(); i++) {
+            sharers->addAction(sharerNames[i], [i, images]() {
+                SharerManager::instance()->share(i, images);
+            });
         }
     }
 
