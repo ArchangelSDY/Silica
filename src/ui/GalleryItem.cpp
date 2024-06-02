@@ -82,7 +82,9 @@ void GalleryItem::setThumbnail(QSharedPointer<QImage> thumbnail)
         // Layout here first using original thumbnail size,
         // which is required by some view renderers
         m_renderer->setImageSize(thumbnail->size());
-        m_renderer->layout(scene()->sceneRect().toRect());
+        if (scene()) {
+            m_renderer->layout(scene()->sceneRect().toRect());
+        }
 
         auto boundingSize = boundingRect().size().toSize();
         if (thumbnailNeedResize(thumbnail->size(), boundingSize)) {
@@ -116,7 +118,9 @@ void GalleryItem::setScaledThumbnail(QSharedPointer<QImage> thumbnailScaled)
     // Layout again using scaled thumbnail size
     m_renderer->setImage(m_thumbnailScaled);
     m_renderer->setImageSize(m_thumbnailSize);
-    m_renderer->layout(scene()->sceneRect().toRect());
+    if (scene()) {
+        m_renderer->layout(scene()->sceneRect().toRect());
+    }
 
     prepareGeometryChange();
 
