@@ -4,18 +4,14 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtTest/QtTest>
+#include <QtCore/QTimeZone>
+#include <QtTest/QTest>
 
 #include <quazip.h>
 #include <quazipfile.h>
 #include <quazipnewinfo.h>
 #include <quazipfileinfo.h>
 #include <quazip_qt_compat.h>
-
-TestQuaZipNewInfo::TestQuaZipNewInfo(QObject *parent) :
-    QObject(parent)
-{
-}
 
 void TestQuaZipNewInfo::setFileNTFSTimes()
 {
@@ -30,13 +26,13 @@ void TestQuaZipNewInfo::setFileNTFSTimes()
     if (!createTestFiles(testFiles)) {
         QFAIL("Can't create test file");
     }
-    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
+    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), COMPAT_UTC_TZ);
     quint64 mTicks, aTicks, cTicks;
     {
         // create
         QuaZip zip(zipName);
         QVERIFY(zip.open(QuaZip::mdCreate));
-        QuaZipFile zipFile(&zip);
+        QuaZipFile _zipFile(&zip);
         QFileInfo fileInfo("tmp/test.txt");
         QDateTime lm = fileInfo.lastModified().toUTC();
         QDateTime lr = fileInfo.lastRead().toUTC();
@@ -55,8 +51,8 @@ void TestQuaZipNewInfo::setFileNTFSTimes()
             * Q_UINT64_C(10000);
         QuaZipNewInfo newInfo("test.txt", "tmp/test.txt");
         newInfo.setFileNTFSTimes("tmp/test.txt");
-        QVERIFY(zipFile.open(QIODevice::WriteOnly, newInfo));
-        zipFile.close();
+        QVERIFY(_zipFile.open(QIODevice::WriteOnly, newInfo));
+        _zipFile.close();
         zip.close();
     }
     {

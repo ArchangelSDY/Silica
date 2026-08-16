@@ -28,8 +28,6 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include <QtCore/QIODevice>
 #include "quazip_global.h"
 
-#include <zlib.h>
-
 class QuaZIODevicePrivate;
 
 /// A class to compress/decompress QIODevice.
@@ -49,7 +47,7 @@ public:
     */
   QuaZIODevice(QIODevice *io, QObject *parent = nullptr);
   /// Destructor.
-  ~QuaZIODevice();
+  ~QuaZIODevice() override;
   /// Flushes data waiting to be written.
   /**
     Unfortunately, as QIODevice doesn't support flush() by itself, the
@@ -77,27 +75,27 @@ public:
     \param mode Neither QIODevice::ReadWrite nor QIODevice::Append are
     not supported.
     */
-  virtual bool open(QIODevice::OpenMode mode);
+  bool open(QIODevice::OpenMode mode) override;
   /// Closes this device, but not the underlying one.
   /**
     The underlying QIODevice is not closed in case you want to write
     something else to it.
     */
-  virtual void close();
+  void close() override;
   /// Returns the underlying device.
   QIODevice *getIoDevice() const;
   /// Returns true.
-  virtual bool isSequential() const;
+  bool isSequential() const override;
   /// Returns true iff the end of the compressed stream is reached.
-  virtual bool atEnd() const;
+  bool atEnd() const override;
   /// Returns the number of the bytes buffered.
-  virtual qint64 bytesAvailable() const;
+  qint64 bytesAvailable() const override;
 protected:
   /// Implementation of QIODevice::readData().
-  virtual qint64 readData(char *data, qint64 maxSize);
+  qint64 readData(char *data, qint64 maxSize) override;
   /// Implementation of QIODevice::writeData().
-  virtual qint64 writeData(const char *data, qint64 maxSize);
+  qint64 writeData(const char *data, qint64 maxSize) override;
 private:
-  QuaZIODevicePrivate *d;
+  QuaZIODevicePrivate *d{};
 };
 #endif // QUAZIP_QUAZIODEVICE_H

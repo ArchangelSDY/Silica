@@ -1,0 +1,24 @@
+Checks: >
+  # Enable core static analysis checks
+  clang-analyzer-*,
+
+  # Best practices and maintainability
+  cppcoreguidelines-*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+
+  # Catch potential bugs
+  bugprone-*,
+  misc-*,
+
+  # Ensure safer memory management
+  cert-*,
+
+  # Security checks
+  security-*,
+
+  # Avoid shadowing issues
+  clang-analyzer-core.Shadowing,
+  cppcoreguidelines-avoid-variable-shadowing

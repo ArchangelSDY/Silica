@@ -27,15 +27,18 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include "qztest.h"
 
 #include <JlCompress.h>
-#include <quazipfile.h>
 #include <quazip.h>
 #include <quazip_qt_compat.h>
+#include <quazipfile.h>
 
 #include <QtCore/QFile>
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <QtCore/QBuffer>
+#include <QtCore/QDataStream>
+#include <QtCore/QCryptographicHash>
 
-#include <QtTest/QtTest>
+#include <QtTest/QTest>
 
 void TestQuaZipFile::zipUnzip_data()
 {
@@ -43,33 +46,29 @@ void TestQuaZipFile::zipUnzip_data()
     QTest::addColumn<QStringList>("fileNames");
     QTest::addColumn<QByteArray>("fileNameCodec");
     QTest::addColumn<QByteArray>("password");
+    QTest::addColumn<int>("method");
+    QTest::addColumn<int>("level");
     QTest::addColumn<bool>("zip64");
     QTest::addColumn<bool>("utf8");
     QTest::addColumn<int>("size");
-    QTest::newRow("simple") << "simple.zip" << (
-            QStringList() << "test0.txt" << "testdir1/test1.txt"
-            << "testdir2/test2.txt" << "testdir2/subdir/test2sub.txt")
-        << QByteArray() << QByteArray() << false << false << -1;
-    QTest::newRow("Cyrillic") << "cyrillic.zip" << (
-            QStringList()
-            << QString::fromUtf8("русское имя файла с пробелами.txt"))
-        << QByteArray("IBM866") << QByteArray() << false << false << -1;
-    QTest::newRow("Unicode") << "unicode.zip" << (
-            QStringList()
-            << QString::fromUtf8("Українське сало.txt")
-            << QString::fromUtf8("Vin français.txt")
-            << QString::fromUtf8("日本の寿司.txt")
-            << QString::fromUtf8("ქართული ხაჭაპური.txt"))
-        << QByteArray("") << QByteArray() << false << true << -1;
-    QTest::newRow("password") << "password.zip" << (
-            QStringList() << "test.txt")
-        << QByteArray() << QByteArray("PassPass") << false << false << -1;
-    QTest::newRow("zip64") << "zip64.zip" << (
-            QStringList() << "test64.txt")
-        << QByteArray() << QByteArray() << true << false << -1;
-    QTest::newRow("large enough to flush") << "flush.zip" << (
-            QStringList() << "flush.txt")
-        << QByteArray() << QByteArray() << true << false << 65536 * 2;
+    QTest::newRow("simple") << "simple.zip" << (QStringList() << "test0.txt" << "testdir1/test1.txt"
+                                                              << "testdir2/test2.txt" << "testdir2/subdir/test2sub.txt")
+                            << QByteArray() << QByteArray() << Z_DEFLATED << Z_DEFAULT_COMPRESSION << false << false << -1;
+#ifdef HAVE_BZIP2
+    QTest::newRow("bzip") << "bzip.zip" << (QStringList() << "testb0.txt" << "testdirb/testb.txt"
+                                                          << "testdir2b/test2b.txt" << "testdir2b/subdir/test2bsub.txt")
+                          << QByteArray() << QByteArray() << Z_BZIP2ED << 9 << false << false << -1;
+#endif
+    QTest::newRow("Cyrillic") << "cyrillic.zip" << (QStringList() << QString::fromUtf8("русское имя файла с пробелами.txt"))
+                              << QByteArray("IBM866") << QByteArray() << Z_DEFLATED << Z_DEFAULT_COMPRESSION << false << false << -1;
+    QTest::newRow("Unicode") << "unicode.zip" << (QStringList() << QString::fromUtf8("Українське сало.txt") << QString::fromUtf8("Vin français.txt") << QString::fromUtf8("日本の寿司.txt") << QString::fromUtf8("ქართული ხაჭაპური.txt"))
+                             << QByteArray("") << QByteArray() << Z_DEFLATED << Z_DEFAULT_COMPRESSION << false << true << -1;
+    QTest::newRow("password") << "password.zip" << (QStringList() << "test.txt")
+                              << QByteArray() << QByteArray("PassPass") << Z_DEFLATED << Z_DEFAULT_COMPRESSION << false << false << -1;
+    QTest::newRow("zip64") << "zip64.zip" << (QStringList() << "test64.txt")
+                           << QByteArray() << QByteArray() << Z_DEFLATED << Z_DEFAULT_COMPRESSION << true << false << -1;
+    QTest::newRow("large enough to flush") << "flush.zip" << (QStringList() << "flush.txt")
+                                           << QByteArray() << QByteArray() << Z_DEFLATED << Z_DEFAULT_COMPRESSION << true << false << 65536 * 2;
 }
 
 void TestQuaZipFile::zipUnzip()
@@ -78,6 +77,8 @@ void TestQuaZipFile::zipUnzip()
     QFETCH(QStringList, fileNames);
     QFETCH(QByteArray, fileNameCodec);
     QFETCH(QByteArray, password);
+    QFETCH(int, method);
+    QFETCH(int, level);
     QFETCH(bool, zip64);
     QFETCH(bool, utf8);
     QFETCH(int, size);
@@ -105,19 +106,27 @@ void TestQuaZipFile::zipUnzip()
             QFAIL("Couldn't open input file");
         }
         QuaZipFile outFile(&testZip);
-        QVERIFY(outFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileName,
-                        inFile.fileName()),
-                password.isEmpty() ? NULL : password.constData()));
-        for (qint64 pos = 0, len = inFile.size(); pos < len; ) {
+        if (
+          !outFile.open(
+            QIODevice::WriteOnly,
+            QuaZipNewInfo(fileName, inFile.fileName()),
+            password.isEmpty() ? NULL : password.constData(),
+            0,
+            method,
+            level)) {
+            qDebug("outFile.open() backend error, code %d", outFile.getZipError());
+            QFAIL("outFile.open() returned FALSE");
+        }
+        for (qint64 pos = 0, len = inFile.size(); pos < len;) {
             char buf[4096];
             qint64 readSize = qMin(static_cast<qint64>(4096), len - pos);
             qint64 l;
             if ((l = inFile.read(buf, readSize)) != readSize) {
                 qDebug("Reading %ld bytes from %s at %ld returned %ld",
-                        static_cast<long>(readSize),
-                        fileName.toUtf8().constData(),
-                        static_cast<long>(pos),
-                        static_cast<long>(l));
+                       static_cast<long>(readSize),
+                       fileName.toUtf8().constData(),
+                       static_cast<long>(pos),
+                       static_cast<long>(l));
                 QFAIL("Read failure");
             }
             QVERIFY(outFile.write(buf, readSize));
@@ -145,7 +154,7 @@ void TestQuaZipFile::zipUnzip()
         QVERIFY(original.open(QIODevice::ReadOnly));
         QuaZipFile archived(&testUnzip);
         QVERIFY(archived.open(QIODevice::ReadOnly,
-                         password.isEmpty() ? NULL : password.constData()));
+                              password.isEmpty() ? NULL : password.constData()));
         QByteArray originalData = original.readAll();
         QByteArray archivedData = archived.readAll();
         QCOMPARE(archivedData, originalData);
@@ -161,7 +170,11 @@ void TestQuaZipFile::zipUnzip()
         QVERIFY(archived.open(QIODevice::ReadOnly, "WrongPassword"));
         QByteArray originalData = original.readAll();
         QByteArray archivedData = archived.readAll();
-        QVERIFY(archivedData != originalData);
+        int readError = archived.getZipError();
+        qDebug("After reading with wrong password, getZipError() is %d", readError);
+        qDebug("Original data size: %d, archived data size: %d", originalData.size(), archivedData.size());
+
+        QVERIFY(readError != ZIP_OK || archivedData.isEmpty() || archivedData != originalData); // corrupt data or empty, depends on the platform
     }
     testUnzip.close();
     QCOMPARE(testUnzip.getZipError(), UNZ_OK);
@@ -170,16 +183,150 @@ void TestQuaZipFile::zipUnzip()
     testFile.remove();
 }
 
+void TestQuaZipFile::zipUnzipLarge_data()
+{
+    QTest::addColumn<QString>("zipName");
+    QTest::addColumn<QString>("fileName");
+    QTest::addColumn<long long>("size");
+
+    QTest::newRow("zip64_large") << "zip64_large.zip" << "largefile64.txt" << 5LL * 1024 * 1024 * 1024; // 5GB
+}
+
+void TestQuaZipFile::zipUnzipLarge()
+{
+    if (!QVariant(qgetenv("TEST_ZIP_UNZIP_LARGE")).toBool()) {
+        qDebug() << "Skipping expensive large file test, set TEST_ZIP_UNZIP_LARGE=true to turn on";
+        return;
+    }
+    QFETCH(QString, zipName);
+    QFETCH(QString, fileName);
+    QFETCH(long long, size);
+    
+    QString testComment = "ZIP64 large file test comment";
+    QFile testFile(zipName);
+    if (testFile.exists()) {
+        if (!testFile.remove()) {
+            QFAIL("Couldn't remove existing archive to create a new one");
+        }
+    }
+    // We generate file with random data so it's not compressible and will end up >4G .zip
+    if (!createTestFileLarge(fileName, size, "tmp", true)) {
+        QFAIL("Couldn't create test files for zipping");
+    }
+    QuaZip testZip(&testFile);
+    testZip.setZip64Enabled(true);
+    QVERIFY(testZip.open(QuaZip::mdCreate));
+    
+    testZip.setComment(testComment);
+    QFile inFile("tmp/" + fileName);
+    if (!inFile.open(QIODevice::ReadOnly)) {
+        qDebug("File name: %s", fileName.toUtf8().constData());
+        QFAIL("Couldn't open input file");
+    }
+    QuaZipFile outFile(&testZip);
+    if (
+      !outFile.open(
+        QIODevice::WriteOnly,
+        QuaZipNewInfo(fileName, inFile.fileName()),
+        NULL,
+        0,
+        Z_DEFLATED,
+        Z_BEST_SPEED)) { // we use best speed here so test is faster..
+        qDebug("outFile.open() backend error, code %d", outFile.getZipError());
+        QFAIL("outFile.open() returned FALSE");
+    }
+    for (qint64 pos = 0, len = inFile.size(); pos < len;) {
+        char buf[256 * 1024];
+        qint64 readSize = qMin(static_cast<qint64>(256 * 1024), len - pos);
+        qint64 l;
+        if ((l = inFile.read(buf, readSize)) != readSize) {
+            qDebug("Reading %ld bytes from %s at %ld returned %ld",
+                   static_cast<long>(readSize),
+                   fileName.toUtf8().constData(),
+                   static_cast<long>(pos),
+                   static_cast<long>(l));
+            QFAIL("Read failure");
+        }
+        QVERIFY(outFile.write(buf, readSize));
+        pos += readSize;
+    }
+    inFile.close();
+    outFile.close();
+    QCOMPARE(outFile.getZipError(), ZIP_OK);
+
+    testZip.close();
+    QCOMPARE(testZip.getZipError(), ZIP_OK);
+    // now test unzip
+    QuaZip testUnzip(&testFile);
+    QVERIFY(testUnzip.open(QuaZip::mdUnzip));
+    
+    // Verify comment is preserved in ZIP64 archive (issue #158)
+    QString readComment = testUnzip.getComment();
+    QCOMPARE(readComment, testComment);
+    
+    QVERIFY(testUnzip.goToFirstFile());
+
+    QuaZipFileInfo64 info;
+    QVERIFY(testUnzip.getCurrentFileInfo(&info));
+    QCOMPARE(info.name, fileName);
+    QFile original("tmp/" + fileName);
+    QVERIFY(original.open(QIODevice::ReadOnly));
+    QuaZipFile archived(&testUnzip);
+    QVERIFY(archived.open(QIODevice::ReadOnly, NULL));
+
+    QCryptographicHash originalHash(QCryptographicHash::Sha256);
+    QCryptographicHash extractedHash(QCryptographicHash::Sha256);
+
+    // readAll fails for large files in Qt5, there is also a deprecation for .addData so we need to do all this below..
+    char buffer[256 * 1024];
+    qint64 bytesRead;
+    while ((bytesRead = original.read(buffer, sizeof(buffer))) > 0) {
+#ifdef QT_VERSION_CHECK
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QByteArrayView view(buffer, bytesRead);
+        originalHash.addData(view);
+#else
+        originalHash.addData(buffer, bytesRead);
+#endif
+#endif
+    }
+    while ((bytesRead = archived.read(buffer, sizeof(buffer))) > 0) {
+#ifdef QT_VERSION_CHECK
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QByteArrayView view(buffer, bytesRead);
+        extractedHash.addData(view);
+#else
+        extractedHash.addData(buffer, bytesRead);
+#endif
+#endif
+    }
+
+    QString originalHashHex = originalHash.result().toHex();
+    QString extractedHashHex = extractedHash.result().toHex();
+
+    qDebug() << "Original file hash: " << originalHashHex;
+    qDebug() << "Extracted file hash: " << extractedHashHex;
+
+    QCOMPARE(originalHashHex, extractedHashHex);
+    testUnzip.goToNextFile();
+
+    testUnzip.close();
+    QCOMPARE(testUnzip.getZipError(), UNZ_OK);
+    // clean up
+    removeTestFiles(QStringList() << fileName);
+    testFile.remove();
+}
+
 void TestQuaZipFile::bytesAvailable_data()
 {
     QTest::addColumn<QString>("zipName");
     QTest::addColumn<QStringList>("fileNames");
     QTest::addColumn<int>("size");
-    QTest::newRow("simple") << "test.zip" << (
-            QStringList() << "test0.txt" << "testdir1/test1.txt"
-            << "testdir2/test2.txt" << "testdir2/subdir/test2sub.txt") << -1;
+    QTest::newRow("simple") << "test.zip" << (QStringList() << "test0.txt" << "testdir1/test1.txt"
+                                                            << "testdir2/test2.txt" << "testdir2/subdir/test2sub.txt")
+                            << -1;
     QTest::newRow("large enough to flush")
-            << "flush.zip" << (QStringList() << "test.txt") << 65536 * 4;
+      << "flush.zip" << (QStringList() << "test.txt") << 65536 * 4;
 }
 
 void TestQuaZipFile::bytesAvailable()
@@ -199,14 +346,14 @@ void TestQuaZipFile::bytesAvailable()
     foreach (QString fileName, fileNames) {
         QFileInfo fileInfo("tmp/" + fileName);
         QVERIFY(testZip.setCurrentFile(fileName));
-        QuaZipFile zipFile(&testZip);
-        QVERIFY(zipFile.open(QIODevice::ReadOnly));
-        QCOMPARE(zipFile.bytesAvailable(), fileInfo.size());
-        QCOMPARE(zipFile.read(1).size(), 1);
-        QCOMPARE(zipFile.bytesAvailable(), fileInfo.size() - 1);
-        QCOMPARE(zipFile.read(fileInfo.size() - 1).size(),
-                static_cast<int>(fileInfo.size() - 1));
-        QCOMPARE(zipFile.bytesAvailable(), (qint64) 0);
+        QuaZipFile _zipFile(&testZip);
+        QVERIFY(_zipFile.open(QIODevice::ReadOnly));
+        QCOMPARE(_zipFile.bytesAvailable(), fileInfo.size());
+        QCOMPARE(_zipFile.read(1).size(), 1);
+        QCOMPARE(_zipFile.bytesAvailable(), fileInfo.size() - 1);
+        QCOMPARE(_zipFile.read(fileInfo.size() - 1).size(),
+                 static_cast<int>(fileInfo.size() - 1));
+        QCOMPARE(_zipFile.bytesAvailable(), (qint64)0);
     }
     removeTestFiles(fileNames);
     testZip.close();
@@ -235,14 +382,14 @@ void TestQuaZipFile::atEnd()
     foreach (QString fileName, fileNames) {
         QFileInfo fileInfo("tmp/" + fileName);
         QVERIFY(testZip.setCurrentFile(fileName));
-        QuaZipFile zipFile(&testZip);
-        QVERIFY(zipFile.open(QIODevice::ReadOnly));
-        QCOMPARE(zipFile.atEnd(), false);
-        QCOMPARE(zipFile.read(1).size(), 1);
-        QCOMPARE(zipFile.atEnd(), false);
-        QCOMPARE(zipFile.read(fileInfo.size() - 1).size(),
-                static_cast<int>(fileInfo.size() - 1));
-        QCOMPARE(zipFile.atEnd(), true);
+        QuaZipFile _zipFile(&testZip);
+        QVERIFY(_zipFile.open(QIODevice::ReadOnly));
+        QCOMPARE(_zipFile.atEnd(), false);
+        QCOMPARE(_zipFile.read(1).size(), 1);
+        QCOMPARE(_zipFile.atEnd(), false);
+        QCOMPARE(_zipFile.read(fileInfo.size() - 1).size(),
+                 static_cast<int>(fileInfo.size() - 1));
+        QCOMPARE(_zipFile.atEnd(), true);
     }
     removeTestFiles(fileNames);
     testZip.close();
@@ -271,14 +418,14 @@ void TestQuaZipFile::posRead()
     foreach (QString fileName, fileNames) {
         QFileInfo fileInfo("tmp/" + fileName);
         QVERIFY(testZip.setCurrentFile(fileName));
-        QuaZipFile zipFile(&testZip);
-        QVERIFY(zipFile.open(QIODevice::ReadOnly));
-        QCOMPARE(zipFile.pos(), (qint64) 0);
-        QCOMPARE(zipFile.read(1).size(), 1);
-        QCOMPARE(zipFile.pos(), (qint64) 1);
-        QCOMPARE(zipFile.read(fileInfo.size() - 1).size(),
-                static_cast<int>(fileInfo.size() - 1));
-        QCOMPARE(zipFile.pos(), fileInfo.size());
+        QuaZipFile _zipFile(&testZip);
+        QVERIFY(_zipFile.open(QIODevice::ReadOnly));
+        QCOMPARE(_zipFile.pos(), (qint64)0);
+        QCOMPARE(_zipFile.read(1).size(), 1);
+        QCOMPARE(_zipFile.pos(), (qint64)1);
+        QCOMPARE(_zipFile.read(fileInfo.size() - 1).size(),
+                 static_cast<int>(fileInfo.size() - 1));
+        QCOMPARE(_zipFile.pos(), fileInfo.size());
     }
     removeTestFiles(fileNames);
     testZip.close();
@@ -301,20 +448,20 @@ void TestQuaZipFile::posWrite()
     QuaZip testZip(zipName);
     QVERIFY(testZip.open(QuaZip::mdCreate));
     foreach (QString fileName, fileNames) {
-        QuaZipFile zipFile(&testZip);
-        QVERIFY(zipFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileName)));
-        QCOMPARE(zipFile.pos(), (qint64) 0);
-        zipFile.putChar('0');
-        QCOMPARE(zipFile.pos(), (qint64) 1);
+        QuaZipFile _zipFile(&testZip);
+        QVERIFY(_zipFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileName)));
+        QCOMPARE(_zipFile.pos(), (qint64)0);
+        _zipFile.putChar('0');
+        QCOMPARE(_zipFile.pos(), (qint64)1);
         QByteArray buffer(size / 2 - 1, '\0');
         for (int i = 0; i < buffer.size(); ++i)
             buffer[i] = static_cast<char>(i);
-        zipFile.write(buffer);
-        QCOMPARE(zipFile.pos(), qint64(size / 2));
+        _zipFile.write(buffer);
+        QCOMPARE(_zipFile.pos(), qint64(size / 2));
         for (int i = 0; i < size - size / 2; ++i) {
-            zipFile.putChar(static_cast<char>(i));
+            _zipFile.putChar(static_cast<char>(i));
         }
-        QCOMPARE(zipFile.pos(), qint64(size));
+        QCOMPARE(_zipFile.pos(), qint64(size));
     }
     testZip.close();
     curDir.remove(zipName);
@@ -420,7 +567,7 @@ void TestQuaZipFile::constructorDestructor()
     // Just test that all constructors and destructors are available.
     // (So there are none that are declared but not defined.)
     QuaZip testZip;
-    QuaZipFile *f1 = new QuaZipFile();
+    QuaZipFile* f1 = new QuaZipFile();
     delete f1; // test D0 destructor
     QObject parent;
     QuaZipFile f2(&testZip, &parent);
@@ -433,11 +580,11 @@ void TestQuaZipFile::setFileAttrs()
 {
     QuaZip testZip("setFileAttrs.zip");
     QVERIFY(testZip.open(QuaZip::mdCreate));
-    QuaZipFile zipFile(&testZip);
+    QuaZipFile _zipFile(&testZip);
     QuaZipNewInfo newInfo("testPerm.txt");
     newInfo.setPermissions(QFile::ReadOwner);
-    QVERIFY(zipFile.open(QIODevice::WriteOnly, newInfo));
-    zipFile.close();
+    QVERIFY(_zipFile.open(QIODevice::WriteOnly, newInfo));
+    _zipFile.close();
     QString fileTestAttr = "testAttr.txt";
     QStringList fileNames;
     fileNames << fileTestAttr;
@@ -445,8 +592,8 @@ void TestQuaZipFile::setFileAttrs()
     newInfo.name = fileTestAttr;
     newInfo.setFileDateTime("tmp/" + fileTestAttr);
     newInfo.setFilePermissions("tmp/" + fileTestAttr);
-    QVERIFY(zipFile.open(QIODevice::WriteOnly, newInfo));
-    zipFile.close();
+    QVERIFY(_zipFile.open(QIODevice::WriteOnly, newInfo));
+    _zipFile.close();
     testZip.close();
     QuaZipFileInfo64 info;
     {
@@ -462,9 +609,9 @@ void TestQuaZipFile::setFileAttrs()
         QVERIFY(readFileAttrs.getFileInfo(&info));
         QFileInfo srcInfo("tmp/" + fileTestAttr);
         QFile::Permissions usedPermissions =
-                QFile::WriteOwner | QFile::ReadOwner | QFile::ExeOwner |
-                QFile::WriteGroup | QFile::ReadGroup | QFile::ExeGroup |
-                QFile::WriteOther | QFile::ReadOther | QFile::ExeOther;
+          QFile::WriteOwner | QFile::ReadOwner | QFile::ExeOwner |
+          QFile::WriteGroup | QFile::ReadGroup | QFile::ExeGroup |
+          QFile::WriteOther | QFile::ReadOther | QFile::ExeOther;
         QCOMPARE(info.getPermissions() & usedPermissions,
                  srcInfo.permissions() & usedPermissions);
         qint64 newTime = quazip_to_time64_t(info.dateTime);
@@ -495,23 +642,23 @@ void TestQuaZipFile::largeFile()
         es.setByteOrder(QDataStream::LittleEndian);
         // prepare extra
         es << static_cast<quint16>(0x0001u); // zip64
-        es << static_cast<quint16>(16); // extra data size
-        es << static_cast<quint64>(0); // uncompressed size
-        es << static_cast<quint64>(0); // compressed size
+        es << static_cast<quint16>(16);      // extra data size
+        es << static_cast<quint64>(0);       // uncompressed size
+        es << static_cast<quint64>(0);       // compressed size
         // now the local header
-        ds << static_cast<quint32>(0x04034b50u); // local magic
-        ds << static_cast<quint16>(45); // version needed
-        ds << static_cast<quint16>(0); // flags
-        ds << static_cast<quint16>(0); // method
-        ds << static_cast<quint16>(0); // time 00:00:00
-        ds << static_cast<quint16>(0x21); // date 1980-01-01
-        ds << static_cast<quint32>(0); // CRC-32
-        ds << static_cast<quint32>(0xFFFFFFFFu); // compressed size
-        ds << static_cast<quint32>(0xFFFFFFFFu); // uncompressed size
-        ds << static_cast<quint16>(5); // name length
+        ds << static_cast<quint32>(0x04034b50u);  // local magic
+        ds << static_cast<quint16>(45);           // version needed
+        ds << static_cast<quint16>(0);            // flags
+        ds << static_cast<quint16>(0);            // method
+        ds << static_cast<quint16>(0);            // time 00:00:00
+        ds << static_cast<quint16>(0x21);         // date 1980-01-01
+        ds << static_cast<quint32>(0);            // CRC-32
+        ds << static_cast<quint32>(0xFFFFFFFFu);  // compressed size
+        ds << static_cast<quint32>(0xFFFFFFFFu);  // uncompressed size
+        ds << static_cast<quint16>(5);            // name length
         ds << static_cast<quint16>(extra.size()); // extra length
-        ds.writeRawData("file", 4); // name
-        ds << static_cast<qint8>('0' + i); // name (contd.)
+        ds.writeRawData("file", 4);               // name
+        ds << static_cast<qint8>('0' + i);        // name (contd.)
         ds.writeRawData(extra.buffer(), extra.size());
     }
     // central dir:
@@ -523,63 +670,63 @@ void TestQuaZipFile::largeFile()
         es.setByteOrder(QDataStream::LittleEndian);
         // prepare extra
         es << static_cast<quint16>(0x0001u); // zip64
-        es << static_cast<quint16>(24); // extra data size
-        es << static_cast<quint64>(0); // uncompressed size
-        es << static_cast<quint64>(0); // compressed size
+        es << static_cast<quint16>(24);      // extra data size
+        es << static_cast<quint64>(0);       // uncompressed size
+        es << static_cast<quint64>(0);       // compressed size
         es << static_cast<quint64>(localOffsets[i]);
         // now the central dir header
-        ds << static_cast<quint32>(0x02014b50u); // central magic
-        ds << static_cast<quint16>(45); // version made by
-        ds << static_cast<quint16>(45); // version needed
-        ds << static_cast<quint16>(0); // flags
-        ds << static_cast<quint16>(0); // method
-        ds << static_cast<quint16>(0); // time 00:00:00
-        ds << static_cast<quint16>(0x21); // date 1980-01-01
-        ds << static_cast<quint32>(0); // CRC-32
-        ds << static_cast<quint32>(0xFFFFFFFFu); // compressed size
-        ds << static_cast<quint32>(0xFFFFFFFFu); // uncompressed size
-        ds << static_cast<quint16>(5); // name length
+        ds << static_cast<quint32>(0x02014b50u);  // central magic
+        ds << static_cast<quint16>(45);           // version made by
+        ds << static_cast<quint16>(45);           // version needed
+        ds << static_cast<quint16>(0);            // flags
+        ds << static_cast<quint16>(0);            // method
+        ds << static_cast<quint16>(0);            // time 00:00:00
+        ds << static_cast<quint16>(0x21);         // date 1980-01-01
+        ds << static_cast<quint32>(0);            // CRC-32
+        ds << static_cast<quint32>(0xFFFFFFFFu);  // compressed size
+        ds << static_cast<quint32>(0xFFFFFFFFu);  // uncompressed size
+        ds << static_cast<quint16>(5);            // name length
         ds << static_cast<quint16>(extra.size()); // extra length
-        ds << static_cast<quint16>(0); // comment length
-        ds << static_cast<quint16>(0); // disk number
-        ds << static_cast<quint16>(0); // internal attrs
-        ds << static_cast<quint32>(0); // external attrs
-        ds << static_cast<quint32>(0xFFFFFFFFu); // local offset
-        ds.writeRawData("file", 4); // name
-        ds << static_cast<qint8>('0' + i); // name (contd.)
+        ds << static_cast<quint16>(0);            // comment length
+        ds << static_cast<quint16>(0);            // disk number
+        ds << static_cast<quint16>(0);            // internal attrs
+        ds << static_cast<quint32>(0);            // external attrs
+        ds << static_cast<quint32>(0xFFFFFFFFu);  // local offset
+        ds.writeRawData("file", 4);               // name
+        ds << static_cast<qint8>('0' + i);        // name (contd.)
         ds.writeRawData(extra.buffer(), extra.size());
     }
     qint64 centralEnd = fakeLargeFile.pos();
     // zip64 end
-    ds << static_cast<quint32>(0x06064b50); // zip64 end magic
-    ds << static_cast<quint64>(44); // size of the zip64 end
-    ds << static_cast<quint16>(45); // version made by
-    ds << static_cast<quint16>(45); // version needed
-    ds << static_cast<quint32>(0); // disk number
-    ds << static_cast<quint32>(0); // central dir disk number
-    ds << static_cast<quint64>(2); // number of entries on disk
-    ds << static_cast<quint64>(2); // total number of entries
+    ds << static_cast<quint32>(0x06064b50);                // zip64 end magic
+    ds << static_cast<quint64>(44);                        // size of the zip64 end
+    ds << static_cast<quint16>(45);                        // version made by
+    ds << static_cast<quint16>(45);                        // version needed
+    ds << static_cast<quint32>(0);                         // disk number
+    ds << static_cast<quint32>(0);                         // central dir disk number
+    ds << static_cast<quint64>(2);                         // number of entries on disk
+    ds << static_cast<quint64>(2);                         // total number of entries
     ds << static_cast<quint64>(centralEnd - centralStart); // size
-    ds << static_cast<quint64>(centralStart); // offset
+    ds << static_cast<quint64>(centralStart);              // offset
     // zip64 locator
     ds << static_cast<quint32>(0x07064b50); // zip64 locator magic
-    ds << static_cast<quint32>(0); // disk number
+    ds << static_cast<quint32>(0);          // disk number
     ds << static_cast<quint64>(centralEnd); // offset
-    ds << static_cast<quint32>(1); // number of disks
+    ds << static_cast<quint32>(1);          // number of disks
     // zip32 end
-    ds << static_cast<quint32>(0x06054b50); // end magic
-    ds << static_cast<quint16>(0); // disk number
-    ds << static_cast<quint16>(0); // central dir disk number
-    ds << static_cast<quint16>(2); // number of entries
+    ds << static_cast<quint32>(0x06054b50);  // end magic
+    ds << static_cast<quint16>(0);           // disk number
+    ds << static_cast<quint16>(0);           // central dir disk number
+    ds << static_cast<quint16>(2);           // number of entries
     ds << static_cast<quint32>(0xFFFFFFFFu); // central dir size
     ds << static_cast<quint32>(0xFFFFFFFFu); // central dir offset
-    ds << static_cast<quint16>(0); // comment length
+    ds << static_cast<quint16>(0);           // comment length
     fakeLargeFile.close();
     QuaZip fakeLargeZip("tmp/large.zip");
     QVERIFY(fakeLargeZip.open(QuaZip::mdUnzip));
     QCOMPARE(fakeLargeZip.getFileInfoList().size(), numFiles);
     QCOMPARE(fakeLargeZip.getFileInfoList()[0].uncompressedSize,
-            static_cast<quint32>(0));
+             static_cast<quint32>(0));
     fakeLargeZip.close();
     curDir.remove("tmp/large.zip");
 }

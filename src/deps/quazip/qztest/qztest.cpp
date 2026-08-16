@@ -23,15 +23,20 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 */
 
 #include "qztest.h"
-#include "testquazip.h"
-#include "testquazipfile.h"
-#include "testquachecksum32.h"
 #include "testjlcompress.h"
-#include "testquazipdir.h"
+#include "testjlcp_compress.h"
+#include "testjlcp_extract.h"
+#include "testquachecksum32.h"
+#include "testquacompress.h"
 #include "testquagzipfile.h"
 #include "testquaziodevice.h"
-#include "testquazipnewinfo.h"
+#include "testquazip.h"
+#include "testquazipdir.h"
+#include "testquazipfile.h"
 #include "testquazipfileinfo.h"
+#include "testquazipnewinfo.h"
+#include "testutf8_compress.h"
+#include "testutf8_decompress.h"
 
 #include <quazip.h>
 #include <quazipfile.h>
@@ -41,8 +46,13 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QTextStream>
+#include <QtCore/QRandomGenerator>
 
-#include <QtTest/QtTest>
+#include <QtTest/QTest>
+
+#ifdef QUAZIP_CAN_USE_QTEXTCODEC
+#include <QTextCodec>
+#endif
 
 bool createTestFiles(const QStringList &fileNames, int size, const QString &dir)
 {
@@ -56,12 +66,30 @@ bool createTestFiles(const QStringList &fileNames, int size, const QString &dir)
                         testDir.path().toUtf8().constData());
                 return false;
             }
+            //qDebug() << "Created path " << testDir.path();
+            QFile dirFile(testDir.path());
+            if (!dirFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
+                                  QFileDevice::ReadGroup | QFileDevice::ExeGroup |
+                                  QFileDevice::ReadOther | QFileDevice::ExeOther)) {
+                qWarning("Couldn't set permissions for %s",
+                         testDir.path().toUtf8().constData());
+                return false;
+            }
         }
         if (fileName.endsWith('/')) {
             if (!curDir.mkpath(filePath)) {
                 qWarning("Couldn't mkpath %s",
 				fileName.toUtf8().constData());
                 return false;
+            }
+            //qDebug() << "Created path " << filePath;
+            QFile dirFile(filePath);
+            if (!dirFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
+                                   QFileDevice::ReadGroup | QFileDevice::ExeGroup |
+                                   QFileDevice::ReadOther | QFileDevice::ExeOther)) {
+              qWarning("Couldn't set permissions for %s",
+                       filePath.toUtf8().constData());
+              return false;
             }
         } else {
             QFile testFile(filePath);
@@ -70,6 +98,8 @@ bool createTestFiles(const QStringList &fileNames, int size, const QString &dir)
                         fileName.toUtf8().constData());
                 return false;
             }
+            testFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+                                QFileDevice::ReadGroup | QFileDevice::ReadOther);
             if (size == -1) {
                 QTextStream testStream(&testFile);
                 testStream << "This is a test file named " << fileName << quazip_endl;
@@ -83,9 +113,68 @@ bool createTestFiles(const QStringList &fileNames, int size, const QString &dir)
     return true;
 }
 
+bool createTestFileLarge(const QString &fileName, long long size, const QString &dir, bool useRandomBuffer)
+{
+	QDir curDir;
+	QString filePath = QDir(dir).filePath(fileName);
+	QDir testDir = QFileInfo(filePath).dir();
+	if (!testDir.exists()) {
+		if (!curDir.mkpath(testDir.path())) {
+			qWarning("Couldn't mkpath %s",
+			         testDir.path().toUtf8().constData());
+			return false;
+		}
+		QFile dirFile(testDir.path());
+		if (!dirFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner |
+		                            QFileDevice::ReadGroup | QFileDevice::ExeGroup |
+		                            QFileDevice::ReadOther | QFileDevice::ExeOther)) {
+		  qWarning("Couldn't set permissions for %s", testDir.path().toUtf8().constData());
+		  return false;
+		}
+	}
+
+	QFile testFile(filePath);
+	if (!testFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		qWarning("Couldn't create %s", fileName.toUtf8().constData());
+		return false;
+	}
+	testFile.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+	                      QFileDevice::ReadGroup | QFileDevice::ReadOther);
+
+	constexpr qint64 BUFFER_SIZE = 10 * 1024 * 1024; // 10MB, need to use heap because stack has size limits
+	static_assert(BUFFER_SIZE % 4 == 0, "BUFFER_SIZE must be divisible by 4");
+	auto buffer0 = std::make_unique<QByteArray>(BUFFER_SIZE, '0');
+	auto buffer1 = std::make_unique<QByteArray>(BUFFER_SIZE, '1');
+	auto randomBuffer = std::make_unique<QVector<quint32>>();
+	randomBuffer->resize(BUFFER_SIZE / 4);
+
+	bool useFirstBuffer = true;
+    long long remaining = size;
+
+    while (remaining > 0) {
+		long long chunkSize = qMin(remaining, BUFFER_SIZE);
+		if (useRandomBuffer) {
+			QRandomGenerator::global()->fillRange(randomBuffer->data(), randomBuffer->size());
+			if (testFile.write(reinterpret_cast<const char*>(randomBuffer->data()), chunkSize) != chunkSize) {
+				qWarning("Write error!");
+				return false;
+			}
+		}
+		else {
+			if (testFile.write(useFirstBuffer ? buffer0->constData() : buffer1->constData(), chunkSize) != chunkSize) {
+				qWarning("Write error!");
+				return false;
+			}
+			useFirstBuffer = !useFirstBuffer; // Alternate buffers
+		}
+		remaining -= chunkSize;
+    }
+	return true;
+}
+
 bool createTestArchive(QuaZip &zip, const QString &zipName,
                        const QStringList &fileNames,
-                       QTextCodec *codec,
+                       QuazipTextCodec *codec,
                        const QString &dir)
 {
     if (codec != NULL) {
@@ -98,7 +187,7 @@ bool createTestArchive(QuaZip &zip, const QString &zipName,
     int i = 0;
     QDateTime dt1;
     foreach (QString fileName, fileNames) {
-        QuaZipFile zipFile(&zip);
+        QuaZipFile _zipFile(&zip);
         QString filePath = QDir(dir).filePath(fileName);
         QFileInfo fileInfo(filePath);
         QuaZipNewInfo newInfo(fileName, filePath);
@@ -108,7 +197,7 @@ bool createTestArchive(QuaZip &zip, const QString &zipName,
             dt1 = newInfo.dateTime;
         else if (i == 2) // to test identical timestamps
             newInfo.dateTime = dt1;
-        if (!zipFile.open(QIODevice::WriteOnly,
+        if (!_zipFile.open(QIODevice::WriteOnly,
                 newInfo, NULL, 0,
                 fileInfo.isDir() ? 0 : 8)) {
             qWarning("Couldn't open %s in %s", fileName.toUtf8()
@@ -130,7 +219,7 @@ bool createTestArchive(QuaZip &zip, const QString &zipName,
                         .constData());
                     return false;
                 }
-                if (zipFile.write(buf, l) != l) {
+                if (_zipFile.write(buf, l) != l) {
                     qWarning("Couldn't write to %s in %s",
                         filePath.toUtf8().constData(),
                         zipName.toUtf8().constData());
@@ -139,16 +228,15 @@ bool createTestArchive(QuaZip &zip, const QString &zipName,
             }
             file.close();
         }
-        zipFile.close();
+        _zipFile.close();
         ++i;
     }
     zip.setComment(QString("This is the test archive"));
     zip.close();
     if (zipName.startsWith("<")) { // something like "<QIODevice pointer>"
         return true;
-    } else {
-        return QFileInfo(zipName).exists();
     }
+    return QFileInfo(zipName).exists();
 }
 
 bool createTestArchive(const QString &zipName,
@@ -159,7 +247,7 @@ bool createTestArchive(const QString &zipName,
 
 bool createTestArchive(QIODevice *ioDevice,
                               const QStringList &fileNames,
-                              QTextCodec *codec,
+                              QuazipTextCodec *codec,
                               const QString &dir)
 {
     QuaZip zip(ioDevice);
@@ -168,7 +256,7 @@ bool createTestArchive(QIODevice *ioDevice,
 
 bool createTestArchive(const QString &zipName,
                               const QStringList &fileNames,
-                              QTextCodec *codec,
+                              QuazipTextCodec *codec,
                               const QString &dir) {
     QuaZip zip(zipName);
     return createTestArchive(zip, zipName, fileNames, codec, dir);
@@ -184,51 +272,111 @@ void removeTestFiles(const QStringList &fileNames, const QString &dir)
         QDir fileDir = QFileInfo(QDir(dir).filePath(fileName)).dir();
         if (fileDir.exists()) {
             // Non-empty dirs won't get removed, and that's good.
-            curDir.rmpath(fileDir.path());
+            QString dirPath = fileDir.path();
+            if (!dirPath.isEmpty()) {
+                curDir.rmpath(dirPath);
+            }
         }
     }
+}
+
+bool isPlatformUtf8()
+{
+#ifdef QUAZIP_CAN_USE_QTEXTCODEC
+    // Qt 5: Check the actual codec
+    QTextCodec *defaultCodec = QTextCodec::codecForLocale();
+    if (defaultCodec) {
+        QByteArray codecName = defaultCodec->name().toLower();
+        return codecName.contains("utf-8") || codecName.contains("utf8");
+    }
+    return false;
+#else
+    // Qt 6: Platform-specific behavior
+#ifdef Q_OS_WIN
+    // Windows: UTF-8 support depends on the archive having UTF-8 flag set,
+    // not on the "platform" encoding. Return false to indicate platform
+    // does not guarantee UTF-8 without the flag.
+    return false;
+#else
+    // Linux/Unix: Qt 6 forces UTF-8 encoding regardless of locale
+    return true;
+#endif
+#endif
 }
 
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
     int err = 0;
+
+    if (QString(qgetenv("TEST_CR_COMPRESS")) == "true")
     {
-        TestQuaZip testQuaZip;
-        err = qMax(err, QTest::qExec(&testQuaZip, app.arguments()));
+        TestJlCpCompress testJlCpCompress;
+        err = qMax(err, QTest::qExec(&testJlCpCompress, app.arguments()));
     }
+    else if (QString(qgetenv("TEST_CR_DECOMPRESS")) == "true")
     {
-        TestQuaZipFile testQuaZipFile;
-        err = qMax(err, QTest::qExec(&testQuaZipFile, app.arguments()));
+        TestJlCpExtract testJlCpExtract;
+        err = qMax(err, QTest::qExec(&testJlCpExtract, app.arguments()));
     }
+    else if (QString(qgetenv("TEST_UTF8_COMPRESS")) == "true")
     {
-        TestQuaChecksum32 testQuaChecksum32;
-        err = qMax(err, QTest::qExec(&testQuaChecksum32, app.arguments()));
+        TestUtf8Compress testUtf8Compress;
+        err = qMax(err, QTest::qExec(&testUtf8Compress, app.arguments()));
     }
+    else if (QString(qgetenv("TEST_UTF8_DECOMPRESS")) == "true")
     {
-        TestJlCompress testJlCompress;
-        err = qMax(err, QTest::qExec(&testJlCompress, app.arguments()));
+        TestUtf8Decompress testUtf8Decompress;
+        err = qMax(err, QTest::qExec(&testUtf8Decompress, app.arguments()));
     }
+    else
     {
-        TestQuaZipDir testQuaZipDir;
-        err = qMax(err, QTest::qExec(&testQuaZipDir, app.arguments()));
+        {
+            TestQuaZip testQuaZip;
+            err = qMax(err, QTest::qExec(&testQuaZip, app.arguments()));
+        }
+        {
+            TestQuaZipFile testQuaZipFile;
+            err = qMax(err, QTest::qExec(&testQuaZipFile, app.arguments()));
+        }
+        {
+            TestQuaChecksum32 testQuaChecksum32;
+            err = qMax(err, QTest::qExec(&testQuaChecksum32, app.arguments()));
+        }
+        {
+            TestJlCompress testJlCompress;
+            err = qMax(err, QTest::qExec(&testJlCompress, app.arguments()));
+        }
+        {
+            TestQuaCompress testQuaCompress;
+            err = qMax(err, QTest::qExec(&testQuaCompress, app.arguments()));
+        }
+        {
+            TestQuaExtract testQuaExtract;
+            err = qMax(err, QTest::qExec(&testQuaExtract, app.arguments()));
+        }
+        {
+            TestQuaZipDir testQuaZipDir;
+            err = qMax(err, QTest::qExec(&testQuaZipDir, app.arguments()));
+        }
+        {
+            TestQuaZIODevice testQuaZIODevice;
+            err = qMax(err, QTest::qExec(&testQuaZIODevice, app.arguments()));
+        }
+        {
+            TestQuaGzipFile testQuaGzipFile;
+            err = qMax(err, QTest::qExec(&testQuaGzipFile, app.arguments()));
+        }
+        {
+            TestQuaZipNewInfo testQuaZipNewInfo;
+            err = qMax(err, QTest::qExec(&testQuaZipNewInfo, app.arguments()));
+        }
+        {
+            TestQuaZipFileInfo testQuaZipFileInfo;
+            err = qMax(err, QTest::qExec(&testQuaZipFileInfo, app.arguments()));
+        }
     }
-    {
-        TestQuaZIODevice testQuaZIODevice;
-        err = qMax(err, QTest::qExec(&testQuaZIODevice, app.arguments()));
-    }
-    {
-        TestQuaGzipFile testQuaGzipFile;
-        err = qMax(err, QTest::qExec(&testQuaGzipFile, app.arguments()));
-    }
-    {
-        TestQuaZipNewInfo testQuaZipNewInfo;
-        err = qMax(err, QTest::qExec(&testQuaZipNewInfo, app.arguments()));
-    }
-    {
-        TestQuaZipFileInfo testQuaZipFileInfo;
-        err = qMax(err, QTest::qExec(&testQuaZipFileInfo, app.arguments()));
-    }
+
     if (err == 0) {
         qDebug("All tests executed successfully");
     } else {

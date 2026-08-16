@@ -12,13 +12,7 @@
 #include <QtCore/Qt>
 #include <QtCore/QtGlobal>
 
-// Legacy encodings are still everywhere, but the Qt team decided we
-// don't need them anymore and moved them out of Core in Qt 6.
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-#  include <QtCore5Compat/QTextCodec>
-#else
-#  include <QtCore/QTextCodec>
-#endif
+#include "quazip_textcodec.h"
 
 // QSaveFile terribly breaks the is-a idiom (Liskov substitution principle):
 // QSaveFile is-a QIODevice, but it makes close() private and aborts
@@ -30,10 +24,9 @@ inline bool quazip_close(QIODevice *device) {
     if (file != nullptr) {
         // We have to call the ugly commit() instead:
         return file->commit();
-    } else {
-        device->close();
-        return true;
     }
+    device->close();
+    return true;
 }
 #else
 inline bool quazip_close(QIODevice *device) {
@@ -104,16 +97,36 @@ inline QString quazip_symlink_target(const QFileInfo &fi) {
 }
 #endif
 
+// deprecation
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+#include <QtCore/QTimeZone>
+inline QDateTime quazip_since_epoch() {
+    return QDateTime(QDate(1970, 1, 1), QTime(0, 0), QTimeZone::UTC);
+}
+
+inline QDateTime quazip_since_epoch_ntfs() {
+    return QDateTime(QDate(1601, 1, 1), QTime(0, 0), QTimeZone::UTC);
+}
+#else
+inline QDateTime quazip_since_epoch() {
+    return QDateTime(QDate(1970, 1, 1), QTime(0, 0), Qt::UTC);
+}
+
+inline QDateTime quazip_since_epoch_ntfs() {
+    return QDateTime(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
+}
+#endif
+
 // this is not a deprecation but an improvement, for a change
 #include <QtCore/QDateTime>
 #if (QT_VERSION >= 0x040700)
 inline quint64 quazip_ntfs_ticks(const QDateTime &time, int fineTicks) {
-    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
+    QDateTime base = quazip_since_epoch_ntfs();
     return base.msecsTo(time) * 10000 + fineTicks;
 }
 #else
 inline quint64 quazip_ntfs_ticks(const QDateTime &time, int fineTicks) {
-    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
+    QDateTime base = quazip_since_epoch_ntfs();
     QDateTime utc = time.toUTC();
     return (static_cast<qint64>(base.date().daysTo(utc.date()))
             * Q_INT64_C(86400000)
@@ -140,6 +153,25 @@ inline qint64 quazip_to_time64_t(const QDateTime &time) {
 const auto quazip_endl = Qt::endl;
 #else
 const auto quazip_endl = endl;
+#endif
+
+// We want to support Qt5, Qt6 up to 6.5 and Qt 6.5+ compiled without timezone feature.
+#if QT_CONFIG(timezone)
+#include <QTimeZone>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+// Qt 6.5+ has QTimeZone::UTC
+#define COMPAT_UTC_TZ QTimeZone(QTimeZone::UTC)
+#else
+// Qt 5.x and Qt 6.0–6.4 use utc()
+#define COMPAT_UTC_TZ QTimeZone::utc()
+#endif
+
+#else // timezone feature disabled
+#include <QtCore/Qt>
+
+#define COMPAT_UTC_TZ Qt::UTC
+
 #endif
 
 #endif // QUAZIP_QT_COMPAT_H

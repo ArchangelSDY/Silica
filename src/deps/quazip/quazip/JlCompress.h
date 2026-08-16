@@ -34,6 +34,7 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
+#include <QtCore/QSharedDataPointer>
 
 /// Utility class for typical operations.
 /**
@@ -42,31 +43,74 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
   */
 class QUAZIP_EXPORT JlCompress {
 public:
+    class QUAZIP_EXPORT Options {
+    public:
+        /**
+         * The enum values refer to the comments in the open function of the quazipfile.h file.
+         *
+         * The value is represented by two hexadecimal characters,
+         * the left character indicating the compression method,
+         * and the right character indicating the compression level.
+         *
+         * method == 0 indicates that the file is not compressed but rather stored as is.
+         * method == 8(Z_DEFLATED) indicates that zlib compression is used.
+         *
+         * A higher value of level indicates a smaller size of the compressed file,
+         * although it also implies more time consumed during the compression process.
+         */
+        enum CompressionStrategy
+        {
+            /// Storage without compression
+            Storage  = 0x00, // Z_NO_COMPRESSION 0
+            /// The fastest compression speed
+            Fastest  = 0x81, // Z_BEST_SPEED 1
+            /// Relatively fast compression speed
+            Faster   = 0x83,
+            /// Standard compression speed and ratio
+            Standard = 0x86,
+            /// Better compression ratio
+            Better   = 0x87,
+            /// The best compression ratio
+            Best     = 0x89, // Z_BEST_COMPRESSION 9
+            /// The default compression strategy, according to the open function of quazipfile.h,
+            /// the value of method is Z_DEFLATED, and the value of level is Z_DEFAULT_COMPRESSION -1 (equals lvl 6)
+            Default  = 0xff
+        };
+
+    public:
+      	explicit Options(const CompressionStrategy& strategy);
+
+        explicit Options(const QDateTime& dateTime = QDateTime(),
+                         const CompressionStrategy& strategy = Default,
+                         bool utf8Enabled = false,
+                         const QByteArray& password = QByteArray());
+
+        Options(const Options& other) noexcept;
+        Options& operator=(const Options& other) noexcept;
+        ~Options();
+
+        QDateTime getDateTime() const;
+        void setDateTime(const QDateTime &dateTime);
+        CompressionStrategy getCompressionStrategy() const;
+        int getCompressionMethod() const;
+        int getCompressionLevel() const;
+        void setCompressionStrategy(const CompressionStrategy &strategy);
+        bool getUtf8Enabled() const;
+        void setUtf8Enabled(bool utf8Enabled);
+        QByteArray getPassword() const;
+        void setPassword(const QByteArray& password);
+
+    private:
+        struct JlOptions;
+        QSharedDataPointer<JlOptions> d;
+    };
+
     static bool copyData(QIODevice &inFile, QIODevice &outFile);
     static QStringList extractDir(QuaZip &zip, const QString &dir);
     static QStringList getFileList(QuaZip *zip);
     static QString extractFile(QuaZip &zip, QString fileName, QString fileDest);
     static QStringList extractFiles(QuaZip &zip, const QStringList &files, const QString &dir);
-    /// Compress a single file.
-    /**
-      \param zip Opened zip to compress the file to.
-      \param fileName The full path to the source file.
-      \param fileDest The full name of the file inside the archive.
-      \return true if success, false otherwise.
-      */
-    static bool compressFile(QuaZip* zip, QString fileName, QString fileDest);
-    /// Compress a subdirectory.
-    /**
-      \param parentZip Opened zip containing the parent directory.
-      \param dir The full path to the directory to pack.
-      \param parentDir The full path to the directory corresponding to
-      the root of the ZIP.
-      \param recursive Whether to pack sub-directories as well or only
-      files.
-      \return true if success, false otherwise.
-      */
-    static bool compressSubDir(QuaZip* parentZip, QString dir, QString parentDir, bool recursive,
-                               QDir::Filters filters);
+
     /// Extract a single file.
     /**
       \param zip The opened zip archive to extract from.
@@ -75,6 +119,57 @@ public:
       \return true if success, false otherwise.
       */
     static bool extractFile(QuaZip* zip, QString fileName, QString fileDest);
+
+    /// Compress a single file.
+    /**
+      \param zip Opened zip to compress the file to.
+      \param fileName The full path to the source file.
+      \param fileDest The full name of the file inside the archive.
+      \return true if success, false otherwise.
+      */
+    static bool compressFile(QuaZip* zip, QString fileName, QString fileDest);
+
+    /// Compress a single file.
+    /**
+      \param zip Opened zip to compress the file to.
+      \param fileName The full path to the source file.
+      \param fileDest The full name of the file inside the archive.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool compressFile(QuaZip* zip, QString fileName, QString fileDest, const Options& options);
+
+    /// Compress a subdirectory.
+    /**
+      \param parentZip Opened zip containing the parent directory.
+      \param dir The full path to the directory to pack.
+      \param parentDir The full path to the directory corresponding to
+      the root of the ZIP.
+      \param recursive Whether to pack sub-directories as well or only
+      files.
+      \param filters what to pack, filters are applied both when searching
+      for subdirs (if packing recursively) and when looking for files to pack
+      \return true if success, false otherwise.
+      */
+    static bool compressSubDir(QuaZip* parentZip, QString dir, QString parentDir, bool recursive,
+                               QDir::Filters filters);
+
+    /// Compress a subdirectory.
+    /**
+      \param parentZip Opened zip containing the parent directory.
+      \param dir The full path to the directory to pack.
+      \param parentDir The full path to the directory corresponding to
+      the root of the ZIP.
+      \param recursive Whether to pack sub-directories as well or only
+      \param filters what to pack, filters are applied both when searching
+      for subdirs (if packing recursively) and when looking for files to pack
+      \param options Options for fixed file timestamp, compression level, encryption..
+      files.
+      \return true if success, false otherwise.
+      */
+    static bool compressSubDir(QuaZip* parentZip, QString dir, QString parentDir, bool recursive,
+                               QDir::Filters filters, const Options& options);
+
     /// Remove some files.
     /**
       \param listFile The list of files to remove.
@@ -84,29 +179,179 @@ public:
 
     /// Compress a single file.
     /**
-      \param fileCompressed The name of the archive.
+      \param fileCompressed The name of the archive to create.
       \param file The file to compress.
       \return true if success, false otherwise.
       */
     static bool compressFile(QString fileCompressed, QString file);
+
+    /// Compress a single file with advanced options.
+    /**
+      \param fileCompressed The name of the archive to create.
+      \param file The file to compress.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool compressFile(QString fileCompressed, QString file, const Options& options);
+
     /// Compress a list of files.
     /**
-      \param fileCompressed The name of the archive.
+      \param fileCompressed The name of the archive to create.
       \param files The file list to compress.
       \return true if success, false otherwise.
       */
     static bool compressFiles(QString fileCompressed, QStringList files);
+
+    /// Compress a list of files.
+    /**
+      \param fileCompressed The name of the archive to create.
+      \param files The file list to compress.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool compressFiles(QString fileCompressed, QStringList files, const Options& options);
+
+    /// Add a single file to an existing archive.
+    /**
+      The file is stored in the archive using only its filename,
+      without any directory path components.
+
+      \param fileCompressed The name of the existing archive.
+      \param file The file to add.
+      \return true if success, false otherwise.
+      */
+    static bool addFile(QString fileCompressed, QString file);
+
+    /// Add a single file to an existing archive with advanced options.
+    /**
+      The file is stored in the archive using only its filename,
+      without any directory path components.
+
+      \param fileCompressed The name of the existing archive.
+      \param file The file to add.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool addFile(QString fileCompressed, QString file, const Options& options);
+
+    /// Add a list of files to an existing archive.
+    /**
+      Each file is stored in the archive using only its filename,
+      without any directory path components.
+
+      \warning The archive must already exist, or the operation will fail.
+      \warning Directories will cause the operation to fail.
+      \warning Files with the same basename will create duplicate entries in the
+      archive since only the filename is used. ZIP format permits multiple files
+      with identical names.
+
+      \param fileCompressed The name of the existing archive.
+      \param files The file list to add.
+      \return true if success, false otherwise.
+      */
+    static bool addFiles(QString fileCompressed, QStringList files);
+
+    /// Add a list of files to an existing archive.
+    /**
+      Each file is stored in the archive using only its filename,
+      without any directory path components.
+
+      \warning The archive must already exist, or the operation will fail.
+      \warning Directories will cause the operation to fail.
+      \warning Files with the same basename will create duplicate entries in the
+      archive since only the filename is used. ZIP format permits multiple files
+      with identical names.
+      \warning On failure, the archive may be left in a partially modified state
+      with some files already added.
+      \warning The UTF-8 flag in options MUST match the existing archive's encoding.
+      QuaZip does not auto-detect this. If the archive was created with UTF-8 enabled,
+      you must also enable UTF-8 when adding files, otherwise the archive will have
+      inconsistent filename encodings.
+
+      \param fileCompressed The name of the existing archive.
+      \param files The file list to add.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool addFiles(QString fileCompressed, QStringList files, const Options& options);
+
+    /// Add a whole directory to an existing archive.
+    /**
+      Does not add hidden files. See addDir(QString, QString, bool, QDir::Filters).
+
+      The relative directory structure is preserved in the archive.
+
+      \param fileCompressed The name of the existing archive.
+      \param dir The directory to add.
+      \param recursive Whether to add the subdirectories as well, or
+      just regular files.
+      \return true if success, false otherwise.
+      */
+    static bool addDir(QString fileCompressed, QString dir = QString(), bool recursive = true);
+
+    /// Add a whole directory to an existing archive.
+    /**
+      Unless filters are specified explicitly, adds
+      only regular non-hidden files (and subdirs, if recursive is true).
+      If filters are specified, they are OR-combined with
+      QDir::AllDirs|QDir::NoDotAndDotDot when searching for dirs
+      and with QDir::Files when searching for files.
+
+      The relative directory structure is preserved in the archive.
+
+      \param fileCompressed The name of the existing archive.
+      \param dir The directory to add.
+      \param recursive Whether to add the subdirectories as well, or
+      just regular files.
+      \param filters What to add, filters are applied both when searching
+      for subdirs (if adding recursively) and when looking for files to add.
+      \return true if success, false otherwise.
+      */
+    static bool addDir(QString fileCompressed, QString dir,
+                       bool recursive, QDir::Filters filters);
+
+    /// Add a whole directory to an existing archive.
+    /**
+      Unless filters are specified explicitly, adds
+      only regular non-hidden files (and subdirs, if recursive is true).
+      If filters are specified, they are OR-combined with
+      QDir::AllDirs|QDir::NoDotAndDotDot when searching for dirs
+      and with QDir::Files when searching for files.
+
+      The relative directory structure is preserved in the archive.
+
+      \warning The archive must already exist, or the operation will fail.
+      \warning On failure, the archive may be left in a partially modified state
+      with some files/directories already added.
+      \warning The UTF-8 flag in options MUST match the existing archive's encoding.
+      QuaZip does not auto-detect this. If the archive was created with UTF-8 enabled,
+      you must also enable UTF-8 when adding files, otherwise the archive will have
+      inconsistent filename encodings.
+
+      \param fileCompressed The name of the existing archive.
+      \param dir The directory to add.
+      \param recursive Whether to add the subdirectories as well, or
+      just regular files.
+      \param filters What to add, filters are applied both when searching
+      for subdirs (if adding recursively) and when looking for files to add.
+      \param options Options for fixed file timestamp, compression level, encryption..
+      \return true if success, false otherwise.
+      */
+    static bool addDir(QString fileCompressed, QString dir,
+                       bool recursive, QDir::Filters filters, const Options& options);
+
     /// Compress a whole directory.
     /**
       Does not compress hidden files. See compressDir(QString, QString, bool, QDir::Filters).
 
-      \param fileCompressed The name of the archive.
+      \param fileCompressed The name of the archive to create.
       \param dir The directory to compress.
       \param recursive Whether to pack the subdirectories as well, or
       just regular files.
       \return true if success, false otherwise.
       */
     static bool compressDir(QString fileCompressed, QString dir = QString(), bool recursive = true);
+
     /**
      * @brief Compress a whole directory.
      *
@@ -126,6 +371,26 @@ public:
     static bool compressDir(QString fileCompressed, QString dir,
                             bool recursive, QDir::Filters filters);
 
+    /**
+     * @brief Compress a whole directory.
+     *
+     * Unless filters are specified explicitly, packs
+     * only regular non-hidden files (and subdirs, if @c recursive is true).
+     * If filters are specified, they are OR-combined with
+     * <tt>%QDir::AllDirs|%QDir::NoDotAndDotDot</tt> when searching for dirs
+     * and with <tt>QDir::Files</tt> when searching for files.
+     *
+     * @param fileCompressed path to the resulting archive
+     * @param dir path to the directory being compressed
+     * @param recursive if true, then the subdirectories are packed as well
+     * @param filters what to pack, filters are applied both when searching
+     * for subdirs (if packing recursively) and when looking for files to pack
+     * @param options Options for fixed file timestamp, compression level, encryption..
+     * @return true on success, false otherwise
+     */
+    static bool compressDir(QString fileCompressed, QString dir,
+                            bool recursive, QDir::Filters filters, const Options& options);
+
     /// Extract a single file.
     /**
       \param fileCompressed The name of the archive.
@@ -135,6 +400,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QString extractFile(QString fileCompressed, QString fileName, QString fileDest = QString());
+
     /// Extract a list of files.
     /**
       \param fileCompressed The name of the archive.
@@ -144,6 +410,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QStringList extractFiles(QString fileCompressed, QStringList files, QString dir = QString());
+
     /// Extract a whole archive.
     /**
       \param fileCompressed The name of the archive.
@@ -152,6 +419,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QStringList extractDir(QString fileCompressed, QString dir = QString());
+
     /// Extract a whole archive.
     /**
       \param fileCompressed The name of the archive.
@@ -160,7 +428,40 @@ public:
       left empty.
       \return The list of the full paths of the files extracted, empty on failure.
       */
-    static QStringList extractDir(QString fileCompressed, QTextCodec* fileNameCodec, QString dir = QString());
+    static QStringList extractDir(QString fileCompressed, QuazipTextCodec* fileNameCodec, QString dir = QString());
+
+    /// Extract a single file with password.
+    /**
+      \param fileCompressed The name of the archive.
+      \param fileName The file to extract.
+      \param fileDest The destination file, assumed to be identical to
+      \a fileName if left empty.
+      \param password Password for decryption (empty for no encryption).
+      \return The full path of the extracted file, empty on failure.
+      */
+    static QString extractFile(QString fileCompressed, QString fileName, QString fileDest, const QByteArray& password);
+
+    /// Extract a list of files with password.
+    /**
+      \param fileCompressed The name of the archive.
+      \param files The file list to extract.
+      \param dir The directory to put the files to, the current
+      directory if left empty.
+      \param password Password for decryption (empty for no encryption).
+      \return The list of the full paths of the files extracted, empty on failure.
+      */
+    static QStringList extractFiles(QString fileCompressed, QStringList files, QString dir, const QByteArray& password);
+
+    /// Extract a whole archive with password.
+    /**
+      \param fileCompressed The name of the archive.
+      \param dir The directory to extract to, the current directory if
+      left empty.
+      \param password Password for decryption (empty for no encryption).
+      \return The list of the full paths of the files extracted, empty on failure.
+      */
+    static QStringList extractDir(QString fileCompressed, QString dir, const QByteArray& password);
+
     /// Get the file list.
     /**
       \return The list of the files in the archive, or, more precisely, the
@@ -168,6 +469,7 @@ public:
       are present separately.
       */
     static QStringList getFileList(QString fileCompressed);
+
     /// Extract a single file.
     /**
       \param ioDevice pointer to device with compressed data.
@@ -177,6 +479,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QString extractFile(QIODevice *ioDevice, QString fileName, QString fileDest = QString());
+
     /// Extract a list of files.
     /**
       \param ioDevice pointer to device with compressed data.
@@ -186,6 +489,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QStringList extractFiles(QIODevice *ioDevice, QStringList files, QString dir = QString());
+
     /// Extract a whole archive.
     /**
       \param ioDevice pointer to device with compressed data.
@@ -194,6 +498,7 @@ public:
       \return The list of the full paths of the files extracted, empty on failure.
       */
     static QStringList extractDir(QIODevice *ioDevice, QString dir = QString());
+
     /// Extract a whole archive.
     /**
       \param ioDevice pointer to device with compressed data.
@@ -202,14 +507,15 @@ public:
       left empty.
       \return The list of the full paths of the files extracted, empty on failure.
       */
-    static QStringList extractDir(QIODevice* ioDevice, QTextCodec* fileNameCodec, QString dir = QString());
+    static QStringList extractDir(QIODevice* ioDevice, QuazipTextCodec* fileNameCodec, QString dir = QString());
+
     /// Get the file list.
     /**
       \return The list of the files in the archive, or, more precisely, the
       list of the entries, including both files and directories if they
       are present separately.
       */
-    static QStringList getFileList(QIODevice *ioDevice); 
+    static QStringList getFileList(QIODevice *ioDevice);
 };
 
 #endif /* JLCOMPRESSFOLDER_H_ */

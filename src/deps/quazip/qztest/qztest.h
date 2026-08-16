@@ -34,6 +34,10 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 extern bool createTestFiles(const QStringList &fileNames,
                             int size = -1,
                             const QString &dir = "tmp");
+extern bool createTestFileLarge(const QString &fileName,
+                                long long size,
+                                const QString &dir = "tmp",
+                    			bool useRandomBuffer = false);
 extern void removeTestFiles(const QStringList &fileNames, const QString
         &dir = "tmp");
 extern bool createTestArchive(const QString &zipName, 
@@ -41,11 +45,12 @@ extern bool createTestArchive(const QString &zipName,
                               const QString &dir = "tmp");
 extern bool createTestArchive(const QString &zipName,
                               const QStringList &fileNames,
-                              QTextCodec *codec,
+                              QuazipTextCodec *codec,
                               const QString &dir = "tmp");
 extern bool createTestArchive(QIODevice *ioDevice,
                               const QStringList &fileNames,
-                              QTextCodec *codec,
+                              QuazipTextCodec *codec,
                               const QString &dir = "tmp");
+extern bool isPlatformUtf8();
 
 #endif // QUAZIP_TEST_QZTEST_H

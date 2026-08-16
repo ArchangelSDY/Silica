@@ -6,8 +6,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QPair>
+#include <QtCore/QTimeZone>
+#include <QtCore/QBuffer>
+#include <QtCore/QDataStream>
 
-#include <QtTest/QtTest>
+#include <QtTest/QTest>
 
 #include <quazip.h>
 #include <quazipfile.h>
@@ -19,11 +22,6 @@
 Q_DECLARE_METATYPE(QList<qint32>);
 Q_DECLARE_METATYPE(QuaExtraFieldHash);
 #endif
-
-TestQuaZipFileInfo::TestQuaZipFileInfo(QObject *parent) :
-    QObject(parent)
-{
-}
 
 void TestQuaZipFileInfo::getNTFSTime()
 {
@@ -41,14 +39,14 @@ void TestQuaZipFileInfo::getNTFSTime()
     if (!createTestFiles(testFiles)) {
         QFAIL("Can't create test file");
     }
-    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), Qt::UTC);
+    QDateTime base(QDate(1601, 1, 1), QTime(0, 0), COMPAT_UTC_TZ);
     quint64 mTicks, aTicks, cTicks;
     QFileInfo fileInfo("tmp/test.txt");
     {
         // create
         QuaZip zip(zipName);
         QVERIFY(zip.open(QuaZip::mdCreate));
-        QuaZipFile zipFile(&zip);
+        QuaZipFile _zipFile(&zip);
         QDateTime lm = fileInfo.lastModified().toUTC();
         QDateTime lr = fileInfo.lastRead().toUTC();
         QDateTime cr = quazip_ctime(fileInfo).toUTC();
@@ -97,8 +95,8 @@ void TestQuaZipFileInfo::getNTFSTime()
         }
         newInfo.extraLocal = extra;
         newInfo.extraGlobal = extra;
-        QVERIFY(zipFile.open(QIODevice::WriteOnly, newInfo));
-        zipFile.close();
+        QVERIFY(_zipFile.open(QIODevice::WriteOnly, newInfo));
+        _zipFile.close();
         zip.close();
     }
     {
@@ -140,39 +138,39 @@ void TestQuaZipFileInfo::getExtTime_data()
     QTest::addColumn<QDateTime>("expectedAcTime");
     QTest::addColumn<QDateTime>("expectedCrTime");
     QTest::newRow("no times") << QString::fromUtf8("noTimes")
-                              << quint8(0)
-                              << quint16(1)
+                              << static_cast<quint8>(0)
+                              << static_cast<quint16>(1)
                               << QList<qint32>()
-                              << quint16(1)
+                              << static_cast<quint16>(1)
                               << QList<qint32>()
                               << QDateTime()
                               << QDateTime()
                               << QDateTime();
     QTest::newRow("all times") << QString::fromUtf8("allTimes")
-                              << quint8(7)
-                              << quint16(13)
+                              << static_cast<quint8>(7)
+                              << static_cast<quint16>(13)
                               << (QList<qint32>() << 1 << 2 << 3)
-                              << quint16(5)
+                              << static_cast<quint16>(5)
                               << (QList<qint32>() << 1)
-                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 1), Qt::UTC)
-                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 2), Qt::UTC)
-                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 3), Qt::UTC);
+                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 1), COMPAT_UTC_TZ)
+                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 2), COMPAT_UTC_TZ)
+                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 3), COMPAT_UTC_TZ);
     QTest::newRow("no ac time") << QString::fromUtf8("noAcTime")
-                              << quint8(5)
-                              << quint16(9)
+                              << static_cast<quint8>(5)
+                              << static_cast<quint16>(9)
                               << (QList<qint32>() << 1 << 3)
-                              << quint16(5)
+                              << static_cast<quint16>(5)
                               << (QList<qint32>() << 1)
-                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 1), Qt::UTC)
+                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 1), COMPAT_UTC_TZ)
                               << QDateTime()
-                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 3), Qt::UTC);
+                              << QDateTime(QDate(1970, 1, 1), QTime(0, 0, 3), COMPAT_UTC_TZ);
     QTest::newRow("negativeTime") << QString::fromUtf8("negativeTime")
-                              << quint8(1)
-                              << quint16(5)
+                              << static_cast<quint8>(1)
+                              << static_cast<quint16>(5)
                               << (QList<qint32>() << -1)
-                              << quint16(5)
+                              << static_cast<quint16>(5)
                               << (QList<qint32>() << -1)
-                              << QDateTime(QDate(1969, 12, 31), QTime(23, 59, 59), Qt::UTC)
+                              << QDateTime(QDate(1969, 12, 31), QTime(23, 59, 59), COMPAT_UTC_TZ)
                               << QDateTime()
                               << QDateTime();
 }
@@ -227,13 +225,13 @@ void TestQuaZipFileInfo::getExtTime()
     QVERIFY(zip.goToFirstFile());
     QuaZipFileInfo64 fileInfo;
     QVERIFY(zip.getCurrentFileInfo(&fileInfo));
-    QuaZipFile zipFile(&zip);
-    QVERIFY(zipFile.open(QIODevice::ReadOnly));
+    QuaZipFile _zipFile(&zip);
+    QVERIFY(_zipFile.open(QIODevice::ReadOnly));
     QDateTime actualGlobalModTime = fileInfo.getExtModTime();
-    QDateTime actualLocalModTime = zipFile.getExtModTime();
-    QDateTime actualLocalAcTime = zipFile.getExtAcTime();
-    QDateTime actualLocalCrTime = zipFile.getExtCrTime();
-    zipFile.close();
+    QDateTime actualLocalModTime = _zipFile.getExtModTime();
+    QDateTime actualLocalAcTime = _zipFile.getExtAcTime();
+    QDateTime actualLocalCrTime = _zipFile.getExtCrTime();
+    _zipFile.close();
     QCOMPARE(actualGlobalModTime, expectedModTime);
     QCOMPARE(actualLocalModTime, expectedModTime);
     QCOMPARE(actualLocalAcTime, expectedAcTime);
@@ -252,14 +250,14 @@ void TestQuaZipFileInfo::getExtTime_issue43()
     QuaZipFileInfo64 zipFileInfo;
     QVERIFY(zip.getCurrentFileInfo(&zipFileInfo));
     zip.goToFirstFile();
-    QuaZipFile zipFile(&zip);
-    QVERIFY(zipFile.open(QIODevice::ReadOnly));
+    QuaZipFile _zipFile(&zip);
+    QVERIFY(_zipFile.open(QIODevice::ReadOnly));
     QDateTime actualGlobalModTime = zipFileInfo.getExtModTime();
-    QDateTime actualLocalModTime = zipFile.getExtModTime();
-    QDateTime actualLocalAcTime = zipFile.getExtAcTime();
-    QDateTime actualLocalCrTime = zipFile.getExtCrTime();
+    QDateTime actualLocalModTime = _zipFile.getExtModTime();
+    QDateTime actualLocalAcTime = _zipFile.getExtAcTime();
+    QDateTime actualLocalCrTime = _zipFile.getExtCrTime();
     zip.close();
-    QDateTime extModTime(QDate(2019, 7, 2), QTime(15, 43, 47), Qt::UTC);
+    QDateTime extModTime(QDate(2019, 7, 2), QTime(15, 43, 47), COMPAT_UTC_TZ);
     QDateTime extAcTime = extModTime;
     QDateTime extCrTime = extModTime;
     QCOMPARE(actualGlobalModTime, extModTime);

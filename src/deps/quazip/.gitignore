@@ -1,3 +1,16 @@
 /doc
 /build
+/build_release
+/build_debug
+/lib
+*.tags
 *.user
+*.swp
+.idea/
+cmake-*
+CMakeUserPresets.json
+vcpkg_installed/
+Testing/
+minizip/
+CMakeFiles/
+CMakeCache.txt

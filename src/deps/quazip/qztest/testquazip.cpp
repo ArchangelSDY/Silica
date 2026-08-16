@@ -35,9 +35,10 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #endif
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
+#include <QtCore/QBuffer>
 #include <quazip_qt_compat.h>
 
-#include <QtTest/QtTest>
+#include <QtTest/QTest>
 
 #include <quazip.h>
 #include <JlCompress.h>
@@ -87,16 +88,16 @@ void TestQuaZip::getFileList()
     }
     QList<QuaZipFileInfo> destList = testZip.getFileInfoList();
     QCOMPARE(destList.size(), srcInfo.size());
-    for (int i = 0; i < destList.size(); i++) {
-        QCOMPARE(static_cast<qint64>(destList[i].uncompressedSize),
-                srcInfo[destList[i].name].size());
+    for (const auto& dest : destList) {
+        QCOMPARE(static_cast<qint64>(dest.uncompressedSize),
+                srcInfo[dest.name].size());
     }
     // Now test zip64
     QList<QuaZipFileInfo64> destList64 = testZip.getFileInfoList64();
     QCOMPARE(destList64.size(), srcInfo.size());
-    for (int i = 0; i < destList64.size(); i++) {
-        QCOMPARE(static_cast<qint64>(destList64[i].uncompressedSize),
-                srcInfo[destList64[i].name].size());
+    for (const auto& dest : destList64) {
+        QCOMPARE(static_cast<qint64>(dest.uncompressedSize),
+                srcInfo[dest.name].size());
     }
     // test that we didn't mess up the current file
     QCOMPARE(testZip.getCurrentFileName(), firstFile);
@@ -144,7 +145,7 @@ void TestQuaZip::add()
     QVERIFY(testZip.open(QuaZip::mdAdd));
     foreach (QString fileName, fileNamesToAdd) {
         QuaZipFile testFile(&testZip);
-        QVERIFY(testFile.open(QIODevice::WriteOnly, 
+        QVERIFY(testFile.open(QIODevice::WriteOnly,
             QuaZipNewInfo(fileName, "tmp/" + fileName)));
         QFile inFile("tmp/" + fileName);
         QVERIFY(inFile.open(QIODevice::ReadOnly));
@@ -169,8 +170,13 @@ void TestQuaZip::setFileNameCodec_data()
     QTest::addColumn<QString>("zipName");
     QTest::addColumn<QStringList>("fileNames");
     QTest::addColumn<QByteArray>("encoding");
+#ifdef QUAZIP_CAN_USE_QTEXTCODEC
     QTest::newRow("russian") << QString::fromUtf8("russian.zip") << (
         QStringList() << QString::fromUtf8("тест.txt")) << QByteArray("IBM866");
+#else
+    QTest::newRow("latin1") << QString::fromUtf8("latin1.zip") << (
+        QStringList() << QString("tést.txt")) << QByteArray("Latin1");
+#endif
 }
 
 void TestQuaZip::setFileNameCodec()
@@ -188,7 +194,7 @@ void TestQuaZip::setFileNameCodec()
         QFAIL("Can't create test file");
     }
     if (!createTestArchive(zipName, fileNames,
-                           QTextCodec::codecForName(encoding))) {
+                           QuazipTextCodec::codecForName(encoding))) {
         QFAIL("Can't create test archive");
     }
     QuaZip testZip(zipName);
@@ -262,9 +268,9 @@ void TestQuaZip::setDataDescriptorWritingEnabled()
     QCOMPARE(readZipFile.csize(), static_cast<qint64>(contents.size()));
     readZipFile.close();
     QCOMPARE(QFileInfo(zipName).size(), static_cast<qint64>(171));
-    QFile zipFile(zipName);
-    QVERIFY(zipFile.open(QIODevice::ReadOnly));
-    QDataStream zipData(&zipFile);
+    QFile _zipFile(zipName);
+    QVERIFY(_zipFile.open(QIODevice::ReadOnly));
+    QDataStream zipData(&_zipFile);
     zipData.setByteOrder(QDataStream::LittleEndian);
     quint32 magic = 0;
     quint16 versionNeeded = 0;
@@ -272,7 +278,7 @@ void TestQuaZip::setDataDescriptorWritingEnabled()
     zipData >> versionNeeded;
     QCOMPARE(magic, static_cast<quint32>(0x04034b50));
     QCOMPARE(versionNeeded, static_cast<quint16>(10));
-    zipFile.close();
+    _zipFile.close();
     curDir.remove(zipName);
     // now test 2.0
     zipName = "zip20.zip";
@@ -358,21 +364,39 @@ void TestQuaZip::setIoDevice()
     QDir().remove(file.fileName());
 }
 
+// When not using QTextCodec the list of supported encodings is reduced:
+// https://doc.qt.io/qt-6/qstringconverter.html#Encoding-enum
 void TestQuaZip::setCommentCodec()
 {
+#ifdef QUAZIP_CAN_USE_QTEXTCODEC
     QuaZip zip("commentCodec.zip");
     QVERIFY(zip.open(QuaZip::mdCreate));
     zip.setCommentCodec("WINDOWS-1251");
     zip.setComment(QString::fromUtf8("Вопрос"));
-    QuaZipFile zipFile(&zip);
-    QVERIFY(zipFile.open(QIODevice::WriteOnly, QuaZipNewInfo("test.txt")));
-    zipFile.close();
+    QuaZipFile _zipFile(&zip);
+    QVERIFY(_zipFile.open(QIODevice::WriteOnly, QuaZipNewInfo("test.txt")));
+    _zipFile.close();
     zip.close();
     QVERIFY(zip.open(QuaZip::mdUnzip));
-    zip.setCommentCodec(QTextCodec::codecForName("KOI8-R"));
+    zip.setCommentCodec(QuazipTextCodec::codecForName("KOI8-R"));
     QCOMPARE(zip.getComment(), QString::fromUtf8("бНОПНЯ"));
     zip.close();
     QDir().remove(zip.getZipName());
+#else
+    QuaZip zip("commentCodecLatin1.zip");
+    QVERIFY(zip.open(QuaZip::mdCreate));
+    zip.setCommentCodec("Latin1");
+    zip.setComment("café");
+    QuaZipFile _zipFile(&zip);
+    QVERIFY(_zipFile.open(QIODevice::WriteOnly, QuaZipNewInfo("test.txt")));
+    _zipFile.close();
+    zip.close();
+    QVERIFY(zip.open(QuaZip::mdUnzip));
+    zip.setCommentCodec(QuazipTextCodec::codecForName("Latin1"));
+    QCOMPARE(zip.getComment(), "café");
+    zip.close();
+    QDir().remove(zip.getZipName());
+#endif
 }
 
 void TestQuaZip::setAutoClose()
@@ -436,11 +460,11 @@ void TestQuaZip::testSequential()
     zip.setAutoClose(false);
     QVERIFY(zip.open(QuaZip::mdCreate));
     QVERIFY(socket.isOpen());
-    QuaZipFile zipFile(&zip);
+    QuaZipFile _zipFile(&zip);
     QuaZipNewInfo info("test.txt");
-    QVERIFY(zipFile.open(QIODevice::WriteOnly, info, NULL, 0, 0));
-    QCOMPARE(zipFile.write("test"), static_cast<qint64>(4));
-    zipFile.close();
+    QVERIFY(_zipFile.open(QIODevice::WriteOnly, info, NULL, 0, 0));
+    QCOMPARE(_zipFile.write("test"), static_cast<qint64>(4));
+    _zipFile.close();
     zip.close();
     QVERIFY(socket.isOpen());
     socket.disconnectFromHost();
