@@ -7,6 +7,8 @@
 
 #include "ui/models/MainGraphicsViewModel.h"
 
+class QGraphicsRectItem;
+
 class MainGraphicsView : public QGraphicsView, public MainGraphicsViewModel::View
 {
     Q_OBJECT
@@ -21,8 +23,10 @@ protected:
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
     virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseDoubleClickEvent(QMouseEvent *);
     virtual void contextMenuEvent(QContextMenuEvent *event);
 
@@ -39,6 +43,9 @@ private:
 
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
+    QGraphicsRectItem *m_selectionItem;
+    QPointF m_selectionStart;
+    bool m_isSelecting;
 };
 
 #endif // MAINGRAPHICSVIEW_H
