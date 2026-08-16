@@ -55,8 +55,8 @@ ImageSource* PdfImageSourceFactory::createSingle(const QString& packagePath, int
     QString realPackagePath = findRealPath(packagePath);
 
     QSharedPointer<QPdfDocument> doc(new QPdfDocument());
-	QPdfDocument::DocumentError err = doc->load(realPackagePath);
-    if (err != QPdfDocument::DocumentError::NoError) {
+    QPdfDocument::Error err = doc->load(realPackagePath);
+    if (err != QPdfDocument::Error::None) {
         return nullptr;
     }
 
@@ -89,8 +89,8 @@ QList<ImageSource *> PdfImageSourceFactory::createMultiple(const QUrl &url)
         QString realPackagePath = findRealPath(packagePath);
 
         QSharedPointer<QPdfDocument> doc(new QPdfDocument());
-        QPdfDocument::DocumentError err = doc->load(realPackagePath);
-        if (err == QPdfDocument::DocumentError::NoError) {
+        QPdfDocument::Error err = doc->load(realPackagePath);
+        if (err == QPdfDocument::Error::None) {
             int pageCount = doc->pageCount();
             for (int i = 0; i < pageCount; i++) {
                 ImageSource *source = new PdfImageSource(this, realPackagePath, doc, i);

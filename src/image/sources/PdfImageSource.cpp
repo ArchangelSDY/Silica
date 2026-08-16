@@ -41,7 +41,7 @@ bool PdfImageSource::readFrames(QList<QImage>& images, QList<int>& durations)
 {
 	Q_ASSERT_X(!m_doc.isNull(), "PdfImageSource::readFrames", "m_doc should not be null");
 
-	QSizeF pageSize = m_doc->pageSize(m_page);
+	QSizeF pageSize = m_doc->pagePointSize(m_page);
 	QImage image = m_doc->render(m_page, pageSize.toSize());
 
 	images << image;

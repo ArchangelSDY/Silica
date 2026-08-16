@@ -117,4 +117,4 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-#include "crashhandler.moc"
+#include "CrashHandler.moc"

@@ -8,7 +8,6 @@
 #include <QPair>
 #include <QSettings>
 #include <QSharedPointer>
-#include <QTextCodec>
 #include <QUrl>
 #include <QVariantHash>
 
@@ -102,11 +101,6 @@ void GlobalConfig::load()
     // Crash upload host
     m_crashUploadHost = settings.value("CrashUploadHost").toString();
     qDebug() << "Crash upload host:" << m_crashUploadHost;
-
-    // Set default codec
-    // This affects codec for zip files
-    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
-    QTextCodec::setCodecForLocale(codec);
 
     // FIXME: Load gallery item size
     m_galleryItemSize = QSize(200, 200);
