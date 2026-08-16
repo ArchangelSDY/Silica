@@ -9,6 +9,8 @@
 //
 //*********************************************************
 
+#include <algorithm>
+
 #include "DeviceResources.h"
 #include "DirectXHelper.h"
 
@@ -219,8 +221,8 @@ void DX::DeviceResources::CreateWindowSizeDependentResources()
     m_outputSize.setHeight(m_logicalSize.height() * m_compositionScaleY);
 
     // Prevent zero size DirectX content from being created.
-    m_outputSize.setWidth(max(m_outputSize.width(), 1));
-    m_outputSize.setHeight(max(m_outputSize.height(), 1));
+    m_outputSize.setWidth(std::max(m_outputSize.width(), 1));
+    m_outputSize.setHeight(std::max(m_outputSize.height(), 1));
 
     // The width and height of the swap chain must be based on the window's
     // natively-oriented width and height. If the window is not in the native
