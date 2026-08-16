@@ -1,5 +1,6 @@
 # Silica API library
 set(SAPI_SRCS
+    "sapi/IImageSelectionPlugin.cpp"
     "sapi/IImageEffectPlugin.cpp"
     "sapi/IImageSource.cpp"
     "sapi/IImageSourceFactory.cpp"
@@ -33,6 +34,7 @@ set_target_properties(sapi PROPERTIES
 
 set(SAPI_PUBLIC_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/ImageResource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSelectionPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageEffectPlugin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSource.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/sapi/IImageSourceFactory.h"

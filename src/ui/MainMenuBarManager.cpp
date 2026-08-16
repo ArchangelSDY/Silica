@@ -9,6 +9,7 @@
 #include "image/caches/ImagesCache.h"
 #include "image/caches/LoopImagesCacheStrategy.h"
 #include "image/caches/NormalImagesCacheStrategy.h"
+#include "image/selection/ImageSelectionPluginManager.h"
 #include "navigation/NavigationPlayerManager.h"
 #include "navigation/NavigatorSynchronizer.h"
 #include "ui/PluginLogsDialog.h"
@@ -45,8 +46,29 @@ void MainMenuBarManager::init()
 
     // Tools
     QMenu *menuTools = m_menuBar->addMenu(tr("Tools"));
+    createMenuImageSelectionPlugins(menuTools);
     menuTools->addAction(tr("Plugin Logs"), this,
                          SLOT(showPluginLogsDialog()));
+}
+
+void MainMenuBarManager::createMenuImageSelectionPlugins(QMenu *parentMenu)
+{
+    QMenu *menuPlugins = parentMenu->addMenu(tr("Image Selection"));
+    QActionGroup *pluginsGroup = new QActionGroup(menuPlugins);
+    pluginsGroup->setExclusive(true);
+
+    ImageSelectionPluginManager *manager = ImageSelectionPluginManager::instance();
+    const QStringList pluginNames = manager->pluginNames();
+    for (int i = 0; i < pluginNames.count(); ++i) {
+        QAction *pluginAction = menuPlugins->addAction(pluginNames[i], [manager, i]() {
+            manager->setActivePluginIndex(i);
+        });
+        pluginAction->setCheckable(true);
+        pluginAction->setChecked(i == manager->activePluginIndex());
+        pluginsGroup->addAction(pluginAction);
+    }
+
+    menuPlugins->setEnabled(!pluginNames.isEmpty());
 }
 
 void MainMenuBarManager::createMenuNavigationPlayers(QMenu *parentMenu)

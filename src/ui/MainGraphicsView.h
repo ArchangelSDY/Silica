@@ -44,6 +44,7 @@ private:
     QGraphicsScene *m_scene;
     QGraphicsPixmapItem *m_imageItem;
     QGraphicsRectItem *m_selectionItem;
+    QImage m_sourceImage;
     QPointF m_selectionStart;
     bool m_isSelecting;
 };

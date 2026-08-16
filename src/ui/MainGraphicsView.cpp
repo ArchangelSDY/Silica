@@ -1,11 +1,10 @@
 #include "MainGraphicsView.h"
 
-#include <QDebug>
 #include <QGraphicsItem>
 #include <QPixmap>
 #include <QScrollBar>
-#include <QUuid>
 
+#include "image/selection/ImageSelectionPluginManager.h"
 #include "ui/models/MainGraphicsViewModel.h"
 
 //#include "RankVoteView.h"
@@ -41,6 +40,7 @@ MainGraphicsView::~MainGraphicsView()
 
 void MainGraphicsView::setImage(const QImage &image)
 {
+    m_sourceImage = image;
     QPixmap pixmap = QPixmap::fromImage(image);
     m_scene->setSceneRect(pixmap.rect());
     m_imageItem->setPixmap(pixmap);
@@ -182,19 +182,11 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *ev)
         m_isSelecting = false;
 
         if (!m_selectionItem->rect().isEmpty()) {
-            qDebug() << "Selected region:" << m_selectionItem->rect();
-
             const QRect selectedPixels = m_imageItem->mapRectFromScene(m_selectionItem->rect())
                                              .toAlignedRect()
-                                             .intersected(m_imageItem->pixmap().rect());
+                                             .intersected(m_sourceImage.rect());
             if (!selectedPixels.isEmpty()) {
-                const QString filePath = QStringLiteral("G:/%1.png").arg(
-                    QUuid::createUuid().toString(QUuid::WithoutBraces));
-                if (m_imageItem->pixmap().copy(selectedPixels).save(filePath)) {
-                    qDebug() << "Saved selected region to:" << filePath;
-                } else {
-                    qWarning() << "Failed to save selected region to:" << filePath;
-                }
+                ImageSelectionPluginManager::instance()->handleSelection(m_sourceImage, selectedPixels);
             }
         }
         m_selectionItem->hide();

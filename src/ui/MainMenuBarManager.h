@@ -38,6 +38,7 @@ private:
     void createMenuNavigationTwoColumns(QMenu *parentMenu);
     void createMenuNavigationLoop(QMenu *parentMenu);
     void createMenuNavigationAutoSpeed(QMenu *parentMenu);
+    void createMenuImageSelectionPlugins(QMenu *parentMenu);
 
     QMenuBar *m_menuBar;
     Navigator *m_primaryNavigator;

@@ -38,6 +38,7 @@ file(GLOB CORE_SRCS
     "image/caches/NormalImagesCacheStrategy.cpp"
     "image/effects/ImageEffectManager.cpp"
     "image/metadata/ImageMetadataConstants.cpp"
+    "image/selection/ImageSelectionPluginManager.cpp"
     "image/sources/LocalImageSource.cpp"
     "image/sources/LocalImageSourceFactory.cpp"
     "image/sources/PdfImageSource.cpp"
