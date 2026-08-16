@@ -7,6 +7,7 @@
 #ifdef Q_OS_WIN
 #include "deps/breakpad/client/windows/handler/exception_handler.h"
 #endif
+#include "deps/quazip/quazip/quazip.h"
 
 #include "GlobalConfig.h"
 #include "LocalDatabase.h"
@@ -60,6 +61,8 @@ int main(int argc, char *argv[])
         qCritical("Fail to migrate database! Will exit now.");
         return 1;
     }
+
+    QuaZip::setDefaultFileNameCodec("UTF-8");
 
     QThreadPool::globalInstance()->setMaxThreadCount(
         QThread::idealThreadCount() - 1);
