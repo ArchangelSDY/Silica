@@ -24,6 +24,7 @@ protected:
     virtual void wheelEvent(QWheelEvent *);
     virtual void resizeEvent(QResizeEvent *);
     virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
@@ -66,6 +67,11 @@ private:
     QTimer m_drawTimer;
     QPointF m_lastDragPos;
     bool m_isDragging;
+    QImage m_sourceImage;
+    QPointF m_selectionStart;
+    QPointF m_selectionEnd;
+    bool m_isSelectionMode;
+    bool m_isSelecting;
 
     Microsoft::WRL::ComPtr<ID2D1Bitmap1> m_imageBitmap;
 

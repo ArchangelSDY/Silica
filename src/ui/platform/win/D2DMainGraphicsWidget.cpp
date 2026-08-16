@@ -3,12 +3,17 @@
 #include "DeviceResources.h"
 #include "DirectXHelper.h"
 
+#include "image/selection/ImageSelectionPluginManager.h"
+
 #include <QTransform>
 #include <QWheelEvent>
 
 D2DMainGraphicsWidget::D2DMainGraphicsWidget(QWidget *parent) : QWidget(parent) ,
     m_deviceResources(new DX::DeviceResources()) ,
-    m_isViewDirty(false)
+    m_isViewDirty(false) ,
+    m_isDragging(false) ,
+    m_isSelectionMode(false) ,
+    m_isSelecting(false)
 {
     setFocusPolicy(Qt::StrongFocus);
 
@@ -29,6 +34,7 @@ QPaintEngine *D2DMainGraphicsWidget::paintEngine() const
 
 void D2DMainGraphicsWidget::setImage(const QImage &image)
 {
+    m_sourceImage = image;
     auto d2dContext = m_deviceResources->GetD2DDeviceContext();
 
     D2D1_SIZE_U size = D2D1::SizeU(image.width(), image.height());
@@ -236,6 +242,12 @@ void D2DMainGraphicsWidget::resizeEvent(QResizeEvent *ev)
 
 void D2DMainGraphicsWidget::keyPressEvent(QKeyEvent *ev)
 {
+    if (ev->key() == Qt::Key_Shift) {
+        m_isSelectionMode = true;
+        ev->ignore();
+        return;
+    }
+
     m_model->keyPressEvent(ev);
 
     if (!ev->isAccepted()) {
@@ -243,8 +255,26 @@ void D2DMainGraphicsWidget::keyPressEvent(QKeyEvent *ev)
     }
 }
 
+void D2DMainGraphicsWidget::keyReleaseEvent(QKeyEvent *ev)
+{
+    if (ev->key() == Qt::Key_Shift) {
+        m_isSelectionMode = false;
+        ev->ignore();
+        return;
+    }
+
+    QWidget::keyReleaseEvent(ev);
+}
+
 void D2DMainGraphicsWidget::mouseMoveEvent(QMouseEvent *ev)
 {
+    if (m_isSelecting) {
+        m_selectionEnd = ev->position();
+        scheduleDraw();
+        ev->accept();
+        return;
+    }
+
     m_model->mouseMoveEvent(ev);
     if (ev->isAccepted()) {
         return;
@@ -264,6 +294,15 @@ void D2DMainGraphicsWidget::mouseMoveEvent(QMouseEvent *ev)
 
 void D2DMainGraphicsWidget::mousePressEvent(QMouseEvent *ev)
 {
+    if (m_isSelectionMode && ev->button() == Qt::LeftButton) {
+        m_selectionStart = ev->position();
+        m_selectionEnd = m_selectionStart;
+        m_isSelecting = true;
+        scheduleDraw();
+        ev->accept();
+        return;
+    }
+
     m_model->mousePressEvent(ev);
     if (ev->isAccepted()) {
         return;
@@ -278,6 +317,31 @@ void D2DMainGraphicsWidget::mousePressEvent(QMouseEvent *ev)
 
 void D2DMainGraphicsWidget::mouseReleaseEvent(QMouseEvent *ev)
 {
+    if (m_isSelecting && ev->button() == Qt::LeftButton) {
+        m_selectionEnd = ev->position();
+        m_isSelecting = false;
+
+        QRectF selectionRect = QRectF(m_selectionStart, m_selectionEnd)
+                                   .normalized()
+                                   .intersected(QRectF(rect()));
+        selectionRect.translate(-drawOffset().x(), -drawOffset().y());
+
+        bool invertible = false;
+        const QTransform inverseTransform = m_transform.inverted(&invertible);
+        if (invertible) {
+            const QRect selectedPixels = inverseTransform.mapRect(selectionRect)
+                                             .toAlignedRect()
+                                             .intersected(m_sourceImage.rect());
+            if (!selectedPixels.isEmpty()) {
+                ImageSelectionPluginManager::instance()->handleSelection(m_sourceImage, selectedPixels);
+            }
+        }
+
+        scheduleDraw();
+        ev->accept();
+        return;
+    }
+
     m_isDragging = false;
     setCursor(Qt::ArrowCursor);
 
@@ -364,6 +428,28 @@ void D2DMainGraphicsWidget::draw()
     D2D1_POINT_2F imageOffset = D2D1::Point2F(offset.x(), offset.y());
 
     d2dContext->DrawImage(m_outputEffect.Get(), &imageOffset);
+
+    if (m_isSelecting) {
+        const QRectF selectionRect = QRectF(m_selectionStart, m_selectionEnd)
+                                         .normalized()
+                                         .intersected(QRectF(rect()));
+        if (!selectionRect.isEmpty()) {
+            Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> fillBrush;
+            Microsoft::WRL::ComPtr<ID2D1SolidColorBrush> borderBrush;
+            DX::ThrowIfFailed(d2dContext->CreateSolidColorBrush(
+                D2D1::ColorF(0.0f, 120.0f / 255.0f, 215.0f / 255.0f, 80.0f / 255.0f),
+                &fillBrush));
+            DX::ThrowIfFailed(d2dContext->CreateSolidColorBrush(
+                D2D1::ColorF(0.0f, 120.0f / 255.0f, 215.0f / 255.0f),
+                &borderBrush));
+
+            const D2D1_RECT_F d2dSelectionRect = D2D1::RectF(
+                FLOAT(selectionRect.left()), FLOAT(selectionRect.top()),
+                FLOAT(selectionRect.right()), FLOAT(selectionRect.bottom()));
+            d2dContext->FillRectangle(d2dSelectionRect, fillBrush.Get());
+            d2dContext->DrawRectangle(d2dSelectionRect, borderBrush.Get());
+        }
+    }
 
     // We ignore D2DERR_RECREATE_TARGET here. This error indicates that the device
     // is lost. It will be handled during the next call to Present.
