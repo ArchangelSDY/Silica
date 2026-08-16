@@ -113,9 +113,9 @@ void MainGraphicsView::resizeEvent(QResizeEvent *ev)
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *ev)
 {
-    if (ev->key() == Qt::Key_Alt) {
+    if (ev->key() == Qt::Key_Shift) {
         setDragMode(QGraphicsView::NoDrag);
-        ev->accept();
+        ev->ignore();
         return;
     }
 
@@ -129,9 +129,9 @@ void MainGraphicsView::keyPressEvent(QKeyEvent *ev)
 
 void MainGraphicsView::keyReleaseEvent(QKeyEvent *ev)
 {
-    if (ev->key() == Qt::Key_Alt) {
+    if (ev->key() == Qt::Key_Shift) {
         setDragMode(QGraphicsView::ScrollHandDrag);
-        ev->accept();
+        ev->ignore();
         return;
     }
 

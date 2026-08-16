@@ -40,25 +40,35 @@ void MainMenuBarManager::init()
     // Navigation
     QMenu *menuNavigation = m_menuBar->addMenu(tr("Navigation"));
     createMenuNavigationPlayers(menuNavigation);
+    createMenuImageSelectionPlugins(menuNavigation);
     createMenuNavigationTwoColumns(menuNavigation);
     createMenuNavigationLoop(menuNavigation);
     createMenuNavigationAutoSpeed(menuNavigation);
 
     // Tools
     QMenu *menuTools = m_menuBar->addMenu(tr("Tools"));
-    createMenuImageSelectionPlugins(menuTools);
     menuTools->addAction(tr("Plugin Logs"), this,
                          SLOT(showPluginLogsDialog()));
 }
 
 void MainMenuBarManager::createMenuImageSelectionPlugins(QMenu *parentMenu)
 {
-    QMenu *menuPlugins = parentMenu->addMenu(tr("Image Selection"));
+    QMenu *menuPlugins = parentMenu->addMenu(tr("Selection"));
     QActionGroup *pluginsGroup = new QActionGroup(menuPlugins);
     pluginsGroup->setExclusive(true);
 
     ImageSelectionPluginManager *manager = ImageSelectionPluginManager::instance();
+    QAction *noneAction = menuPlugins->addAction(tr("None"), [manager]() {
+        manager->setActivePluginIndex(-1);
+    });
+    noneAction->setCheckable(true);
+    noneAction->setChecked(manager->activePluginIndex() == -1);
+    pluginsGroup->addAction(noneAction);
+
     const QStringList pluginNames = manager->pluginNames();
+    if (!pluginNames.isEmpty()) {
+        menuPlugins->addSeparator();
+    }
     for (int i = 0; i < pluginNames.count(); ++i) {
         QAction *pluginAction = menuPlugins->addAction(pluginNames[i], [manager, i]() {
             manager->setActivePluginIndex(i);
@@ -67,8 +77,6 @@ void MainMenuBarManager::createMenuImageSelectionPlugins(QMenu *parentMenu)
         pluginAction->setChecked(i == manager->activePluginIndex());
         pluginsGroup->addAction(pluginAction);
     }
-
-    menuPlugins->setEnabled(!pluginNames.isEmpty());
 }
 
 void MainMenuBarManager::createMenuNavigationPlayers(QMenu *parentMenu)
