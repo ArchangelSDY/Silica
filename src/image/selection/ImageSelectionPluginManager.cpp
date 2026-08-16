@@ -36,6 +36,10 @@ ImageSelectionPluginManager::ImageSelectionPluginManager() :
         m_pluginNames << name;
     };
     sapi::loadPlugins("imageselections", callback);
+
+    if (!m_plugins.isEmpty()) {
+        m_activePluginIndex = 0;
+    }
 }
 
 ImageSelectionPluginManager::~ImageSelectionPluginManager()
